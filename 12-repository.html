@@ -7,6 +7,8 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+<link rel="stylesheet" href="common.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Segoe UI',sans-serif;background:#0f0f1a;color:#e2e8f0;line-height:1.7}
@@ -192,7 +194,7 @@ p{color:#94a3b8;margin-bottom:14px}
       <div class="compare-box">
         <div class="compare-header bad">❌ Without Repository — Business logic รู้จัก SQL</div>
         <div class="compare-body">
-          <pre><code class="language-go">// Service มี SQL โดยตรง — ทดสอบยาก
+          <pre data-lang="go"><code class="language-go">// Service มี SQL โดยตรง — ทดสอบยาก
 func (s *OrderService) GetOrder(id string) (*Order, error) {
     // SQL ปนอยู่ใน business layer
     row := s.db.QueryRow(
@@ -206,12 +208,27 @@ func (s *OrderService) GetOrder(id string) (*Order, error) {
     // ต้องมี DB จริงถึงจะ test ได้
     return &o, nil
 }</code></pre>
+          <pre data-lang="ts" style="display:none"><code class="language-typescript">// Service มี SQL โดยตรง — ทดสอบยาก
+class OrderService {
+  constructor(private db: Pool) {}
+
+  async getOrder(id: string): Promise<Order> {
+    // SQL ปนอยู่ใน business layer
+    const result = await this.db.query(
+      'SELECT id, status, total FROM orders WHERE id = $1',
+      [id]
+    );
+    if (result.rows.length === 0) throw new Error('not found');
+    // ต้องมี DB จริงถึงจะ test ได้
+    return result.rows[0] as Order;
+  }
+}</code></pre>
         </div>
       </div>
       <div class="compare-box">
         <div class="compare-header good">✅ With Repository — Business logic สะอาด</div>
         <div class="compare-body">
-          <pre><code class="language-go">// Service ไม่รู้จัก SQL เลย
+          <pre data-lang="go"><code class="language-go">// Service ไม่รู้จัก SQL เลย
 func (s *OrderService) GetOrder(id string) (*Order, error) {
     // คุยกับ interface เท่านั้น
     order, err := s.repo.FindByID(id)
@@ -225,6 +242,20 @@ func (s *OrderService) GetOrder(id string) (*Order, error) {
     return order, nil
 }
 // Test ใช้ InMemoryRepo แทน — ไม่ต้องการ DB</code></pre>
+          <pre data-lang="ts" style="display:none"><code class="language-typescript">// Service ไม่รู้จัก SQL เลย
+class OrderService {
+  constructor(private repo: OrderRepository) {}
+
+  async getOrder(id: string): Promise<Order> {
+    // คุยกับ interface เท่านั้น
+    const order = await this.repo.findById(id);
+    if (!order) throw new Error(`order not found: ${id}`);
+    // Pure business logic
+    if (order.isExpired()) throw new OrderExpiredError();
+    return order;
+  }
+}
+// Test ใช้ InMemoryOrderRepository แทน — ไม่ต้องการ DB</code></pre>
         </div>
       </div>
     </div>
@@ -382,7 +413,7 @@ func (s *OrderService) GetOrder(id string) (*Order, error) {
     <div class="code-section">
       <div class="code-file">
         <div class="code-file-header">domain/order.go — Domain Entity</div>
-        <pre><code class="language-go">package domain
+        <pre data-lang="go"><code class="language-go">package domain
 
 import (
 	"time"
@@ -419,11 +450,40 @@ func (o *Order) IsExpired() bool {
 func (o *Order) CanBeCancelled() bool {
 	return o.Status == StatusPending && !o.IsExpired()
 }</code></pre>
+        <pre data-lang="ts" style="display:none"><code class="language-typescript">// domain/order.ts — Domain Entity
+
+export type OrderStatus = 'pending' | 'paid' | 'cancelled';
+
+export interface OrderItem {
+  productId: string;
+  quantity: number;
+  price: number;
+}
+
+export class Order {
+  constructor(
+    public readonly id: string,
+    public readonly customerId: string,
+    public readonly items: OrderItem[],
+    public total: number,
+    public status: OrderStatus,
+    public readonly createdAt: Date,
+    public readonly expiresAt: Date,
+  ) {}
+
+  isExpired(): boolean {
+    return new Date() > this.expiresAt;
+  }
+
+  canBeCancelled(): boolean {
+    return this.status === 'pending' && !this.isExpired();
+  }
+}</code></pre>
       </div>
 
       <div class="code-file">
         <div class="code-file-header">domain/repository.go — Repository Interface (The Contract)</div>
-        <pre><code class="language-go">package domain
+        <pre data-lang="go"><code class="language-go">package domain
 
 import "context"
 
@@ -442,6 +502,26 @@ var (
 	ErrNotFound    = fmt.Errorf("order: not found")
 	ErrDuplicate   = fmt.Errorf("order: duplicate")
 )</code></pre>
+        <pre data-lang="ts" style="display:none"><code class="language-typescript">// domain/repository.ts — Repository Interface (The Contract)
+import { Order, OrderStatus } from './order';
+
+// OrderRepository — the interface that business layer depends on.
+// All implementations must satisfy this contract.
+export interface OrderRepository {
+  findById(id: string): Promise<Order | null>;
+  findByCustomerId(customerId: string): Promise<Order[]>;
+  findByStatus(status: OrderStatus): Promise<Order[]>;
+  save(order: Order): Promise<void>;
+  delete(id: string): Promise<void>;
+}
+
+// Domain errors — defined in domain, not in infrastructure
+export class OrderNotFoundError extends Error {
+  constructor(id: string) { super(`order: not found — ${id}`); }
+}
+export class OrderDuplicateError extends Error {
+  constructor(id: string) { super(`order: duplicate — ${id}`); }
+}</code></pre>
       </div>
 
       <div class="code-file">

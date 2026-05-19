@@ -6,6 +6,8 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+<link rel="stylesheet" href="common.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Segoe UI',system-ui,sans-serif;background:#07090f;color:#e2e8f0;line-height:1.7}
@@ -358,7 +360,7 @@ a{color:#fb923c;text-decoration:none}
 
   <div class="code-block">
     <div class="code-header"><span>user-service/main.go — User Microservice</span><span class="lang">Go</span></div>
-    <pre><code class="language-go">package main
+    <pre data-lang="go"><code class="language-go">package main
 
 import (
     "encoding/json"
@@ -420,11 +422,56 @@ func main() {
     log.Printf("User Service running on :%s", port)
     log.Fatal(http.ListenAndServe(":"+port, mux))
 }</code></pre>
+    <pre data-lang="ts" style="display:none"><code class="language-typescript">// user-service/index.ts — User Microservice (Express)
+import express, { Request, Response } from 'express';
+
+// ── User Microservice — standalone process ─────────────────────────────────
+// มี DB ของตัวเอง, Deploy แยก, Scale แยก
+
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  createdAt: string;
+}
+
+const app = express();
+app.use(express.json());
+
+// Health check — สำหรับ Load Balancer & Service Discovery
+app.get('/health', (_req: Request, res: Response) => {
+  res.json({ service: 'user-service', status: 'healthy', version: '1.0.0' });
+});
+
+// GetUser — synchronous API call
+app.get('/users', (req: Request, res: Response) => {
+  // ดึง user ID จาก header หรือ query string
+  const userID = (req.headers['x-user-id'] as string) || (req.query.id as string) || '';
+
+  // ดึงจาก DB ของ User Service (mock)
+  const user: User = {
+    id: userID,
+    name: 'สมชาย ใจดี',
+    email: 'somchai@example.com',
+    createdAt: new Date().toISOString(),
+  };
+
+  res.json(user);
+});
+
+const PORT = process.env.PORT ?? '3001';
+
+// Register กับ Service Discovery (e.g. env-based config)
+// await consulClient.register({ name: 'user-service', port: PORT });
+
+app.listen(Number(PORT), () => {
+  console.log(`User Service running on :${PORT}`);
+});</code></pre>
   </div>
 
   <div class="code-block">
     <div class="code-header"><span>api-gateway/main.go — API Gateway</span><span class="lang">Go</span></div>
-    <pre><code class="language-go">package main
+    <pre data-lang="go"><code class="language-go">package main
 
 import (
     "context"
@@ -543,6 +590,91 @@ func main() {
     log.Printf("API Gateway running on :%s", port)
     log.Fatal(http.ListenAndServe(":"+port, handler))
 }</code></pre>
+    <pre data-lang="ts" style="display:none"><code class="language-typescript">// api-gateway/index.ts — API Gateway (Express)
+import express, { Request, Response, NextFunction } from 'express';
+import { createProxyMiddleware } from 'http-proxy-middleware';
+
+// ── API Gateway — Single Entry Point ──────────────────────────────────────
+// ทุก request เข้ามาที่นี่ก่อน ก่อนจะ route ไปหา service ที่เหมาะสม
+
+type ServiceRegistry = Record<string, string>;
+
+const services: ServiceRegistry = {
+  users:    'http://user-service:3001',
+  orders:   'http://order-service:3002',
+  payments: 'http://payment-service:3003',
+  products: 'http://product-service:3005',
+};
+
+const app = express();
+
+// ── Middleware: Authentication ─────────────────────────────────────────────
+function authMiddleware(req: Request, res: Response, next: NextFunction): void {
+  if (req.path === '/health') return next();
+
+  const authHeader = req.headers['authorization'] ?? '';
+  if (!authHeader.startsWith('Bearer ')) {
+    res.status(401).json({ error: 'unauthorized' });
+    return;
+  }
+
+  // Validate token — in production, verify JWT or call auth service
+  const token = authHeader.slice(7);
+  const userID = validateToken(token);
+  if (!userID) {
+    res.status(401).json({ error: 'invalid token' });
+    return;
+  }
+
+  // Forward user identity to downstream services
+  req.headers['x-user-id'] = userID;
+  next();
+}
+
+function validateToken(token: string): string | null {
+  // JWT validation in real life
+  return token === 'test-token' ? 'user-123' : null;
+}
+
+// ── Middleware: Rate Limiting (simple counter) ─────────────────────────────
+// Production: use Redis-based rate limiter (e.g. express-rate-limit + ioredis)
+function rateLimitMiddleware(_req: Request, _res: Response, next: NextFunction): void {
+  // Check rate limit...
+  next();
+}
+
+app.use(authMiddleware);
+app.use(rateLimitMiddleware);
+
+app.get('/health', (_req, res) => res.json({ status: 'ok' }));
+
+// ── Router: proxy /api/<service>/... → upstream microservice ───────────────
+app.use('/api/:serviceName', (req: Request, res: Response, next: NextFunction) => {
+  const { serviceName } = req.params;
+  const target = services[serviceName];
+  if (!target) {
+    res.status(404).json({ error: `service "${serviceName}" not found` });
+    return;
+  }
+
+  // Strip /api/<service> prefix and proxy to upstream
+  createProxyMiddleware({
+    target,
+    changeOrigin: true,
+    pathRewrite: { [`^/api/${serviceName}`]: '' },
+    on: {
+      proxyRes: (proxyRes) => {
+        proxyRes.headers['x-gateway'] = 'ts-api-gateway/1.0';
+      },
+      error: (_err, _req, res) => {
+        (res as Response).status(503).json({ error: 'service unavailable' });
+      },
+    },
+  })(req, res, next);
+});
+
+const PORT = process.env.PORT ?? '8080';
+app.listen(Number(PORT), () => console.log(`API Gateway running on :${PORT}`));</code></pre>
   </div>
 
   <div class="code-block">

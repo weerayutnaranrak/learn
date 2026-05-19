@@ -1,0 +1,101 @@
+/* common.css — shared styles for code block controls */
+
+/* Controls container in code-header */
+.code-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+/* Language toggle pill */
+.lang-toggle {
+  display: flex;
+  background: #070c14;
+  border: 1px solid #1e293b;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.lang-btn {
+  padding: 3px 10px;
+  font-size: .68rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  background: transparent;
+  color: #475569;
+  transition: background .15s, color .15s;
+  white-space: nowrap;
+}
+.lang-btn.active {
+  background: rgba(255,255,255,.09);
+  color: #e2e8f0;
+}
+.lang-btn:hover:not(.active) {
+  color: #94a3b8;
+}
+
+/* Copy button */
+.copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.1);
+  color: #94a3b8;
+  font-size: .7rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background .15s, color .15s, border-color .15s;
+  flex-shrink: 0;
+}
+.copy-btn.hovered {
+  background: rgba(255,255,255,.1);
+  color: #e2e8f0;
+}
+.copy-btn.copied {
+  background: rgba(249,115,22,.1);
+  border-color: rgba(249,115,22,.3);
+}
+
+/* Collapse button */
+.collapse-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.1);
+  color: #64748b;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+  flex-shrink: 0;
+  padding: 0;
+}
+.collapse-btn:hover {
+  background: rgba(255,255,255,.1);
+  color: #e2e8f0;
+}
+
+/* Collapsed state */
+.code-block.collapsed .code-body {
+  display: none;
+}
+.code-block.collapsed {
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
+/* Make code-header flex when it isn't already */
+.code-header {
+  display: flex !important;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 8px;
+}

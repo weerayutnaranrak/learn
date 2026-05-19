@@ -7,6 +7,8 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+<link rel="stylesheet" href="common.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Segoe UI',system-ui,sans-serif;background:#07090f;color:#e2e8f0;line-height:1.7}
@@ -171,7 +173,7 @@ a:hover{text-decoration:underline}
         <span>❌ สร้าง concrete type โดยตรง</span>
         <span class="lang-bad">ผิดหลักการ</span>
       </div>
-      <pre><code class="language-go">// caller รู้ว่าเป็น SMTPMailer
+      <pre data-lang="go"><code class="language-go">// caller รู้ว่าเป็น SMTPMailer
 // ถ้าอยากเปลี่ยนเป็น SendGrid ต้องแก้ทุกจุด
 func sendWelcome(user User) {
     mailer := &SMTPMailer{
@@ -188,13 +190,28 @@ func sendAlert(admin User) {
     }
     mailer.Send(admin.Email, "Alert!")
 }</code></pre>
+<pre data-lang="ts" style="display:none"><code class="language-typescript">// caller รู้ว่าเป็น SMTPMailer
+// ถ้าอยากเปลี่ยนเป็น SendGrid ต้องแก้ทุกจุด
+async function sendWelcome(user: User) {
+  const mailer = new SMTPMailer({
+    host: 'smtp.co.th', port: 587,
+  });
+  await mailer.send(user.email, 'Welcome!');
+}
+
+async function sendAlert(admin: User) {
+  const mailer = new SMTPMailer({ // duplicate
+    host: 'smtp.co.th', port: 587,
+  });
+  await mailer.send(admin.email, 'Alert!');
+}</code></pre>
     </div>
     <div class="code-block" style="border-color:#4ade8030">
       <div class="code-header">
         <span>✅ Factory ซ่อน concrete type</span>
         <span class="lang-good">ถูกหลักการ</span>
       </div>
-      <pre><code class="language-go">type Mailer interface {
+      <pre data-lang="go"><code class="language-go">type Mailer interface {
     Send(to, body string) error
 }
 
@@ -218,6 +235,27 @@ func sendWelcome(m Mailer, user User) {
 // main.go — เปลี่ยน provider ที่จุดเดียว
 mailer := NewMailer(cfg)
 sendWelcome(mailer, user)</code></pre>
+<pre data-lang="ts" style="display:none"><code class="language-typescript">interface Mailer {
+  send(to: string, body: string): Promise<void>;
+}
+
+// Factory function — สร้างผ่านนี้เสมอ
+function createMailer(cfg: Config): Mailer {
+  switch (cfg.provider) {
+    case 'sendgrid': return new SendGridMailer(cfg.key);
+    case 'ses':      return new SESMailer(cfg.region);
+    default:         return new SMTPMailer(cfg.host);
+  }
+}
+
+// caller ไม่รู้ concrete type
+async function sendWelcome(mailer: Mailer, user: User) {
+  await mailer.send(user.email, 'Welcome!');
+}
+
+// main.ts — เปลี่ยน provider ที่จุดเดียว
+const mailer = createMailer(cfg);
+await sendWelcome(mailer, user);</code></pre>
     </div>
   </div>
 
@@ -249,7 +287,7 @@ sendWelcome(mailer, user)</code></pre>
         <span>❌ Constructor ที่อ่านไม่ออก</span>
         <span class="lang-bad">ผิดหลักการ</span>
       </div>
-      <pre><code class="language-go">// อ่านไม่ออกว่า true, false, 30, 5 คืออะไร
+      <pre data-lang="go"><code class="language-go">// อ่านไม่ออกว่า true, false, 30, 5 คืออะไร
 server := NewServer(
     "localhost", 8080,
     true, false, 30, 5,
@@ -268,13 +306,32 @@ server := &Server{
     APIVersion:  "v1",
     // ลืม field ไหนไปก็ไม่รู้
 }</code></pre>
+<pre data-lang="ts" style="display:none"><code class="language-typescript">// อ่านไม่ออกว่า true, false, 30, 5 คืออะไร
+const server = new Server(
+  'localhost', 8080,
+  true, false, 30, 5,
+  '/api', 'v1',
+);
+
+// หรือ object literal ที่ต้อง set ทุก field
+const server: ServerConfig = {
+  host: 'localhost',
+  port: 8080,
+  tls: true,
+  debug: false,
+  timeout: 30,
+  maxRetry: 5,
+  basePath: '/api',
+  apiVersion: 'v1',
+  // ลืม field ไหนไปก็ไม่รู้
+};</code></pre>
     </div>
     <div class="code-block" style="border-color:#4ade8030">
       <div class="code-header">
         <span>✅ Builder — chain method อ่านออกทันที</span>
         <span class="lang-good">ถูกหลักการ</span>
       </div>
-      <pre><code class="language-go">type ServerBuilder struct{ s Server }
+      <pre data-lang="go"><code class="language-go">type ServerBuilder struct{ s Server }
 
 func NewServerBuilder(host string, port int) *ServerBuilder {
     return &ServerBuilder{s: Server{Host: host, Port: port}}
@@ -305,6 +362,39 @@ srv, _ := NewServerBuilder("localhost", 8080).
     WithTimeout(30).
     WithBasePath("/api").
     Build()</code></pre>
+<pre data-lang="ts" style="display:none"><code class="language-typescript">class ServerBuilder {
+  private config: Partial<ServerConfig> = {};
+
+  constructor(host: string, port: number) {
+    this.config.host = host;
+    this.config.port = port;
+  }
+
+  withTLS(): this {
+    this.config.tls = true; return this;
+  }
+  withDebug(): this {
+    this.config.debug = true; return this;
+  }
+  withTimeout(t: number): this {
+    this.config.timeout = t; return this;
+  }
+  withBasePath(p: string): this {
+    this.config.basePath = p; return this;
+  }
+
+  build(): ServerConfig {
+    if (!this.config.host) throw new Error('host required');
+    return this.config as ServerConfig;
+  }
+}
+
+// อ่านออกทันทีว่าทำอะไร
+const srv = new ServerBuilder('localhost', 8080)
+  .withTLS()
+  .withTimeout(30)
+  .withBasePath('/api')
+  .build();</code></pre>
     </div>
   </div>
 
@@ -335,7 +425,7 @@ srv, _ := NewServerBuilder("localhost", 8080).
       <span>✅ Decorator — เพิ่ม logging + caching โดยไม่แก้ original</span>
       <span class="lang-good">ถูกหลักการ</span>
     </div>
-    <pre><code class="language-go">type OrderRepository interface {
+    <pre data-lang="go"><code class="language-go">type OrderRepository interface {
     FindByID(id string) (*Order, error)
     Save(o *Order) error
 }
@@ -385,6 +475,59 @@ repo = &CachingOrderRepo{inner: repo, cache: map[string]*Order{}}
 
 // caller ไม่รู้เลยว่ามีกี่ชั้น — ใช้แค่ interface
 svc := NewOrderService(repo)</code></pre>
+<pre data-lang="ts" style="display:none"><code class="language-typescript">interface OrderRepository {
+  findById(id: string): Promise<Order | null>;
+  save(order: Order): Promise<void>;
+}
+
+// Original implementation
+class PostgresOrderRepo implements OrderRepository {
+  constructor(private db: Pool) {}
+  async findById(id: string) { /* DB query */ return null; }
+  async save(o: Order) { /* DB write */ }
+}
+
+// Decorator 1: Logging — wrap ซ้อนบน original
+class LoggingOrderRepo implements OrderRepository {
+  constructor(
+    private inner: OrderRepository,
+    private logger: Logger,
+  ) {}
+
+  async findById(id: string) {
+    const start = Date.now();
+    const order = await this.inner.findById(id); // delegate
+    this.logger.info('findById', { id, ms: Date.now() - start });
+    return order;
+  }
+  async save(o: Order) { return this.inner.save(o); }
+}
+
+// Decorator 2: Caching — wrap ซ้อนบน logging
+class CachingOrderRepo implements OrderRepository {
+  private cache = new Map<string, Order>();
+
+  constructor(private inner: OrderRepository) {}
+
+  async findById(id: string) {
+    if (this.cache.has(id)) return this.cache.get(id)!; // cache hit
+    const order = await this.inner.findById(id); // miss → delegate
+    if (order) this.cache.set(id, order);
+    return order;
+  }
+  async save(o: Order) {
+    this.cache.delete(o.id); // invalidate
+    return this.inner.save(o);
+  }
+}
+
+// Wire-up: ซ้อน decorator หลายชั้น
+let repo: OrderRepository = new PostgresOrderRepo(db);
+repo = new LoggingOrderRepo(repo, logger);
+repo = new CachingOrderRepo(repo);
+
+// caller ไม่รู้เลยว่ามีกี่ชั้น
+const svc = new OrderService(repo);</code></pre>
   </div>
 
   <div class="callout" style="border-left-color:#22d3ee">
@@ -414,7 +557,7 @@ svc := NewOrderService(repo)</code></pre>
       <span>✅ Strategy — เปลี่ยน sorting algorithm โดยไม่แก้ caller</span>
       <span class="lang-good">ถูกหลักการ</span>
     </div>
-    <pre><code class="language-go">// Strategy interface
+    <pre data-lang="go"><code class="language-go">// Strategy interface
 type SortStrategy interface {
     Sort(data []int) []int
 }
@@ -466,6 +609,52 @@ type Checkout struct{ payment PaymentStrategy }
 func (c *Checkout) Complete(amount float64) error {
     return c.payment.Pay(amount) // ไม่รู้ว่า payment แบบไหน
 }</code></pre>
+<pre data-lang="ts" style="display:none"><code class="language-typescript">// Strategy interface
+interface SortStrategy {
+  sort(data: number[]): number[];
+}
+
+// Concrete strategies
+class BubbleSort implements SortStrategy {
+  sort(d: number[]) { /* bubble sort */; return d; }
+}
+class QuickSort implements SortStrategy {
+  sort(d: number[]) { /* quick sort */;  return d; }
+}
+class MergeSort implements SortStrategy {
+  sort(d: number[]) { /* merge sort */;  return d; }
+}
+
+// Context — ใช้ strategy ที่ inject มา
+class DataProcessor {
+  constructor(private strategy: SortStrategy) {}
+
+  setStrategy(s: SortStrategy) { this.strategy = s; }
+  process(data: number[]) { return this.strategy.sort(data); }
+}
+
+// เปลี่ยน strategy ตอน runtime
+const proc = new DataProcessor(new QuickSort());
+let result = proc.process(bigData); // quick sort
+
+proc.setStrategy(new MergeSort()); // swap strategy
+result = proc.process(bigData);    // merge sort
+
+// Real-world: payment strategy
+interface PaymentStrategy {
+  pay(amount: number): Promise<void>;
+}
+
+class CreditCard  implements PaymentStrategy { async pay(a: number) { /* charge */ } }
+class PromptPay   implements PaymentStrategy { async pay(a: number) { /* qr */    } }
+class CryptoWallet implements PaymentStrategy { async pay(a: number) { /* chain */  } }
+
+class Checkout {
+  constructor(private payment: PaymentStrategy) {}
+  async complete(amount: number) {
+    await this.payment.pay(amount); // ไม่รู้ว่า payment แบบไหน
+  }
+}</code></pre>
   </div>
 </div>
 
@@ -491,7 +680,7 @@ func (c *Checkout) Complete(amount float64) error {
       <span>✅ Observer — Order state เปลี่ยน → แจ้งหลายระบบอัตโนมัติ</span>
       <span class="lang-good">ถูกหลักการ</span>
     </div>
-    <pre><code class="language-go">// Observer interface
+    <pre data-lang="go"><code class="language-go">// Observer interface
 type OrderObserver interface {
     OnOrderPlaced(o Order)
 }
@@ -542,6 +731,58 @@ svc.Subscribe(&EmailNotifier{mailer})
 svc.Subscribe(&InventoryService{invRepo})
 svc.Subscribe(&AuditLogger{logger})
 // เพิ่ม Analytics observer วันหลัง — แค่ Subscribe เพิ่ม</code></pre>
+<pre data-lang="ts" style="display:none"><code class="language-typescript">// Observer interface
+interface OrderObserver {
+  onOrderPlaced(order: Order): void;
+}
+
+// Subject: เก็บ list of observers
+class OrderService {
+  private observers: OrderObserver[] = [];
+
+  constructor(private repo: OrderRepository) {}
+
+  subscribe(obs: OrderObserver) {
+    this.observers.push(obs);
+  }
+
+  private notify(order: Order) {
+    for (const obs of this.observers) {
+      obs.onOrderPlaced(order); // each handles async internally
+    }
+  }
+
+  async placeOrder(order: Order): Promise<void> {
+    await this.repo.save(order);
+    this.notify(order); // broadcast — ไม่รู้ว่ามีใคร subscribe
+  }
+}
+
+// Observers: ต่างคนต่างรับแล้วทำของตัวเอง
+class EmailNotifier implements OrderObserver {
+  constructor(private mailer: Mailer) {}
+  onOrderPlaced(order: Order) {
+    this.mailer.send(order.email, `Order ${order.id} placed!`);
+  }
+}
+
+class InventoryService implements OrderObserver {
+  constructor(private repo: InventoryRepo) {}
+  onOrderPlaced(order: Order) { this.repo.reserve(order.items); }
+}
+
+class AuditLogger implements OrderObserver {
+  constructor(private logger: Logger) {}
+  onOrderPlaced(order: Order) {
+    this.logger.info('order_placed', { id: order.id, total: order.total });
+  }
+}
+
+// Wire-up
+const svc = new OrderService(repo);
+svc.subscribe(new EmailNotifier(mailer));
+svc.subscribe(new InventoryService(invRepo));
+svc.subscribe(new AuditLogger(logger));</code></pre>
   </div>
 
   <div class="callout" style="border-left-color:#a78bfa">
@@ -571,7 +812,7 @@ svc.Subscribe(&AuditLogger{logger})
       <span>✅ HTTP Middleware chain — Go idiom</span>
       <span class="lang-good">ถูกหลักการ</span>
     </div>
-    <pre><code class="language-go">// Middleware type ใน Go คือ func(http.Handler) http.Handler
+    <pre data-lang="go"><code class="language-go">// Middleware type ใน Go คือ func(http.Handler) http.Handler
 type Middleware func(http.Handler) http.Handler
 
 // Middleware 1: logging
@@ -624,6 +865,45 @@ handler := Chain(
     Auth,
     RateLimit(100),
 )</code></pre>
+<pre data-lang="ts" style="display:none"><code class="language-typescript">// Middleware type ใน Express/Node
+type Middleware = (req: Request, res: Response, next: NextFunction) => void;
+
+// Middleware 1: logging
+const logging: Middleware = (req, res, next) => {
+  const start = Date.now();
+  res.on('finish', () => {
+    console.log(`${req.method} ${req.path} ${res.statusCode} ${Date.now()-start}ms`);
+  });
+  next(); // ส่งต่อไป
+};
+
+// Middleware 2: auth
+const auth: Middleware = (req, res, next) => {
+  const token = req.headers.authorization;
+  if (!isValid(token)) {
+    res.status(401).json({ error: 'Unauthorized' });
+    return; // หยุด chain ที่นี่
+  }
+  next();
+};
+
+// Middleware 3: rate limit
+function rateLimit(rps: number): Middleware {
+  const limiter = new RateLimiter(rps);
+  return (req, res, next) => {
+    if (!limiter.allow()) {
+      res.status(429).json({ error: 'Too Many Requests' });
+      return;
+    }
+    next();
+  };
+}
+
+// Wire-up: อ่านออกว่า request ผ่านอะไรบ้าง
+app.use(logging);
+app.use(auth);
+app.use(rateLimit(100));
+app.post('/orders', orderHandler);</code></pre>
   </div>
 </div>
 
@@ -667,30 +947,6 @@ handler := Chain(
 
 </div>
 <script>hljs.highlightAll()</script>
-<script>
-document.querySelectorAll('.code-block').forEach(block => {
-  const header = block.querySelector('.code-header')
-  const code   = block.querySelector('code')
-  if (!header || !code) return
-  const btn = document.createElement('button')
-  btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span>Copy</span>`
-  btn.style.cssText = 'display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#94a3b8;font-size:.7rem;font-weight:600;padding:3px 10px;border-radius:6px;cursor:pointer;transition:all .15s;flex-shrink:0'
-  btn.addEventListener('mouseenter', () => { btn.style.background='rgba(255,255,255,.1)'; btn.style.color='#e2e8f0' })
-  btn.addEventListener('mouseleave', () => { if (!btn.dataset.copied) { btn.style.background='rgba(255,255,255,.06)'; btn.style.color='#94a3b8' } })
-  btn.addEventListener('click', async () => {
-    try { await navigator.clipboard.writeText(code.innerText) }
-    catch { const ta=document.createElement('textarea'); ta.value=code.innerText; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove() }
-    btn.dataset.copied='1'
-    btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span style="color:#8b5cf6">Copied!</span>`
-    btn.style.background='rgba(139,92,246,.1)'; btn.style.borderColor='rgba(139,92,246,.3)'
-    setTimeout(() => {
-      delete btn.dataset.copied
-      btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span>Copy</span>`
-      btn.style.background='rgba(255,255,255,.06)'; btn.style.borderColor='rgba(255,255,255,.1)'; btn.style.color='#94a3b8'
-    }, 2000)
-  })
-  header.appendChild(btn)
-})
-</script>
+<script src="common.js"></script>
 </body>
 </html>

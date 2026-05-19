@@ -7,6 +7,8 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+<link rel="stylesheet" href="common.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Segoe UI',sans-serif;background:#0f0f1a;color:#e2e8f0;line-height:1.7}
@@ -455,7 +457,7 @@ p{color:#94a3b8;margin-bottom:14px}
     <div class="code-section">
       <div class="code-file">
         <div class="code-file-header">peer/peer.go — Basic Peer Node</div>
-        <pre><code class="language-go">package peer
+        <pre data-lang="go"><code class="language-go">package peer
 
 import (
 	"crypto/sha1"
@@ -528,6 +530,52 @@ func (n *Node) handleConnection(conn net.Conn) {
 	}
 	msg := ParseMessage(buf[:nRead])
 	n.handleMessage(conn, msg)
+}</code></pre>
+        <pre data-lang="ts" style="display:none"><code class="language-typescript">import * as crypto from 'crypto';
+import * as WebSocket from 'ws';
+
+// PeerID — unique identifier for a node (hash-based)
+type PeerID = string;
+
+function newPeerID(addr: string): PeerID {
+  return crypto.createHash('sha1').update(addr).digest('hex');
+}
+
+// PeerInfo — information about a peer in the network
+interface PeerInfo {
+  id: PeerID;
+  addr: string; // "host:port" or "ws://host:port"
+}
+
+// Node — a peer that is both client and server
+class Node {
+  private self: PeerInfo;
+  private peers: Map<PeerID, PeerInfo> = new Map();
+  private data: Map<string, Buffer> = new Map();
+  private server: WebSocket.Server | null = null;
+
+  constructor(addr: string) {
+    this.self = { id: newPeerID(addr), addr };
+  }
+
+  // start — begins listening for incoming WebSocket connections (acting as server)
+  start(): void {
+    const port = parseInt(this.self.addr.replace(':', ''), 10);
+    this.server = new WebSocket.Server({ port });
+
+    this.server.on('connection', (ws) => {
+      this.handleConnection(ws);
+    });
+
+    console.log(`[${this.self.id.slice(0, 8)}] Node started at ${this.self.addr}`);
+  }
+
+  private handleConnection(ws: WebSocket): void {
+    ws.on('message', (data: Buffer) => {
+      const msg: Message = JSON.parse(data.toString());
+      this.handleMessage(ws, msg);
+    });
+  }
 }</code></pre>
       </div>
 

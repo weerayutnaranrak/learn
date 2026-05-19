@@ -7,6 +7,8 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+<link rel="stylesheet" href="common.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Segoe UI',system-ui,sans-serif;background:#07090f;color:#e2e8f0;line-height:1.7}
@@ -311,7 +313,7 @@ a{color:#a78bfa;text-decoration:none}
 
   <div class="code-block">
     <div class="code-header"><span>domain/post.go — Business Layer (Domain)</span><span class="lang">Go</span></div>
-    <pre><code class="language-go">package domain
+    <pre data-lang="go"><code class="language-go">package domain
 
 import (
     "errors"
@@ -408,11 +410,104 @@ func (s *PostService) GetFeed(page, pageSize int) ([]*Post, error) {
     offset := (page - 1) * pageSize
     return s.repo.FindPublished(pageSize, offset)
 }</code></pre>
+    <pre data-lang="ts" style="display:none"><code class="language-typescript">// domain/post.ts — Business Layer (Domain)
+// ไม่รู้จัก HTTP, Database, หรือ Framework ใดๆ
+
+// ── Domain Interfaces ──────────────────────────────────────────────────────
+export interface Post {
+  id: number;
+  title: string;
+  body: string;
+  authorId: number;
+  tags: string[];
+  published: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface PostRepository {
+  create(post: Omit<Post, 'id'>): Promise<Post>;
+  findById(id: number): Promise<Post | null>;
+  findPublished(limit: number, offset: number): Promise<Post[]>;
+  update(post: Post): Promise<Post>;
+  delete(id: number): Promise<void>;
+}
+
+// ── Domain Entity with Business Rules ─────────────────────────────────────
+export class PostEntity implements Post {
+  id: number;
+  title: string;
+  body: string;
+  authorId: number;
+  tags: string[];
+  published: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+
+  constructor(data: Post) {
+    Object.assign(this, data);
+  }
+
+  // Business Rule: Title ต้องไม่ว่างและไม่เกิน 200 ตัวอักษร
+  setTitle(title: string): void {
+    const trimmed = title.trim();
+    if (!trimmed) throw new Error('title cannot be empty');
+    if (trimmed.length > 200) throw new Error('title must not exceed 200 characters');
+    this.title = trimmed;
+  }
+
+  // Business Rule: publish ได้เมื่อมี body เท่านั้น
+  publish(): void {
+    if (!this.body.trim()) throw new Error('cannot publish post without body');
+    this.published = true;
+    this.updatedAt = new Date();
+  }
+}
+
+// ── Business Service ────────────────────────────────────────────────────────
+export class PostService {
+  constructor(private readonly repo: PostRepository) {}
+
+  async createDraft(
+    title: string,
+    body: string,
+    authorId: number,
+    tags: string[]
+  ): Promise<Post> {
+    const entity = new PostEntity({
+      id: 0,
+      title: '',
+      body,
+      authorId,
+      tags,
+      published: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+    entity.setTitle(title); // Business rule — throws on invalid
+    return this.repo.create(entity);
+  }
+
+  async publishPost(id: number): Promise<Post> {
+    const found = await this.repo.findById(id);
+    if (!found) throw new Error(`post ${id} not found`);
+    const entity = new PostEntity(found);
+    entity.publish(); // Business rule — throws if no body
+    return this.repo.update(entity);
+  }
+
+  async getFeed(page: number, pageSize: number): Promise<Post[]> {
+    if (page < 1) page = 1;
+    if (pageSize < 1 || pageSize > 50) pageSize = 20;
+    const offset = (page - 1) * pageSize;
+    return this.repo.findPublished(pageSize, offset);
+  }
+}</code></pre>
   </div>
 
   <div class="code-block">
     <div class="code-header"><span>dataaccess/postgres_repo.go — Data Access Layer</span><span class="lang">Go</span></div>
-    <pre><code class="language-go">package dataaccess
+    <pre data-lang="go"><code class="language-go">package dataaccess
 
 import (
     "database/sql"
@@ -482,11 +577,65 @@ func (r *PostgresPostRepository) Delete(id domain.PostID) error {
     _, err := r.db.Exec(`DELETE FROM posts WHERE id=$1`, id)
     return err
 }</code></pre>
+    <pre data-lang="ts" style="display:none"><code class="language-typescript">// dataaccess/postgresPostRepository.ts — Data Access Layer
+// implements PostRepository interface from domain
+// รู้จัก PostgreSQL, SQL — Business Layer ไม่รู้
+
+import { Pool } from 'pg';
+import type { Post, PostRepository } from '../domain/post';
+
+export class PostgresPostRepository implements PostRepository {
+  constructor(private readonly pool: Pool) {}
+
+  async create(post: Omit&lt;Post, 'id'&gt;): Promise&lt;Post&gt; {
+    const { rows } = await this.pool.query&lt;Post&gt;(
+      `INSERT INTO posts (title, body, author_id, published, created_at, updated_at)
+       VALUES ($1, $2, $3, $4, $5, $6)
+       RETURNING *`,
+      [post.title, post.body, post.authorId, post.published, post.createdAt, post.updatedAt]
+    );
+    return rows[0];
+  }
+
+  async findById(id: number): Promise&lt;Post | null&gt; {
+    const { rows } = await this.pool.query&lt;Post&gt;(
+      `SELECT id, title, body, author_id AS "authorId", published, created_at AS "createdAt", updated_at AS "updatedAt"
+       FROM posts WHERE id = $1`,
+      [id]
+    );
+    if (!rows[0]) throw new Error(`post ${id} not found`);
+    return rows[0];
+  }
+
+  async findPublished(limit: number, offset: number): Promise&lt;Post[]&gt; {
+    const { rows } = await this.pool.query&lt;Post&gt;(
+      `SELECT id, title, body, author_id AS "authorId", created_at AS "createdAt"
+       FROM posts WHERE published = true
+       ORDER BY created_at DESC
+       LIMIT $1 OFFSET $2`,
+      [limit, offset]
+    );
+    return rows;
+  }
+
+  async update(post: Post): Promise&lt;Post&gt; {
+    const updatedAt = new Date();
+    await this.pool.query(
+      `UPDATE posts SET title=$1, body=$2, published=$3, updated_at=$4 WHERE id=$5`,
+      [post.title, post.body, post.published, updatedAt, post.id]
+    );
+    return { ...post, updatedAt };
+  }
+
+  async delete(id: number): Promise&lt;void&gt; {
+    await this.pool.query(`DELETE FROM posts WHERE id = $1`, [id]);
+  }
+}</code></pre>
   </div>
 
   <div class="code-block">
     <div class="code-header"><span>presentation/handler.go — Presentation Layer (HTTP)</span><span class="lang">Go</span></div>
-    <pre><code class="language-go">package presentation
+    <pre data-lang="go"><code class="language-go">package presentation
 
 import (
     "encoding/json"
@@ -583,6 +732,92 @@ func writeError(w http.ResponseWriter, code int, msg string) {
     w.Header().Set("Content-Type", "application/json")
     w.WriteHeader(code)
     json.NewEncoder(w).Encode(map[string]string{"error": msg})
+}</code></pre>
+    <pre data-lang="ts" style="display:none"><code class="language-typescript">// presentation/postController.ts — Presentation Layer (Express)
+// รู้จัก HTTP แต่ไม่รู้จัก Database
+// เรียก Business Layer ผ่าน Service
+
+import { Request, Response, Router } from 'express';
+import type { PostService } from '../domain/post';
+
+// Request/Response DTOs — ไม่ใช่ Domain objects โดยตรง
+interface CreatePostRequest {
+  title: string;
+  body: string;
+  tags: string[];
+}
+
+interface PostResponse {
+  id: number;
+  title: string;
+  body: string;
+  tags: string[];
+  published: boolean;
+  created_at: string;
+}
+
+function toPostResponse(p: any): PostResponse {
+  return {
+    id: p.id,
+    title: p.title,
+    body: p.body,
+    tags: p.tags ?? [],
+    published: p.published,
+    created_at: new Date(p.createdAt).toISOString(),
+  };
+}
+
+export class PostController {
+  constructor(private readonly svc: PostService) {}
+
+  // POST /posts
+  async createPost(req: Request, res: Response): Promise&lt;void&gt; {
+    const { title, body, tags }: CreatePostRequest = req.body;
+
+    try {
+      // เรียก Business Layer (ไม่ใช่ DB โดยตรง!)
+      const post = await this.svc.createDraft(title, body, 1, tags ?? []);
+      res.status(201).json(toPostResponse(post));
+    } catch (err: any) {
+      res.status(400).json({ error: err.message });
+    }
+  }
+
+  // POST /posts/publish?id=:id
+  async publishPost(req: Request, res: Response): Promise&lt;void&gt; {
+    const id = parseInt(req.query['id'] as string, 10);
+    if (isNaN(id)) {
+      res.status(400).json({ error: 'invalid post id' });
+      return;
+    }
+    try {
+      const post = await this.svc.publishPost(id);
+      res.json(toPostResponse(post));
+    } catch (err: any) {
+      res.status(400).json({ error: err.message });
+    }
+  }
+
+  // GET /feed?page=:page
+  async getFeed(req: Request, res: Response): Promise&lt;void&gt; {
+    const page = parseInt(req.query['page'] as string, 10) || 1;
+    try {
+      const posts = await this.svc.getFeed(page, 20);
+      res.json(posts.map(toPostResponse));
+    } catch {
+      res.status(500).json({ error: 'failed to get feed' });
+    }
+  }
+}
+
+// Wire routes
+export function createPostRouter(svc: PostService): Router {
+  const router = Router();
+  const ctrl = new PostController(svc);
+  router.post('/',        (req, res) => ctrl.createPost(req, res));
+  router.post('/publish', (req, res) => ctrl.publishPost(req, res));
+  router.get('/feed',     (req, res) => ctrl.getFeed(req, res));
+  return router;
 }</code></pre>
   </div>
 

@@ -7,6 +7,8 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+<link rel="stylesheet" href="common.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Segoe UI',system-ui,sans-serif;background:#07090f;color:#e2e8f0;line-height:1.7}
@@ -280,7 +282,7 @@ a{color:#fca5a5;text-decoration:none}
       <span>grade/grade.go — ครบทุกขั้นตอน</span>
       <span class="lang">Go</span>
     </div>
-    <pre><code class="language-go">package grade
+    <pre data-lang="go"><code class="language-go">package grade
 
 import "fmt"
 
@@ -410,13 +412,106 @@ func topStudents(students []Student) []Student {
     return result
 }</code></pre>
   </div>
+  <div class="code-block" style="border:1px solid #1e293b;border-radius:12px;overflow:hidden;margin:1.5rem 0">
+    <div class="code-header" style="background:#111827;padding:.7rem 1rem;display:flex;justify-content:space-between;align-items:center">
+      <span>grade/grade.ts — ครบทุกขั้นตอน</span>
+      <span class="lang" style="background:rgba(96,165,250,.12);color:#60a5fa">TypeScript</span>
+    </div>
+    <pre data-lang="ts" style="display:none"><code class="language-typescript">// ═══════════════════════════════════════════════════════════════════════════
+// STEP 1: DATA DEFINITION
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Grade คือคะแนนสอบ: เป็น number ในช่วง [0, 100]
+// Invariant: 0 <= grade <= 100
+type Grade = number;
+
+// LetterGrade คือเกรดตัวอักษร: หนึ่งใน "A", "B", "C", "D", "F"
+type LetterGrade = 'A' | 'B' | 'C' | 'D' | 'F';
+
+// Student คือนักเรียนที่มีชื่อและคะแนน
+interface Student {
+  name:  string;
+  score: Grade;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// STEP 2: SIGNATURE + PURPOSE
+// ═══════════════════════════════════════════════════════════════════════════
+
+// toLetterGrade รับคะแนน 0-100 คืน letter grade ตามเกณฑ์:
+// A=80+, B=70-79, C=60-69, D=50-59, F=0-49
+function toLetterGrade(g: Grade): LetterGrade {
+  // ═══════════════════════════════════════════════════════════════════════
+  // STEP 3: EXAMPLES (documented ไว้เป็น reference)
+  // g=90  → 'A' (in A range)
+  // g=80  → 'A' (boundary: ต่ำสุดของ A)
+  // g=79  → 'B' (boundary: สูงสุดของ B)
+  // g=0   → 'F' (ต่ำสุด)
+  // g=100 → 'A' (สูงสุด)
+  // g=-1  → throw (ออกนอกช่วง)
+  // g=101 → throw (ออกนอกช่วง)
+  // ═══════════════════════════════════════════════════════════════════════
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // STEP 4: TEMPLATE — input เป็น range ของตัวเลข → if-else chain
+  // ═══════════════════════════════════════════════════════════════════════
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // STEP 5: BODY
+  // ═══════════════════════════════════════════════════════════════════════
+  if (g < 0 || g > 100) {
+    throw new Error(`invalid grade ${g}: must be 0-100`);
+  }
+  if (g >= 80) return 'A';
+  if (g >= 70) return 'B';
+  if (g >= 60) return 'C';
+  if (g >= 50) return 'D';
+  return 'F';
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// STEP 2: SIGNATURE + PURPOSE (function ที่ 2)
+// averageGrade คำนวณคะแนนเฉลี่ยของนักเรียนทั้งหมดในกลุ่ม
+// คืน 0 ถ้ากลุ่มว่าง
+function averageGrade(students: Student[]): number {
+  // STEP 3: EXAMPLES
+  // []                          → 0.0        (empty → 0)
+  // [{name:'A',score:90}]       → 90.0       (single)
+  // [{...,score:90},{...,score:80}] → 85.0   (two students)
+
+  // STEP 4: TEMPLATE — input เป็น list → ใช้ reduce
+  // if empty → return 0
+  // else → sum all → divide by count
+
+  // STEP 5: BODY
+  if (students.length === 0) return 0;
+  const sum = students.reduce((acc, s) => acc + s.score, 0);
+  return sum / students.length;
+}
+
+// topStudents คืนนักเรียนที่ได้เกรด A ทั้งหมด (เรียงตามคะแนนสูงสุด)
+// คืน empty array ถ้าไม่มีใครได้ A
+function topStudents(students: Student[]): Student[] {
+  // STEP 3: EXAMPLES
+  // []                          → []
+  // [{name:'A',score:70}]       → [] (ไม่ได้ A)
+  // [{name:'A',score:90},{name:'B',score:85}] → [{name:'A',score:90}]
+
+  // STEP 4: TEMPLATE — input เป็น list → filter + sort
+
+  // STEP 5: BODY
+  return students
+    .filter(s => { try { return toLetterGrade(s.score) === 'A'; } catch { return false; } })
+    .sort((a, b) => b.score - a.score);
+}</code></pre>
+  </div>
 
   <div class="code-block">
     <div class="code-header">
       <span>grade/grade_test.go — STEP 6: Tests (มาจาก Examples ในขั้นที่ 3)</span>
       <span class="lang">Go</span>
     </div>
-    <pre><code class="language-go">package grade_test
+    <pre data-lang="go"><code class="language-go">package grade_test
 
 import (
     "testing"
@@ -491,6 +586,55 @@ func TestAverageGrade(t *testing.T) {
     }
 }</code></pre>
   </div>
+  <div class="code-block" style="border:1px solid #1e293b;border-radius:12px;overflow:hidden;margin:1.5rem 0">
+    <div class="code-header" style="background:#111827;padding:.7rem 1rem;display:flex;justify-content:space-between;align-items:center">
+      <span>grade/grade.test.ts — STEP 6: Tests (TypeScript · Vitest)</span>
+      <span class="lang" style="background:rgba(96,165,250,.12);color:#60a5fa">TypeScript</span>
+    </div>
+    <pre data-lang="ts" style="display:none"><code class="language-typescript">import { describe, it, expect } from 'vitest';
+import { toLetterGrade, averageGrade } from './grade';
+
+// ═══════════════════════════════════════════════════════════════════════════
+// STEP 6: TESTS — ใช้ examples จาก step 3 เป็น test cases โดยตรง
+// ═══════════════════════════════════════════════════════════════════════════
+
+describe('toLetterGrade', () => {
+  it.each([
+    // Normal cases
+    ['A range',      90,  'A'],
+    ['B range',      75,  'B'],
+    ['C range',      65,  'C'],
+    ['D range',      55,  'D'],
+    ['F range',      45,  'F'],
+    // Boundaries — ขอบเขตสำคัญมาก!
+    ['A lower bound', 80, 'A'],
+    ['B upper bound', 79, 'B'],
+    ['B lower bound', 70, 'B'],
+    ['zero',           0, 'F'],
+    ['max',          100, 'A'],
+  ] as [string, number, string][])('%s: toLetterGrade(%i) → %s', (_, input, want) => {
+    expect(toLetterGrade(input)).toBe(want);
+  });
+
+  it.each([
+    ['negative', -1],
+    ['over 100', 101],
+  ] as [string, number][])('%s: throws for %i', (_, input) => {
+    expect(() => toLetterGrade(input)).toThrow();
+  });
+});
+
+describe('averageGrade', () => {
+  it.each([
+    ['empty',  [],                                          0],
+    ['single', [{ name: 'ก', score: 90 }],                90],
+    ['two',    [{ name: 'ก', score: 90 }, { name: 'ข', score: 80 }], 85],
+    ['three',  [{ name: 'ก', score: 100 }, { name: 'ข', score: 0 }, { name: 'ค', score: 50 }], 50],
+  ] as [string, { name: string; score: number }[], number][])('%s', (_, students, want) => {
+    expect(averageGrade(students)).toBe(want);
+  });
+});</code></pre>
+  </div>
 </div>
 
 <!-- ── FULL EXAMPLE 2 ── -->
@@ -503,7 +647,7 @@ func TestAverageGrade(t *testing.T) {
       <span>cart/cart.go — Design Recipe กับ Complex Data</span>
       <span class="lang">Go</span>
     </div>
-    <pre><code class="language-go">package cart
+    <pre data-lang="go"><code class="language-go">package cart
 
 import (
     "errors"
@@ -655,13 +799,93 @@ func (c *Cart) ApplyDiscount(pct int) (Price, error) {
     return total - discount, nil
 }</code></pre>
   </div>
+  <div class="code-block" style="border:1px solid #1e293b;border-radius:12px;overflow:hidden;margin:1.5rem 0">
+    <div class="code-header" style="background:#111827;padding:.7rem 1rem;display:flex;justify-content:space-between;align-items:center">
+      <span>cart/cart.ts — Design Recipe กับ Complex Data</span>
+      <span class="lang" style="background:rgba(96,165,250,.12);color:#60a5fa">TypeScript</span>
+    </div>
+    <pre data-lang="ts" style="display:none"><code class="language-typescript">// ═══════════════════════════════════════════════════════════════════════════
+// STEP 1: DATA DEFINITION
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Price คือราคาเป็นสตางค์ (หน่วย: satang): เป็น number >= 0
+type Price = number;
+
+function priceToBaht(p: Price): number { return p / 100; }
+function priceToString(p: Price): string { return `฿${priceToBaht(p).toFixed(2)}`; }
+
+// CartItem คือรายการสินค้าใน cart:
+// productId ต้องไม่ว่าง, unitPrice >= 0, qty > 0
+interface CartItem {
+  productId: string;
+  name:      string;
+  unitPrice: Price;
+  qty:       number;
+}
+
+function subtotal(item: CartItem): Price {
+  return item.unitPrice * item.qty;
+}
+
+// Cart คือตะกร้าสินค้า
+class Cart {
+  items: CartItem[] = [];
+
+  // ─────────────────────────────────────────────────────────────────────
+  // STEP 2: SIGNATURE + PURPOSE
+  // addItem เพิ่มสินค้าลงใน cart
+  // ถ้า productId เดิมมีอยู่แล้ว ให้เพิ่ม qty แทน
+  addItem(item: CartItem): void {
+    // STEP 3: EXAMPLES
+    // (empty) + {P1, "ข้าว", 3000, 1} → [{P1, "ข้าว", 3000, 1}]
+    // [{P1,...,qty:1}] + {P1,...,qty:2} → [{P1,...,qty:3}] (merge)
+    // STEP 4: TEMPLATE — validate → find existing → add/merge
+    // STEP 5: BODY
+    if (!item.productId)   throw new Error('product ID required');
+    if (!item.name)        throw new Error('product name required');
+    if (item.unitPrice < 0) throw new Error('price must be non-negative');
+    if (item.qty <= 0)     throw new Error('quantity must be positive');
+
+    const existing = this.items.find(i => i.productId === item.productId);
+    if (existing) {
+      existing.qty += item.qty;
+    } else {
+      this.items.push({ ...item });
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────────────
+  // STEP 2: removeItem ลบสินค้าออกจาก cart ด้วย productId
+  removeItem(productId: string): void {
+    const idx = this.items.findIndex(i => i.productId === productId);
+    if (idx === -1) throw new Error(`product ${productId} not found in cart`);
+    this.items.splice(idx, 1);
+  }
+
+  // ─────────────────────────────────────────────────────────────────────
+  // STEP 2: total คำนวณยอดรวมทั้ง cart ก่อนส่วนลด
+  total(): Price {
+    // STEP 3: [] → 0 | [{P1,3000,2}] → 6000 | [{P1,3000},{P2,2000,3}] → 9000
+    return this.items.reduce((sum, item) => sum + subtotal(item), 0);
+  }
+
+  // ─────────────────────────────────────────────────────────────────────
+  // STEP 2: applyDiscount คิดราคาหลังส่วนลด pct (0-100%)
+  applyDiscount(pct: number): Price {
+    // STEP 3: total=10000, pct=10 → 9000 | pct=100 → 0 | pct=-1 → throw
+    if (pct < 0 || pct > 100) throw new Error(`discount ${pct}% out of range [0,100]`);
+    const tot = this.total();
+    return tot - Math.floor(tot * pct / 100);
+  }
+}</code></pre>
+  </div>
 
   <div class="code-block">
     <div class="code-header">
       <span>cart/cart_test.go — Tests จาก Examples</span>
       <span class="lang">Go</span>
     </div>
-    <pre><code class="language-go">package cart_test
+    <pre data-lang="go"><code class="language-go">package cart_test
 
 import (
     "testing"
@@ -778,6 +1002,79 @@ func TestCart_ApplyDiscount(t *testing.T) {
     }
 }</code></pre>
   </div>
+  <div class="code-block" style="border:1px solid #1e293b;border-radius:12px;overflow:hidden;margin:1.5rem 0">
+    <div class="code-header" style="background:#111827;padding:.7rem 1rem;display:flex;justify-content:space-between;align-items:center">
+      <span>cart/cart.test.ts — Tests จาก Examples (TypeScript · Vitest)</span>
+      <span class="lang" style="background:rgba(96,165,250,.12);color:#60a5fa">TypeScript</span>
+    </div>
+    <pre data-lang="ts" style="display:none"><code class="language-typescript">import { describe, it, expect } from 'vitest';
+import { Cart } from './cart';
+
+function makeItem(productId: string, name: string, unitPrice: number, qty: number) {
+  return { productId, name, unitPrice, qty };
+}
+
+// Tests สำหรับ addItem
+describe('Cart.addItem', () => {
+  it('add new item', () => {
+    const c = new Cart();
+    c.addItem(makeItem('P1', 'ข้าว', 3000, 1));
+    expect(c.items).toHaveLength(1);
+  });
+
+  it('add duplicate merges qty', () => {
+    const c = new Cart();
+    c.addItem(makeItem('P1', 'ข้าว', 3000, 1));
+    c.addItem(makeItem('P1', 'ข้าว', 3000, 2));
+    expect(c.items).toHaveLength(1);
+    expect(c.items[0].qty).toBe(3);
+  });
+
+  it('reject empty name', () => {
+    const c = new Cart();
+    expect(() => c.addItem(makeItem('P1', '', 3000, 1))).toThrow();
+  });
+
+  it('reject zero quantity', () => {
+    const c = new Cart();
+    expect(() => c.addItem(makeItem('P1', 'ข้าว', 3000, 0))).toThrow();
+  });
+});
+
+// Tests สำหรับ total
+describe('Cart.total', () => {
+  it.each([
+    ['empty cart',     [],                                             0],
+    ['single item',    [['P1', 'ข้าว', 3000, 2]],                   6000],
+    ['multiple items', [['P1', 'ข้าว', 3000, 1], ['P2', 'น้ำ', 2000, 3]], 9000],
+  ] as [string, [string, string, number, number][], number][])('%s', (_, items, want) => {
+    const c = new Cart();
+    items.forEach(([id, name, price, qty]) => c.addItem(makeItem(id, name, price, qty)));
+    expect(c.total()).toBe(want);
+  });
+});
+
+// Tests สำหรับ applyDiscount
+describe('Cart.applyDiscount', () => {
+  it.each([
+    ['no discount',  10000, 0,   10000, false],
+    ['10% off',      10000, 10,  9000,  false],
+    ['50% off',      10000, 50,  5000,  false],
+    ['100% off',     10000, 100, 0,     false],
+    ['empty cart',   0,     50,  0,     false],
+    ['negative pct', 10000, -1,  0,     true],
+    ['over 100 pct', 10000, 101, 0,     true],
+  ] as [string, number, number, number, boolean][])('%s', (_, total, pct, want, wantErr) => {
+    const c = new Cart();
+    if (total > 0) c.addItem(makeItem('P1', 'สินค้า', total, 1));
+    if (wantErr) {
+      expect(() => c.applyDiscount(pct)).toThrow();
+    } else {
+      expect(c.applyDiscount(pct)).toBe(want);
+    }
+  });
+});</code></pre>
+  </div>
 </div>
 
 <!-- ── WHEN TO USE ── -->
@@ -840,61 +1137,6 @@ func TestCart_ApplyDiscount(t *testing.T) {
 
 </div>
 <script>hljs.highlightAll()</script>
-
-<script>
-/* ── Copy button — inject into every .code-block ── */
-document.querySelectorAll('.code-block').forEach(block => {
-  const header = block.querySelector('.code-header')
-  const code   = block.querySelector('code')
-  if (!header || !code) return
-
-  const btn = document.createElement('button')
-  btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span>Copy</span>`
-  btn.style.cssText = [
-    'display:inline-flex','align-items:center','gap:5px',
-    'background:rgba(255,255,255,.06)','border:1px solid rgba(255,255,255,.1)',
-    'color:#94a3b8','font-size:.7rem','font-weight:600',
-    'padding:3px 10px','border-radius:6px','cursor:pointer',
-    'transition:all .15s','flex-shrink:0',
-  ].join(';')
-
-  btn.addEventListener('mouseenter', () => {
-    btn.style.background = 'rgba(255,255,255,.1)'
-    btn.style.color = '#e2e8f0'
-  })
-  btn.addEventListener('mouseleave', () => {
-    if (!btn.dataset.copied) {
-      btn.style.background = 'rgba(255,255,255,.06)'
-      btn.style.color = '#94a3b8'
-    }
-  })
-
-  btn.addEventListener('click', async () => {
-    try {
-      await navigator.clipboard.writeText(code.innerText)
-    } catch {
-      const ta = document.createElement('textarea')
-      ta.value = code.innerText
-      document.body.appendChild(ta)
-      ta.select()
-      document.execCommand('copy')
-      ta.remove()
-    }
-    btn.dataset.copied = '1'
-    btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span style="color:#4ade80">Copied!</span>`
-    btn.style.background = 'rgba(74,222,128,.1)'
-    btn.style.borderColor = 'rgba(74,222,128,.3)'
-    setTimeout(() => {
-      delete btn.dataset.copied
-      btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span>Copy</span>`
-      btn.style.background = 'rgba(255,255,255,.06)'
-      btn.style.borderColor = 'rgba(255,255,255,.1)'
-      btn.style.color = '#94a3b8'
-    }, 2000)
-  })
-
-  header.appendChild(btn)
-})
-</script>
+<script src="common.js"></script>
 </body>
 </html>

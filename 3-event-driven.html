@@ -7,6 +7,8 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+<link rel="stylesheet" href="common.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Segoe UI',system-ui,sans-serif;background:#07090f;color:#e2e8f0;line-height:1.7}
@@ -197,7 +199,7 @@ a{color:#34d399;text-decoration:none}
       <span>events/event.go — Event Types</span>
       <span class="lang">Go</span>
     </div>
-    <pre><code class="language-go">package events
+    <pre data-lang="go"><code class="language-go">package events
 
 import (
     "encoding/json"
@@ -260,6 +262,68 @@ func NewEvent(eventType string, payload interface{}) (Event, error) {
         Version:   1,
     }, nil
 }</code></pre>
+<pre data-lang="ts" style="display:none"><code class="language-typescript">// events/event.ts — Event Types
+
+import { randomUUID } from 'crypto';
+
+// Event — base structure for every event
+export interface DomainEvent<T = unknown> {
+  id: string;
+  type: string;
+  payload: T;
+  occurredAt: Date;
+  version: number;
+}
+
+// Handler — async function that processes an event
+export type Handler<T = unknown> = (event: DomainEvent<T>) => Promise<void>;
+
+// ── Domain Event Payload Types ────────────────────────────────────────────────
+
+export interface OrderPlacedPayload {
+  orderId: string;
+  customerId: string;
+  total: number;
+  items: number;
+}
+
+export interface PaymentReceivedPayload {
+  paymentId: string;
+  orderId: string;
+  amount: number;
+  method: string;
+}
+
+export interface OrderShippedPayload {
+  orderId: string;
+  trackingCode: string;
+  carrier: string;
+}
+
+// Discriminated union of all domain events
+export type AppEvent =
+  | DomainEvent<OrderPlacedPayload>    & { type: 'order.placed' }
+  | DomainEvent<PaymentReceivedPayload> & { type: 'payment.received' }
+  | DomainEvent<OrderShippedPayload>   & { type: 'order.shipped' };
+
+// ── Event Constants ───────────────────────────────────────────────────────────
+export const EventTypes = {
+  OrderPlaced:     'order.placed',
+  OrderConfirmed:  'order.confirmed',
+  OrderShipped:    'order.shipped',
+  PaymentReceived: 'payment.received',
+} as const;
+
+// newEvent — helper to create a typed event with id and timestamp
+export function newEvent<T>(type: string, payload: T): DomainEvent<T> {
+  return {
+    id:          randomUUID(),
+    type,
+    payload,
+    occurredAt:  new Date(),
+    version:     1,
+  };
+}</code></pre>
   </div>
 
   <div class="code-block">
@@ -267,7 +331,7 @@ func NewEvent(eventType string, payload interface{}) (Event, error) {
       <span>events/bus.go — Event Bus (In-Memory Implementation)</span>
       <span class="lang">Go</span>
     </div>
-    <pre><code class="language-go">package events
+    <pre data-lang="go"><code class="language-go">package events
 
 import (
     "context"
@@ -367,6 +431,80 @@ func retryHandler(ctx context.Context, h Handler, event Event, maxRetries int) e
     }
     return fmt.Errorf("after %d retries: %w", maxRetries, err)
 }</code></pre>
+<pre data-lang="ts" style="display:none"><code class="language-typescript">// events/bus.ts — In-Memory Event Bus
+
+import { DomainEvent, Handler } from './event';
+
+// EventBus interface
+export interface EventBus {
+  subscribe<T>(eventType: string, handler: Handler<T>): void;
+  publish<T>(event: DomainEvent<T>): Promise<void>;
+  publishAll<T>(events: DomainEvent<T>[]): Promise<void>;
+}
+
+// InMemoryBus — for development/testing
+// For production use Kafka / RabbitMQ / NATS adapter
+export class InMemoryBus implements EventBus {
+  private handlers = new Map<string, Set<Handler<unknown>>>();
+
+  subscribe<T>(eventType: string, handler: Handler<T>): void {
+    if (!this.handlers.has(eventType)) {
+      this.handlers.set(eventType, new Set());
+    }
+    this.handlers.get(eventType)!.add(handler as Handler<unknown>);
+    console.log(`[Bus] Subscribed to ${eventType}`);
+  }
+
+  async publish<T>(event: DomainEvent<T>): Promise<void> {
+    const handlers = this.handlers.get(event.type);
+    if (!handlers || handlers.size === 0) {
+      console.log(`[Bus] No subscribers for ${event.type}`);
+      return;
+    }
+
+    // Run all handlers in parallel — equivalent to goroutines + WaitGroup
+    const results = await Promise.allSettled(
+      [...handlers].map(handler => retryHandler(handler, event, 3))
+    );
+
+    const failures = results
+      .filter((r): r is PromiseRejectedResult => r.status === 'rejected')
+      .map(r => r.reason as Error);
+
+    if (failures.length > 0) {
+      throw new Error(`Some handlers failed: ${failures.map(e => e.message).join(', ')}`);
+    }
+  }
+
+  async publishAll<T>(events: DomainEvent<T>[]): Promise<void> {
+    for (const event of events) {
+      await this.publish(event);
+    }
+  }
+}
+
+// retryHandler — exponential backoff retry
+async function retryHandler<T>(
+  handler: Handler<T>,
+  event: DomainEvent<T>,
+  maxRetries: number
+): Promise<void> {
+  let lastError: unknown;
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    if (attempt > 0) {
+      const waitMs = attempt * attempt * 100; // exponential backoff
+      console.log(`[Bus] Retry ${attempt} for ${event.type} after ${waitMs}ms`);
+      await new Promise(resolve => setTimeout(resolve, waitMs));
+    }
+    try {
+      await handler(event);
+      return; // success
+    } catch (err) {
+      lastError = err;
+    }
+  }
+  throw new Error(`After ${maxRetries} retries: ${(lastError as Error)?.message}`);
+}</code></pre>
   </div>
 
   <div class="code-block">
@@ -374,7 +512,7 @@ func retryHandler(ctx context.Context, h Handler, event Event, maxRetries int) e
       <span>services/order_service.go — Publisher</span>
       <span class="lang">Go</span>
     </div>
-    <pre><code class="language-go">package services
+    <pre data-lang="go"><code class="language-go">package services
 
 import (
     "context"
@@ -442,6 +580,74 @@ func (s *OrderService) ConfirmOrder(ctx context.Context, orderID string) error {
         "order_id": orderID,
     })
     return s.bus.Publish(ctx, event)
+}</code></pre>
+<pre data-lang="ts" style="display:none"><code class="language-typescript">// services/order.service.ts — Publisher
+
+import { EventBus } from '../events/bus';
+import { newEvent, EventTypes, OrderPlacedPayload } from '../events/event';
+
+export interface PlaceOrderRequest {
+  customerId: string;
+  items: OrderItem[];
+}
+
+export interface OrderItem {
+  productId: string;
+  quantity: number;
+  price: number;
+}
+
+export interface Order {
+  id: string;
+  customerId: string;
+  total: number;
+  status: string;
+}
+
+// OrderService — publishes events when things happen
+export class OrderService {
+  constructor(
+    private readonly repo: OrderRepository,
+    private readonly bus: EventBus,
+  ) {}
+
+  async placeOrder(req: PlaceOrderRequest): Promise<Order> {
+    // 1. Business logic — create the order
+    const order = await this.repo.create(req);
+
+    // 2. Publish event — tell the world "an order was placed"
+    const event = newEvent<OrderPlacedPayload>(EventTypes.OrderPlaced, {
+      orderId:    order.id,
+      customerId: req.customerId,
+      total:      order.total,
+      items:      req.items.length,
+    });
+
+    // Fire-and-forget — don't fail the order if publish fails
+    // (use Outbox Pattern for at-least-once delivery in production)
+    this.bus.publish(event).catch(err => {
+      console.warn('warn: publish event failed:', err);
+    });
+
+    return order;
+  }
+
+  async confirmOrder(orderId: string): Promise<void> {
+    const order = await this.repo.findById(orderId);
+    order.confirm(); // throws if not in 'pending' state
+    await this.repo.save(order);
+
+    // Publish that the order is confirmed
+    const event = newEvent(EventTypes.OrderConfirmed, { orderId });
+    await this.bus.publish(event);
+  }
+}
+
+// Repository interface (dependency inversion)
+interface OrderRepository {
+  create(req: PlaceOrderRequest): Promise<Order>;
+  findById(id: string): Promise<Order & { confirm(): void }>;
+  save(order: Order): Promise<void>;
 }</code></pre>
   </div>
 

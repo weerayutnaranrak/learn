@@ -514,6 +514,8 @@ a{color:#f472b6;text-decoration:none}
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <link rel="stylesheet" href="common.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
 
   <!-- Atom -->
   <div class="code-block" style="border:1px solid #1e293b;border-radius:12px;overflow:hidden;margin:1.5rem 0">
@@ -521,7 +523,7 @@ a{color:#f472b6;text-decoration:none}
       <span style="font-size:.78rem;color:#64748b;font-weight:600">src/components/atoms/AppButton.vue — Atom</span>
       <span style="background:rgba(74,222,128,.1);color:#4ade80;padding:.15rem .6rem;border-radius:4px;font-size:.72rem;font-weight:700">Vue SFC</span>
     </div>
-    <pre style="margin:0;padding:0"><code class="language-html">&lt;script setup lang="ts"&gt;
+    <pre data-lang="html" style="margin:0;padding:0"><code class="language-html">&lt;script setup lang="ts"&gt;
 type Variant = 'primary' | 'secondary' | 'ghost' | 'danger'
 type Size    = 'sm' | 'md' | 'lg'
 
@@ -555,7 +557,7 @@ const emit = defineEmits&lt;{
       <span style="font-size:.78rem;color:#64748b;font-weight:600">src/components/atoms/AppBadge.vue &amp; AppAvatar.vue — Atoms</span>
       <span style="background:rgba(74,222,128,.1);color:#4ade80;padding:.15rem .6rem;border-radius:4px;font-size:.72rem;font-weight:700">Vue SFC</span>
     </div>
-    <pre style="margin:0;padding:0"><code class="language-html">&lt;!-- AppBadge.vue --&gt;
+    <pre data-lang="html" style="margin:0;padding:0"><code class="language-html">&lt;!-- AppBadge.vue --&gt;
 &lt;script setup lang="ts"&gt;
 defineProps&lt;{ color?: 'blue' | 'red' | 'green' | 'gray' }&gt;()
 &lt;/script&gt;
@@ -598,7 +600,7 @@ const initials = computed(() =&gt; props.name.charAt(0).toUpperCase())
       <span style="font-size:.78rem;color:#64748b;font-weight:600">src/components/molecules/ProductCard.vue — Molecule</span>
       <span style="background:rgba(74,222,128,.1);color:#4ade80;padding:.15rem .6rem;border-radius:4px;font-size:.72rem;font-weight:700">Vue SFC</span>
     </div>
-    <pre style="margin:0;padding:0"><code class="language-html">&lt;script setup lang="ts"&gt;
+    <pre data-lang="html" style="margin:0;padding:0"><code class="language-html">&lt;script setup lang="ts"&gt;
 import AppButton from '@/components/atoms/AppButton.vue'
 import AppBadge  from '@/components/atoms/AppBadge.vue'
 
@@ -661,7 +663,7 @@ const formattedPrice = computed(() =&gt;
       <span style="font-size:.78rem;color:#64748b;font-weight:600">src/components/organisms/ProductGrid.vue — Organism</span>
       <span style="background:rgba(74,222,128,.1);color:#4ade80;padding:.15rem .6rem;border-radius:4px;font-size:.72rem;font-weight:700">Vue SFC</span>
     </div>
-    <pre style="margin:0;padding:0"><code class="language-html">&lt;script setup lang="ts"&gt;
+    <pre data-lang="html" style="margin:0;padding:0"><code class="language-html">&lt;script setup lang="ts"&gt;
 import ProductCard, { type Product } from '@/components/molecules/ProductCard.vue'
 import { useCartStore } from '@/stores/cart'
 
@@ -718,7 +720,7 @@ const filtered = computed(() =&gt;
       <span style="font-size:.78rem;color:#64748b;font-weight:600">src/pages/CategoryPage.vue — Page</span>
       <span style="background:rgba(74,222,128,.1);color:#4ade80;padding:.15rem .6rem;border-radius:4px;font-size:.72rem;font-weight:700">Vue SFC</span>
     </div>
-    <pre style="margin:0;padding:0"><code class="language-html">&lt;script setup lang="ts"&gt;
+    <pre data-lang="html" style="margin:0;padding:0"><code class="language-html">&lt;script setup lang="ts"&gt;
 import ProductGrid from '@/components/organisms/ProductGrid.vue'
 import { useRoute }         from 'vue-router'
 import { useHead }          from '@vueuse/head'
@@ -941,7 +943,7 @@ function handleAddToCart(productId: number) {
       <span style="color:#fbbf24;font-size:.82rem;font-family:monospace">vitest.config.ts — test setup</span>
       <span style="background:rgba(251,191,36,.12);color:#fbbf24;padding:.15rem .6rem;border-radius:4px;font-size:.72rem;font-weight:700">Config</span>
     </div>
-    <pre style="margin:0;padding:0"><code class="language-typescript">// vitest.config.ts
+    <pre data-lang="ts" style="margin:0;padding:0"><code class="language-typescript">// vitest.config.ts
 import { defineConfig } from 'vitest/config'
 import vue from '@vitejs/plugin-vue'
 
@@ -973,7 +975,7 @@ config.global.plugins = [createPinia()]</code></pre>
       <span style="color:#86efac;font-size:.82rem;font-family:monospace">atoms/AppButton.spec.ts</span>
       <span style="background:rgba(74,222,128,.12);color:#86efac;padding:.15rem .6rem;border-radius:4px;font-size:.72rem;font-weight:700">Atom · Unit Test</span>
     </div>
-    <pre style="margin:0;padding:0"><code class="language-typescript">import { mount } from '@vue/test-utils'
+    <pre data-lang="ts" style="margin:0;padding:0"><code class="language-typescript">import { mount } from '@vue/test-utils'
 import AppButton from '@/components/atoms/AppButton.vue'
 
 describe('AppButton', () => {
@@ -1031,7 +1033,7 @@ describe('AppButton', () => {
       <span style="color:#93c5fd;font-size:.82rem;font-family:monospace">molecules/ProductCard.spec.ts</span>
       <span style="background:rgba(96,165,250,.12);color:#93c5fd;padding:.15rem .6rem;border-radius:4px;font-size:.72rem;font-weight:700">Molecule · Composition Test</span>
     </div>
-    <pre style="margin:0;padding:0"><code class="language-typescript">import { mount } from '@vue/test-utils'
+    <pre data-lang="ts" style="margin:0;padding:0"><code class="language-typescript">import { mount } from '@vue/test-utils'
 import ProductCard from '@/components/molecules/ProductCard.vue'
 
 const baseProduct = {
@@ -1100,7 +1102,7 @@ describe('ProductCard', () => {
       <span style="color:#c4b5fd;font-size:.82rem;font-family:monospace">organisms/ProductGrid.spec.ts</span>
       <span style="background:rgba(167,139,250,.12);color:#c4b5fd;padding:.15rem .6rem;border-radius:4px;font-size:.72rem;font-weight:700">Organism · Integration Test</span>
     </div>
-    <pre style="margin:0;padding:0"><code class="language-typescript">import { mount }        from '@vue/test-utils'
+    <pre data-lang="ts" style="margin:0;padding:0"><code class="language-typescript">import { mount }        from '@vue/test-utils'
 import { createTestingPinia } from '@pinia/testing'
 import ProductGrid from '@/components/organisms/ProductGrid.vue'
 
@@ -1183,7 +1185,7 @@ describe('ProductGrid', () => {
       <span style="color:#f9a8d4;font-size:.82rem;font-family:monospace">pages/CategoryPage.spec.ts</span>
       <span style="background:rgba(236,72,153,.12);color:#f9a8d4;padding:.15rem .6rem;border-radius:4px;font-size:.72rem;font-weight:700">Page · E2E Component Test</span>
     </div>
-    <pre style="margin:0;padding:0"><code class="language-typescript">import { mount, flushPromises } from '@vue/test-utils'
+    <pre data-lang="ts" style="margin:0;padding:0"><code class="language-typescript">import { mount, flushPromises } from '@vue/test-utils'
 import { createTestingPinia }   from '@pinia/testing'
 import { createRouter, createMemoryHistory } from 'vue-router'
 import CategoryPage from '@/pages/CategoryPage.vue'
@@ -1284,63 +1286,7 @@ describe('CategoryPage', () => {
 </div>
 
 </div>
-<script>
-hljs.highlightAll()
-
-/* ── Copy button — inject into every .code-block ── */
-document.querySelectorAll('.code-block').forEach(block => {
-  const header = block.querySelector('.code-header')
-  const code   = block.querySelector('code')
-  if (!header || !code) return
-
-  const btn = document.createElement('button')
-  btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span>Copy</span>`
-  btn.style.cssText = [
-    'display:inline-flex', 'align-items:center', 'gap:5px',
-    'background:rgba(255,255,255,.06)', 'border:1px solid rgba(255,255,255,.1)',
-    'color:#94a3b8', 'font-size:.7rem', 'font-weight:600',
-    'padding:3px 10px', 'border-radius:6px', 'cursor:pointer',
-    'transition:all .15s', 'flex-shrink:0',
-  ].join(';')
-
-  btn.addEventListener('mouseenter', () => {
-    btn.style.background = 'rgba(255,255,255,.1)'
-    btn.style.color = '#e2e8f0'
-  })
-  btn.addEventListener('mouseleave', () => {
-    if (!btn.dataset.copied) {
-      btn.style.background = 'rgba(255,255,255,.06)'
-      btn.style.color = '#94a3b8'
-    }
-  })
-
-  btn.addEventListener('click', async () => {
-    try {
-      await navigator.clipboard.writeText(code.innerText)
-    } catch {
-      // fallback for older browsers
-      const ta = document.createElement('textarea')
-      ta.value = code.innerText
-      document.body.appendChild(ta)
-      ta.select()
-      document.execCommand('copy')
-      ta.remove()
-    }
-    btn.dataset.copied = '1'
-    btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span style="color:#4ade80">Copied!</span>`
-    btn.style.background = 'rgba(74,222,128,.1)'
-    btn.style.borderColor = 'rgba(74,222,128,.3)'
-    setTimeout(() => {
-      delete btn.dataset.copied
-      btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span>Copy</span>`
-      btn.style.background = 'rgba(255,255,255,.06)'
-      btn.style.borderColor = 'rgba(255,255,255,.1)'
-      btn.style.color = '#94a3b8'
-    }, 2000)
-  })
-
-  header.appendChild(btn)
-})
-</script>
+<script>hljs.highlightAll()</script>
+<script src="common.js"></script>
 </body>
 </html>

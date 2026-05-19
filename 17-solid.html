@@ -7,6 +7,8 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+<link rel="stylesheet" href="common.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Segoe UI',system-ui,sans-serif;background:#07090f;color:#e2e8f0;line-height:1.7}
@@ -165,7 +167,7 @@ a:hover{text-decoration:underline}
         <span>❌ ละเมิด SRP — หนึ่ง service ทำทุกอย่าง</span>
         <span class="lang-bad">ผิดหลักการ</span>
       </div>
-      <pre><code class="language-go">// OrderService ทำ 3 อย่างพร้อมกัน:
+      <pre data-lang="go"><code class="language-go">// OrderService ทำ 3 อย่างพร้อมกัน:
 // 1) save order  2) send email  3) gen PDF
 // ถ้าอยากเปลี่ยน email template หรือ PDF layout
 // ต้องมาแก้ไฟล์นี้ทั้งที่ไม่เกี่ยวกับ order logic
@@ -197,13 +199,48 @@ func (s *OrderService) PlaceOrder(o Order) error {
 
     return nil
 }</code></pre>
+<pre data-lang="ts" style="display:none"><code class="language-typescript">// OrderService ทำ 3 อย่างพร้อมกัน
+// ถ้าอยากเปลี่ยน email template หรือ layout
+// ต้องมาแก้ไฟล์นี้ทั้งที่ไม่เกี่ยวกับ order logic
+
+class OrderService {
+  private db: Database;
+
+  constructor(db: Database) {
+    this.db = db;
+  }
+
+  async placeOrder(order: Order): Promise<void> {
+    // business logic
+    await this.db.query(
+      'INSERT INTO orders VALUES($1, $2)',
+      [order.id, order.total]
+    );
+
+    // ส่ง email — ไม่ใช่หน้าที่ OrderService!
+    const transporter = nodemailer.createTransport({
+      host: 'smtp.co.th', port: 587,
+    });
+    await transporter.sendMail({
+      from: 'from@co.th',
+      to: order.email,
+      subject: 'Order confirmed: ' + order.id,
+    });
+
+    // สร้าง PDF invoice — ไม่ใช่หน้าที่ OrderService!
+    const doc = new PDFDocument();
+    doc.fontSize(16).text('Invoice #' + order.id);
+    doc.pipe(fs.createWriteStream('invoice.pdf'));
+    doc.end();
+  }
+}</code></pre>
     </div>
     <div class="code-block" style="border-color:#4ade8030">
       <div class="code-header">
         <span>✅ ถูกต้อง — แยก responsibility</span>
         <span class="lang-good">ถูกหลักการ</span>
       </div>
-      <pre><code class="language-go">// แต่ละ type มีเหตุผลเดียวในการเปลี่ยน
+      <pre data-lang="go"><code class="language-go">// แต่ละ type มีเหตุผลเดียวในการเปลี่ยน
 
 type OrderRepository struct{ db *sql.DB }
 
@@ -247,6 +284,52 @@ func (s *OrderService) PlaceOrder(o Order) error {
     go s.email.SendConfirmation(o) // async
     return nil
 }</code></pre>
+<pre data-lang="ts" style="display:none"><code class="language-typescript">// แต่ละ class มีเหตุผลเดียวในการเปลี่ยน
+
+class OrderRepository {
+  constructor(private db: Database) {}
+
+  async save(order: Order): Promise<void> {
+    await this.db.query(
+      'INSERT INTO orders VALUES($1, $2)',
+      [order.id, order.total]
+    );
+  }
+}
+
+// เหตุผลเดียวที่จะเปลี่ยน EmailService:
+// เปลี่ยน email template หรือ SMTP provider
+class EmailService {
+  constructor(private smtpHost: string) {}
+
+  async sendConfirmation(order: Order): Promise<void> {
+    const body = 'Order confirmed: ' + order.id;
+    await sendMail(this.smtpHost, order.email, body);
+  }
+}
+
+// เหตุผลเดียวที่จะเปลี่ยน InvoiceService:
+// เปลี่ยน layout หรือ format ของ PDF
+class InvoiceService {
+  async generate(order: Order): Promise<Buffer> {
+    // ... PDF generation
+    return Buffer.from('');
+  }
+}
+
+// OrderService: orchestrate เท่านั้น
+class OrderService {
+  constructor(
+    private repo: OrderRepository,
+    private email: EmailService,
+    private invoice: InvoiceService,
+  ) {}
+
+  async placeOrder(order: Order): Promise<void> {
+    await this.repo.save(order);
+    this.email.sendConfirmation(order); // fire-and-forget
+  }
+}</code></pre>
     </div>
   </div>
 
@@ -282,7 +365,7 @@ func (s *OrderService) PlaceOrder(o Order) error {
         <span>❌ ละเมิด OCP — เพิ่ม type ต้องแก้ switch</span>
         <span class="lang-bad">ผิดหลักการ</span>
       </div>
-      <pre><code class="language-go">type DiscountService struct{}
+      <pre data-lang="go"><code class="language-go">type DiscountService struct{}
 
 // เพิ่ม user type ใหม่ทุกครั้ง
 // ต้องมาแก้ function นี้ → ผิด OCP
@@ -303,13 +386,27 @@ func (d *DiscountService) Calculate(
         return 0
     }
 }</code></pre>
+<pre data-lang="ts" style="display:none"><code class="language-typescript">class DiscountService {
+  // เพิ่ม user type ใหม่ทุกครั้ง
+  // ต้องมาแก้ method นี้ → ผิด OCP
+  calculate(total: number, userType: string): number {
+    switch (userType) {
+      case 'vip':    return total * 0.20;
+      case 'member': return total * 0.10;
+      case 'new_user': return total * 0.05;
+      // เพิ่ม 'partner' → ต้องแก้ที่นี่
+      // เพิ่ม 'staff'   → ต้องแก้ที่นี่
+      default: return 0;
+    }
+  }
+}</code></pre>
     </div>
     <div class="code-block" style="border-color:#4ade8030">
       <div class="code-header">
         <span>✅ ถูกต้อง — เพิ่ม type ใหม่โดยไม่แก้ code เดิม</span>
         <span class="lang-good">ถูกหลักการ</span>
       </div>
-      <pre><code class="language-go">// Abstraction ที่ "ปิด" ต่อการแก้ไข
+      <pre data-lang="go"><code class="language-go">// Abstraction ที่ "ปิด" ต่อการแก้ไข
 type DiscountStrategy interface {
     Discount(total float64) float64
 }
@@ -338,6 +435,38 @@ func (s *OrderService) FinalPrice(total float64) float64 {
 // inject ตอน wire-up
 svc := &OrderService{discount: VIPDiscount{}}
 svc2 := &OrderService{discount: PartnerDiscount{Rate: 0.15}}</code></pre>
+<pre data-lang="ts" style="display:none"><code class="language-typescript">// Abstraction ที่ "ปิด" ต่อการแก้ไข
+interface DiscountStrategy {
+  discount(total: number): number;
+}
+
+// ขยายได้โดยเพิ่ม class ใหม่
+class VIPDiscount     implements DiscountStrategy {
+  discount(t: number) { return t * 0.20; }
+}
+class MemberDiscount  implements DiscountStrategy {
+  discount(t: number) { return t * 0.10; }
+}
+class NewUserDiscount implements DiscountStrategy {
+  discount(t: number) { return t * 0.05; }
+}
+class PartnerDiscount implements DiscountStrategy {
+  constructor(private rate: number) {}
+  discount(t: number) { return t * this.rate; }
+}
+
+// OrderService ไม่ต้องเปลี่ยนเลย
+class OrderService {
+  constructor(private discount: DiscountStrategy) {}
+
+  finalPrice(total: number): number {
+    return total - this.discount.discount(total);
+  }
+}
+
+// inject ตอน wire-up
+const svc1 = new OrderService(new VIPDiscount());
+const svc2 = new OrderService(new PartnerDiscount(0.15));</code></pre>
     </div>
   </div>
 
@@ -373,7 +502,7 @@ svc2 := &OrderService{discount: PartnerDiscount{Rate: 0.15}}</code></pre>
         <span>❌ ละเมิด LSP — Square ทำ Rectangle ไม่ได้</span>
         <span class="lang-bad">ผิดหลักการ</span>
       </div>
-      <pre><code class="language-go">type Resizable interface {
+      <pre data-lang="go"><code class="language-go">type Resizable interface {
     SetWidth(w float64)
     SetHeight(h float64)
     Area() float64
@@ -398,13 +527,42 @@ func resize(r Resizable) {
     // Square    → Area = 9  ✗ (SetHeight override Side = 3)
     fmt.Println("Area:", r.Area())
 }</code></pre>
+<pre data-lang="ts" style="display:none"><code class="language-typescript">interface Resizable {
+  setWidth(w: number): void;
+  setHeight(h: number): void;
+  area(): number;
+}
+
+class Rectangle implements Resizable {
+  constructor(public w: number, public h: number) {}
+  setWidth(w: number)  { this.w = w; }
+  setHeight(h: number) { this.h = h; }
+  area() { return this.w * this.h; }
+}
+
+// Square "is-a" Rectangle? ไม่จริง!
+class Square implements Resizable {
+  constructor(public side: number) {}
+  setWidth(w: number)  { this.side = w; } // override both
+  setHeight(h: number) { this.side = h; } // ทำให้ width เปลี่ยนด้วย!
+  area() { return this.side * this.side; }
+}
+
+// caller คาดหวัง behavior แบบ Rectangle
+function resize(r: Resizable) {
+  r.setWidth(5);
+  r.setHeight(3);
+  // Rectangle → area = 15 ✓
+  // Square    → area = 9  ✗ (setHeight override side = 3)
+  console.log('Area:', r.area());
+}</code></pre>
     </div>
     <div class="code-block" style="border-color:#4ade8030">
       <div class="code-header">
         <span>✅ ถูกต้อง — interface ตรงกับ behavior จริง</span>
         <span class="lang-good">ถูกหลักการ</span>
       </div>
-      <pre><code class="language-go">// แยก interface ตาม capability จริงๆ
+      <pre data-lang="go"><code class="language-go">// แยก interface ตาม capability จริงๆ
 type Shape interface {
     Area() float64
 }
@@ -436,6 +594,41 @@ func resize(r Resizable, w, h float64) {
     r.SetWidth(w)
     r.SetHeight(h)
     // Square ไม่ผ่านมาที่นี่ → ไม่มี LSP violation
+}</code></pre>
+<pre data-lang="ts" style="display:none"><code class="language-typescript">// แยก interface ตาม capability จริงๆ
+interface Shape {
+  area(): number;
+}
+
+interface Resizable extends Shape {
+  setWidth(w: number): void;
+  setHeight(h: number): void;
+}
+
+// Rectangle implement Resizable
+class Rectangle implements Resizable {
+  constructor(public w: number, public h: number) {}
+  setWidth(w: number)  { this.w = w; }
+  setHeight(h: number) { this.h = h; }
+  area() { return this.w * this.h; }
+}
+
+// Square implement แค่ Shape — honest!
+// ไม่ implement Resizable เพราะ setWidth ≠ setHeight ไม่ได้
+class Square implements Shape {
+  constructor(public side: number) {}
+  setSide(n: number) { this.side = n; }
+  area() { return this.side * this.side; }
+}
+
+function printArea(s: Shape) {
+  console.log('Area:', s.area()); // ทั้ง Rectangle และ Square ใช้ได้
+}
+
+function resize(r: Resizable, w: number, h: number) {
+  r.setWidth(w);
+  r.setHeight(h);
+  // Square ไม่ผ่านมาที่นี่ → ไม่มี LSP violation
 }</code></pre>
     </div>
   </div>
@@ -472,7 +665,7 @@ func resize(r Resizable, w, h float64) {
         <span>❌ ละเมิด ISP — Fat interface บังคับ implement ทุก method</span>
         <span class="lang-bad">ผิดหลักการ</span>
       </div>
-      <pre><code class="language-go">// OrderRepository ใหญ่เกินไป
+      <pre data-lang="go"><code class="language-go">// OrderRepository ใหญ่เกินไป
 // บางคนอยากแค่ Read แต่ถูกบังคับ implement Save, Delete ด้วย
 type OrderRepository interface {
     FindByID(id string) (*Order, error)
@@ -493,13 +686,33 @@ func (c *CacheRepo) Save(o *Order) error                    { return errors.New(
 func (c *CacheRepo) Delete(id string) error                 { return errors.New("read-only") }
 func (c *CacheRepo) GenerateReport() ([]byte, error)        { return nil, errors.New("N/A") }
 func (c *CacheRepo) ExportCSV() (string, error)             { return "", errors.New("N/A") }</code></pre>
+<pre data-lang="ts" style="display:none"><code class="language-typescript">// Fat interface บังคับ implement ทุก method
+interface OrderRepository {
+  findById(id: string): Promise<Order | null>;
+  findByUserId(uid: string): Promise<Order[]>;
+  save(order: Order): Promise<void>;
+  delete(id: string): Promise<void>;
+  generateReport(): Promise<Buffer>; // ไม่ใช่หน้าที่ repository!
+  exportCsv(): Promise<string>;      // ไม่ใช่หน้าที่ repository!
+}
+
+// CacheRepo ต้องการแค่ findById
+// แต่ถูกบังคับ implement save, delete, report ด้วย!
+class CacheRepo implements OrderRepository {
+  async findById(id: string) { /* cache lookup */ return null; }
+  async findByUserId(uid: string) { return []; }
+  async save(o: Order) { throw new Error('read-only'); }
+  async delete(id: string) { throw new Error('read-only'); }
+  async generateReport() { throw new Error('N/A'); }
+  async exportCsv() { throw new Error('N/A'); }
+}</code></pre>
     </div>
     <div class="code-block" style="border-color:#4ade8030">
       <div class="code-header">
         <span>✅ ถูกต้อง — แยก interface ตาม role</span>
         <span class="lang-good">ถูกหลักการ</span>
       </div>
-      <pre><code class="language-go">// Interface เล็กๆ แยกตาม role
+      <pre data-lang="go"><code class="language-go">// Interface เล็กๆ แยกตาม role
 type OrderReader interface {
     FindByID(id string) (*Order, error)
     FindByUserID(uid string) ([]*Order, error)
@@ -530,6 +743,38 @@ type ReportService struct {
 
 type OrderService struct {
     repo OrderRepository // ต้องการทั้ง Read และ Write
+}</code></pre>
+<pre data-lang="ts" style="display:none"><code class="language-typescript">// Interface เล็กๆ แยกตาม role
+interface OrderReader {
+  findById(id: string): Promise<Order | null>;
+  findByUserId(uid: string): Promise<Order[]>;
+}
+
+interface OrderWriter {
+  save(order: Order): Promise<void>;
+  delete(id: string): Promise<void>;
+}
+
+// Compose เมื่อต้องการทั้งสองอย่าง
+interface OrderRepository extends OrderReader, OrderWriter {}
+
+// CacheRepo implement แค่ที่ตัวเองทำได้จริง
+class CacheRepo implements OrderReader {
+  private data = new Map<string, Order>();
+  async findById(id: string) { return this.data.get(id) ?? null; }
+  async findByUserId(uid: string) {
+    return [...this.data.values()].filter(o => o.userId === uid);
+  }
+  // ไม่ต้อง implement save/delete
+}
+
+// Service ขอแค่ที่ตัวเองต้องการ
+class ReportService {
+  constructor(private reader: OrderReader) {} // ต้องการแค่ Read
+}
+
+class OrderService {
+  constructor(private repo: OrderRepository) {} // ต้องการทั้ง Read + Write
 }</code></pre>
     </div>
   </div>
@@ -566,7 +811,7 @@ type OrderService struct {
         <span>❌ ละเมิด DIP — High-level depend on Low-level</span>
         <span class="lang-bad">ผิดหลักการ</span>
       </div>
-      <pre><code class="language-go">// Low-level module: concrete DB implementation
+      <pre data-lang="go"><code class="language-go">// Low-level module: concrete DB implementation
 type PostgresOrderRepo struct{ db *sql.DB }
 
 func (r *PostgresOrderRepo) Save(o Order) error {
@@ -590,13 +835,36 @@ func NewOrderService() *OrderService {
 
 // Test ยากมาก — ต้อง spin up Postgres จริงๆ
 // เปลี่ยนเป็น MySQL → ต้องแก้ OrderService</code></pre>
+<pre data-lang="ts" style="display:none"><code class="language-typescript">// Low-level module: concrete DB implementation
+class PostgresOrderRepo {
+  constructor(private db: Pool) {}
+
+  async save(order: Order): Promise<void> {
+    await this.db.query('INSERT INTO orders...');
+  }
+}
+
+// High-level module: business logic
+// ผิดตรงที่ depend on concrete type โดยตรง
+class OrderService {
+  private repo: PostgresOrderRepo; // ← concrete! ผิด DIP
+
+  constructor() {
+    // สร้าง dependency เอง — ยิ่งผิดหนัก
+    const pool = new Pool({ connectionString: process.env.DB_URL });
+    this.repo = new PostgresOrderRepo(pool); // tightly coupled
+  }
+}
+
+// Test ยากมาก — ต้องใช้ Postgres จริงๆ
+// เปลี่ยนเป็น MySQL → ต้องแก้ OrderService</code></pre>
     </div>
     <div class="code-block" style="border-color:#4ade8030">
       <div class="code-header">
         <span>✅ ถูกต้อง — ทั้งสอง depend on abstraction</span>
         <span class="lang-good">ถูกหลักการ</span>
       </div>
-      <pre><code class="language-go">// Abstraction — กำหนดโดย High-level module
+      <pre data-lang="go"><code class="language-go">// Abstraction — กำหนดโดย High-level module
 type OrderStorer interface {
     Save(o Order) error
     FindByID(id string) (*Order, error)
@@ -633,6 +901,42 @@ svc  := NewOrderService(repo)
 // --- test ---
 mock := &MockOrderRepo{}
 svc  := NewOrderService(mock) // ไม่ต้องการ DB เลย!</code></pre>
+<pre data-lang="ts" style="display:none"><code class="language-typescript">// Abstraction — กำหนดโดย High-level module
+interface OrderStorer {
+  save(order: Order): Promise<void>;
+  findById(id: string): Promise<Order | null>;
+}
+
+// High-level module: depend on interface เท่านั้น
+class OrderService {
+  constructor(private store: OrderStorer) {} // ← abstraction!
+
+  async placeOrder(order: Order): Promise<void> {
+    await this.store.save(order);
+  }
+}
+
+// Low-level modules: implement interface
+class PostgresOrderRepo implements OrderStorer {
+  constructor(private db: Pool) {}
+  async save(o: Order) { await this.db.query('INSERT...', [o.id, o.total]); }
+  async findById(id: string) { const r = await this.db.query('SELECT...', [id]); return r.rows[0]; }
+}
+
+// Mock สำหรับ test
+class MockOrderRepo implements OrderStorer {
+  saved: Order[] = [];
+  async save(o: Order) { this.saved.push(o); }
+  async findById(id: string) { return this.saved.find(o => o.id === id) ?? null; }
+}
+
+// --- main.ts ---
+const repo = new PostgresOrderRepo(pool);
+const svc  = new OrderService(repo);
+
+// --- test ---
+const mock = new MockOrderRepo();
+const svc  = new OrderService(mock); // ไม่ต้องการ DB เลย!</code></pre>
     </div>
   </div>
 
@@ -651,7 +955,7 @@ svc  := NewOrderService(mock) // ไม่ต้องการ DB เลย!</c
       <span>ตัวอย่าง Order System ที่ใช้ SOLID ครบทั้ง 5 ข้อ</span>
       <span style="background:rgba(249,115,22,.12);color:#fdba74;padding:.15rem .6rem;border-radius:4px;font-size:.72rem;font-weight:700">Go · SOLID</span>
     </div>
-    <pre><code class="language-go">// ── D: Abstraction ที่ High-level กำหนด ──────────────────────
+    <pre data-lang="go"><code class="language-go">// ── D: Abstraction ที่ High-level กำหนด ──────────────────────
 type OrderRepository interface {      // ISP: เล็ก ตรงประเด็น
     Save(o *Order) error
     FindByID(id string) (*Order, error)
@@ -705,6 +1009,58 @@ func (p *PromptPayProcessor)  Pay(amount float64) error { /* scan QR */    retur
 
 func checkout(p PaymentProcessor, amount float64) error {
     return p.Pay(amount) // LSP: ทั้ง CreditCard และ PromptPay ใช้แทนกันได้
+}</code></pre>
+<pre data-lang="ts" style="display:none"><code class="language-typescript">// ── D: Abstraction ที่ High-level กำหนด ──────────────────────
+interface OrderRepository {   // ISP: เล็ก ตรงประเด็น
+  save(o: Order): Promise<void>;
+  findById(id: string): Promise<Order | null>;
+}
+
+interface Notifier {          // ISP: แยกจาก Repository
+  notify(email: string, msg: string): Promise<void>;
+}
+
+// ── S: OrderService มีหน้าที่เดียว — orchestrate ──────────────
+class OrderService {
+  constructor(
+    private repo: OrderRepository,     // D: depend on abstraction
+    private notifier: Notifier,        // D: depend on abstraction
+  ) {}
+
+  async placeOrder(order: Order): Promise<void> {
+    await this.repo.save(order); // ไม่รู้ว่าเป็น Postgres หรือ Mock
+    this.notifier.notify(order.userEmail, 'Order placed!'); // fire-and-forget
+  }
+}
+
+// ── O: เพิ่ม discount strategy โดยไม่แก้ OrderService ──────────
+interface DiscountStrategy {
+  discount(total: number): number;
+}
+
+class VIPDiscount   implements DiscountStrategy { discount(t: number) { return t * 0.20; } }
+class StaffDiscount implements DiscountStrategy {
+  constructor(private rate: number) {}
+  discount(t: number) { return t * this.rate; }
+}
+
+// ── L: PaymentProcessor ต้อง honor contract ────────────────────
+interface PaymentProcessor {
+  pay(amount: number): Promise<void>;
+}
+
+class CreditCardProcessor implements PaymentProcessor {
+  constructor(private cardNo: string) {}
+  async pay(amount: number) { /* charge card */ }
+}
+
+class PromptPayProcessor implements PaymentProcessor {
+  constructor(private qrCode: string) {}
+  async pay(amount: number) { /* scan QR */ }
+}
+
+async function checkout(p: PaymentProcessor, amount: number) {
+  await p.pay(amount); // LSP: ทั้ง CreditCard และ PromptPay ใช้แทนกันได้
 }</code></pre>
   </div>
 </div>
@@ -826,30 +1182,6 @@ func checkout(p PaymentProcessor, amount float64) error {
 
 </div>
 <script>hljs.highlightAll()</script>
-<script>
-document.querySelectorAll('.code-block').forEach(block => {
-  const header = block.querySelector('.code-header')
-  const code   = block.querySelector('code')
-  if (!header || !code) return
-  const btn = document.createElement('button')
-  btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span>Copy</span>`
-  btn.style.cssText = 'display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#94a3b8;font-size:.7rem;font-weight:600;padding:3px 10px;border-radius:6px;cursor:pointer;transition:all .15s;flex-shrink:0'
-  btn.addEventListener('mouseenter', () => { btn.style.background='rgba(255,255,255,.1)'; btn.style.color='#e2e8f0' })
-  btn.addEventListener('mouseleave', () => { if (!btn.dataset.copied) { btn.style.background='rgba(255,255,255,.06)'; btn.style.color='#94a3b8' } })
-  btn.addEventListener('click', async () => {
-    try { await navigator.clipboard.writeText(code.innerText) }
-    catch { const ta=document.createElement('textarea'); ta.value=code.innerText; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove() }
-    btn.dataset.copied='1'
-    btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fb923c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span style="color:#fb923c">Copied!</span>`
-    btn.style.background='rgba(249,115,22,.1)'; btn.style.borderColor='rgba(249,115,22,.3)'
-    setTimeout(() => {
-      delete btn.dataset.copied
-      btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span>Copy</span>`
-      btn.style.background='rgba(255,255,255,.06)'; btn.style.borderColor='rgba(255,255,255,.1)'; btn.style.color='#94a3b8'
-    }, 2000)
-  })
-  header.appendChild(btn)
-})
-</script>
+<script src="common.js"></script>
 </body>
 </html>

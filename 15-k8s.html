@@ -9,6 +9,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/yaml.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+<link rel="stylesheet" href="common.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Segoe UI',sans-serif;background:#0a0e1a;color:#e2e8f0;line-height:1.7}
@@ -553,7 +555,7 @@ strong{color:#e2e8f0}
     </div>
 
     <div id="tab-pod" class="tab-content active">
-      <pre><code class="language-yaml">apiVersion: v1
+      <pre data-lang="yaml"><code class="language-yaml">apiVersion: v1
 kind: Pod
 metadata:
   name: api-pod
@@ -600,7 +602,7 @@ spec:
     </div>
 
     <div id="tab-deploy" class="tab-content">
-      <pre><code class="language-yaml">apiVersion: apps/v1
+      <pre data-lang="yaml"><code class="language-yaml">apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: api-deployment
@@ -648,7 +650,7 @@ spec:
     </div>
 
     <div id="tab-stateful" class="tab-content">
-      <pre><code class="language-yaml">apiVersion: apps/v1
+      <pre data-lang="yaml"><code class="language-yaml">apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: postgres
@@ -692,7 +694,7 @@ spec:
     </div>
 
     <div id="tab-configmap" class="tab-content">
-      <pre><code class="language-yaml">apiVersion: v1
+      <pre data-lang="yaml"><code class="language-yaml">apiVersion: v1
 kind: ConfigMap
 metadata:
   name: app-config
@@ -737,7 +739,7 @@ data:
     </div>
 
     <div id="tab-secret" class="tab-content">
-      <pre><code class="language-yaml">apiVersion: v1
+      <pre data-lang="yaml"><code class="language-yaml">apiVersion: v1
 kind: Secret
 metadata:
   name: app-secret
@@ -766,7 +768,7 @@ stringData:
     </div>
 
     <div id="tab-ns" class="tab-content">
-      <pre><code class="language-yaml">apiVersion: v1
+      <pre data-lang="yaml"><code class="language-yaml">apiVersion: v1
 kind: Namespace
 metadata:
   name: production
@@ -843,7 +845,7 @@ spec:
       <button class="tab-btn" onclick="showTab('svc-ingress')">Ingress</button>
     </div>
     <div id="tab-svc-clusterip" class="tab-content active">
-      <pre><code class="language-yaml">apiVersion: v1
+      <pre data-lang="yaml"><code class="language-yaml">apiVersion: v1
 kind: Service
 metadata:
   name: api-service
@@ -890,7 +892,7 @@ spec:
   - port: 5432</code></pre>
     </div>
     <div id="tab-svc-ingress" class="tab-content">
-      <pre><code class="language-yaml">apiVersion: networking.k8s.io/v1
+      <pre data-lang="yaml"><code class="language-yaml">apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: main-ingress
@@ -981,7 +983,7 @@ spec:
 
   <div class="code-file">
     <div class="code-file-header">storage.yaml — StorageClass + PVC + Pod</div>
-    <pre><code class="language-yaml"># StorageClass — ให้ K8s สร้าง disk อัตโนมัติบน AWS
+    <pre data-lang="yaml"><code class="language-yaml"># StorageClass — ให้ K8s สร้าง disk อัตโนมัติบน AWS
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
@@ -1064,7 +1066,7 @@ spec:
 
   <div class="code-file">
     <div class="code-file-header">hpa.yaml — Horizontal Pod Autoscaler</div>
-    <pre><code class="language-yaml">apiVersion: autoscaling/v2
+    <pre data-lang="yaml"><code class="language-yaml">apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: api-hpa
@@ -1234,7 +1236,7 @@ spec:
 
   <div class="code-file">
     <div class="code-file-header">config/config.go — อ่าน config จาก env vars (K8s inject ให้)</div>
-    <pre><code class="language-go">package config
+    <pre data-lang="go"><code class="language-go">package config
 
 import (
 	"fmt"
@@ -1283,10 +1285,46 @@ func mustEnv(key string) string {
 	return v
 }</code></pre>
   </div>
+  <div class="code-file">
+    <div class="code-file-header">config/config.ts — อ่าน config จาก env vars (K8s inject ให้)</div>
+    <pre data-lang="ts" style="display:none"><code class="language-typescript">// config/config.ts
+// K8s inject ค่าเหล่านี้จาก ConfigMap และ Secret
+// ไม่ต้องรู้เรื่อง K8s เลย — แค่อ่าน process.env ปกติ
+
+interface Config {
+  dbHost:     string;
+  dbPort:     number;
+  dbName:     string;
+  dbPassword: string; // มาจาก Secret
+  logLevel:   string;
+  port:       number;
+}
+
+function getEnv(key: string, fallback: string): string {
+  return process.env[key] || fallback;
+}
+
+function mustEnv(key: string): string {
+  const v = process.env[key];
+  if (!v) throw new Error(`required env var "${key}" is not set`);
+  return v;
+}
+
+export function loadConfig(): Config {
+  return {
+    dbHost:     getEnv('DB_HOST',    'localhost'),
+    dbPort:     parseInt(getEnv('DB_PORT', '5432'), 10),
+    dbName:     getEnv('DB_NAME',    'appdb'),
+    dbPassword: mustEnv('DB_PASSWORD'), // ถ้าไม่มีจะ throw ทันที
+    logLevel:   getEnv('LOG_LEVEL',  'info'),
+    port:       parseInt(getEnv('PORT', '8080'), 10),
+  };
+}</code></pre>
+  </div>
 
   <div class="code-file">
     <div class="code-file-header">config/file_config.go — อ่าน ConfigMap ที่ mount เป็น file</div>
-    <pre><code class="language-go">package config
+    <pre data-lang="go"><code class="language-go">package config
 
 import (
 	"os"
@@ -1331,10 +1369,50 @@ func LoadFromFile(path string) (*AppConfig, error) {
 //
 // K8s จะ hot-reload file เมื่อ ConfigMap เปลี่ยน (ใน ~1 นาที)</code></pre>
   </div>
+  <div class="code-file">
+    <div class="code-file-header">config/fileConfig.ts — อ่าน ConfigMap ที่ mount เป็น file</div>
+    <pre data-lang="ts" style="display:none"><code class="language-typescript">// config/fileConfig.ts
+import * as fs from 'fs';
+import * as yaml from 'js-yaml';
+
+// K8s mount ConfigMap เป็น file ที่ /etc/app/config/app.yaml
+// App ก็แค่อ่าน file ปกติ — ไม่ต้องรู้เรื่อง K8s
+
+interface AppConfig {
+  server: {
+    port:    number;
+    timeout: string;
+  };
+  cache: {
+    ttl:     string;
+    maxSize: number;
+  };
+  features: Record&lt;string, boolean&gt;;
+}
+
+export function loadFromFile(path: string): AppConfig {
+  // path = "/etc/app/config/app.yaml" (mounted from ConfigMap)
+  const data = fs.readFileSync(path, 'utf8');
+  return yaml.load(data) as AppConfig;
+}
+
+// ── K8s YAML ที่ทำให้ mount ได้ ──
+//
+// volumes:
+// - name: config-vol
+//   configMap:
+//     name: app-config
+// volumeMounts:
+// - name: config-vol
+//   mountPath: /etc/app/config    # app.yaml จะอยู่ที่นี่
+//   readOnly: true
+//
+// K8s จะ hot-reload file เมื่อ ConfigMap เปลี่ยน (ใน ~1 นาที)</code></pre>
+  </div>
 
   <div class="code-file">
     <div class="code-file-header">health/health.go — Health check endpoints (K8s ต้องการ)</div>
-    <pre><code class="language-go">package health
+    <pre data-lang="go"><code class="language-go">package health
 
 import (
 	"database/sql"
@@ -1379,6 +1457,40 @@ func (h *HealthHandler) Readiness(w http.ResponseWriter, r *http.Request) {
 // วิธี register:
 // mux.HandleFunc("/healthz", health.Liveness)
 // mux.HandleFunc("/ready",   health.Readiness)</code></pre>
+  </div>
+  <div class="code-file">
+    <div class="code-file-header">health/health.ts — Health check endpoints (K8s ต้องการ)</div>
+    <pre data-lang="ts" style="display:none"><code class="language-typescript">// health/health.ts
+// K8s ใช้ 2 endpoints นี้ตรวจสุขภาพ app:
+// - /healthz → livenessProbe  (K8s restart Pod ถ้า fail)
+// - /ready   → readinessProbe (K8s หยุดส่ง traffic ถ้า fail)
+import express, { Request, Response } from 'express';
+import { Pool } from 'pg';
+
+export function createHealthRouter(db: Pool) {
+  const router = express.Router();
+  const startTime = Date.now();
+
+  // /healthz — ตอบแค่ว่า process ยังรันอยู่ไหม
+  router.get('/healthz', (_req: Request, res: Response) => {
+    res.json({ status: 'ok', uptime: `${Date.now() - startTime}ms` });
+  });
+
+  // /ready — ตรวจว่าพร้อมรับ traffic จริงๆ (ตรวจ dependencies)
+  router.get('/ready', async (_req: Request, res: Response) => {
+    try {
+      await db.query('SELECT 1');
+      res.json({ status: 'ready' });
+    } catch {
+      res.status(503).json({ status: 'not ready', reason: 'db unreachable' });
+    }
+  });
+
+  return router;
+}
+
+// วิธี register:
+// app.use(createHealthRouter(pool));</code></pre>
   </div>
 
   <!-- ═══ วิธี 2 ═══ -->
@@ -1426,7 +1538,7 @@ func (h *HealthHandler) Readiness(w http.ResponseWriter, r *http.Request) {
 
   <div class="code-file">
     <div class="code-file-header">operator/reconciler.go — controller-runtime Reconciler (นิยมที่สุด)</div>
-    <pre><code class="language-go">package operator
+    <pre data-lang="go"><code class="language-go">package operator
 
 // go get sigs.k8s.io/controller-runtime@latest
 
@@ -1516,10 +1628,76 @@ func (r *DeploymentReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Complete(r)
 }</code></pre>
   </div>
+  <div class="code-file">
+    <div class="code-file-header">operator/k8s-client.ts — @kubernetes/client-node (TypeScript equivalent)</div>
+    <pre data-lang="ts" style="display:none"><code class="language-typescript">import * as k8s from '@kubernetes/client-node';
+
+// ── Connect to cluster ────────────────────────────────────
+const kc = new k8s.KubeConfig();
+kc.loadFromDefault(); // uses ~/.kube/config
+
+const appsV1Api = kc.makeApiClient(k8s.AppsV1Api);
+const coreV1Api  = kc.makeApiClient(k8s.CoreV1Api);
+
+// ── List Pods ─────────────────────────────────────────────
+async function listPods(namespace: string): Promise&lt;void&gt; {
+  const res = await coreV1Api.listNamespacedPod({ namespace });
+  for (const pod of res.items) {
+    console.log(`${pod.metadata?.name} — ${pod.status?.phase}`);
+  }
+}
+
+// ── Create Deployment ─────────────────────────────────────
+async function createDeployment(namespace: string): Promise&lt;void&gt; {
+  const deployment: k8s.V1Deployment = {
+    metadata: { name: 'my-app', namespace },
+    spec: {
+      replicas: 3,
+      selector: { matchLabels: { app: 'my-app' } },
+      template: {
+        metadata: { labels: { app: 'my-app' } },
+        spec: {
+          containers: [{
+            name: 'my-app',
+            image: 'my-app:latest',
+            resources: {
+              requests: { cpu: '100m', memory: '128Mi' },
+              limits:   { cpu: '500m', memory: '512Mi' },
+            },
+          }],
+        },
+      },
+    },
+  };
+  await appsV1Api.createNamespacedDeployment({ namespace, body: deployment });
+}
+
+// ── Scale Deployment ──────────────────────────────────────
+async function scaleDeployment(namespace: string, name: string, replicas: number): Promise&lt;void&gt; {
+  await appsV1Api.patchNamespacedDeployment({
+    name, namespace,
+    body: { spec: { replicas } },
+  });
+  console.log(`scaled ${name} to ${replicas} replicas`);
+}
+
+// ── Watch events ──────────────────────────────────────────
+async function watchPods(namespace: string): Promise&lt;void&gt; {
+  const watch = new k8s.Watch(kc);
+  await watch.watch(
+    `/api/v1/namespaces/${namespace}/pods`,
+    {},
+    (type, obj: k8s.V1Pod) =&gt; {
+      console.log(`${type}: ${obj.metadata?.name}`);
+    },
+    (err) =&gt; { if (err) console.error('watch error:', err); }
+  );
+}</code></pre>
+  </div>
 
   <div class="code-file">
     <div class="code-file-header">cmd/operator/main.go — Start the operator</div>
-    <pre><code class="language-go">package main
+    <pre data-lang="go"><code class="language-go">package main
 
 import (
 	"log"
@@ -1571,6 +1749,47 @@ func main() {
 	}
 }</code></pre>
   </div>
+  <div class="code-file">
+    <div class="code-file-header">cmd/operator/main.ts — Start operator (TypeScript)</div>
+    <pre data-lang="ts" style="display:none"><code class="language-typescript">// cmd/operator/main.ts
+// npm install @kubernetes/client-node
+import * as k8s from '@kubernetes/client-node';
+
+async function main(): Promise&lt;void&gt; {
+  const kc = new k8s.KubeConfig();
+  kc.loadFromDefault();
+
+  const appsV1Api = kc.makeApiClient(k8s.AppsV1Api);
+  const coreV1Api = kc.makeApiClient(k8s.CoreV1Api);
+
+  // Watch Deployments and enforce minimum replicas = 2
+  const watch = new k8s.Watch(kc);
+  await watch.watch(
+    '/apis/apps/v1/deployments',
+    {},
+    async (type: string, obj: k8s.V1Deployment) =&gt; {
+      if (type === 'DELETED') return;
+      const name      = obj.metadata?.name!;
+      const namespace = obj.metadata?.namespace!;
+      const replicas  = obj.spec?.replicas ?? 1;
+
+      // Enforce minimum replicas (HA)
+      if (replicas &lt; 2) {
+        await appsV1Api.patchNamespacedDeployment({
+          name, namespace,
+          body: { spec: { replicas: 2 } },
+        });
+        console.log(`[reconcile] ${namespace}/${name}: enforced replicas → 2`);
+      }
+    },
+    (err) =&gt; { if (err) console.error('watch error:', err); }
+  );
+
+  console.log('Operator started — watching Deployments...');
+}
+
+main().catch(console.error);</code></pre>
+  </div>
 
   <!-- ═══ วิธี 3 ═══ -->
   <div style="margin:48px 0 0">
@@ -1590,7 +1809,7 @@ func main() {
 
   <div class="code-file">
     <div class="code-file-header">tool/main.go — CLI tool ด้วย client-go (เปรียบเทียบวิธีที่ 2)</div>
-    <pre><code class="language-go">package main
+    <pre data-lang="go"><code class="language-go">package main
 
 import (
 	"context"
@@ -1656,6 +1875,50 @@ func main() {
 	}
 	w.Flush()
 }</code></pre>
+  </div>
+  <div class="code-file">
+    <div class="code-file-header">tool/main.ts — CLI tool ด้วย @kubernetes/client-node</div>
+    <pre data-lang="ts" style="display:none"><code class="language-typescript">// tool/main.ts — เครื่องมือง่ายๆ: แสดงสรุป resource usage ทุก namespace
+// npm install @kubernetes/client-node
+import * as k8s from '@kubernetes/client-node';
+
+async function main(): Promise&lt;void&gt; {
+  // 1. โหลด kubeconfig (อ่านจาก ~/.kube/config)
+  const kc = new k8s.KubeConfig();
+  kc.loadFromDefault();
+
+  const coreV1Api = kc.makeApiClient(k8s.CoreV1Api);
+
+  // 2. ดึง namespaces ทั้งหมด
+  const nsList = await coreV1Api.listNamespace();
+
+  // 3. แสดงผลเป็นตาราง
+  console.log('NAMESPACE'.padEnd(30), 'PODS'.padEnd(6), 'RUNNING'.padEnd(9), 'PENDING'.padEnd(9), 'FAILED');
+  console.log('-'.repeat(65));
+
+  for (const ns of nsList.items) {
+    const name = ns.metadata?.name!;
+    const pods = await coreV1Api.listNamespacedPod({ namespace: name });
+
+    let running = 0, pending = 0, failed = 0;
+    for (const p of pods.items) {
+      switch (p.status?.phase) {
+        case 'Running': running++; break;
+        case 'Pending': pending++; break;
+        case 'Failed':  failed++;  break;
+      }
+    }
+    console.log(
+      name.padEnd(30),
+      String(pods.items.length).padEnd(6),
+      String(running).padEnd(9),
+      String(pending).padEnd(9),
+      String(failed),
+    );
+  }
+}
+
+main().catch(console.error);</code></pre>
   </div>
 
   <!-- Summary table -->
@@ -1729,7 +1992,7 @@ func main() {
 
   <div class="code-file">
     <div class="code-file-header">rbac.yaml — ServiceAccount + Role + RoleBinding</div>
-    <pre><code class="language-yaml">apiVersion: v1
+    <pre data-lang="yaml"><code class="language-yaml">apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: api-service-account
@@ -1939,7 +2202,7 @@ spec:
     </div>
 
     <div id="tab-helm-chart" class="tab-content active">
-      <pre><code class="language-yaml">apiVersion: v2
+      <pre data-lang="yaml"><code class="language-yaml">apiVersion: v2
 name: myapp
 description: My Go API application
 type: application
@@ -1968,7 +2231,7 @@ keywords:
     </div>
 
     <div id="tab-helm-values" class="tab-content">
-      <pre><code class="language-yaml"># values.yaml — default values (development)
+      <pre data-lang="yaml"><code class="language-yaml"># values.yaml — default values (development)
 # ทุก key ที่นี่ใช้ได้ใน templates ด้วย {{ .Values.xxx }}
 
 replicaCount: 1          # dev ใช้ 1 replica พอ
@@ -2027,7 +2290,7 @@ redis:
     </div>
 
     <div id="tab-helm-deploy" class="tab-content">
-      <pre><code class="language-yaml"># templates/deployment.yaml
+      <pre data-lang="yaml"><code class="language-yaml"># templates/deployment.yaml
 # {{ }} คือ Helm template syntax — แทนที่ด้วยค่าจาก values
 apiVersion: apps/v1
 kind: Deployment
@@ -2087,7 +2350,7 @@ spec:
     </div>
 
     <div id="tab-helm-helper" class="tab-content">
-      <pre><code class="language-yaml"># templates/_helpers.tpl
+      <pre data-lang="yaml"><code class="language-yaml"># templates/_helpers.tpl
 # ไฟล์นี้ไม่ถูก render เป็น K8s resource
 # แต่ define functions ที่ template อื่นเรียกใช้ได้
 
@@ -2123,7 +2386,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
     </div>
 
     <div id="tab-helm-values-prod" class="tab-content">
-      <pre><code class="language-yaml"># values-prod.yaml — production overrides เท่านั้น
+      <pre data-lang="yaml"><code class="language-yaml"># values-prod.yaml — production overrides เท่านั้น
 # ค่าที่ไม่ได้ระบุจะใช้จาก values.yaml
 
 replicaCount: 3
@@ -2336,7 +2599,7 @@ redis:
 
   <div class="code-file">
     <div class="code-file-header">templates/migration-job.yaml — Helm Hook: รัน DB migration ก่อน deploy</div>
-    <pre><code class="language-yaml">apiVersion: batch/v1
+    <pre data-lang="yaml"><code class="language-yaml">apiVersion: batch/v1
 kind: Job
 metadata:
   name: {{ include "myapp.fullname" . }}-migration
@@ -2579,7 +2842,7 @@ spec:
     </div>
 
     <div id="tab-argo-app" class="tab-content active">
-      <pre><code class="language-yaml"># ArgoCD Application — บอกว่าเอา Git อะไร deploy ที่ไหน
+      <pre data-lang="yaml"><code class="language-yaml"># ArgoCD Application — บอกว่าเอา Git อะไร deploy ที่ไหน
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -2632,7 +2895,7 @@ spec:
     </div>
 
     <div id="tab-argo-appofapps" class="tab-content">
-      <pre><code class="language-yaml"># App of Apps Pattern — 1 Application จัดการหลาย Applications
+      <pre data-lang="yaml"><code class="language-yaml"># App of Apps Pattern — 1 Application จัดการหลาย Applications
 # ใช้สำหรับ bootstrap ทั้ง cluster ด้วย git push ครั้งเดียว
 
 # root-app.yaml — deploy ลง ArgoCD namespace
@@ -2672,7 +2935,7 @@ spec:
     </div>
 
     <div id="tab-argo-sync" class="tab-content">
-      <pre><code class="language-yaml"># Sync Strategy Options
+      <pre data-lang="yaml"><code class="language-yaml"># Sync Strategy Options
 
 # ── 1. Manual Sync (production แนะนำ) ─────────────
 syncPolicy: {}   # ไม่มี automated = manual เท่านั้น
@@ -2706,7 +2969,7 @@ metadata:
     </div>
 
     <div id="tab-argo-cli" class="tab-content">
-      <pre><code class="language-bash"># ติดตั้ง ArgoCD CLI
+      <pre data-lang="bash"><code class="language-bash"># ติดตั้ง ArgoCD CLI
 brew install argocd
 
 # Login
@@ -2746,7 +3009,7 @@ argocd app create root-app \
     </div>
 
     <div id="tab-argo-ci" class="tab-content">
-      <pre><code class="language-yaml"># .github/workflows/deploy.yaml
+      <pre data-lang="yaml"><code class="language-yaml"># .github/workflows/deploy.yaml
 # GitHub Actions workflow: build → push → update ArgoCD
 
 name: Build and Deploy
@@ -2805,7 +3068,7 @@ jobs:
   <h3>ติดตั้ง ArgoCD บน Cluster</h3>
   <div class="code-file">
     <div class="code-file-header">install-argocd.sh — ติดตั้งด้วย kubectl หรือ Helm</div>
-    <pre><code class="language-bash"># ── วิธีที่ 1: kubectl apply (เร็ว สำหรับทดลอง) ──────────────────
+    <pre data-lang="bash"><code class="language-bash"># ── วิธีที่ 1: kubectl apply (เร็ว สำหรับทดลอง) ──────────────────
 kubectl create namespace argocd
 kubectl apply -n argocd \
   -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
@@ -2913,60 +3176,6 @@ function showTab(id) {
 }
 </script>
 
-<script>
-/* ── Copy button — inject into every .code-block ── */
-document.querySelectorAll('.code-block').forEach(block => {
-  const header = block.querySelector('.code-header')
-  const code   = block.querySelector('code')
-  if (!header || !code) return
-
-  const btn = document.createElement('button')
-  btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span>Copy</span>`
-  btn.style.cssText = [
-    'display:inline-flex','align-items:center','gap:5px',
-    'background:rgba(255,255,255,.06)','border:1px solid rgba(255,255,255,.1)',
-    'color:#94a3b8','font-size:.7rem','font-weight:600',
-    'padding:3px 10px','border-radius:6px','cursor:pointer',
-    'transition:all .15s','flex-shrink:0',
-  ].join(';')
-
-  btn.addEventListener('mouseenter', () => {
-    btn.style.background = 'rgba(255,255,255,.1)'
-    btn.style.color = '#e2e8f0'
-  })
-  btn.addEventListener('mouseleave', () => {
-    if (!btn.dataset.copied) {
-      btn.style.background = 'rgba(255,255,255,.06)'
-      btn.style.color = '#94a3b8'
-    }
-  })
-
-  btn.addEventListener('click', async () => {
-    try {
-      await navigator.clipboard.writeText(code.innerText)
-    } catch {
-      const ta = document.createElement('textarea')
-      ta.value = code.innerText
-      document.body.appendChild(ta)
-      ta.select()
-      document.execCommand('copy')
-      ta.remove()
-    }
-    btn.dataset.copied = '1'
-    btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span style="color:#4ade80">Copied!</span>`
-    btn.style.background = 'rgba(74,222,128,.1)'
-    btn.style.borderColor = 'rgba(74,222,128,.3)'
-    setTimeout(() => {
-      delete btn.dataset.copied
-      btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span>Copy</span>`
-      btn.style.background = 'rgba(255,255,255,.06)'
-      btn.style.borderColor = 'rgba(255,255,255,.1)'
-      btn.style.color = '#94a3b8'
-    }, 2000)
-  })
-
-  header.appendChild(btn)
-})
-</script>
+<script src="common.js"></script>
 </body>
 </html>

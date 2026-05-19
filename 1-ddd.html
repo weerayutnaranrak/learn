@@ -7,6 +7,8 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+<link rel="stylesheet" href="common.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Segoe UI',system-ui,sans-serif;background:#07090f;color:#e2e8f0;line-height:1.7}
@@ -337,7 +339,7 @@ a:hover{text-decoration:underline}
       <span>domain/money.go — Value Object</span>
       <span class="lang">Go</span>
     </div>
-    <pre><code class="language-go">package domain
+    <pre data-lang="go"><code class="language-go">package domain
 
 import (
     "errors"
@@ -387,6 +389,51 @@ func (m Money) Equal(other Money) bool {
 func (m Money) String() string {
     return fmt.Sprintf("%.2f %s", m.Baht(), m.currency)
 }</code></pre>
+    <pre data-lang="ts" style="display:none"><code class="language-typescript">// domain/money.ts — Value Object
+
+// Money เป็น Immutable Value Object — กำหนดจากค่า ไม่ใช่ identity
+class Money {
+  // amount เก็บเป็น satang เพื่อหลีก floating point error
+  constructor(
+    readonly amount: number,
+    readonly currency: string
+  ) {
+    if (amount < 0) throw new Error("amount must be non-negative");
+    if (!currency) throw new Error("currency required");
+  }
+
+  static of(amount: number, currency: string): Money {
+    return new Money(amount, currency);
+  }
+
+  /** แสดงค่าเป็น Baht (amount / 100) */
+  get baht(): number {
+    return this.amount / 100;
+  }
+
+  /** Add คืน Money ใหม่ — ไม่ mutate */
+  add(other: Money): Money {
+    if (this.currency !== other.currency) {
+      throw new Error(`currency mismatch: ${this.currency} vs ${other.currency}`);
+    }
+    return new Money(this.amount + other.amount, this.currency);
+  }
+
+  multiply(qty: number): Money {
+    return new Money(this.amount * qty, this.currency);
+  }
+
+  /** Value Object เปรียบเทียบจากค่า */
+  equals(other: Money): boolean {
+    return this.amount === other.amount && this.currency === other.currency;
+  }
+
+  toString(): string {
+    return `${this.baht.toFixed(2)} ${this.currency}`;
+  }
+}
+
+export { Money };</code></pre>
   </div>
 
   <div class="code-block">
@@ -394,7 +441,7 @@ func (m Money) String() string {
       <span>domain/order.go — Aggregate Root</span>
       <span class="lang">Go</span>
     </div>
-    <pre><code class="language-go">package domain
+    <pre data-lang="go"><code class="language-go">package domain
 
 import (
     "errors"
@@ -550,6 +597,105 @@ func (o *Order) PopEvents() []DomainEvent {
     o.events = nil
     return evts
 }</code></pre>
+    <pre data-lang="ts" style="display:none"><code class="language-typescript">// domain/order.ts — Aggregate Root
+
+import { Money } from "./money";
+import { DomainEvent, OrderCreatedEvent, OrderConfirmedEvent, OrderCancelledEvent } from "./events";
+
+// ── Branded types (Ubiquitous Language) ──
+type OrderID    = string & { readonly _brand: "OrderID" };
+type CustomerID = string & { readonly _brand: "CustomerID" };
+type ProductID  = string & { readonly _brand: "ProductID" };
+
+type OrderStatus = "pending" | "confirmed" | "shipped" | "cancelled";
+
+// ── OrderLine — Entity ภายใน Aggregate ──
+class OrderLine {
+  constructor(
+    readonly productId: ProductID,
+    readonly name: string,
+    readonly unitPrice: Money,
+    public quantity: number
+  ) {
+    if (quantity <= 0) throw new Error("quantity must be positive");
+  }
+
+  get lineTotal(): Money {
+    return this.unitPrice.multiply(this.quantity);
+  }
+}
+
+// ── Order — Aggregate Root ──
+// ทุก access ต้องผ่าน Order เท่านั้น
+class Order {
+  private _status: OrderStatus = "pending";
+  private _lines: OrderLine[] = [];
+  private _events: DomainEvent[] = [];
+  readonly createdAt: Date;
+
+  constructor(
+    readonly id: OrderID,
+    readonly customerId: CustomerID
+  ) {
+    this.createdAt = new Date();
+    this.raise(new OrderCreatedEvent(id, customerId, this.createdAt));
+  }
+
+  get status(): OrderStatus   { return this._status; }
+  get lines(): readonly OrderLine[] { return [...this._lines]; }
+
+  addLine(productId: ProductID, name: string, unitPrice: Money, quantity: number): void {
+    if (this._status !== "pending") {
+      throw new Error("cannot modify non-pending order");
+    }
+    // ถ้า product ซ้ำ ให้รวม quantity
+    const existing = this._lines.find(l => l.productId === productId);
+    if (existing) {
+      existing.quantity += quantity;
+      return;
+    }
+    this._lines.push(new OrderLine(productId, name, unitPrice, quantity));
+  }
+
+  /** Total — Domain logic อยู่ใน Aggregate */
+  get total(): Money {
+    if (this._lines.length === 0) throw new Error("order is empty");
+    return this._lines.reduce(
+      (sum, l) => sum.add(l.lineTotal),
+      Money.of(0, "THB")
+    );
+  }
+
+  /** Confirm — Business Rule: ต้องมีสินค้าก่อน confirm */
+  confirm(): void {
+    if (this._status !== "pending") throw new Error("only pending orders can be confirmed");
+    if (this._lines.length === 0) throw new Error("cannot confirm empty order");
+    const total = this.total;
+    this._status = "confirmed";
+    this.raise(new OrderConfirmedEvent(this.id, total, new Date()));
+  }
+
+  /** Cancel — Business Rule: ไม่ cancel หลังส่งแล้ว */
+  cancel(reason: string): void {
+    if (this._status === "shipped")   throw new Error("shipped orders cannot be cancelled");
+    if (this._status === "cancelled") throw new Error("order already cancelled");
+    this._status = "cancelled";
+    this.raise(new OrderCancelledEvent(this.id, reason, new Date()));
+  }
+
+  private raise(event: DomainEvent): void {
+    this._events.push(event);
+  }
+
+  /** popEvents — เอา events ออกเพื่อ publish (clear หลัง pop) */
+  popEvents(): DomainEvent[] {
+    const evts = [...this._events];
+    this._events = [];
+    return evts;
+  }
+}
+
+export { Order, OrderLine, OrderID, CustomerID, ProductID, OrderStatus };</code></pre>
   </div>
 
   <div class="code-block">
@@ -557,7 +703,7 @@ func (o *Order) PopEvents() []DomainEvent {
       <span>domain/events.go — Domain Events</span>
       <span class="lang">Go</span>
     </div>
-    <pre><code class="language-go">package domain
+    <pre data-lang="go"><code class="language-go">package domain
 
 import "time"
 
@@ -596,6 +742,47 @@ type OrderCancelledEvent struct {
 
 func (e OrderCancelledEvent) EventName() string    { return "order.cancelled" }
 func (e OrderCancelledEvent) OccurredAt() time.Time { return e.OccurredAt }</code></pre>
+    <pre data-lang="ts" style="display:none"><code class="language-typescript">// domain/events.ts — Domain Events
+
+import { Money } from "./money";
+
+// DomainEvent — base interface สำหรับทุก event ใน Domain
+interface DomainEvent {
+  readonly eventName: string;
+  readonly occurredAt: Date;
+}
+
+// OrderCreatedEvent — เกิดเมื่อสร้าง Order ใหม่
+class OrderCreatedEvent implements DomainEvent {
+  readonly eventName = "order.created";
+  constructor(
+    readonly orderId: string,
+    readonly customerId: string,
+    readonly occurredAt: Date
+  ) {}
+}
+
+// OrderConfirmedEvent — เกิดเมื่อ Confirm Order
+class OrderConfirmedEvent implements DomainEvent {
+  readonly eventName = "order.confirmed";
+  constructor(
+    readonly orderId: string,
+    readonly total: Money,
+    readonly occurredAt: Date
+  ) {}
+}
+
+// OrderCancelledEvent — เกิดเมื่อยกเลิก Order
+class OrderCancelledEvent implements DomainEvent {
+  readonly eventName = "order.cancelled";
+  constructor(
+    readonly orderId: string,
+    readonly reason: string,
+    readonly occurredAt: Date
+  ) {}
+}
+
+export { DomainEvent, OrderCreatedEvent, OrderConfirmedEvent, OrderCancelledEvent };</code></pre>
   </div>
 
   <div class="code-block">

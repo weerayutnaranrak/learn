@@ -7,6 +7,8 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+<link rel="stylesheet" href="common.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Segoe UI',system-ui,sans-serif;background:#07090f;color:#e2e8f0;line-height:1.7}
@@ -139,7 +141,7 @@ a:hover{text-decoration:underline}
       <span>Stub, Mock, Fake ใน Go — ไม่ต้องใช้ library</span>
       <span class="lang-tag">Go · Test Doubles</span>
     </div>
-    <pre><code class="language-go">// ── Interface ที่จะ test ───────────────────────────────────
+    <pre data-lang="go"><code class="language-go">// ── Interface ที่จะ test ───────────────────────────────────
 type UserRepository interface {
     FindByID(id string) (*User, error)
     Save(u *User) error
@@ -230,6 +232,74 @@ func TestRegisterUser_CallsSave(t *testing.T) {
         t.Error("saved wrong email")
     }
 }</code></pre>
+    <pre data-lang="ts" style="display:none"><code class="language-typescript">// ── Interface ที่จะ test ───────────────────────────────────
+interface User { id: string; email: string }
+
+interface UserRepository {
+  findByID(id: string): Promise<User | null>;
+  save(u: User): Promise<void>;
+  countByEmail(email: string): Promise<number>;
+}
+
+// ── STUB: คืนค่าที่กำหนดล่วงหน้า ─────────────────────────
+const stubUserRepo: UserRepository = {
+  findByID: async (_id) => ({ id: '1', email: 'a@test.com' }),
+  save: async (_u) => {},
+  countByEmail: async (_e) => 0,
+};
+
+// ── MOCK: บันทึก calls แล้ว assert (Vitest / Jest) ─────────
+import { vi, describe, it, expect } from 'vitest';
+
+const mockUserRepo: UserRepository = {
+  findByID: vi.fn().mockResolvedValue({ id: '1', email: 'a@test.com' }),
+  save:     vi.fn().mockResolvedValue(undefined),
+  countByEmail: vi.fn().mockResolvedValue(0),
+};
+
+// ── FAKE: in-memory implementation จริงๆ ───────────────────
+class InMemoryUserRepo implements UserRepository {
+  private data = new Map<string, User>();
+
+  async findByID(id: string) {
+    return this.data.get(id) ?? null;
+  }
+  async save(u: User) {
+    this.data.set(u.id, u);
+  }
+  async countByEmail(email: string) {
+    let count = 0;
+    for (const u of this.data.values()) {
+      if (u.email === email) count++;
+    }
+    return count;
+  }
+}
+
+// ── Tests ──────────────────────────────────────────────────
+describe('UserService', () => {
+  it('throws when email already exists', async () => {
+    const fakeRepo = new InMemoryUserRepo();
+    await fakeRepo.save({ id: '1', email: 'a@test.com' });
+
+    const svc = new UserService(fakeRepo);
+    await expect(svc.register('a@test.com', 'pass'))
+      .rejects.toThrow('duplicate email');
+  });
+
+  it('calls save with correct email', async () => {
+    const mock = { ...mockUserRepo };
+    (mock.save as ReturnType<typeof vi.fn>).mockClear();
+    (mock.countByEmail as ReturnType<typeof vi.fn>).mockResolvedValue(0);
+
+    const svc = new UserService(mock);
+    await svc.register('new@test.com', 'pass');
+
+    expect(mock.save).toHaveBeenCalledTimes(1);
+    expect((mock.save as ReturnType<typeof vi.fn>).mock.calls[0][0].email)
+      .toBe('new@test.com');
+  });
+});</code></pre>
   </div>
 </div>
 
