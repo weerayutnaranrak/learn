@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOLID Principles — สื่อการสอน</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#07090f;color:#e2e8f0;line-height:1.7}
+a{color:#fb923c;text-decoration:none}
+a:hover{text-decoration:underline}
+
+.topnav{display:flex;align-items:center;gap:1rem;padding:1rem 2rem;background:#0d1117;border-bottom:1px solid #1e293b;position:sticky;top:0;z-index:100}
+.back-btn{display:flex;align-items:center;gap:.4rem;color:#64748b;font-size:.85rem;transition:color .2s}
+.back-btn:hover{color:#e2e8f0;text-decoration:none}
+.nav-title{color:#475569;font-size:.85rem}
+.nav-title span{color:#fdba74;font-weight:600}
+
+.hero{padding:4rem 2rem 3rem;text-align:center;background:linear-gradient(160deg,#07090f,#1a0c04)}
+.hero-badge{display:inline-block;background:rgba(249,115,22,.1);border:1px solid rgba(249,115,22,.3);color:#fdba74;padding:.35rem 1rem;border-radius:999px;font-size:.8rem;font-weight:600;margin-bottom:1.5rem}
+.hero h1{font-size:clamp(1.8rem,4vw,3rem);font-weight:800;background:linear-gradient(135deg,#f97316 0%,#fb923c 30%,#fbbf24 60%,#f472b6 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:1rem}
+.hero p{color:#64748b;max-width:640px;margin:0 auto;font-size:1rem}
+
+.content{max-width:960px;margin:0 auto;padding:2rem 1.5rem 5rem}
+.section{margin-bottom:4rem}
+.section-title{font-size:1.5rem;font-weight:700;margin-bottom:.4rem;display:flex;align-items:center;gap:.6rem}
+.section-sub{color:#475569;font-size:.9rem;margin-bottom:2rem;padding-left:2rem}
+
+.callout{background:#0f172a;border-left:3px solid #f97316;border-radius:0 8px 8px 0;padding:1rem 1.2rem;margin:1.5rem 0;font-size:.88rem;color:#94a3b8}
+.callout strong{color:#fdba74}
+.callout.tip{border-left-color:#10b981}.callout.tip strong{color:#6ee7b7}
+.callout.warn{border-left-color:#f59e0b}.callout.warn strong{color:#fcd34d}
+
+.code-block{margin:1rem 0;border-radius:12px;overflow:hidden;border:1px solid #1e293b}
+.code-header{background:#111827;padding:.7rem 1rem;display:flex;justify-content:space-between;align-items:center}
+.code-header span{font-size:.78rem;color:#64748b;font-weight:600}
+.code-block pre{margin:0!important;border-radius:0!important;border:none!important;font-size:.82rem!important;line-height:1.6!important}
+
+.lang-bad {background:rgba(239,68,68,.12);color:#fca5a5;padding:.15rem .6rem;border-radius:4px;font-size:.72rem;font-weight:700}
+.lang-good{background:rgba(74,222,128,.12);color:#86efac;padding:.15rem .6rem;border-radius:4px;font-size:.72rem;font-weight:700}
+
+/* Principle letter badge */
+.principle-header{display:flex;align-items:center;gap:1.2rem;margin-bottom:1.5rem}
+.letter-badge{width:64px;height:64px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:900;flex-shrink:0;border:2px solid var(--lc)}
+.principle-name{font-size:1.35rem;font-weight:800;color:#f1f5f9}
+.principle-full{font-size:.85rem;color:var(--lc);font-weight:600;margin-top:.1rem}
+
+/* SOLID nav bar */
+.solid-nav{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:2rem 0}
+.solid-nav a{background:#0d1117;border:1px solid #1e293b;border-radius:12px;padding:14px 10px;text-align:center;text-decoration:none;transition:transform .2s,border-color .2s}
+.solid-nav a:hover{transform:translateY(-3px);border-color:var(--sc)}
+.solid-nav .s-letter{font-size:1.8rem;font-weight:900;line-height:1;color:var(--sc)}
+.solid-nav .s-name{font-size:.65rem;color:#64748b;margin-top:4px;line-height:1.3}
+
+@keyframes pulse{0%,100%{opacity:.4}50%{opacity:.9}}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="index.html" class="back-btn">← กลับหน้าหลัก</a>
+  <span class="nav-title">17 / <span>SOLID Principles</span></span>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">🔷 หัวข้อที่ 17</div>
+  <h1>SOLID Principles</h1>
+  <p>5 หลักการออกแบบ Object-Oriented ที่ทำให้ code ยืดหยุ่น ขยายได้ง่าย และทดสอบได้ — รากฐานของ Clean Architecture, Hexagonal, และ Pattern ทุกอย่างที่เราเรียนมา</p>
+</div>
+
+<div class="content">
+
+<!-- ── OVERVIEW ── -->
+<div class="section">
+  <div class="section-title" style="color:#f97316">📋 ภาพรวม SOLID</div>
+  <div class="section-sub">โดย Robert C. Martin (Uncle Bob) — หลักการที่ดีที่สุดสำหรับ OOP design</div>
+
+  <div class="solid-nav">
+    <a href="#srp" style="--sc:#f97316">
+      <div class="s-letter">S</div>
+      <div class="s-name">Single<br>Responsibility</div>
+    </a>
+    <a href="#ocp" style="--sc:#22d3ee">
+      <div class="s-letter" style="color:#22d3ee">O</div>
+      <div class="s-name">Open /<br>Closed</div>
+    </a>
+    <a href="#lsp" style="--sc:#4ade80">
+      <div class="s-letter" style="color:#4ade80">L</div>
+      <div class="s-name">Liskov<br>Substitution</div>
+    </a>
+    <a href="#isp" style="--sc:#a78bfa">
+      <div class="s-letter" style="color:#a78bfa">I</div>
+      <div class="s-name">Interface<br>Segregation</div>
+    </a>
+    <a href="#dip" style="--sc:#f472b6">
+      <div class="s-letter" style="color:#f472b6">D</div>
+      <div class="s-name">Dependency<br>Inversion</div>
+    </a>
+  </div>
+
+  <!-- Summary table -->
+  <div style="background:#0d1117;border:1px solid #1e293b;border-radius:14px;overflow:hidden;margin:1.5rem 0">
+    <div style="background:#111827;padding:10px 20px;display:grid;grid-template-columns:40px 1fr 1.8fr;font-size:.77rem;font-weight:700;color:#64748b;gap:12px">
+      <div>ตัว</div><div>ชื่อ</div><div>หมายความว่า</div>
+    </div>
+    <div style="display:grid;grid-template-columns:40px 1fr 1.8fr;padding:10px 20px;font-size:.82rem;border-bottom:1px solid #0f172a;gap:12px;align-items:center">
+      <div style="font-size:1.2rem;font-weight:900;color:#f97316">S</div>
+      <div style="color:#e2e8f0;font-weight:600">Single Responsibility</div>
+      <div style="color:#64748b">1 class/func มีเหตุผลเดียวในการเปลี่ยน</div>
+    </div>
+    <div style="display:grid;grid-template-columns:40px 1fr 1.8fr;padding:10px 20px;font-size:.82rem;border-bottom:1px solid #0f172a;gap:12px;align-items:center">
+      <div style="font-size:1.2rem;font-weight:900;color:#22d3ee">O</div>
+      <div style="color:#e2e8f0;font-weight:600">Open / Closed</div>
+      <div style="color:#64748b">เปิดต่อการขยาย ปิดต่อการแก้ไข</div>
+    </div>
+    <div style="display:grid;grid-template-columns:40px 1fr 1.8fr;padding:10px 20px;font-size:.82rem;border-bottom:1px solid #0f172a;gap:12px;align-items:center">
+      <div style="font-size:1.2rem;font-weight:900;color:#4ade80">L</div>
+      <div style="color:#e2e8f0;font-weight:600">Liskov Substitution</div>
+      <div style="color:#64748b">Subtype ต้องแทน parent ได้โดยไม่เสีย behavior</div>
+    </div>
+    <div style="display:grid;grid-template-columns:40px 1fr 1.8fr;padding:10px 20px;font-size:.82rem;border-bottom:1px solid #0f172a;gap:12px;align-items:center">
+      <div style="font-size:1.2rem;font-weight:900;color:#a78bfa">I</div>
+      <div style="color:#e2e8f0;font-weight:600">Interface Segregation</div>
+      <div style="color:#64748b">ไม่บังคับ implement method ที่ไม่ได้ใช้</div>
+    </div>
+    <div style="display:grid;grid-template-columns:40px 1fr 1.8fr;padding:10px 20px;font-size:.82rem;gap:12px;align-items:center">
+      <div style="font-size:1.2rem;font-weight:900;color:#f472b6">D</div>
+      <div style="color:#e2e8f0;font-weight:600">Dependency Inversion</div>
+      <div style="color:#64748b">Depend on abstraction ไม่ใช่ concrete</div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>ทำไม SOLID ถึงสำคัญ?</strong> หลักการเหล่านี้เป็น <strong>รากฐาน</strong> ของทุก Architecture Pattern ที่เรียนมา — Clean Architecture ใช้ DIP, Hexagonal ใช้ DIP + ISP, Repository Pattern ใช้ DIP, Strategy Pattern ใช้ OCP ทั้งสิ้น
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- S — SRP                               -->
+<!-- ══════════════════════════════════════ -->
+<div class="section" id="srp">
+  <div class="principle-header" style="--lc:#f97316">
+    <div class="letter-badge" style="background:rgba(249,115,22,.1);--lc:#f97316">
+      <span style="color:#f97316">S</span>
+    </div>
+    <div>
+      <div class="principle-name">Single Responsibility Principle</div>
+      <div class="principle-full">A class should have only one reason to change</div>
+    </div>
+  </div>
+
+  <div style="background:linear-gradient(135deg,#1a0c04,#2a1206);border:1px solid #f9731630;border-radius:12px;padding:1.2rem 1.4rem;margin-bottom:1.5rem">
+    <div style="font-size:.83rem;color:#94a3b8;line-height:1.8">
+      <span style="color:#fdba74;font-weight:700">หลักการ:</span> 1 module ควรมีเหตุผลเดียวในการเปลี่ยน — หมายความว่า มี <strong style="color:#e2e8f0">stakeholder เดียว</strong> ที่เป็นเจ้าของ responsibility นั้น<br>
+      <span style="color:#fdba74;font-weight:700">สัญญาณว่าผิด SRP:</span> เมื่อมีเหตุผล ≥ 2 อย่างที่ทำให้ต้องแก้ไข class เดิม (เช่น เปลี่ยน business rule <em>และ</em> เปลี่ยน email template)
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+    <div class="code-block" style="border-color:#ef444430">
+      <div class="code-header">
+        <span>❌ ละเมิด SRP — หนึ่ง service ทำทุกอย่าง</span>
+        <span class="lang-bad">ผิดหลักการ</span>
+      </div>
+      <pre><code class="language-go">// OrderService ทำ 3 อย่างพร้อมกัน:
+// 1) save order  2) send email  3) gen PDF
+// ถ้าอยากเปลี่ยน email template หรือ PDF layout
+// ต้องมาแก้ไฟล์นี้ทั้งที่ไม่เกี่ยวกับ order logic
+
+type OrderService struct {
+    db *sql.DB
+}
+
+func (s *OrderService) PlaceOrder(o Order) error {
+    // business logic
+    _, err := s.db.Exec(
+        `INSERT INTO orders VALUES(?,?)`, o.ID, o.Total)
+    if err != nil {
+        return err
+    }
+
+    // ส่ง email — ไม่ใช่หน้าที่ OrderService!
+    auth := smtp.PlainAuth("", "from@co.th", "pass", "smtp.co.th")
+    smtp.SendMail("smtp.co.th:587", auth,
+        "from@co.th", []string{o.Email},
+        []byte("Order confirmed: "+o.ID))
+
+    // สร้าง PDF invoice — ไม่ใช่หน้าที่ OrderService!
+    pdf := gofpdf.New("P", "mm", "A4", "")
+    pdf.AddPage()
+    pdf.SetFont("Arial", "B", 16)
+    pdf.Cell(40, 10, "Invoice #"+o.ID)
+    pdf.OutputFileAndClose("invoice.pdf")
+
+    return nil
+}</code></pre>
+    </div>
+    <div class="code-block" style="border-color:#4ade8030">
+      <div class="code-header">
+        <span>✅ ถูกต้อง — แยก responsibility</span>
+        <span class="lang-good">ถูกหลักการ</span>
+      </div>
+      <pre><code class="language-go">// แต่ละ type มีเหตุผลเดียวในการเปลี่ยน
+
+type OrderRepository struct{ db *sql.DB }
+
+func (r *OrderRepository) Save(o Order) error {
+    _, err := r.db.Exec(
+        `INSERT INTO orders VALUES(?,?)`, o.ID, o.Total)
+    return err
+}
+
+// เหตุผลเดียวที่จะเปลี่ยน EmailService:
+// เปลี่ยน email template หรือ SMTP provider
+type EmailService struct{ smtpAddr string }
+
+func (e *EmailService) SendConfirmation(o Order) error {
+    body := "Order confirmed: " + o.ID
+    return smtp.SendMail(e.smtpAddr, nil,
+        "no-reply@co.th", []string{o.Email},
+        []byte(body))
+}
+
+// เหตุผลเดียวที่จะเปลี่ยน InvoiceService:
+// เปลี่ยน layout หรือ format ของ PDF
+type InvoiceService struct{}
+
+func (i *InvoiceService) Generate(o Order) ([]byte, error) {
+    // ... PDF generation
+    return nil, nil
+}
+
+// OrderService: orchestrate เท่านั้น
+type OrderService struct {
+    repo    *OrderRepository
+    email   *EmailService
+    invoice *InvoiceService
+}
+
+func (s *OrderService) PlaceOrder(o Order) error {
+    if err := s.repo.Save(o); err != nil {
+        return err
+    }
+    go s.email.SendConfirmation(o) // async
+    return nil
+}</code></pre>
+    </div>
+  </div>
+
+  <div class="callout" style="border-left-color:#f97316">
+    <strong>เคล็ดลับ:</strong> ถามตัวเองว่า "ถ้าต้องเปลี่ยน X จะต้องแก้ไฟล์นี้ไหม?" ถ้าตอบ "ใช่" กับเหตุผลหลายอย่าง — แยก type ออกมา
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- O — OCP                               -->
+<!-- ══════════════════════════════════════ -->
+<div class="section" id="ocp">
+  <div class="principle-header" style="--lc:#22d3ee">
+    <div class="letter-badge" style="background:rgba(34,211,238,.1);--lc:#22d3ee">
+      <span style="color:#22d3ee">O</span>
+    </div>
+    <div>
+      <div class="principle-name">Open / Closed Principle</div>
+      <div class="principle-full">Open for extension, closed for modification</div>
+    </div>
+  </div>
+
+  <div style="background:linear-gradient(135deg,#041418,#061e24);border:1px solid #22d3ee30;border-radius:12px;padding:1.2rem 1.4rem;margin-bottom:1.5rem">
+    <div style="font-size:.83rem;color:#94a3b8;line-height:1.8">
+      <span style="color:#67e8f9;font-weight:700">หลักการ:</span> เพิ่ม feature ใหม่ได้โดย <strong style="color:#e2e8f0">เพิ่ม code ใหม่</strong> ไม่ใช่แก้ code เดิม — ลด risk ของ regression bug<br>
+      <span style="color:#67e8f9;font-weight:700">เครื่องมือ:</span> Interface + Polymorphism — ให้ caller depend on abstraction แล้ว inject implementation ใหม่ได้เสมอ
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+    <div class="code-block" style="border-color:#ef444430">
+      <div class="code-header">
+        <span>❌ ละเมิด OCP — เพิ่ม type ต้องแก้ switch</span>
+        <span class="lang-bad">ผิดหลักการ</span>
+      </div>
+      <pre><code class="language-go">type DiscountService struct{}
+
+// เพิ่ม user type ใหม่ทุกครั้ง
+// ต้องมาแก้ function นี้ → ผิด OCP
+func (d *DiscountService) Calculate(
+    total float64, userType string,
+) float64 {
+    switch userType {
+    case "vip":
+        return total * 0.20
+    case "member":
+        return total * 0.10
+    case "new_user":
+        return total * 0.05
+    // เพิ่ม "partner" → ต้องแก้ที่นี่
+    // เพิ่ม "staff"   → ต้องแก้ที่นี่
+    // แก้ทุกครั้งมีโอกาส break case เดิม
+    default:
+        return 0
+    }
+}</code></pre>
+    </div>
+    <div class="code-block" style="border-color:#4ade8030">
+      <div class="code-header">
+        <span>✅ ถูกต้อง — เพิ่ม type ใหม่โดยไม่แก้ code เดิม</span>
+        <span class="lang-good">ถูกหลักการ</span>
+      </div>
+      <pre><code class="language-go">// Abstraction ที่ "ปิด" ต่อการแก้ไข
+type DiscountStrategy interface {
+    Discount(total float64) float64
+}
+
+// ขยายได้โดยเพิ่ม type ใหม่
+type VIPDiscount     struct{}
+type MemberDiscount  struct{}
+type NewUserDiscount struct{}
+type PartnerDiscount struct{ Rate float64 } // ใหม่
+
+func (VIPDiscount)     Discount(t float64) float64 { return t * 0.20 }
+func (MemberDiscount)  Discount(t float64) float64 { return t * 0.10 }
+func (NewUserDiscount) Discount(t float64) float64 { return t * 0.05 }
+func (p PartnerDiscount) Discount(t float64) float64 { return t * p.Rate }
+
+// OrderService ไม่ต้องเปลี่ยนเลย
+// เพิ่ม discount ใหม่ → เพิ่ม struct ใหม่อย่างเดียว
+type OrderService struct {
+    discount DiscountStrategy
+}
+
+func (s *OrderService) FinalPrice(total float64) float64 {
+    return total - s.discount.Discount(total)
+}
+
+// inject ตอน wire-up
+svc := &OrderService{discount: VIPDiscount{}}
+svc2 := &OrderService{discount: PartnerDiscount{Rate: 0.15}}</code></pre>
+    </div>
+  </div>
+
+  <div class="callout" style="border-left-color:#22d3ee">
+    <strong>ความเชื่อมโยง:</strong> OCP คือเหตุผลที่เราใช้ <strong>Strategy Pattern, Plugin Pattern, และ Middleware chains</strong> — ทุก pattern เหล่านี้เป็นการ extend behavior โดยไม่แก้ core code
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- L — LSP                               -->
+<!-- ══════════════════════════════════════ -->
+<div class="section" id="lsp">
+  <div class="principle-header" style="--lc:#4ade80">
+    <div class="letter-badge" style="background:rgba(74,222,128,.1);--lc:#4ade80">
+      <span style="color:#4ade80">L</span>
+    </div>
+    <div>
+      <div class="principle-name">Liskov Substitution Principle</div>
+      <div class="principle-full">Subtypes must be substitutable for their base types without altering correctness</div>
+    </div>
+  </div>
+
+  <div style="background:linear-gradient(135deg,#041408,#081e0e);border:1px solid #4ade8030;border-radius:12px;padding:1.2rem 1.4rem;margin-bottom:1.5rem">
+    <div style="font-size:.83rem;color:#94a3b8;line-height:1.8">
+      <span style="color:#86efac;font-weight:700">หลักการ:</span> ถ้า code ทำงานกับ <code style="background:#0d2a18;padding:1px 5px;border-radius:3px">Shape</code> ได้ถูกต้อง ก็ต้องทำงานกับ <code style="background:#0d2a18;padding:1px 5px;border-radius:3px">Circle</code> (ซึ่ง implement Shape) ได้ถูกต้องเช่นกัน <strong style="color:#e2e8f0">โดยไม่ต้อง type-assert</strong><br>
+      <span style="color:#86efac;font-weight:700">สัญญาณว่าผิด LSP:</span> มี <code>if _, ok := x.(ConcreteType)</code> อยู่ในโค้ด — นั่นหมายความว่า interface ออกแบบมาไม่ดีหรือ subtype ไม่ได้ honor contract
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+    <div class="code-block" style="border-color:#ef444430">
+      <div class="code-header">
+        <span>❌ ละเมิด LSP — Square ทำ Rectangle ไม่ได้</span>
+        <span class="lang-bad">ผิดหลักการ</span>
+      </div>
+      <pre><code class="language-go">type Resizable interface {
+    SetWidth(w float64)
+    SetHeight(h float64)
+    Area() float64
+}
+
+type Rectangle struct{ W, H float64 }
+func (r *Rectangle) SetWidth(w float64)  { r.W = w }
+func (r *Rectangle) SetHeight(h float64) { r.H = h }
+func (r *Rectangle) Area() float64       { return r.W * r.H }
+
+// Square "is-a" Rectangle? ไม่จริง!
+type Square struct{ Side float64 }
+func (s *Square) SetWidth(w float64)  { s.Side = w } // override both
+func (s *Square) SetHeight(h float64) { s.Side = h } // ทำให้ Width เปลี่ยนด้วย!
+func (s *Square) Area() float64       { return s.Side * s.Side }
+
+// caller คาดหวัง behavior แบบ Rectangle
+func resize(r Resizable) {
+    r.SetWidth(5)
+    r.SetHeight(3)
+    // Rectangle → Area = 15 ✓
+    // Square    → Area = 9  ✗ (SetHeight override Side = 3)
+    fmt.Println("Area:", r.Area())
+}</code></pre>
+    </div>
+    <div class="code-block" style="border-color:#4ade8030">
+      <div class="code-header">
+        <span>✅ ถูกต้อง — interface ตรงกับ behavior จริง</span>
+        <span class="lang-good">ถูกหลักการ</span>
+      </div>
+      <pre><code class="language-go">// แยก interface ตาม capability จริงๆ
+type Shape interface {
+    Area() float64
+}
+
+type Resizable interface {
+    Shape
+    SetWidth(w float64)
+    SetHeight(h float64)
+}
+
+// Rectangle implement Resizable (มี SetWidth + SetHeight)
+type Rectangle struct{ W, H float64 }
+func (r *Rectangle) SetWidth(w float64)  { r.W = w }
+func (r *Rectangle) SetHeight(h float64) { r.H = h }
+func (r *Rectangle) Area() float64       { return r.W * r.H }
+
+// Square implement แค่ Shape — honest!
+// ไม่ implement Resizable เพราะ SetWidth ≠ SetHeight ไม่ได้
+type Square struct{ Side float64 }
+func (s *Square) SetSide(n float64)  { s.Side = n }
+func (s *Square) Area() float64      { return s.Side * s.Side }
+
+// function รับแค่ interface ที่จำเป็น
+func printArea(s Shape) {
+    fmt.Println("Area:", s.Area()) // ทั้ง Rectangle และ Square ใช้ได้
+}
+
+func resize(r Resizable, w, h float64) {
+    r.SetWidth(w)
+    r.SetHeight(h)
+    // Square ไม่ผ่านมาที่นี่ → ไม่มี LSP violation
+}</code></pre>
+    </div>
+  </div>
+
+  <div class="callout" style="border-left-color:#4ade80">
+    <strong>Rule of Thumb:</strong> ถ้าต้อง type-switch หรือ type-assert บน interface ที่รับมา — เป็นสัญญาณว่า <strong>interface ออกแบบมาไม่ตรงกับ real contract</strong> ให้ split interface หรือ redesign hierarchy
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- I — ISP                               -->
+<!-- ══════════════════════════════════════ -->
+<div class="section" id="isp">
+  <div class="principle-header" style="--lc:#a78bfa">
+    <div class="letter-badge" style="background:rgba(167,139,250,.1);--lc:#a78bfa">
+      <span style="color:#a78bfa">I</span>
+    </div>
+    <div>
+      <div class="principle-name">Interface Segregation Principle</div>
+      <div class="principle-full">Clients should not be forced to depend on interfaces they do not use</div>
+    </div>
+  </div>
+
+  <div style="background:linear-gradient(135deg,#100820,#180d30);border:1px solid #a78bfa30;border-radius:12px;padding:1.2rem 1.4rem;margin-bottom:1.5rem">
+    <div style="font-size:.83rem;color:#94a3b8;line-height:1.8">
+      <span style="color:#c4b5fd;font-weight:700">หลักการ:</span> Interface ควรเล็กและตรงประเด็น — อย่าสร้าง "fat interface" ที่บังคับให้ทุก implementor ต้อง implement method ที่ตัวเองไม่ต้องการใช้<br>
+      <span style="color:#c4b5fd;font-weight:700">ใน Go:</span> ISP มาโดยธรรมชาติ — Go interface เป็น <strong style="color:#e2e8f0">implicit</strong> และ define ที่ผู้ใช้ ไม่ใช่ผู้สร้าง ทำให้ง่ายต่อการแยก interface เล็กๆ
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+    <div class="code-block" style="border-color:#ef444430">
+      <div class="code-header">
+        <span>❌ ละเมิด ISP — Fat interface บังคับ implement ทุก method</span>
+        <span class="lang-bad">ผิดหลักการ</span>
+      </div>
+      <pre><code class="language-go">// OrderRepository ใหญ่เกินไป
+// บางคนอยากแค่ Read แต่ถูกบังคับ implement Save, Delete ด้วย
+type OrderRepository interface {
+    FindByID(id string) (*Order, error)
+    FindByUserID(uid string) ([]*Order, error)
+    Save(o *Order) error
+    Delete(id string) error
+    GenerateReport() ([]byte, error) // ไม่ใช่หน้าที่ repository!
+    ExportCSV() (string, error)      // ไม่ใช่หน้าที่ repository!
+}
+
+// ReadOnlyService ต้องการแค่ FindByID
+// แต่ถูกบังคับ implement Save, Delete, Report ด้วย!
+type CacheRepo struct{}
+
+func (c *CacheRepo) FindByID(id string) (*Order, error)     { /* cache lookup */ }
+func (c *CacheRepo) FindByUserID(uid string) ([]*Order, error) { /* ... */ }
+func (c *CacheRepo) Save(o *Order) error                    { return errors.New("read-only") }
+func (c *CacheRepo) Delete(id string) error                 { return errors.New("read-only") }
+func (c *CacheRepo) GenerateReport() ([]byte, error)        { return nil, errors.New("N/A") }
+func (c *CacheRepo) ExportCSV() (string, error)             { return "", errors.New("N/A") }</code></pre>
+    </div>
+    <div class="code-block" style="border-color:#4ade8030">
+      <div class="code-header">
+        <span>✅ ถูกต้อง — แยก interface ตาม role</span>
+        <span class="lang-good">ถูกหลักการ</span>
+      </div>
+      <pre><code class="language-go">// Interface เล็กๆ แยกตาม role
+type OrderReader interface {
+    FindByID(id string) (*Order, error)
+    FindByUserID(uid string) ([]*Order, error)
+}
+
+type OrderWriter interface {
+    Save(o *Order) error
+    Delete(id string) error
+}
+
+// Compose เมื่อต้องการทั้งสองอย่าง
+type OrderRepository interface {
+    OrderReader
+    OrderWriter
+}
+
+// CacheRepo implement แค่ที่ตัวเองทำได้จริง
+type CacheRepo struct{ data map[string]*Order }
+
+func (c *CacheRepo) FindByID(id string) (*Order, error)        { return c.data[id], nil }
+func (c *CacheRepo) FindByUserID(uid string) ([]*Order, error) { /* ... */ }
+// ไม่ต้อง implement Save/Delete เพราะไม่ได้ implement OrderWriter
+
+// Service ขอแค่ที่ตัวเองต้องการ
+type ReportService struct {
+    reader OrderReader // ต้องการแค่ Read — ไม่ต้องรู้ Save/Delete
+}
+
+type OrderService struct {
+    repo OrderRepository // ต้องการทั้ง Read และ Write
+}</code></pre>
+    </div>
+  </div>
+
+  <div class="callout" style="border-left-color:#a78bfa">
+    <strong>Go tip:</strong> กำหนด interface <strong>ที่ผู้ใช้</strong> ไม่ใช่ผู้สร้าง — <code>io.Reader</code> (1 method), <code>io.Writer</code> (1 method), <code>io.ReadWriter</code> (compose) คือตัวอย่างที่ดีที่สุดของ ISP ใน Go standard library
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- D — DIP                               -->
+<!-- ══════════════════════════════════════ -->
+<div class="section" id="dip">
+  <div class="principle-header" style="--lc:#f472b6">
+    <div class="letter-badge" style="background:rgba(244,114,182,.1);--lc:#f472b6">
+      <span style="color:#f472b6">D</span>
+    </div>
+    <div>
+      <div class="principle-name">Dependency Inversion Principle</div>
+      <div class="principle-full">High-level modules should not depend on low-level modules — both should depend on abstractions</div>
+    </div>
+  </div>
+
+  <div style="background:linear-gradient(135deg,#1a0410,#280618);border:1px solid #f472b630;border-radius:12px;padding:1.2rem 1.4rem;margin-bottom:1.5rem">
+    <div style="font-size:.83rem;color:#94a3b8;line-height:1.8">
+      <span style="color:#f9a8d4;font-weight:700">หลักการ:</span> High-level module (business logic) ไม่ควร import low-level module (DB, HTTP) โดยตรง — ทั้งคู่ควร depend on <strong style="color:#e2e8f0">interface</strong><br>
+      <span style="color:#f9a8d4;font-weight:700">ผล:</span> สามารถ swap implementation ได้โดยไม่กระทบ business logic — ทดสอบ business logic ด้วย mock ได้ทันที
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+    <div class="code-block" style="border-color:#ef444430">
+      <div class="code-header">
+        <span>❌ ละเมิด DIP — High-level depend on Low-level</span>
+        <span class="lang-bad">ผิดหลักการ</span>
+      </div>
+      <pre><code class="language-go">// Low-level module: concrete DB implementation
+type PostgresOrderRepo struct{ db *sql.DB }
+
+func (r *PostgresOrderRepo) Save(o Order) error {
+    _, err := r.db.Exec(`INSERT INTO orders...`)
+    return err
+}
+
+// High-level module: business logic
+// ผิดตรงที่ depend on concrete type โดยตรง
+type OrderService struct {
+    repo *PostgresOrderRepo // ← concrete! ผิด DIP
+}
+
+// สร้าง dependency เอง — ยิ่งผิดหนัก
+func NewOrderService() *OrderService {
+    db, _ := sql.Open("postgres", os.Getenv("DB_URL"))
+    return &OrderService{
+        repo: &PostgresOrderRepo{db: db}, // tightly coupled
+    }
+}
+
+// Test ยากมาก — ต้อง spin up Postgres จริงๆ
+// เปลี่ยนเป็น MySQL → ต้องแก้ OrderService</code></pre>
+    </div>
+    <div class="code-block" style="border-color:#4ade8030">
+      <div class="code-header">
+        <span>✅ ถูกต้อง — ทั้งสอง depend on abstraction</span>
+        <span class="lang-good">ถูกหลักการ</span>
+      </div>
+      <pre><code class="language-go">// Abstraction — กำหนดโดย High-level module
+type OrderStorer interface {
+    Save(o Order) error
+    FindByID(id string) (*Order, error)
+}
+
+// High-level module: depend on interface เท่านั้น
+type OrderService struct {
+    store OrderStorer // ← abstraction!
+}
+
+// รับ dependency จาก outside (Dependency Injection)
+func NewOrderService(store OrderStorer) *OrderService {
+    return &OrderService{store: store}
+}
+
+func (s *OrderService) PlaceOrder(o Order) error {
+    return s.store.Save(o)
+}
+
+// Low-level modules: implement interface
+type PostgresOrderRepo struct{ db *sql.DB }
+func (r *PostgresOrderRepo) Save(o Order) error {/* ... */}
+func (r *PostgresOrderRepo) FindByID(id string) (*Order, error) {/* ... */}
+
+// Mock สำหรับ test
+type MockOrderRepo struct{ saved []Order }
+func (m *MockOrderRepo) Save(o Order) error { m.saved = append(m.saved, o); return nil }
+func (m *MockOrderRepo) FindByID(id string) (*Order, error) { return &Order{ID: id}, nil }
+
+// --- main.go ---
+repo := &PostgresOrderRepo{db: db}
+svc  := NewOrderService(repo)
+
+// --- test ---
+mock := &MockOrderRepo{}
+svc  := NewOrderService(mock) // ไม่ต้องการ DB เลย!</code></pre>
+    </div>
+  </div>
+
+  <div class="callout" style="border-left-color:#f472b6">
+    <strong>DIP = รากฐานของ Clean Architecture:</strong> Dependency Rule ที่ว่า "source code dependencies must point inward" คือ DIP นั่นเอง — Use Case depend on Repository <em>interface</em>, Infrastructure implement interface นั้น
+  </div>
+</div>
+
+<!-- ── SOLID IN ACTION ── -->
+<div class="section">
+  <div class="section-title" style="color:#fb923c">🔗 SOLID ทำงานร่วมกัน</div>
+  <div class="section-sub">ตัวอย่างที่ใช้ทั้ง 5 หลักการในคราวเดียว</div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>ตัวอย่าง Order System ที่ใช้ SOLID ครบทั้ง 5 ข้อ</span>
+      <span style="background:rgba(249,115,22,.12);color:#fdba74;padding:.15rem .6rem;border-radius:4px;font-size:.72rem;font-weight:700">Go · SOLID</span>
+    </div>
+    <pre><code class="language-go">// ── D: Abstraction ที่ High-level กำหนด ──────────────────────
+type OrderRepository interface {      // ISP: เล็ก ตรงประเด็น
+    Save(o *Order) error
+    FindByID(id string) (*Order, error)
+}
+
+type Notifier interface {             // ISP: แยกจาก Repository
+    Notify(email, msg string) error
+}
+
+// ── S: OrderService มีหน้าที่เดียว — orchestrate ──────────────
+type OrderService struct {
+    repo     OrderRepository  // D: depend on abstraction
+    notifier Notifier         // D: depend on abstraction
+}
+
+func NewOrderService(r OrderRepository, n Notifier) *OrderService {
+    return &OrderService{repo: r, notifier: n}
+}
+
+func (s *OrderService) PlaceOrder(o *Order) error {
+    if err := s.repo.Save(o); err != nil {  // ไม่รู้ว่าเป็น Postgres หรือ Mock
+        return err
+    }
+    go s.notifier.Notify(o.UserEmail, "Order placed!")
+    return nil
+}
+
+// ── O: เพิ่ม discount strategy โดยไม่แก้ OrderService ──────────
+type DiscountStrategy interface {
+    Discount(total float64) float64
+}
+
+type VIPDiscount    struct{}
+type StaffDiscount  struct{ Rate float64 } // ใหม่ — ไม่ต้องแก้ที่ไหนเลย
+
+func (VIPDiscount) Discount(t float64) float64  { return t * 0.20 }
+func (s StaffDiscount) Discount(t float64) float64 { return t * s.Rate }
+
+// ── L: PaymentProcessor ต้อง honor contract ────────────────────
+type PaymentProcessor interface {
+    Pay(amount float64) error
+}
+
+// CreditCard และ PromptPay ต่าง implement Pay() ได้ถูกต้อง
+// caller ไม่ต้องรู้ว่าเป็น type ไหน — ไม่มี type-switch
+type CreditCardProcessor struct{ cardNo string }
+type PromptPayProcessor   struct{ qrCode string }
+
+func (c *CreditCardProcessor) Pay(amount float64) error { /* charge card */ return nil }
+func (p *PromptPayProcessor)  Pay(amount float64) error { /* scan QR */    return nil }
+
+func checkout(p PaymentProcessor, amount float64) error {
+    return p.Pay(amount) // LSP: ทั้ง CreditCard และ PromptPay ใช้แทนกันได้
+}</code></pre>
+  </div>
+</div>
+
+<!-- ── CONNECTION TO ARCHITECTURE ── -->
+<div class="section">
+  <div class="section-title" style="color:#fb923c">🏗️ SOLID กับ Architecture Patterns</div>
+  <div class="section-sub">แต่ละ pattern ที่เรียนมาใช้ SOLID อย่างไร</div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin:1.5rem 0">
+
+    <div style="background:#0d1117;border:1px solid #1e293b;border-left:3px solid #34d399;border-radius:12px;padding:16px">
+      <div style="font-size:.8rem;font-weight:700;color:#34d399;margin-bottom:8px">🏛️ Clean / Onion Architecture</div>
+      <div style="font-size:.8rem;color:#64748b;line-height:1.8">
+        <span style="color:#f472b6">D</span> — Use Case depend on Repository interface<br>
+        <span style="color:#f97316">S</span> — Entity, Use Case, Adapter แยกกัน<br>
+        <span style="color:#a78bfa">I</span> — Repository interface เล็กและตรงประเด็น
+      </div>
+    </div>
+
+    <div style="background:#0d1117;border:1px solid #1e293b;border-left:3px solid #06b6d4;border-radius:12px;padding:16px">
+      <div style="font-size:.8rem;font-weight:700;color:#06b6d4;margin-bottom:8px">⬡ Hexagonal Architecture</div>
+      <div style="font-size:.8rem;color:#64748b;line-height:1.8">
+        <span style="color:#f472b6">D</span> — Core depend on Ports (interfaces)<br>
+        <span style="color:#a78bfa">I</span> — Primary Port ≠ Secondary Port<br>
+        <span style="color:#22d3ee">O</span> — เพิ่ม Adapter ใหม่ ไม่แก้ Core
+      </div>
+    </div>
+
+    <div style="background:#0d1117;border:1px solid #1e293b;border-left:3px solid #60a5fa;border-radius:12px;padding:16px">
+      <div style="font-size:.8rem;font-weight:700;color:#60a5fa;margin-bottom:8px">🗄️ Repository Pattern</div>
+      <div style="font-size:.8rem;color:#64748b;line-height:1.8">
+        <span style="color:#f472b6">D</span> — Service depend on Repository interface<br>
+        <span style="color:#f97316">S</span> — Repository มีหน้าที่เดียวคือ data access<br>
+        <span style="color:#4ade80">L</span> — MockRepo แทน PostgresRepo ได้ใน test
+      </div>
+    </div>
+
+    <div style="background:#0d1117;border:1px solid #1e293b;border-left:3px solid #f87171;border-radius:12px;padding:16px">
+      <div style="font-size:.8rem;font-weight:700;color:#f87171;margin-bottom:8px">🔄 CQRS</div>
+      <div style="font-size:.8rem;color:#64748b;line-height:1.8">
+        <span style="color:#f97316">S</span> — Command Handler ≠ Query Handler<br>
+        <span style="color:#a78bfa">I</span> — CommandBus ≠ QueryBus (interface แยก)<br>
+        <span style="color:#22d3ee">O</span> — เพิ่ม Event Handler ใหม่ ไม่แก้เดิม
+      </div>
+    </div>
+
+    <div style="background:#0d1117;border:1px solid #1e293b;border-left:3px solid #10b981;border-radius:12px;padding:16px">
+      <div style="font-size:.8rem;font-weight:700;color:#10b981;margin-bottom:8px">⚡ Event-Driven</div>
+      <div style="font-size:.8rem;color:#64748b;line-height:1.8">
+        <span style="color:#22d3ee">O</span> — เพิ่ม Event Handler ใหม่ ไม่แก้ Publisher<br>
+        <span style="color:#f97316">S</span> — Publisher มีหน้าที่เดียว ไม่รู้จัก Consumer<br>
+        <span style="color:#f472b6">D</span> — Depend on EventBus interface
+      </div>
+    </div>
+
+    <div style="background:#0d1117;border:1px solid #1e293b;border-left:3px solid #fb923c;border-radius:12px;padding:16px">
+      <div style="font-size:.8rem;font-weight:700;color:#fb923c;margin-bottom:8px">🏗️ Microservices</div>
+      <div style="font-size:.8rem;color:#64748b;line-height:1.8">
+        <span style="color:#f97316">S</span> — แต่ละ service มี 1 bounded context<br>
+        <span style="color:#22d3ee">O</span> — เพิ่ม service ใหม่ ไม่แก้ service เดิม<br>
+        <span style="color:#f472b6">D</span> — สื่อสารผ่าน API contract (interface)
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── QUICK CHEATSHEET ── -->
+<div class="section">
+  <div class="section-title" style="color:#fb923c">📌 Quick Reference</div>
+  <div class="section-sub">สรุปสั้นๆ พกพาได้</div>
+
+  <div style="background:#0d1117;border:1px solid #1e293b;border-radius:14px;overflow:hidden;margin:1.5rem 0">
+    <div style="background:#111827;padding:10px 20px;display:grid;grid-template-columns:32px 1fr 1.5fr 1.5fr;font-size:.77rem;font-weight:700;color:#64748b;gap:12px">
+      <div></div><div>หลักการ</div><div>คำถามทดสอบ</div><div>เครื่องมือที่ใช้</div>
+    </div>
+    <div style="display:grid;grid-template-columns:32px 1fr 1.5fr 1.5fr;padding:10px 20px;font-size:.8rem;border-bottom:1px solid #0f172a;gap:12px;align-items:center">
+      <div style="font-size:1.1rem;font-weight:900;color:#f97316">S</div>
+      <div style="color:#e2e8f0">Single Responsibility</div>
+      <div style="color:#64748b">"มีกี่เหตุผลที่จะแก้ไฟล์นี้?"</div>
+      <div style="color:#64748b">แยก struct/function ออก</div>
+    </div>
+    <div style="display:grid;grid-template-columns:32px 1fr 1.5fr 1.5fr;padding:10px 20px;font-size:.8rem;border-bottom:1px solid #0f172a;gap:12px;align-items:center">
+      <div style="font-size:1.1rem;font-weight:900;color:#22d3ee">O</div>
+      <div style="color:#e2e8f0">Open / Closed</div>
+      <div style="color:#64748b">"เพิ่ม feature ต้องแก้ไฟล์ไหนบ้าง?"</div>
+      <div style="color:#64748b">Interface + Injection</div>
+    </div>
+    <div style="display:grid;grid-template-columns:32px 1fr 1.5fr 1.5fr;padding:10px 20px;font-size:.8rem;border-bottom:1px solid #0f172a;gap:12px;align-items:center">
+      <div style="font-size:1.1rem;font-weight:900;color:#4ade80">L</div>
+      <div style="color:#e2e8f0">Liskov Substitution</div>
+      <div style="color:#64748b">"มี type-switch/assert บน interface ไหม?"</div>
+      <div style="color:#64748b">Interface เล็ก / redesign hierarchy</div>
+    </div>
+    <div style="display:grid;grid-template-columns:32px 1fr 1.5fr 1.5fr;padding:10px 20px;font-size:.8rem;border-bottom:1px solid #0f172a;gap:12px;align-items:center">
+      <div style="font-size:1.1rem;font-weight:900;color:#a78bfa">I</div>
+      <div style="color:#e2e8f0">Interface Segregation</div>
+      <div style="color:#64748b">"interface มี method ที่บางคน implement ไม่ได้ไหม?"</div>
+      <div style="color:#64748b">แยก interface / compose</div>
+    </div>
+    <div style="display:grid;grid-template-columns:32px 1fr 1.5fr 1.5fr;padding:10px 20px;font-size:.8rem;gap:12px;align-items:center">
+      <div style="font-size:1.1rem;font-weight:900;color:#f472b6">D</div>
+      <div style="color:#e2e8f0">Dependency Inversion</div>
+      <div style="color:#64748b">"High-level import concrete type ไหม?"</div>
+      <div style="color:#64748b">Inject ผ่าน interface / constructor</div>
+    </div>
+  </div>
+
+  <div class="callout tip">
+    <strong>ลำดับการเรียน:</strong> เริ่มจาก <strong>S</strong> (ง่ายที่สุด) → <strong>D</strong> (สำคัญที่สุดสำหรับ testability) → <strong>O</strong> → <strong>I</strong> → <strong>L</strong> — D และ I มักใช้คู่กันเสมอเมื่อออกแบบ interface
+  </div>
+</div>
+
+<div style="text-align:center;margin:3rem 0;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+  <a href="16-clean-onion.html" style="display:inline-flex;align-items:center;gap:.5rem;background:#0d1117;border:1px solid #1e293b;color:#64748b;padding:.7rem 1.5rem;border-radius:10px;font-size:.88rem">← Clean &amp; Onion Architecture</a>
+  <a href="index.html" style="display:inline-flex;align-items:center;gap:.5rem;background:#0d1117;border:1px solid #f9731640;color:#fb923c;padding:.7rem 1.5rem;border-radius:10px;font-weight:600;font-size:.88rem">กลับหน้าหลัก →</a>
+</div>
+
+</div>
+<script>hljs.highlightAll()</script>
+<script>
+document.querySelectorAll('.code-block').forEach(block => {
+  const header = block.querySelector('.code-header')
+  const code   = block.querySelector('code')
+  if (!header || !code) return
+  const btn = document.createElement('button')
+  btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span>Copy</span>`
+  btn.style.cssText = 'display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#94a3b8;font-size:.7rem;font-weight:600;padding:3px 10px;border-radius:6px;cursor:pointer;transition:all .15s;flex-shrink:0'
+  btn.addEventListener('mouseenter', () => { btn.style.background='rgba(255,255,255,.1)'; btn.style.color='#e2e8f0' })
+  btn.addEventListener('mouseleave', () => { if (!btn.dataset.copied) { btn.style.background='rgba(255,255,255,.06)'; btn.style.color='#94a3b8' } })
+  btn.addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(code.innerText) }
+    catch { const ta=document.createElement('textarea'); ta.value=code.innerText; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove() }
+    btn.dataset.copied='1'
+    btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fb923c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span style="color:#fb923c">Copied!</span>`
+    btn.style.background='rgba(249,115,22,.1)'; btn.style.borderColor='rgba(249,115,22,.3)'
+    setTimeout(() => {
+      delete btn.dataset.copied
+      btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span>Copy</span>`
+      btn.style.background='rgba(255,255,255,.06)'; btn.style.borderColor='rgba(255,255,255,.1)'; btn.style.color='#94a3b8'
+    }, 2000)
+  })
+  header.appendChild(btn)
+})
+</script>
+</body>
+</html>

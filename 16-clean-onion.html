@@ -1,0 +1,1357 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clean Architecture &amp; Onion Architecture — สื่อการสอน</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#07090f;color:#e2e8f0;line-height:1.7}
+a{color:#34d399;text-decoration:none}
+
+.topnav{display:flex;align-items:center;gap:1rem;padding:1rem 2rem;background:#0d1117;border-bottom:1px solid #1e293b;position:sticky;top:0;z-index:100}
+.back-btn{display:flex;align-items:center;gap:.4rem;color:#64748b;font-size:.85rem;transition:color .2s}
+.back-btn:hover{color:#e2e8f0}
+.nav-title{color:#475569;font-size:.85rem}
+.nav-title span{color:#6ee7b7;font-weight:600}
+
+.hero{padding:4rem 2rem 3rem;text-align:center;background:linear-gradient(160deg,#07090f 60%,#031a0e)}
+.hero-badge{display:inline-block;background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.3);color:#6ee7b7;padding:.35rem 1rem;border-radius:999px;font-size:.8rem;font-weight:600;margin-bottom:1.5rem}
+.hero h1{font-size:clamp(1.8rem,4vw,3rem);font-weight:800;background:linear-gradient(135deg,#34d399 0%,#10b981 45%,#a78bfa 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:1rem}
+.hero p{color:#64748b;max-width:660px;margin:0 auto;font-size:1rem}
+
+.content{max-width:960px;margin:0 auto;padding:2rem 1.5rem 5rem}
+.section{margin-bottom:4rem}
+.section-title{font-size:1.5rem;font-weight:700;color:#34d399;margin-bottom:.4rem;display:flex;align-items:center;gap:.6rem}
+.section-title.violet{color:#a78bfa}
+.section-sub{color:#475569;font-size:.9rem;margin-bottom:2rem;padding-left:2rem}
+
+.callout{background:#0f172a;border-left:3px solid #34d399;border-radius:0 8px 8px 0;padding:1rem 1.2rem;margin:1.5rem 0;font-size:.88rem;color:#94a3b8}
+.callout strong{color:#6ee7b7}
+.callout.violet{border-left-color:#a78bfa}.callout.violet strong{color:#c4b5fd}
+.callout.tip{border-left-color:#10b981}.callout.tip strong{color:#6ee7b7}
+.callout.warn{border-left-color:#f59e0b}.callout.warn strong{color:#fcd34d}
+
+.code-block{margin:1.5rem 0;border-radius:12px;overflow:hidden;border:1px solid #1e293b}
+.code-header{background:#111827;padding:.7rem 1rem;display:flex;justify-content:space-between;align-items:center}
+.code-header span{font-size:.78rem;color:#64748b;font-weight:600}
+.lang-go{background:rgba(52,211,153,.12);color:#6ee7b7;padding:.15rem .6rem;border-radius:4px;font-size:.72rem;font-weight:700}
+.lang-violet{background:rgba(167,139,250,.12);color:#c4b5fd;padding:.15rem .6rem;border-radius:4px;font-size:.72rem;font-weight:700}
+.code-block pre{margin:0!important;border-radius:0!important;border:none!important;font-size:.83rem!important;line-height:1.6!important}
+
+.tab-bar{display:flex;gap:4px;flex-wrap:wrap;background:#0d1117;border-bottom:1px solid #1e293b;padding:.5rem .5rem 0}
+.tab-btn{background:transparent;border:1px solid #1e293b;border-bottom:none;color:#475569;padding:.45rem 1rem;border-radius:8px 8px 0 0;font-size:.78rem;cursor:pointer;font-family:'Segoe UI',sans-serif;transition:all .2s}
+.tab-btn.active{background:rgba(52,211,153,.08);color:#34d399;border-color:#34d39940}
+.tab-btn.v.active{background:rgba(167,139,250,.08);color:#a78bfa;border-color:#a78bfa40}
+.tab-content{display:none}.tab-content.active{display:block}
+
+.diagram{background:#0d1117;border:1px solid #1e293b;border-radius:16px;padding:2rem;margin:2rem 0;text-align:center}
+.diagram-title{font-size:.8rem;color:#475569;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:1rem}
+
+.concept-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin:1.5rem 0}
+.concept-card{background:#0d1117;border:1px solid #1e293b;border-radius:12px;padding:1.4rem;border-left:3px solid var(--c,#34d399)}
+.concept-card h3{font-size:.95rem;font-weight:700;color:#f1f5f9;margin-bottom:.4rem}
+.concept-card p{font-size:.83rem;color:#64748b;line-height:1.6}
+.concept-card .label{font-size:.7rem;color:var(--c,#34d399);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.4rem}
+
+.vb{display:flex;gap:1rem;margin:1.5rem 0;flex-wrap:wrap}
+.vb-box{flex:1;min-width:200px;background:#0d1117;border:1px solid #1e293b;border-radius:12px;padding:1.2rem}
+
+.compare-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#1e293b;border-radius:12px;overflow:hidden;margin:2rem 0}
+.compare-cell{background:#0d1117;padding:.8rem 1rem}
+.compare-header{background:#111827;padding:.7rem 1rem;font-size:.78rem;font-weight:700}
+
+@keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
+@keyframes spin-slow{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="index.html" class="back-btn">← กลับหน้าหลัก</a>
+  <span class="nav-title">16 / <span>Clean &amp; Onion Architecture</span></span>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">🧅 หัวข้อที่ 16</div>
+  <h1>Clean &amp; Onion Architecture</h1>
+  <p>Architecture ที่วาง Business Logic ไว้ตรงกลาง ไม่ขึ้นกับ Framework, Database, หรือ UI — เปลี่ยน infrastructure ได้โดยไม่ต้องแก้ business rules เลยสักบรรทัด</p>
+</div>
+
+<div class="content">
+
+<!-- ── PROBLEM ── -->
+<div class="section">
+  <div class="section-title">😣 ปัญหาที่ทั้งสองแก้ไข</div>
+  <div class="section-sub">ทำไมถึงต้องการ architecture แบบนี้?</div>
+
+  <div class="concept-grid">
+    <div class="concept-card" style="--c:#ef4444">
+      <div class="label">ปัญหา 1</div>
+      <h3>Business Logic ผูกติดกับ Framework</h3>
+      <p>เปลี่ยน ORM, HTTP library, หรือ DB ไม่ได้ เพราะ logic กระจายอยู่ทั่ว codebase</p>
+    </div>
+    <div class="concept-card" style="--c:#f59e0b">
+      <div class="label">ปัญหา 2</div>
+      <h3>Unit Test ทำยาก</h3>
+      <p>ต้องมี DB connection จริงถึงจะ test ได้ ทำให้ test ช้า brittle และ developer ไม่ test</p>
+    </div>
+    <div class="concept-card" style="--c:#ef4444">
+      <div class="label">ปัญหา 3</div>
+      <h3>Architecture ไม่ "Scream"</h3>
+      <p>ดู codebase แล้วไม่รู้ว่า app ทำอะไร เห็นแต่ controllers, models, views — ไม่เห็น business intent</p>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>หลักการแก้ปัญหา:</strong> ทำให้ Business Logic เป็น Pure Go ที่ไม่ import อะไรนอกจาก standard library — แล้วให้ Infrastructure implement interface ที่ Business Logic กำหนด (Dependency Inversion)
+  </div>
+</div>
+
+<!-- ── DEPENDENCY RULE ── -->
+<div class="section">
+  <div class="section-title">📐 The Dependency Rule</div>
+  <div class="section-sub">กฎเดียวที่ต้องจำ — ทั้ง Clean และ Onion ใช้กฎนี้เหมือนกัน</div>
+
+  <!-- big rule box -->
+  <div style="background:linear-gradient(135deg,#031a0e,#0d2a1a);border:1px solid #34d39940;border-radius:16px;padding:2rem;text-align:center;margin:2rem 0">
+    <div style="font-size:.75rem;font-weight:700;color:#34d399;letter-spacing:.15em;text-transform:uppercase;margin-bottom:.8rem">The Dependency Rule</div>
+    <div style="font-size:1.5rem;font-weight:800;color:#e2e8f0;line-height:1.4;max-width:600px;margin:0 auto">
+      Source code dependencies must point <span style="color:#34d399">inward</span> — toward higher-level policies
+    </div>
+    <div style="font-size:.88rem;color:#64748b;margin-top:1rem">Inner rings ไม่รู้จักอะไรที่อยู่ outer rings เลย</div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1.5rem 0">
+    <div style="background:#0d1117;border:1px solid #1e293b;border-radius:12px;padding:1.4rem">
+      <div style="font-size:.75rem;font-weight:700;color:#ef4444;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.8rem">❌ ผิดกฎ</div>
+      <div style="font-size:.83rem;color:#94a3b8;line-height:1.8">
+        <code style="background:#1a0a0a;color:#fca5a5;padding:2px 6px;border-radius:3px">entity</code> import <code style="background:#1a0a0a;color:#fca5a5;padding:2px 6px;border-radius:3px">database/sql</code><br>
+        <code style="background:#1a0a0a;color:#fca5a5;padding:2px 6px;border-radius:3px">usecase</code> import <code style="background:#1a0a0a;color:#fca5a5;padding:2px 6px;border-radius:3px">net/http</code><br>
+        <code style="background:#1a0a0a;color:#fca5a5;padding:2px 6px;border-radius:3px">entity</code> import <code style="background:#1a0a0a;color:#fca5a5;padding:2px 6px;border-radius:3px">gorm</code>
+      </div>
+    </div>
+    <div style="background:#0d1117;border:1px solid #1e293b;border-radius:12px;padding:1.4rem">
+      <div style="font-size:.75rem;font-weight:700;color:#34d399;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.8rem">✅ ถูกกฎ</div>
+      <div style="font-size:.83rem;color:#94a3b8;line-height:1.8">
+        <code style="background:#0d2a1a;color:#6ee7b7;padding:2px 6px;border-radius:3px">infrastructure</code> import <code style="background:#0d2a1a;color:#6ee7b7;padding:2px 6px;border-radius:3px">usecase</code><br>
+        <code style="background:#0d2a1a;color:#6ee7b7;padding:2px 6px;border-radius:3px">adapter</code> import <code style="background:#0d2a1a;color:#6ee7b7;padding:2px 6px;border-radius:3px">usecase</code><br>
+        <code style="background:#0d2a1a;color:#6ee7b7;padding:2px 6px;border-radius:3px">usecase</code> import <code style="background:#0d2a1a;color:#6ee7b7;padding:2px 6px;border-radius:3px">entity</code>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── CLEAN ARCHITECTURE ── -->
+<div class="section">
+  <div class="section-title">🏛️ Clean Architecture</div>
+  <div class="section-sub">โดย Robert C. Martin (Uncle Bob) — 2012 · เน้นแยก Enterprise Rules ออกจาก Application Rules อย่างชัดเจน</div>
+
+  <!-- Diagram -->
+  <div class="diagram">
+    <div class="diagram-title">Clean Architecture — 4 Concentric Rings</div>
+    <svg viewBox="0 0 740 440" style="max-width:100%;height:auto">
+      <defs>
+        <radialGradient id="entGrad" cx="50%" cy="50%">
+          <stop offset="0%" stop-color="#0d3d27"/>
+          <stop offset="100%" stop-color="#062113"/>
+        </radialGradient>
+        <filter id="glow-e">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <marker id="arrowE" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+          <path d="M0,0 L7,3.5 L0,7 Z" fill="#34d399"/>
+        </marker>
+      </defs>
+
+      <!-- Frameworks & Drivers (outermost) -->
+      <circle cx="370" cy="220" r="200" fill="#060e08" stroke="#1e3a2a" stroke-width="1.5"/>
+      <!-- Interface Adapters -->
+      <circle cx="370" cy="220" r="152" fill="#07110a" stroke="#0f3d24" stroke-width="1.5"/>
+      <!-- Use Cases -->
+      <circle cx="370" cy="220" r="104" fill="#091a0e" stroke="#1a5c38" stroke-width="1.5"/>
+      <!-- Entities -->
+      <circle cx="370" cy="220" r="60" fill="url(#entGrad)" stroke="#34d399" stroke-width="2.5"/>
+      <circle cx="370" cy="220" r="60" fill="none" stroke="#34d399" stroke-width="1" opacity=".3" style="animation:pulse 2s ease-in-out infinite"/>
+
+      <!-- Entities label -->
+      <text x="370" y="213" text-anchor="middle" fill="#34d399" font-size="13" font-weight="700">Entities</text>
+      <text x="370" y="229" text-anchor="middle" fill="#6ee7b7" font-size="8.5">Enterprise Business Rules</text>
+
+      <!-- Use Cases label (band r=60→104, mid=82, top y=138) -->
+      <text x="370" y="143" text-anchor="middle" fill="#10b981" font-size="11.5" font-weight="700">Use Cases</text>
+      <text x="370" y="157" text-anchor="middle" fill="#6ee7b7" font-size="8">Application Business Rules</text>
+
+      <!-- Interface Adapters label (band r=104→152, mid=128, top y=92) -->
+      <text x="370" y="89" text-anchor="middle" fill="#64748b" font-size="11" font-weight="700">Interface Adapters</text>
+      <text x="370" y="103" text-anchor="middle" fill="#475569" font-size="8">Controllers · Gateways · Presenters</text>
+
+      <!-- Frameworks & Drivers label (band r=152→200, mid=176, top y=44) -->
+      <text x="370" y="34" text-anchor="middle" fill="#334155" font-size="10.5" font-weight="700">Frameworks &amp; Drivers</text>
+      <text x="370" y="47" text-anchor="middle" fill="#2d3748" font-size="8">Web · DB · UI · Devices · External Interfaces</text>
+
+      <!-- Side annotations -->
+      <text x="86" y="190" text-anchor="middle" fill="#475569" font-size="8.5">HTTP / gRPC</text>
+      <text x="86" y="202" text-anchor="middle" fill="#334155" font-size="8">Web Framework</text>
+      <text x="654" y="190" text-anchor="middle" fill="#475569" font-size="8.5">PostgreSQL</text>
+      <text x="654" y="202" text-anchor="middle" fill="#334155" font-size="8">Redis / S3</text>
+      <text x="370" y="415" text-anchor="middle" fill="#475569" font-size="8.5">Message Queue · CLI · Tests</text>
+
+      <!-- Dependency direction arrow (curved, pointing inward from top-right) -->
+      <path d="M 595 85 Q 540 110 500 150" fill="none" stroke="#34d399" stroke-width="1.5" marker-end="url(#arrowE)" opacity=".6"/>
+      <text x="605" y="75" fill="#34d399" font-size="9" font-weight="600" text-anchor="middle">Source Code</text>
+      <text x="605" y="86" fill="#34d399" font-size="9" font-weight="600" text-anchor="middle">Dependencies</text>
+      <text x="610" y="97" fill="#6ee7b7" font-size="8" text-anchor="middle">point inward →</text>
+
+      <!-- Data flow arrows (opposite direction — runtime) -->
+      <path d="M 430 220 Q 460 190 490 180" fill="none" stroke="#475569" stroke-width="1" stroke-dasharray="4,3" opacity=".4"/>
+      <text x="500" y="176" fill="#334155" font-size="7.5">Data Flow</text>
+      <text x="500" y="187" fill="#334155" font-size="7.5">(runtime)</text>
+    </svg>
+  </div>
+
+  <!-- 4 Layer cards -->
+  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:2rem 0">
+
+    <div style="background:linear-gradient(135deg,#031a0e,#062113);border:1px solid #34d39940;border-radius:14px;padding:18px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <div style="width:36px;height:36px;background:#34d39920;border:2px solid #34d399;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">🎯</div>
+        <div>
+          <div style="font-size:.72rem;color:#34d399;font-weight:700;letter-spacing:.1em;text-transform:uppercase">Innermost</div>
+          <div style="font-size:.95rem;font-weight:700;color:#f1f5f9">Entities</div>
+        </div>
+      </div>
+      <div style="font-size:.82rem;color:#64748b;line-height:1.7">
+        <span style="color:#6ee7b7">Enterprise Business Rules</span> — struct, methods, business invariants ที่ไม่เปลี่ยนแปลงตาม use case<br><br>
+        ✓ Pure Go — ไม่ import อะไร<br>
+        ✓ Validate ข้อมูลในตัวเอง<br>
+        ✓ Business rule อยู่ที่นี่ เช่น <code style="background:#0d2a1a;padding:1px 4px;border-radius:3px">order.Confirm()</code>
+      </div>
+    </div>
+
+    <div style="background:linear-gradient(135deg,#051509,#0a2010);border:1px solid #10b98140;border-radius:14px;padding:18px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <div style="width:36px;height:36px;background:#10b98120;border:2px solid #10b981;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">⚙️</div>
+        <div>
+          <div style="font-size:.72rem;color:#10b981;font-weight:700;letter-spacing:.1em;text-transform:uppercase">2nd Ring</div>
+          <div style="font-size:.95rem;font-weight:700;color:#f1f5f9">Use Cases</div>
+        </div>
+      </div>
+      <div style="font-size:.82rem;color:#64748b;line-height:1.7">
+        <span style="color:#6ee7b7">Application Business Rules</span> — orchestrate entities เพื่อให้งานสำเร็จตาม use case<br><br>
+        ✓ Input/Output DTO<br>
+        ✓ กำหนด <strong>Ports</strong> (interfaces) ที่ต้องการ<br>
+        ✓ ไม่รู้ว่า HTTP, DB, หรือ framework ใดใช้อยู่
+      </div>
+    </div>
+
+    <div style="background:#0d1117;border:1px solid #1e293b;border-radius:14px;padding:18px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <div style="width:36px;height:36px;background:#60a5fa20;border:2px solid #60a5fa;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">🔌</div>
+        <div>
+          <div style="font-size:.72rem;color:#60a5fa;font-weight:700;letter-spacing:.1em;text-transform:uppercase">3rd Ring</div>
+          <div style="font-size:.95rem;font-weight:700;color:#f1f5f9">Interface Adapters</div>
+        </div>
+      </div>
+      <div style="font-size:.82rem;color:#64748b;line-height:1.7">
+        <span style="color:#93c5fd">แปลง format</span> ระหว่าง Use Cases กับ External World<br><br>
+        ✓ Controllers — แปลง HTTP request → Use Case Input<br>
+        ✓ Presenters — แปลง Use Case Output → JSON/HTML<br>
+        ✓ Gateways — implement interfaces ที่ Use Case กำหนด
+      </div>
+    </div>
+
+    <div style="background:#0d1117;border:1px solid #1e293b;border-radius:14px;padding:18px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <div style="width:36px;height:36px;background:#47556920;border:2px solid #475569;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">🏗️</div>
+        <div>
+          <div style="font-size:.72rem;color:#475569;font-weight:700;letter-spacing:.1em;text-transform:uppercase">Outermost</div>
+          <div style="font-size:.95rem;font-weight:700;color:#f1f5f9">Frameworks &amp; Drivers</div>
+        </div>
+      </div>
+      <div style="font-size:.82rem;color:#64748b;line-height:1.7">
+        <span style="color:#94a3b8">Implementation details</span> — glue code ที่ไม่ควรมี business logic<br><br>
+        ✓ Database drivers (postgres, redis)<br>
+        ✓ Web frameworks (chi, gin, fiber)<br>
+        ✓ External services (email, SMS, S3)
+      </div>
+    </div>
+
+  </div>
+
+  <div class="callout">
+    <strong>Humble Object Pattern:</strong> Frameworks &amp; Drivers เป็นแค่ "glue" — business logic ไม่ควรมีแม้แต่บรรทัดเดียวที่นี่ หากเพิ่ม logic ใน handler หรือ repo ให้ย้ายไป use case หรือ entity แทน
+  </div>
+</div>
+
+<!-- ── ONION ARCHITECTURE ── -->
+<div class="section">
+  <div class="section-title violet">🧅 Onion Architecture</div>
+  <div class="section-sub">โดย Jeffrey Palermo — 2008 · เน้น Domain Model เป็นศูนย์กลาง มี Domain Services เป็นชั้นพิเศษ</div>
+
+  <!-- Diagram -->
+  <div class="diagram">
+    <div class="diagram-title">Onion Architecture — Domain at the Core</div>
+    <svg viewBox="0 0 740 440" style="max-width:100%;height:auto">
+      <defs>
+        <radialGradient id="domGrad" cx="50%" cy="50%">
+          <stop offset="0%" stop-color="#2a1060"/>
+          <stop offset="100%" stop-color="#150830"/>
+        </radialGradient>
+        <marker id="arrowO" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+          <path d="M0,0 L7,3.5 L0,7 Z" fill="#a78bfa"/>
+        </marker>
+      </defs>
+
+      <!-- Infrastructure (outermost) -->
+      <circle cx="370" cy="220" r="200" fill="#080610" stroke="#1e1040" stroke-width="1.5"/>
+      <!-- Application Services -->
+      <circle cx="370" cy="220" r="152" fill="#09071a" stroke="#1e1060" stroke-width="1.5"/>
+      <!-- Domain Services -->
+      <circle cx="370" cy="220" r="104" fill="#0c0820" stroke="#3b1f8c" stroke-width="1.5"/>
+      <!-- Domain Model -->
+      <circle cx="370" cy="220" r="60" fill="url(#domGrad)" stroke="#a78bfa" stroke-width="2.5"/>
+      <circle cx="370" cy="220" r="60" fill="none" stroke="#a78bfa" stroke-width="1" opacity=".3" style="animation:pulse 2.2s ease-in-out infinite"/>
+
+      <!-- Domain Model label -->
+      <text x="370" y="213" text-anchor="middle" fill="#a78bfa" font-size="13" font-weight="700">Domain Model</text>
+      <text x="370" y="229" text-anchor="middle" fill="#c4b5fd" font-size="8.5">Entities · Value Objects · Aggregates</text>
+
+      <!-- Domain Services label -->
+      <text x="370" y="143" text-anchor="middle" fill="#7c3aed" font-size="11.5" font-weight="700">Domain Services</text>
+      <text x="370" y="157" text-anchor="middle" fill="#a78bfa" font-size="8">Logic ที่ไม่เหมาะอยู่ใน Model เดี่ยวๆ</text>
+
+      <!-- Application Services label -->
+      <text x="370" y="89" text-anchor="middle" fill="#4c1d95" font-size="11" font-weight="700">Application Services</text>
+      <text x="370" y="103" text-anchor="middle" fill="#6d28d9" font-size="8">Orchestrate Domain · Use Case flows</text>
+
+      <!-- Infrastructure label -->
+      <text x="370" y="34" text-anchor="middle" fill="#334155" font-size="10.5" font-weight="700">Infrastructure</text>
+      <text x="370" y="47" text-anchor="middle" fill="#2d3748" font-size="8">UI · Tests · DB · Web · External Services</text>
+
+      <!-- Side annotations -->
+      <text x="86" y="190" text-anchor="middle" fill="#475569" font-size="8.5">REST API</text>
+      <text x="86" y="202" text-anchor="middle" fill="#334155" font-size="8">Web Framework</text>
+      <text x="654" y="190" text-anchor="middle" fill="#475569" font-size="8.5">Database</text>
+      <text x="654" y="202" text-anchor="middle" fill="#334155" font-size="8">Email / Queue</text>
+      <text x="370" y="415" text-anchor="middle" fill="#475569" font-size="8.5">Unit Tests · Integration Tests</text>
+
+      <!-- Dependency direction arrow -->
+      <path d="M 595 85 Q 540 110 500 150" fill="none" stroke="#a78bfa" stroke-width="1.5" marker-end="url(#arrowO)" opacity=".6"/>
+      <text x="605" y="75" fill="#a78bfa" font-size="9" font-weight="600" text-anchor="middle">Dependency</text>
+      <text x="610" y="86" fill="#c4b5fd" font-size="8" text-anchor="middle">points inward →</text>
+    </svg>
+  </div>
+
+  <!-- 4 Layer cards for Onion -->
+  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:2rem 0">
+
+    <div style="background:linear-gradient(135deg,#12082e,#1e0d48);border:1px solid #a78bfa40;border-radius:14px;padding:18px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <div style="width:36px;height:36px;background:#a78bfa20;border:2px solid #a78bfa;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">💎</div>
+        <div>
+          <div style="font-size:.72rem;color:#a78bfa;font-weight:700;letter-spacing:.1em;text-transform:uppercase">Innermost</div>
+          <div style="font-size:.95rem;font-weight:700;color:#f1f5f9">Domain Model</div>
+        </div>
+      </div>
+      <div style="font-size:.82rem;color:#64748b;line-height:1.7">
+        <span style="color:#c4b5fd">Entities, Value Objects, Aggregates</span> — แนวคิดจาก DDD ที่อยู่ที่นี่<br><br>
+        ✓ Aggregate Root ควบคุม invariants<br>
+        ✓ Value Object ไม่มี ID<br>
+        ✓ Pure Go — ไม่ import อะไร
+      </div>
+    </div>
+
+    <div style="background:linear-gradient(135deg,#0e0620,#1a0d35);border:1px solid #7c3aed40;border-radius:14px;padding:18px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <div style="width:36px;height:36px;background:#7c3aed20;border:2px solid #7c3aed;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">⚗️</div>
+        <div>
+          <div style="font-size:.72rem;color:#7c3aed;font-weight:700;letter-spacing:.1em;text-transform:uppercase">2nd Ring</div>
+          <div style="font-size:.95rem;font-weight:700;color:#f1f5f9">Domain Services</div>
+        </div>
+      </div>
+      <div style="font-size:.82rem;color:#64748b;line-height:1.7">
+        <span style="color:#c4b5fd">Business logic ที่ต้องรู้จักหลาย Domain Objects</span> — ไม่เหมาะอยู่ใน Model เดี่ยว<br><br>
+        ✓ ตรวจสอบ business rule ที่ span หลาย aggregate<br>
+        ✓ Calculation ที่ซับซ้อน<br>
+        ✓ <strong>ไม่มีใน Clean Architecture</strong> — ถือว่าอยู่ใน Entities
+      </div>
+    </div>
+
+    <div style="background:#0d1117;border:1px solid #1e293b;border-radius:14px;padding:18px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <div style="width:36px;height:36px;background:#4c1d9520;border:2px solid #4c1d95;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">🎭</div>
+        <div>
+          <div style="font-size:.72rem;color:#4c1d95;font-weight:700;letter-spacing:.1em;text-transform:uppercase">3rd Ring</div>
+          <div style="font-size:.95rem;font-weight:700;color:#f1f5f9">Application Services</div>
+        </div>
+      </div>
+      <div style="font-size:.82rem;color:#64748b;line-height:1.7">
+        <span style="color:#94a3b8">Orchestrate Domain</span> — รับ command จากนอก แล้วเรียก domain services + repositories<br><br>
+        ✓ Transaction management<br>
+        ✓ กำหนด Repository interfaces<br>
+        ✓ เทียบเท่า Use Cases ใน Clean Architecture
+      </div>
+    </div>
+
+    <div style="background:#0d1117;border:1px solid #1e293b;border-radius:14px;padding:18px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <div style="width:36px;height:36px;background:#47556920;border:2px solid #475569;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">🔧</div>
+        <div>
+          <div style="font-size:.72rem;color:#475569;font-weight:700;letter-spacing:.1em;text-transform:uppercase">Outermost</div>
+          <div style="font-size:.95rem;font-weight:700;color:#f1f5f9">Infrastructure</div>
+        </div>
+      </div>
+      <div style="font-size:.82rem;color:#64748b;line-height:1.7">
+        <span style="color:#94a3b8">Implements interfaces</span> ที่ Application Services กำหนด<br><br>
+        ✓ Persistence (DB repositories)<br>
+        ✓ Web layer (HTTP handlers)<br>
+        ✓ Tests อยู่ชั้นนี้ด้วย — ทดสอบได้ทุก layer
+      </div>
+    </div>
+
+  </div>
+
+  <div class="callout violet">
+    <strong>Onion vs Clean — ความต่างหลัก:</strong> Onion มี <strong>Domain Services</strong> เป็น explicit layer แยกจาก Domain Model ทำให้ business logic ที่ต้องรู้จักหลาย aggregate มีที่อยู่ที่ชัดเจน — Clean Architecture รวมทุกอย่างไว้ใน Entities layer
+  </div>
+</div>
+
+<!-- ── COMPARISON ── -->
+<div class="section">
+  <div class="section-title">⚖️ เปรียบเทียบ 3 Architecture</div>
+  <div class="section-sub">Clean · Onion · Hexagonal — ต่างกันที่ชื่อ layer และจุดเน้น แต่ใช้หลักการเดียวกัน</div>
+
+  <div class="compare-grid">
+    <div class="compare-header" style="font-size:.78rem;color:#64748b">ด้าน</div>
+    <div class="compare-header" style="font-size:.78rem;color:#34d399">🏛️ Clean Architecture</div>
+    <div class="compare-header" style="font-size:.78rem;color:#a78bfa">🧅 Onion Architecture</div>
+
+    <div class="compare-cell" style="font-size:.78rem;color:#64748b;font-weight:600">ผู้สร้าง / ปี</div>
+    <div class="compare-cell" style="font-size:.82rem;color:#94a3b8">Robert C. Martin<br><span style="color:#64748b">2012</span></div>
+    <div class="compare-cell" style="font-size:.82rem;color:#94a3b8">Jeffrey Palermo<br><span style="color:#64748b">2008</span></div>
+
+    <div class="compare-cell" style="font-size:.78rem;color:#64748b;font-weight:600">Innermost layer</div>
+    <div class="compare-cell" style="font-size:.82rem;color:#34d399">Entities<br><span style="color:#64748b;font-size:.77rem">Enterprise Business Rules</span></div>
+    <div class="compare-cell" style="font-size:.82rem;color:#a78bfa">Domain Model<br><span style="color:#64748b;font-size:.77rem">Entities + Value Objects + Aggregates</span></div>
+
+    <div class="compare-cell" style="font-size:.78rem;color:#64748b;font-weight:600">Business logic layer</div>
+    <div class="compare-cell" style="font-size:.82rem;color:#94a3b8">Use Cases<br><span style="color:#64748b;font-size:.77rem">Application rules อยู่ที่นี่</span></div>
+    <div class="compare-cell" style="font-size:.82rem;color:#94a3b8">Domain Services + Application Services<br><span style="color:#64748b;font-size:.77rem">แบ่งเป็น 2 ชั้น</span></div>
+
+    <div class="compare-cell" style="font-size:.78rem;color:#64748b;font-weight:600">Domain Service layer</div>
+    <div class="compare-cell" style="font-size:.82rem;color:#64748b">❌ ไม่มี explicit<br><span style="font-size:.77rem">รวมอยู่ใน Entities</span></div>
+    <div class="compare-cell" style="font-size:.82rem;color:#a78bfa">✅ Explicit layer<br><span style="color:#64748b;font-size:.77rem">จาก DDD concept</span></div>
+
+    <div class="compare-cell" style="font-size:.78rem;color:#64748b;font-weight:600">Input/Output DTO</div>
+    <div class="compare-cell" style="font-size:.82rem;color:#34d399">✅ ชัดเจนมาก<br><span style="color:#64748b;font-size:.77rem">Input/Output struct สำหรับทุก Use Case</span></div>
+    <div class="compare-cell" style="font-size:.82rem;color:#64748b">⚠️ ไม่บังคับ<br><span style="font-size:.77rem">ขึ้นอยู่กับทีม</span></div>
+
+    <div class="compare-cell" style="font-size:.78rem;color:#64748b;font-weight:600">เหมาะกับ</div>
+    <div class="compare-cell" style="font-size:.82rem;color:#94a3b8">App ที่ใช้ Use Cases เป็น entry point ชัดเจน</div>
+    <div class="compare-cell" style="font-size:.82rem;color:#94a3b8">App ที่ domain ซับซ้อน ใช้ DDD concepts</div>
+
+    <div class="compare-cell" style="font-size:.78rem;color:#64748b;font-weight:600">ความสัมพันธ์กับ Hexagonal</div>
+    <div class="compare-cell" style="font-size:.82rem;color:#64748b">Superset ของ Hexagonal — เพิ่ม Entities และ Use Cases layer</div>
+    <div class="compare-cell" style="font-size:.82rem;color:#64748b">คล้ายกัน — Infrastructure = Adapters ของ Hexagonal</div>
+  </div>
+
+  <div class="callout tip">
+    <strong>สรุป:</strong> ทั้งสามเป็น "Inside-Out Architecture" ที่มีหลักการเหมือนกัน — ต่างกันที่ชื่อ layer และความละเอียด ในทางปฏิบัติ ทีมส่วนใหญ่ผสมทั้งสองแนวคิดเข้าด้วยกัน เรียกว่า "Clean Architecture influenced by DDD"
+  </div>
+</div>
+
+<!-- ── GO CODE: CLEAN ARCHITECTURE ── -->
+<div class="section">
+  <div class="section-title">🐹 Go Code — Clean Architecture</div>
+  <div class="section-sub">ระบบ Order Management ตัวอย่าง — แสดง dependency flow จาก Entity → Use Case → Adapter → Infrastructure</div>
+
+  <div class="callout tip">
+    <strong>File Structure:</strong>
+    <pre style="font-size:.78rem;margin-top:.6rem;color:#94a3b8;line-height:1.7">myapp/
+├── entity/                  ← Enterprise Business Rules (innermost)
+│   └── order.go
+├── usecase/                 ← Application Business Rules
+│   ├── port.go              ← interfaces (Ports ที่ต้องการ)
+│   └── confirm_order.go     ← Use Case implementation
+├── adapter/                 ← Interface Adapters
+│   └── handler/
+│       └── order_handler.go
+├── infrastructure/          ← Frameworks &amp; Drivers (outermost)
+│   ├── postgres_order_repo.go
+│   └── email_notifier.go
+└── cmd/
+    └── main.go              ← Dependency Injection wiring</pre>
+  </div>
+
+  <div class="code-block">
+    <div class="tab-bar" id="tabs-clean">
+      <button class="tab-btn active" onclick="switchTab('clean','entity')">entity/order.go</button>
+      <button class="tab-btn" onclick="switchTab('clean','port')">usecase/port.go</button>
+      <button class="tab-btn" onclick="switchTab('clean','uc')">usecase/confirm_order.go</button>
+      <button class="tab-btn" onclick="switchTab('clean','handler')">adapter/handler.go</button>
+      <button class="tab-btn" onclick="switchTab('clean','infra')">infrastructure/repo.go</button>
+      <button class="tab-btn" onclick="switchTab('clean','main')">cmd/main.go</button>
+    </div>
+
+    <!-- entity -->
+    <div class="tab-content active" id="clean-entity">
+      <div class="code-header">
+        <span>entity/order.go — Enterprise Business Rules</span>
+        <span class="lang-go">Go · Entity</span>
+      </div>
+      <pre><code class="language-go">package entity
+
+import "errors"
+
+var (
+	ErrOrderNotFound   = errors.New("order not found")
+	ErrOrderNotPending = errors.New("order is not in pending status")
+	ErrEmptyItems      = errors.New("order must have at least one item")
+)
+
+type OrderStatus string
+
+const (
+	Pending   OrderStatus = "pending"
+	Confirmed OrderStatus = "confirmed"
+	Cancelled OrderStatus = "cancelled"
+)
+
+type OrderItem struct {
+	ProductID string
+	Name      string
+	Qty       int
+	Price     float64
+}
+
+// Order — Enterprise Business Rule
+// ไม่ depend อะไรเลย ไม่รู้จัก DB, HTTP, หรือ Framework ใดๆ
+type Order struct {
+	ID     string
+	UserID string
+	Items  []OrderItem
+	Status OrderStatus
+}
+
+func NewOrder(id, userID string, items []OrderItem) (*Order, error) {
+	if len(items) == 0 {
+		return nil, ErrEmptyItems
+	}
+	return &Order{ID: id, UserID: userID, Items: items, Status: Pending}, nil
+}
+
+// Confirm — business rule: ยืนยันได้เฉพาะ order ที่ pending เท่านั้น
+func (o *Order) Confirm() error {
+	if o.Status != Pending {
+		return ErrOrderNotPending
+	}
+	o.Status = Confirmed
+	return nil
+}
+
+func (o *Order) Cancel() error {
+	if o.Status == Cancelled {
+		return errors.New("order already cancelled")
+	}
+	o.Status = Cancelled
+	return nil
+}
+
+// Total — business calculation อยู่ใน Entity
+func (o *Order) Total() float64 {
+	var total float64
+	for _, item := range o.Items {
+		total += float64(item.Qty) * item.Price
+	}
+	return total
+}</code></pre>
+    </div>
+
+    <!-- port -->
+    <div class="tab-content" id="clean-port">
+      <div class="code-header">
+        <span>usecase/port.go — Ports (interfaces ที่ Use Case ต้องการ)</span>
+        <span class="lang-go">Go · Port</span>
+      </div>
+      <pre><code class="language-go">package usecase
+
+import "myapp/entity"
+
+// OrderRepository — Secondary Port
+// Infrastructure ต้อง implement interface นี้
+// Use Case ไม่รู้ว่าใช้ Postgres, MySQL, หรือ In-Memory
+type OrderRepository interface {
+	FindByID(id string) (*entity.Order, error)
+	FindByUserID(userID string) ([]*entity.Order, error)
+	Save(order *entity.Order) error
+}
+
+// Notifier — Secondary Port สำหรับส่ง notification
+type Notifier interface {
+	SendConfirmation(order *entity.Order) error
+}
+
+// IDGenerator — Port สำหรับสร้าง unique ID
+type IDGenerator interface {
+	NewID() string
+}</code></pre>
+    </div>
+
+    <!-- usecase -->
+    <div class="tab-content" id="clean-uc">
+      <div class="code-header">
+        <span>usecase/confirm_order.go — Application Business Rule</span>
+        <span class="lang-go">Go · Use Case</span>
+      </div>
+      <pre><code class="language-go">package usecase
+
+import "myapp/entity"
+
+// ConfirmOrder — Application Business Rule (Use Case)
+// รู้จักแค่ Ports (interfaces) — ไม่รู้ว่าใคร implement
+type ConfirmOrder struct {
+	orders   OrderRepository
+	notifier Notifier
+}
+
+func NewConfirmOrder(r OrderRepository, n Notifier) *ConfirmOrder {
+	return &ConfirmOrder{orders: r, notifier: n}
+}
+
+// Input/Output DTOs — Use Case boundary ที่ชัดเจน
+type ConfirmOrderInput struct {
+	OrderID string
+}
+
+type ConfirmOrderOutput struct {
+	OrderID string
+	Status  string
+	Total   float64
+}
+
+// Execute — orchestrate: ดึง Entity → call business rule → save → notify
+func (uc *ConfirmOrder) Execute(in ConfirmOrderInput) (ConfirmOrderOutput, error) {
+	order, err := uc.orders.FindByID(in.OrderID)
+	if err != nil {
+		return ConfirmOrderOutput{}, err
+	}
+
+	// Entity บังคับ business rule — Use Case แค่เรียก
+	if err := order.Confirm(); err != nil {
+		return ConfirmOrderOutput{}, err
+	}
+
+	if err := uc.orders.Save(order); err != nil {
+		return ConfirmOrderOutput{}, err
+	}
+
+	// best-effort notification — ไม่ fail ถ้า notify ไม่ได้
+	_ = uc.notifier.SendConfirmation(order)
+
+	return ConfirmOrderOutput{
+		OrderID: order.ID,
+		Status:  string(order.Status),
+		Total:   order.Total(),
+	}, nil
+}
+
+// --- Test ง่ายมาก เพราะ Use Case รับ interface ---
+// func TestConfirmOrder(t *testing.T) {
+//     repo := &mockOrderRepo{order: &entity.Order{...}}
+//     uc   := NewConfirmOrder(repo, &mockNotifier{})
+//     out, err := uc.Execute(ConfirmOrderInput{OrderID: "1"})
+//     // ไม่ต้องมี DB เลย!
+// }</code></pre>
+    </div>
+
+    <!-- handler -->
+    <div class="tab-content" id="clean-handler">
+      <div class="code-header">
+        <span>adapter/handler/order_handler.go — Interface Adapter</span>
+        <span class="lang-go">Go · Adapter</span>
+      </div>
+      <pre><code class="language-go">package handler
+
+import (
+	"encoding/json"
+	"net/http"
+
+	"myapp/usecase"
+)
+
+// OrderHandler — Interface Adapter
+// หน้าที่เดียว: แปลง HTTP request → Use Case Input, Use Case Output → HTTP response
+// ไม่มี business logic ที่นี่
+type OrderHandler struct {
+	confirmOrder *usecase.ConfirmOrder
+}
+
+func NewOrderHandler(uc *usecase.ConfirmOrder) *OrderHandler {
+	return &OrderHandler{confirmOrder: uc}
+}
+
+func (h *OrderHandler) ConfirmOrder(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id") // Go 1.22+ built-in path params
+
+	out, err := h.confirmOrder.Execute(usecase.ConfirmOrderInput{OrderID: id})
+	if err != nil {
+		code := http.StatusInternalServerError
+		if err.Error() == "order not found" {
+			code = http.StatusNotFound
+		}
+		http.Error(w, err.Error(), code)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(out)
+}
+
+// GetOrders handler ตัวอย่างเพิ่มเติม
+func (h *OrderHandler) RegisterRoutes(mux *http.ServeMux) {
+	mux.HandleFunc("PUT /orders/{id}/confirm", h.ConfirmOrder)
+}</code></pre>
+    </div>
+
+    <!-- infra -->
+    <div class="tab-content" id="clean-infra">
+      <div class="code-header">
+        <span>infrastructure/postgres_order_repo.go — Frameworks &amp; Drivers</span>
+        <span class="lang-go">Go · Infrastructure</span>
+      </div>
+      <pre><code class="language-go">package infrastructure
+
+import (
+	"database/sql"
+
+	"myapp/entity"
+)
+
+// PostgresOrderRepo implements usecase.OrderRepository
+// เปลี่ยน DB ได้โดยไม่กระทบ Use Case หรือ Entity เลย
+type PostgresOrderRepo struct {
+	db *sql.DB
+}
+
+func NewPostgresOrderRepo(db *sql.DB) *PostgresOrderRepo {
+	return &PostgresOrderRepo{db: db}
+}
+
+func (r *PostgresOrderRepo) FindByID(id string) (*entity.Order, error) {
+	row := r.db.QueryRow(
+		`SELECT id, user_id, status FROM orders WHERE id = $1`, id,
+	)
+	o := &entity.Order{}
+	if err := row.Scan(&o.ID, &o.UserID, &o.Status); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, entity.ErrOrderNotFound
+		}
+		return nil, err
+	}
+	// load items from order_items table ...
+	return o, nil
+}
+
+func (r *PostgresOrderRepo) Save(order *entity.Order) error {
+	_, err := r.db.Exec(
+		`UPDATE orders SET status = $1, updated_at = NOW() WHERE id = $2`,
+		string(order.Status), order.ID,
+	)
+	return err
+}
+
+func (r *PostgresOrderRepo) FindByUserID(userID string) ([]*entity.Order, error) {
+	rows, err := r.db.Query(
+		`SELECT id, user_id, status FROM orders WHERE user_id = $1`, userID,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var orders []*entity.Order
+	for rows.Next() {
+		o := &entity.Order{}
+		rows.Scan(&o.ID, &o.UserID, &o.Status)
+		orders = append(orders, o)
+	}
+	return orders, nil
+}</code></pre>
+    </div>
+
+    <!-- main -->
+    <div class="tab-content" id="clean-main">
+      <div class="code-header">
+        <span>cmd/main.go — Dependency Injection Wiring</span>
+        <span class="lang-go">Go · Composition Root</span>
+      </div>
+      <pre><code class="language-go">package main
+
+import (
+	"database/sql"
+	"log"
+	"net/http"
+
+	_ "github.com/lib/pq"
+
+	"myapp/adapter/handler"
+	"myapp/infrastructure"
+	"myapp/usecase"
+)
+
+func main() {
+	// 1. Infrastructure (outermost) — concrete implementations
+	db, err := sql.Open("postgres", "postgres://user:pass@localhost/mydb")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	// 2. Wire dependencies — Outer depends on Inner, never reverse
+	orderRepo := infrastructure.NewPostgresOrderRepo(db)    // implements usecase.OrderRepository
+	notifier  := infrastructure.NewEmailNotifier()          // implements usecase.Notifier
+
+	// 3. Use Cases — depend only on interfaces (Ports)
+	confirmOrder := usecase.NewConfirmOrder(orderRepo, notifier)
+
+	// 4. Adapters — depend on Use Cases
+	orderHandler := handler.NewOrderHandler(confirmOrder)
+
+	// 5. Framework wiring (outermost)
+	mux := http.NewServeMux()
+	orderHandler.RegisterRoutes(mux)
+
+	log.Println("Starting server on :8080")
+	log.Fatal(http.ListenAndServe(":8080", mux))
+}
+
+// Dependency Graph (all arrows point inward):
+//
+//  main.go
+//    ├─► infrastructure/  ──► usecase/ (interfaces)
+//    ├─► adapter/         ──► usecase/ (structs)
+//    └─► usecase/         ──► entity/  (structs)
+//
+//  entity/ ──► (nothing outside standard library)</code></pre>
+    </div>
+  </div>
+</div>
+
+<!-- ── GO CODE: ONION ARCHITECTURE ── -->
+<div class="section">
+  <div class="section-title violet">🧅 Go Code — Onion Architecture</div>
+  <div class="section-sub">เน้น Domain Services layer ที่ชัดเจน — เหมาะเมื่อ business logic ซับซ้อน มีหลาย aggregate ต้องทำงานร่วมกัน</div>
+
+  <div class="callout violet">
+    <strong>File Structure:</strong>
+    <pre style="font-size:.78rem;margin-top:.6rem;color:#94a3b8;line-height:1.7">myapp/
+├── domain/
+│   ├── model/               ← Domain Model (innermost)
+│   │   ├── order.go
+│   │   └── user.go
+│   ├── service/             ← Domain Services
+│   │   └── order_domain_service.go
+│   └── port/                ← Repository interfaces (defined here!)
+│       └── repository.go
+├── application/             ← Application Services
+│   └── order_app_service.go
+├── infrastructure/          ← Outermost
+│   ├── persistence/
+│   │   └── postgres_order_repo.go
+│   └── web/
+│       └── order_handler.go
+└── cmd/main.go</pre>
+  </div>
+
+  <div class="code-block">
+    <div class="tab-bar" id="tabs-onion">
+      <button class="tab-btn v active" onclick="switchTabV('onion','model')">domain/model/order.go</button>
+      <button class="tab-btn v" onclick="switchTabV('onion','port')">domain/port/repository.go</button>
+      <button class="tab-btn v" onclick="switchTabV('onion','dsvc')">domain/service/...</button>
+      <button class="tab-btn v" onclick="switchTabV('onion','app')">application/service.go</button>
+      <button class="tab-btn v" onclick="switchTabV('onion','infra')">infrastructure/...</button>
+    </div>
+
+    <!-- domain model -->
+    <div class="tab-content active" id="onion-model">
+      <div class="code-header">
+        <span>domain/model/order.go — Domain Model (Aggregate Root)</span>
+        <span class="lang-violet">Go · Domain Model</span>
+      </div>
+      <pre><code class="language-go">package model
+
+import "errors"
+
+// Money — Value Object (immutable, ไม่มี ID)
+type Money struct {
+	Amount   float64
+	Currency string
+}
+
+func (m Money) Add(other Money) (Money, error) {
+	if m.Currency != other.Currency {
+		return Money{}, errors.New("currency mismatch")
+	}
+	return Money{Amount: m.Amount + other.Amount, Currency: m.Currency}, nil
+}
+
+// OrderItem — Value Object
+type OrderItem struct {
+	ProductID string
+	Name      string
+	Qty       int
+	UnitPrice Money
+}
+
+func (i OrderItem) Subtotal() Money {
+	return Money{Amount: float64(i.Qty) * i.UnitPrice.Amount, Currency: i.UnitPrice.Currency}
+}
+
+type OrderStatus string
+
+const (
+	OrderPending   OrderStatus = "pending"
+	OrderConfirmed OrderStatus = "confirmed"
+	OrderCancelled OrderStatus = "cancelled"
+)
+
+// Order — Aggregate Root
+// ควบคุม invariants ของ aggregate ทั้งหมด
+type Order struct {
+	ID     string
+	UserID string
+	Items  []OrderItem
+	Status OrderStatus
+}
+
+func NewOrder(id, userID string, items []OrderItem) (*Order, error) {
+	if len(items) == 0 {
+		return nil, errors.New("order must have at least one item")
+	}
+	return &Order{ID: id, UserID: userID, Items: items, Status: OrderPending}, nil
+}
+
+func (o *Order) Confirm() error {
+	if o.Status != OrderPending {
+		return errors.New("can only confirm a pending order")
+	}
+	o.Status = OrderConfirmed
+	return nil
+}
+
+// Total — calculation อยู่ใน Aggregate Root
+func (o *Order) Total() Money {
+	var total float64
+	for _, item := range o.Items {
+		total += item.Subtotal().Amount
+	}
+	return Money{Amount: total, Currency: "THB"}
+}</code></pre>
+    </div>
+
+    <!-- port -->
+    <div class="tab-content" id="onion-port">
+      <div class="code-header">
+        <span>domain/port/repository.go — Repository Interfaces (กำหนดในชั้น Domain)</span>
+        <span class="lang-violet">Go · Port</span>
+      </div>
+      <pre><code class="language-go">package port
+
+import "myapp/domain/model"
+
+// Interfaces ถูกกำหนดในชั้น Domain — ไม่ใช่ Infrastructure
+// Infrastructure implement ตาม interface นี้ (Dependency Inversion)
+
+// OrderRepository — interface ที่ Application Services ต้องการ
+type OrderRepository interface {
+	FindByID(id string) (*model.Order, error)
+	FindByUserID(userID string) ([]*model.Order, error)
+	Save(order *model.Order) error
+}
+
+// UserRepository
+type UserRepository interface {
+	FindByID(id string) (*model.User, error)
+}
+
+// Notifier
+type Notifier interface {
+	Notify(email, message string) error
+}</code></pre>
+    </div>
+
+    <!-- domain service -->
+    <div class="tab-content" id="onion-dsvc">
+      <div class="code-header">
+        <span>domain/service/order_domain_service.go — Domain Service</span>
+        <span class="lang-violet">Go · Domain Service</span>
+      </div>
+      <pre><code class="language-go">package domainservice
+
+import (
+	"errors"
+
+	"myapp/domain/model"
+)
+
+// OrderDomainService — logic ที่ต้องรู้จักหลาย Domain Objects
+// ไม่เหมาะอยู่ใน Order.Confirm() เพราะต้องรู้จัก User ด้วย
+type OrderDomainService struct{}
+
+// CanPlaceOrder — business rule ที่ span หลาย aggregate (Order + User)
+// ถ้าใส่ใน Order.go → Order ต้อง depend on User → ผิด boundary
+func (s *OrderDomainService) CanPlaceOrder(user *model.User, items []model.OrderItem) error {
+	if user.IsBanned {
+		return errors.New("banned users cannot place orders")
+	}
+	if !user.IsEmailVerified {
+		return errors.New("please verify email before ordering")
+	}
+
+	total := s.calculateTotal(items)
+	if total > user.CreditLimit {
+		return errors.New("order total exceeds credit limit")
+	}
+	return nil
+}
+
+func (s *OrderDomainService) calculateTotal(items []model.OrderItem) float64 {
+	var total float64
+	for _, item := range items {
+		total += item.Subtotal().Amount
+	}
+	return total
+}
+
+// ApplyBulkDiscount — pricing rule ที่ซับซ้อน ไม่เหมาะอยู่ใน model
+func (s *OrderDomainService) ApplyBulkDiscount(order *model.Order) float64 {
+	total := order.Total().Amount
+	switch {
+	case total >= 10000:
+		return total * 0.15 // 15% discount
+	case total >= 5000:
+		return total * 0.10
+	default:
+		return 0
+	}
+}</code></pre>
+    </div>
+
+    <!-- app service -->
+    <div class="tab-content" id="onion-app">
+      <div class="code-header">
+        <span>application/order_app_service.go — Application Service</span>
+        <span class="lang-violet">Go · Application Service</span>
+      </div>
+      <pre><code class="language-go">package application
+
+import (
+	"github.com/google/uuid"
+
+	"myapp/domain/model"
+	"myapp/domain/port"
+	domainservice "myapp/domain/service"
+)
+
+// OrderAppService — orchestrate domain objects
+// ไม่มี business logic เอง แค่ประสาน Domain Services + Repositories
+type OrderAppService struct {
+	orders      port.OrderRepository
+	users       port.UserRepository
+	notifier    port.Notifier
+	orderDomain *domainservice.OrderDomainService
+}
+
+func NewOrderAppService(
+	orders port.OrderRepository,
+	users port.UserRepository,
+	notifier port.Notifier,
+) *OrderAppService {
+	return &OrderAppService{
+		orders:      orders,
+		users:       users,
+		notifier:    notifier,
+		orderDomain: &domainservice.OrderDomainService{},
+	}
+}
+
+type PlaceOrderCmd struct {
+	UserID string
+	Items  []model.OrderItem
+}
+
+func (s *OrderAppService) PlaceOrder(cmd PlaceOrderCmd) (*model.Order, error) {
+	// 1. Load domain objects
+	user, err := s.users.FindByID(cmd.UserID)
+	if err != nil {
+		return nil, err
+	}
+
+	// 2. Domain Service ตรวจสอบ business rule (ต้องรู้จัก User + Items)
+	if err := s.orderDomain.CanPlaceOrder(user, cmd.Items); err != nil {
+		return nil, err
+	}
+
+	// 3. Domain Model สร้าง Aggregate
+	order, err := model.NewOrder(uuid.NewString(), cmd.UserID, cmd.Items)
+	if err != nil {
+		return nil, err
+	}
+
+	// 4. Persist
+	if err := s.orders.Save(order); err != nil {
+		return nil, err
+	}
+
+	// 5. Side effects (notification)
+	_ = s.notifier.Notify(user.Email, "Your order has been placed!")
+
+	return order, nil
+}
+
+func (s *OrderAppService) ConfirmOrder(orderID string) error {
+	order, err := s.orders.FindByID(orderID)
+	if err != nil {
+		return err
+	}
+	if err := order.Confirm(); err != nil { // Domain Model business rule
+		return err
+	}
+	return s.orders.Save(order)
+}</code></pre>
+    </div>
+
+    <!-- infra -->
+    <div class="tab-content" id="onion-infra">
+      <div class="code-header">
+        <span>infrastructure/ — Persistence + Web Handler</span>
+        <span class="lang-violet">Go · Infrastructure</span>
+      </div>
+      <pre><code class="language-go">// infrastructure/persistence/postgres_order_repo.go
+package persistence
+
+import (
+	"database/sql"
+
+	"myapp/domain/model"
+)
+
+// PostgresOrderRepo implements domain/port.OrderRepository
+// Infrastructure อยู่ชั้นนอกสุด — depend on domain, ไม่ใช่ domain depend on infrastructure
+type PostgresOrderRepo struct{ db *sql.DB }
+
+func NewPostgresOrderRepo(db *sql.DB) *PostgresOrderRepo {
+	return &PostgresOrderRepo{db: db}
+}
+
+func (r *PostgresOrderRepo) FindByID(id string) (*model.Order, error) {
+	row := r.db.QueryRow(`SELECT id, user_id, status FROM orders WHERE id=$1`, id)
+	o := &model.Order{}
+	if err := row.Scan(&o.ID, &o.UserID, &o.Status); err != nil {
+		return nil, err
+	}
+	return o, nil
+}
+
+func (r *PostgresOrderRepo) Save(order *model.Order) error {
+	_, err := r.db.Exec(
+		`INSERT INTO orders(id,user_id,status) VALUES($1,$2,$3)
+		 ON CONFLICT(id) DO UPDATE SET status=$3`,
+		order.ID, order.UserID, string(order.Status),
+	)
+	return err
+}
+
+// ─────────────────────────────────────────────────────────────
+
+// infrastructure/web/order_handler.go
+package web
+
+import (
+	"encoding/json"
+	"net/http"
+
+	"myapp/application"
+	"myapp/domain/model"
+)
+
+type OrderHandler struct {
+	svc *application.OrderAppService
+}
+
+func NewOrderHandler(svc *application.OrderAppService) *OrderHandler {
+	return &OrderHandler{svc: svc}
+}
+
+func (h *OrderHandler) PlaceOrder(w http.ResponseWriter, r *http.Request) {
+	var cmd application.PlaceOrderCmd
+	if err := json.NewDecoder(r.Body).Decode(&cmd); err != nil {
+		http.Error(w, "invalid body", http.StatusBadRequest)
+		return
+	}
+	order, err := h.svc.PlaceOrder(cmd)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(order)
+}</code></pre>
+    </div>
+  </div>
+</div>
+
+<!-- ── WHEN TO USE ── -->
+<div class="section">
+  <div class="section-title">🤔 เลือกใช้เมื่อไหร่?</div>
+  <div class="section-sub">ทั้งสอง architecture มี trade-off ที่ต้องพิจารณา</div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:2rem 0">
+
+    <div style="background:linear-gradient(135deg,#031a0e,#062113);border:1px solid #34d39940;border-radius:14px;padding:20px">
+      <div style="font-size:.75rem;font-weight:700;color:#34d399;letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px">✅ ใช้ Clean Architecture เมื่อ</div>
+      <div style="font-size:.83rem;color:#64748b;line-height:1.9">
+        • ต้องการ <strong style="color:#e2e8f0">Use Cases ที่ชัดเจน</strong> เป็น entry point<br>
+        • Team ไม่คุ้นกับ DDD concepts<br>
+        • App ขนาดกลาง-ใหญ่ที่ต้องการ testability สูง<br>
+        • ต้องการ <strong style="color:#e2e8f0">Input/Output DTOs</strong> ที่เข้มงวด<br>
+        • อยากแยก business rules หลายชั้น ไม่รวมกันใน model
+      </div>
+    </div>
+
+    <div style="background:linear-gradient(135deg,#12082e,#1e0d48);border:1px solid #a78bfa40;border-radius:14px;padding:20px">
+      <div style="font-size:.75rem;font-weight:700;color:#a78bfa;letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px">✅ ใช้ Onion Architecture เมื่อ</div>
+      <div style="font-size:.83rem;color:#64748b;line-height:1.9">
+        • Domain ซับซ้อน มี <strong style="color:#e2e8f0">multiple aggregates</strong><br>
+        • Team คุ้นกับ <strong style="color:#e2e8f0">DDD</strong> (Entities, VOs, Aggregates)<br>
+        • มี business logic ที่ span หลาย domain objects<br>
+        • ต้องการ Domain Services layer ที่แยกออกมาชัดเจน<br>
+        • E-commerce, ERP, Banking systems
+      </div>
+    </div>
+
+    <div style="background:#0d1117;border:1px solid #ef444440;border-radius:14px;padding:20px">
+      <div style="font-size:.75rem;font-weight:700;color:#ef4444;letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px">⚠️ ไม่เหมาะเมื่อ</div>
+      <div style="font-size:.83rem;color:#64748b;line-height:1.9">
+        • <strong style="color:#e2e8f0">CRUD App</strong> ง่ายๆ — overkill มาก<br>
+        • Team เล็ก deadline ตึง — boilerplate เยอะ<br>
+        • Microservice ที่ทำงานเดียวเฉพาะเจาะจง<br>
+        • Prototype หรือ MVP ที่ requirements เปลี่ยนเร็ว
+      </div>
+    </div>
+
+    <div style="background:#0d1117;border:1px solid #fbbf2440;border-radius:14px;padding:20px">
+      <div style="font-size:.75rem;font-weight:700;color:#fbbf24;letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px">💡 Tips จากประสบการณ์จริง</div>
+      <div style="font-size:.83rem;color:#64748b;line-height:1.9">
+        • เริ่มจาก <strong style="color:#e2e8f0">Hexagonal</strong> ถ้าทีมยังใหม่กับ concept<br>
+        • ในทางปฏิบัติ Clean + Onion มักผสมกัน<br>
+        • ไม่ต้องทำตามกฎ 100% — เอาหลักการไปใช้<br>
+        • Rule of Thumb: ถ้า test ยาก → แยก layer
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Quick reference -->
+  <div style="background:#0d1117;border:1px solid #1e293b;border-radius:14px;overflow:hidden;margin:2rem 0">
+    <div style="background:#111827;padding:12px 20px;display:grid;grid-template-columns:1.5fr 1fr 1fr;font-size:.78rem;font-weight:700;color:#34d399;gap:8px">
+      <div>Layer / ชั้น</div><div>Clean Architecture</div><div>Onion Architecture</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr;padding:10px 20px;font-size:.8rem;color:#94a3b8;border-bottom:1px solid #ffffff08;gap:8px;align-items:center">
+      <div style="color:#64748b">Innermost (ไม่ depend ใคร)</div><div style="color:#34d399">Entities</div><div style="color:#a78bfa">Domain Model</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr;padding:10px 20px;font-size:.8rem;color:#94a3b8;border-bottom:1px solid #ffffff08;gap:8px;align-items:center">
+      <div style="color:#64748b">Cross-aggregate logic</div><div style="color:#64748b">รวมใน Entities</div><div style="color:#a78bfa">Domain Services</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr;padding:10px 20px;font-size:.8rem;color:#94a3b8;border-bottom:1px solid #ffffff08;gap:8px;align-items:center">
+      <div style="color:#64748b">Orchestration layer</div><div style="color:#34d399">Use Cases</div><div style="color:#a78bfa">Application Services</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr;padding:10px 20px;font-size:.8rem;color:#94a3b8;border-bottom:1px solid #ffffff08;gap:8px;align-items:center">
+      <div style="color:#64748b">Format translation</div><div style="color:#34d399">Interface Adapters</div><div style="color:#64748b">Web layer (in Infra)</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr;padding:10px 20px;font-size:.8rem;color:#94a3b8;gap:8px;align-items:center">
+      <div style="color:#64748b">Outermost</div><div style="color:#34d399">Frameworks &amp; Drivers</div><div style="color:#a78bfa">Infrastructure</div>
+    </div>
+  </div>
+
+</div>
+
+<div style="text-align:center;margin:3rem 0;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+  <a href="2-hexagonal.html" style="display:inline-flex;align-items:center;gap:.5rem;background:#0d1117;border:1px solid #1e293b;color:#64748b;padding:.7rem 1.5rem;border-radius:10px;font-size:.88rem">← Hexagonal Architecture</a>
+  <a href="index.html" style="display:inline-flex;align-items:center;gap:.5rem;background:#0d1117;border:1px solid #34d39940;color:#34d399;padding:.7rem 1.5rem;border-radius:10px;font-weight:600;font-size:.88rem">กลับหน้าหลัก →</a>
+</div>
+
+</div>
+
+<script>
+function switchTab(group, id) {
+  const bar = document.getElementById('tabs-' + group)
+  bar.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'))
+  event.target.classList.add('active')
+  document.querySelectorAll('[id^="' + group + '-"]').forEach(c => c.classList.remove('active'))
+  document.getElementById(group + '-' + id).classList.add('active')
+  document.querySelectorAll('#' + group + '-' + id + ' code').forEach(el => {
+    delete el.dataset.highlighted
+    hljs.highlightElement(el)
+  })
+}
+
+function switchTabV(group, id) {
+  const bar = document.getElementById('tabs-' + group)
+  bar.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'))
+  event.target.classList.add('active')
+  document.querySelectorAll('[id^="' + group + '-"]').forEach(c => c.classList.remove('active'))
+  document.getElementById(group + '-' + id).classList.add('active')
+  document.querySelectorAll('#' + group + '-' + id + ' code').forEach(el => {
+    delete el.dataset.highlighted
+    hljs.highlightElement(el)
+  })
+}
+</script>
+
+<script>hljs.highlightAll()</script>
+
+<script>
+/* ── Copy button — inject into every .code-block ── */
+document.querySelectorAll('.code-block').forEach(block => {
+  const header = block.querySelector('.code-header')
+  const code   = block.querySelector('code')
+  if (!header || !code) return
+
+  const btn = document.createElement('button')
+  btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span>Copy</span>`
+  btn.style.cssText = [
+    'display:inline-flex','align-items:center','gap:5px',
+    'background:rgba(255,255,255,.06)','border:1px solid rgba(255,255,255,.1)',
+    'color:#94a3b8','font-size:.7rem','font-weight:600',
+    'padding:3px 10px','border-radius:6px','cursor:pointer',
+    'transition:all .15s','flex-shrink:0',
+  ].join(';')
+
+  btn.addEventListener('mouseenter', () => { btn.style.background='rgba(255,255,255,.1)'; btn.style.color='#e2e8f0' })
+  btn.addEventListener('mouseleave', () => {
+    if (!btn.dataset.copied) { btn.style.background='rgba(255,255,255,.06)'; btn.style.color='#94a3b8' }
+  })
+  btn.addEventListener('click', async () => {
+    const activeCode = block.querySelector('.tab-content.active code') || code
+    try { await navigator.clipboard.writeText(activeCode.innerText) }
+    catch { const ta=document.createElement('textarea'); ta.value=activeCode.innerText; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove() }
+    btn.dataset.copied='1'
+    btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span style="color:#34d399">Copied!</span>`
+    btn.style.background='rgba(52,211,153,.1)'; btn.style.borderColor='rgba(52,211,153,.3)'
+    setTimeout(() => {
+      delete btn.dataset.copied
+      btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span>Copy</span>`
+      btn.style.background='rgba(255,255,255,.06)'; btn.style.borderColor='rgba(255,255,255,.1)'; btn.style.color='#94a3b8'
+    }, 2000)
+  })
+  header.appendChild(btn)
+})
+</script>
+</body>
+</html>
