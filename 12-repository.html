@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Repository Pattern</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',sans-serif;background:#0f0f1a;color:#e2e8f0;line-height:1.7}
+.hero{background:linear-gradient(135deg,#0a1628 0%,#1a2d4e 50%,#0a1628 100%);padding:60px 40px;text-align:center;border-bottom:1px solid #60a5fa33;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,#60a5fa22 0%,transparent 70%)}
+.hero-badge{display:inline-block;background:#60a5fa20;border:1px solid #60a5fa60;color:#60a5fa;padding:6px 18px;border-radius:20px;font-size:.8rem;letter-spacing:2px;text-transform:uppercase;margin-bottom:20px}
+.hero h1{font-size:3rem;font-weight:800;background:linear-gradient(135deg,#60a5fa,#818cf8,#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:16px}
+.hero p{font-size:1.15rem;color:#94a3b8;max-width:700px;margin:0 auto}
+nav{background:#1e1e2e;padding:16px 40px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #ffffff10;position:sticky;top:0;z-index:100}
+.nav-home{color:#60a5fa;text-decoration:none;font-weight:600;font-size:.9rem}
+.nav-links{display:flex;gap:16px}
+.nav-links a{color:#94a3b8;text-decoration:none;font-size:.85rem;padding:6px 14px;border-radius:8px;border:1px solid #ffffff15;transition:all .2s}
+.nav-links a:hover{color:#e2e8f0;border-color:#60a5fa40}
+.container{max-width:1100px;margin:0 auto;padding:40px 20px}
+section{margin-bottom:56px}
+h2{font-size:1.7rem;font-weight:700;color:#60a5fa;margin-bottom:8px;padding-bottom:8px;border-bottom:2px solid #60a5fa30}
+h3{font-size:1.2rem;font-weight:600;color:#818cf8;margin:28px 0 14px}
+p{color:#94a3b8;margin-bottom:14px}
+
+/* VB System */
+.vb-wrap{margin:24px 0}
+.vb-label{font-size:.75rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#60a5fa;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.vb-label::after{content:'';flex:1;height:1px;background:#60a5fa20}
+.vb-grid{display:grid;gap:14px}
+.vb-2{grid-template-columns:repeat(2,1fr)}
+.vb-3{grid-template-columns:repeat(3,1fr)}
+.vb-4{grid-template-columns:repeat(4,1fr)}
+.vbox{background:#1e1e2e;border:1px solid #60a5fa30;border-radius:14px;padding:20px;transition:transform .2s,border-color .2s}
+.vbox:hover{transform:translateY(-3px);border-color:#60a5fa60}
+.vb-icon{font-size:1.8rem;margin-bottom:10px}
+.vb-title{font-size:.95rem;font-weight:700;color:#e2e8f0;margin-bottom:8px}
+.vb-body{font-size:.84rem;color:#94a3b8;line-height:1.6}
+.vb-list{list-style:none;margin-top:8px}
+.vb-list li{font-size:.82rem;color:#94a3b8;padding:3px 0;padding-left:14px;position:relative}
+.vb-list li::before{content:'›';position:absolute;left:0;color:#60a5fa}
+.vb-chip{display:inline-block;background:#60a5fa15;border:1px solid #60a5fa40;color:#60a5fa;padding:3px 10px;border-radius:12px;font-size:.75rem;margin:3px 2px}
+
+/* Layer diagram */
+.layer-flow{display:flex;flex-direction:column;gap:0;margin:28px 0}
+.layer-row{display:flex;align-items:stretch;gap:0}
+.layer-arrow{display:flex;align-items:center;justify-content:center;font-size:1.4rem;color:#60a5fa60;padding:4px 0}
+.layer-block{flex:1;padding:18px 22px;border-radius:12px;position:relative}
+.layer-block.business{background:linear-gradient(135deg,#1a2d1a,#1e3a2a);border:1px solid #4ade8040}
+.layer-block.service{background:linear-gradient(135deg,#1a1a3a,#2a2a4a);border:1px solid #818cf840}
+.layer-block.repo-if{background:linear-gradient(135deg,#0a1628,#1a2d4e);border:2px solid #60a5fa60}
+.layer-block.repo-impl{background:linear-gradient(135deg,#1a1a2a,#2a2a3a);border:1px solid #60a5fa30}
+.layer-block.db{background:linear-gradient(135deg,#1a0a0a,#2a1a1a);border:1px solid #f8717140}
+.layer-name{font-size:.85rem;font-weight:700;margin-bottom:6px}
+.layer-name.green{color:#4ade80}
+.layer-name.indigo{color:#818cf8}
+.layer-name.blue{color:#60a5fa}
+.layer-name.blue2{color:#38bdf8}
+.layer-name.red{color:#f87171}
+.layer-desc{font-size:.82rem;color:#94a3b8}
+.layer-badge{position:absolute;right:16px;top:50%;transform:translateY(-50%);background:#60a5fa20;border:1px solid #60a5fa40;color:#60a5fa;padding:3px 10px;border-radius:8px;font-size:.75rem}
+
+/* Without vs With */
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin:28px 0}
+.compare-box{border-radius:14px;overflow:hidden}
+.compare-header{padding:14px 20px;font-weight:700;font-size:.95rem}
+.compare-header.bad{background:#f8717115;color:#f87171;border-bottom:1px solid #f8717130}
+.compare-header.good{background:#4ade8015;color:#4ade80;border-bottom:1px solid #4ade8030}
+.compare-body{background:#1e1e2e;padding:0}
+.compare-body pre{margin:0!important}
+.compare-body code{font-size:.78rem!important;padding:16px!important}
+
+/* Diagram */
+.diagram-wrap{background:#141425;border:1px solid #60a5fa30;border-radius:16px;padding:20px;margin:28px 0;overflow:hidden}
+.diagram-wrap svg{width:100%;height:auto}
+
+/* Code */
+.code-section{margin:24px 0}
+.code-file{background:#1a1a2e;border:1px solid #60a5fa30;border-radius:12px;margin-bottom:20px;overflow:hidden}
+.code-file-header{background:#60a5fa15;padding:10px 16px;font-size:.82rem;color:#60a5fa;font-family:monospace;border-bottom:1px solid #60a5fa30;display:flex;align-items:center;gap:8px}
+.code-file-header::before{content:'📄'}
+.code-file pre{margin:0}
+.code-file code{font-size:.82rem!important;padding:20px!important}
+
+@media(max-width:768px){
+  .hero h1{font-size:2rem}
+  .vb-3,.vb-4{grid-template-columns:repeat(2,1fr)}
+  .compare-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-home">← กลับหน้าหลัก</a>
+  <div class="nav-links">
+    <a href="11-soa.html">← SOA</a>
+    <a href="13-cqrs.html">CQRS →</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">Design Pattern #12</div>
+  <h1>Repository Pattern</h1>
+  <p>แยก Business Logic ออกจาก Data Access ด้วย Abstraction Layer — ทำให้ทดสอบง่าย เปลี่ยน Database ง่าย</p>
+</div>
+
+<div class="container">
+
+  <!-- Core Concept -->
+  <section>
+    <h2>Repository Pattern คืออะไร?</h2>
+    <p>Repository Pattern เป็น design pattern ที่ใส่ <strong>abstraction layer</strong> ระหว่าง business logic กับ data access code โดย Business Layer จะคุยกับ Repository <em>Interface</em> เท่านั้น ไม่รู้จักว่า data เก็บอยู่ที่ไหน (PostgreSQL, MongoDB, In-Memory, API)</p>
+
+    <div class="layer-flow">
+      <div class="layer-block business">
+        <div class="layer-name green">🧠 Business Layer / Use Case</div>
+        <div class="layer-desc">Business logic, rules, orchestration — ไม่รู้จัก SQL, ORM, หรือ database driver</div>
+        <div class="layer-badge">Calls interface only</div>
+      </div>
+      <div class="layer-arrow">⬇️</div>
+      <div class="layer-block service">
+        <div class="layer-name indigo">⚙️ Application Service</div>
+        <div class="layer-desc">Coordinates use cases, injects repository via constructor (Dependency Injection)</div>
+        <div class="layer-badge">Depends on interface</div>
+      </div>
+      <div class="layer-arrow">⬇️</div>
+      <div class="layer-block repo-if">
+        <div class="layer-name blue">🔌 Repository Interface</div>
+        <div class="layer-desc"><strong>The contract</strong> — กำหนด operations: Find, Save, Delete, List (กำแพงระหว่าง domain กับ infrastructure)</div>
+        <div class="layer-badge">Interface boundary</div>
+      </div>
+      <div class="layer-arrow">⬇️</div>
+      <div class="layer-block repo-impl">
+        <div class="layer-name blue2">🏗️ Repository Implementations</div>
+        <div class="layer-desc">PostgresRepo, MongoRepo, InMemoryRepo (for tests), CachedRepo — implements the interface</div>
+        <div class="layer-badge">Swappable</div>
+      </div>
+      <div class="layer-arrow">⬇️</div>
+      <div class="layer-block db">
+        <div class="layer-name red">💾 Data Sources</div>
+        <div class="layer-desc">PostgreSQL, MongoDB, Redis, REST API, File System — ซ่อนอยู่ใน implementation</div>
+        <div class="layer-badge">Infrastructure</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Benefits boxes -->
+  <section>
+    <h2>ประโยชน์หลัก</h2>
+    <div class="vb-wrap">
+      <div class="vb-grid vb-4">
+        <div class="vbox">
+          <div class="vb-icon">🧪</div>
+          <div class="vb-title">Testability</div>
+          <div class="vb-body">ใช้ InMemoryRepo ใน unit tests แทน database จริง ทำให้ test เร็วและไม่ต้องการ infrastructure</div>
+          <span class="vb-chip">Unit Tests</span>
+          <span class="vb-chip">No DB needed</span>
+        </div>
+        <div class="vbox">
+          <div class="vb-icon">🔄</div>
+          <div class="vb-title">Flexibility</div>
+          <div class="vb-body">เปลี่ยน database ได้โดยไม่แตะ business logic — เปลี่ยนจาก MySQL เป็น PostgreSQL แค่ swap implementation</div>
+          <span class="vb-chip">Swappable DB</span>
+          <span class="vb-chip">Easy migration</span>
+        </div>
+        <div class="vbox">
+          <div class="vb-icon">🧱</div>
+          <div class="vb-title">Separation of Concerns</div>
+          <div class="vb-body">Business logic ไม่มี SQL อยู่เลย — domain code อ่านง่าย maintain ง่าย เปลี่ยน query ไม่กระทบ logic</div>
+          <span class="vb-chip">Clean Code</span>
+          <span class="vb-chip">DDD-ready</span>
+        </div>
+        <div class="vbox">
+          <div class="vb-icon">♻️</div>
+          <div class="vb-title">Reusability</div>
+          <div class="vb-body">Repository ใช้ได้หลาย use case — findByID ใช้ได้ทั้ง GetOrder, UpdateOrder, DeleteOrder</div>
+          <span class="vb-chip">DRY</span>
+          <span class="vb-chip">Centralized queries</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Before vs After -->
+  <section>
+    <h2>Before vs After</h2>
+    <div class="compare-grid">
+      <div class="compare-box">
+        <div class="compare-header bad">❌ Without Repository — Business logic รู้จัก SQL</div>
+        <div class="compare-body">
+          <pre><code class="language-go">// Service มี SQL โดยตรง — ทดสอบยาก
+func (s *OrderService) GetOrder(id string) (*Order, error) {
+    // SQL ปนอยู่ใน business layer
+    row := s.db.QueryRow(
+        "SELECT id, status, total FROM orders WHERE id = $1",
+        id,
+    )
+    var o Order
+    if err := row.Scan(&o.ID, &o.Status, &o.Total); err != nil {
+        return nil, err
+    }
+    // ต้องมี DB จริงถึงจะ test ได้
+    return &o, nil
+}</code></pre>
+        </div>
+      </div>
+      <div class="compare-box">
+        <div class="compare-header good">✅ With Repository — Business logic สะอาด</div>
+        <div class="compare-body">
+          <pre><code class="language-go">// Service ไม่รู้จัก SQL เลย
+func (s *OrderService) GetOrder(id string) (*Order, error) {
+    // คุยกับ interface เท่านั้น
+    order, err := s.repo.FindByID(id)
+    if err != nil {
+        return nil, fmt.Errorf("order not found: %w", err)
+    }
+    // Pure business logic
+    if order.IsExpired() {
+        return nil, ErrOrderExpired
+    }
+    return order, nil
+}
+// Test ใช้ InMemoryRepo แทน — ไม่ต้องการ DB</code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Architecture Diagram -->
+  <section>
+    <h2>Repository Pattern Diagram</h2>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 860 420" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#60a5fa"/>
+          </marker>
+          <marker id="arr-g" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#4ade80"/>
+          </marker>
+          <style>
+            .rl{font-family:sans-serif;font-size:11px;fill:#94a3b8}
+            .rt{font-family:sans-serif;font-size:12px;font-weight:bold;fill:#e2e8f0}
+            .rs{font-family:sans-serif;font-size:10px;fill:#64748b}
+          </style>
+        </defs>
+        <rect width="860" height="420" fill="#0d0d1a" rx="12"/>
+
+        <!-- Business Layer -->
+        <rect x="20" y="20" width="180" height="80" rx="10" fill="#1a2a1a" stroke="#4ade8040"/>
+        <text x="110" y="50" text-anchor="middle" class="rt">🧠 Order Service</text>
+        <text x="110" y="68" text-anchor="middle" class="rl">Business Logic</text>
+        <text x="110" y="84" text-anchor="middle" class="rs">Uses: repo.FindByID()</text>
+
+        <!-- Interface (center) -->
+        <rect x="280" y="20" width="300" height="80" rx="10" fill="#0a1628" stroke="#60a5fa" stroke-width="2"/>
+        <text x="430" y="46" text-anchor="middle" class="rt">🔌 OrderRepository</text>
+        <text x="430" y="62" text-anchor="middle" class="rl" fill="#60a5fa">interface</text>
+        <text x="430" y="78" text-anchor="middle" class="rs">FindByID · Save · Delete · List</text>
+
+        <!-- Test annotation -->
+        <rect x="660" y="20" width="180" height="80" rx="10" fill="#1a2a1a" stroke="#4ade8040"/>
+        <text x="750" y="50" text-anchor="middle" class="rt">🧪 Unit Tests</text>
+        <text x="750" y="68" text-anchor="middle" class="rl">Use InMemoryRepo</text>
+        <text x="750" y="84" text-anchor="middle" class="rs">No database needed</text>
+
+        <!-- Implementation boxes (row 2) -->
+        <rect x="60" y="200" width="150" height="80" rx="10" fill="#1a1a2e" stroke="#60a5fa30"/>
+        <text x="135" y="230" text-anchor="middle" class="rt">🐘 PostgresRepo</text>
+        <text x="135" y="248" text-anchor="middle" class="rl">production</text>
+        <text x="135" y="264" text-anchor="middle" class="rs">database/sql</text>
+
+        <rect x="240" y="200" width="150" height="80" rx="10" fill="#1a1a2e" stroke="#60a5fa30"/>
+        <text x="315" y="230" text-anchor="middle" class="rt">🍃 MongoRepo</text>
+        <text x="315" y="248" text-anchor="middle" class="rl">document store</text>
+        <text x="315" y="264" text-anchor="middle" class="rs">go.mongodb.org/mongo-driver</text>
+
+        <rect x="420" y="200" width="150" height="80" rx="10" fill="#1a1a2e" stroke="#60a5fa30"/>
+        <text x="495" y="230" text-anchor="middle" class="rt">🧠 CachedRepo</text>
+        <text x="495" y="248" text-anchor="middle" class="rl">decorator</text>
+        <text x="495" y="264" text-anchor="middle" class="rs">Redis + fallthrough</text>
+
+        <rect x="600" y="200" width="150" height="80" rx="10" fill="#1e2a1a" stroke="#4ade8040"/>
+        <text x="675" y="230" text-anchor="middle" class="rt">🔬 InMemoryRepo</text>
+        <text x="675" y="248" text-anchor="middle" class="rl">testing only</text>
+        <text x="675" y="264" text-anchor="middle" class="rs">map[string]*Order</text>
+
+        <!-- Data stores (row 3) -->
+        <rect x="60" y="360" width="150" height="40" rx="8" fill="#2a1a1a" stroke="#f8717130"/>
+        <text x="135" y="385" text-anchor="middle" class="rt" fill="#f87171">💾 PostgreSQL</text>
+
+        <rect x="240" y="360" width="150" height="40" rx="8" fill="#2a1a1a" stroke="#f8717130"/>
+        <text x="315" y="385" text-anchor="middle" class="rt" fill="#f87171">🍃 MongoDB</text>
+
+        <rect x="420" y="360" width="150" height="40" rx="8" fill="#2a1a1a" stroke="#f8717130"/>
+        <text x="495" y="385" text-anchor="middle" class="rt" fill="#f87171">⚡ Redis</text>
+
+        <!-- Arrows: service → interface -->
+        <line x1="200" y1="60" x2="280" y2="60" stroke="#4ade80" stroke-width="2" marker-end="url(#arr-g)"/>
+        <text x="240" y="52" text-anchor="middle" class="rs" fill="#4ade80">calls</text>
+
+        <!-- Arrows: tests → interface -->
+        <line x1="660" y1="60" x2="580" y2="60" stroke="#4ade80" stroke-width="2" marker-end="url(#arr-g)"/>
+        <text x="620" y="52" text-anchor="middle" class="rs" fill="#4ade80">uses</text>
+
+        <!-- Arrows: interface → implementations -->
+        <line x1="350" y1="100" x2="135" y2="200" stroke="#60a5fa50" stroke-width="1.5" marker-end="url(#arr)" stroke-dasharray="4,3"/>
+        <line x1="400" y1="100" x2="315" y2="200" stroke="#60a5fa50" stroke-width="1.5" marker-end="url(#arr)" stroke-dasharray="4,3"/>
+        <line x1="460" y1="100" x2="495" y2="200" stroke="#60a5fa50" stroke-width="1.5" marker-end="url(#arr)" stroke-dasharray="4,3"/>
+        <line x1="520" y1="100" x2="675" y2="200" stroke="#4ade8050" stroke-width="1.5" marker-end="url(#arr-g)" stroke-dasharray="4,3"/>
+        <text x="430" y="165" text-anchor="middle" class="rs" fill="#60a5fa">implements</text>
+
+        <!-- Arrows: implementations → stores -->
+        <line x1="135" y1="280" x2="135" y2="360" stroke="#f8717140" stroke-width="1.5" marker-end="url(#arr)"/>
+        <line x1="315" y1="280" x2="315" y2="360" stroke="#f8717140" stroke-width="1.5" marker-end="url(#arr)"/>
+        <line x1="495" y1="280" x2="495" y2="360" stroke="#f8717140" stroke-width="1.5" marker-end="url(#arr)"/>
+
+        <!-- DI annotation -->
+        <rect x="280" y="130" width="300" height="36" rx="8" fill="#60a5fa10" stroke="#60a5fa30"/>
+        <text x="430" y="153" text-anchor="middle" class="rl" fill="#60a5fa">Dependency Injection — injected at startup</text>
+
+        <!-- No arrow from InMemory to DB -->
+        <text x="675" y="330" text-anchor="middle" class="rs" fill="#4ade80">no DB</text>
+        <text x="675" y="343" text-anchor="middle" class="rs" fill="#4ade80">needed</text>
+      </svg>
+    </div>
+  </section>
+
+  <!-- Repository Variants -->
+  <section>
+    <h2>Repository Variants</h2>
+    <div class="vb-wrap">
+      <div class="vb-grid vb-3">
+        <div class="vbox">
+          <div class="vb-icon">📋</div>
+          <div class="vb-title">Generic Repository</div>
+          <div class="vb-body">Repository&lt;T&gt; ที่ใช้ได้กับทุก entity — มี CRUD พื้นฐานพร้อมใช้</div>
+          <ul class="vb-list">
+            <li>FindByID(id) T</li>
+            <li>FindAll() []T</li>
+            <li>Save(entity T)</li>
+            <li>Delete(id)</li>
+          </ul>
+          <span class="vb-chip">DRY</span>
+        </div>
+        <div class="vbox">
+          <div class="vb-icon">🎯</div>
+          <div class="vb-title">Specific Repository</div>
+          <div class="vb-body">Repository สำหรับ entity หนึ่งๆ มี query เฉพาะ domain ที่ generic ทำไม่ได้</div>
+          <ul class="vb-list">
+            <li>FindByCustomerID()</li>
+            <li>FindByStatus()</li>
+            <li>FindExpiredOrders()</li>
+            <li>CountByMonth()</li>
+          </ul>
+          <span class="vb-chip">Domain-specific</span>
+        </div>
+        <div class="vbox">
+          <div class="vb-icon">🎨</div>
+          <div class="vb-title">Decorator Repository</div>
+          <div class="vb-body">Wrap repository อื่นเพื่อเพิ่ม behavior เช่น caching, logging, retry โดยไม่แก้ implementation</div>
+          <ul class="vb-list">
+            <li>CachedRepo (Redis)</li>
+            <li>LoggedRepo</li>
+            <li>RetryRepo</li>
+            <li>MetricsRepo</li>
+          </ul>
+          <span class="vb-chip">Decorator pattern</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Go Code -->
+  <section>
+    <h2>ตัวอย่าง Code (Go)</h2>
+
+    <div class="code-section">
+      <div class="code-file">
+        <div class="code-file-header">domain/order.go — Domain Entity</div>
+        <pre><code class="language-go">package domain
+
+import (
+	"time"
+)
+
+type OrderStatus string
+
+const (
+	StatusPending   OrderStatus = "pending"
+	StatusPaid      OrderStatus = "paid"
+	StatusCancelled OrderStatus = "cancelled"
+)
+
+type Order struct {
+	ID         string
+	CustomerID string
+	Items      []OrderItem
+	Total      float64
+	Status     OrderStatus
+	CreatedAt  time.Time
+	ExpiresAt  time.Time
+}
+
+type OrderItem struct {
+	ProductID string
+	Quantity  int
+	Price     float64
+}
+
+func (o *Order) IsExpired() bool {
+	return time.Now().After(o.ExpiresAt)
+}
+
+func (o *Order) CanBeCancelled() bool {
+	return o.Status == StatusPending && !o.IsExpired()
+}</code></pre>
+      </div>
+
+      <div class="code-file">
+        <div class="code-file-header">domain/repository.go — Repository Interface (The Contract)</div>
+        <pre><code class="language-go">package domain
+
+import "context"
+
+// OrderRepository — the interface that business layer depends on.
+// All implementations must satisfy this contract.
+type OrderRepository interface {
+	FindByID(ctx context.Context, id string) (*Order, error)
+	FindByCustomerID(ctx context.Context, customerID string) ([]*Order, error)
+	FindByStatus(ctx context.Context, status OrderStatus) ([]*Order, error)
+	Save(ctx context.Context, order *Order) error
+	Delete(ctx context.Context, id string) error
+}
+
+// Sentinel errors — defined in domain, not in infrastructure
+var (
+	ErrNotFound    = fmt.Errorf("order: not found")
+	ErrDuplicate   = fmt.Errorf("order: duplicate")
+)</code></pre>
+      </div>
+
+      <div class="code-file">
+        <div class="code-file-header">infrastructure/postgres_repo.go — PostgreSQL Implementation</div>
+        <pre><code class="language-go">package infrastructure
+
+import (
+	"context"
+	"database/sql"
+	"fmt"
+
+	"myapp/domain"
+)
+
+type PostgresOrderRepo struct {
+	db *sql.DB
+}
+
+func NewPostgresOrderRepo(db *sql.DB) domain.OrderRepository {
+	return &PostgresOrderRepo{db: db}
+}
+
+func (r *PostgresOrderRepo) FindByID(ctx context.Context, id string) (*domain.Order, error) {
+	row := r.db.QueryRowContext(ctx,
+		`SELECT id, customer_id, total, status, created_at, expires_at
+		 FROM orders WHERE id = $1`, id)
+
+	var o domain.Order
+	err := row.Scan(&o.ID, &o.CustomerID, &o.Total, &o.Status, &o.CreatedAt, &o.ExpiresAt)
+	if err == sql.ErrNoRows {
+		return nil, domain.ErrNotFound
+	}
+	if err != nil {
+		return nil, fmt.Errorf("postgres FindByID: %w", err)
+	}
+	return &o, nil
+}
+
+func (r *PostgresOrderRepo) Save(ctx context.Context, order *domain.Order) error {
+	_, err := r.db.ExecContext(ctx,
+		`INSERT INTO orders (id, customer_id, total, status, created_at, expires_at)
+		 VALUES ($1,$2,$3,$4,$5,$6)
+		 ON CONFLICT (id) DO UPDATE SET status=$4, total=$3`,
+		order.ID, order.CustomerID, order.Total, order.Status,
+		order.CreatedAt, order.ExpiresAt)
+	return err
+}
+
+func (r *PostgresOrderRepo) FindByCustomerID(ctx context.Context, customerID string) ([]*domain.Order, error) {
+	rows, err := r.db.QueryContext(ctx,
+		`SELECT id, customer_id, total, status, created_at, expires_at
+		 FROM orders WHERE customer_id = $1 ORDER BY created_at DESC`, customerID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var orders []*domain.Order
+	for rows.Next() {
+		var o domain.Order
+		if err := rows.Scan(&o.ID, &o.CustomerID, &o.Total, &o.Status, &o.CreatedAt, &o.ExpiresAt); err != nil {
+			return nil, err
+		}
+		orders = append(orders, &o)
+	}
+	return orders, rows.Err()
+}
+
+func (r *PostgresOrderRepo) FindByStatus(ctx context.Context, status domain.OrderStatus) ([]*domain.Order, error) {
+	// similar implementation
+	return nil, nil
+}
+
+func (r *PostgresOrderRepo) Delete(ctx context.Context, id string) error {
+	_, err := r.db.ExecContext(ctx, `DELETE FROM orders WHERE id = $1`, id)
+	return err
+}</code></pre>
+      </div>
+
+      <div class="code-file">
+        <div class="code-file-header">infrastructure/memory_repo.go — In-Memory Implementation (for tests)</div>
+        <pre><code class="language-go">package infrastructure
+
+import (
+	"context"
+	"sync"
+
+	"myapp/domain"
+)
+
+// InMemoryOrderRepo — used in unit tests, no database needed
+type InMemoryOrderRepo struct {
+	mu     sync.RWMutex
+	orders map[string]*domain.Order
+}
+
+func NewInMemoryOrderRepo() domain.OrderRepository {
+	return &InMemoryOrderRepo{
+		orders: make(map[string]*domain.Order),
+	}
+}
+
+func (r *InMemoryOrderRepo) FindByID(_ context.Context, id string) (*domain.Order, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	o, ok := r.orders[id]
+	if !ok {
+		return nil, domain.ErrNotFound
+	}
+	return o, nil
+}
+
+func (r *InMemoryOrderRepo) Save(_ context.Context, order *domain.Order) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.orders[order.ID] = order
+	return nil
+}
+
+func (r *InMemoryOrderRepo) FindByCustomerID(_ context.Context, customerID string) ([]*domain.Order, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	var result []*domain.Order
+	for _, o := range r.orders {
+		if o.CustomerID == customerID {
+			result = append(result, o)
+		}
+	}
+	return result, nil
+}
+
+func (r *InMemoryOrderRepo) FindByStatus(_ context.Context, status domain.OrderStatus) ([]*domain.Order, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	var result []*domain.Order
+	for _, o := range r.orders {
+		if o.Status == status {
+			result = append(result, o)
+		}
+	}
+	return result, nil
+}
+
+func (r *InMemoryOrderRepo) Delete(_ context.Context, id string) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	delete(r.orders, id)
+	return nil
+}</code></pre>
+      </div>
+
+      <div class="code-file">
+        <div class="code-file-header">application/order_service.go — Business Logic (no SQL!)</div>
+        <pre><code class="language-go">package application
+
+import (
+	"context"
+	"fmt"
+	"time"
+
+	"myapp/domain"
+)
+
+type OrderService struct {
+	repo domain.OrderRepository // depends on interface, not concrete type
+}
+
+func NewOrderService(repo domain.OrderRepository) *OrderService {
+	return &OrderService{repo: repo}
+}
+
+func (s *OrderService) CancelOrder(ctx context.Context, orderID string) error {
+	order, err := s.repo.FindByID(ctx, orderID)
+	if err != nil {
+		return fmt.Errorf("cancel order: %w", err)
+	}
+
+	if !order.CanBeCancelled() {
+		return fmt.Errorf("order %s cannot be cancelled", orderID)
+	}
+
+	order.Status = domain.StatusCancelled
+	return s.repo.Save(ctx, order)
+}
+
+func (s *OrderService) GetCustomerOrders(ctx context.Context, customerID string) ([]*domain.Order, error) {
+	return s.repo.FindByCustomerID(ctx, customerID)
+}</code></pre>
+      </div>
+
+      <div class="code-file">
+        <div class="code-file-header">application/order_service_test.go — Test with InMemoryRepo</div>
+        <pre><code class="language-go">package application_test
+
+import (
+	"context"
+	"testing"
+	"time"
+
+	"myapp/application"
+	"myapp/domain"
+	"myapp/infrastructure"
+)
+
+func TestCancelOrder_Success(t *testing.T) {
+	// Use InMemoryRepo — no database, no setup needed
+	repo := infrastructure.NewInMemoryOrderRepo()
+	svc := application.NewOrderService(repo)
+	ctx := context.Background()
+
+	// Seed test data
+	order := &domain.Order{
+		ID:         "ORD-001",
+		CustomerID: "CUST-001",
+		Status:     domain.StatusPending,
+		ExpiresAt:  time.Now().Add(24 * time.Hour),
+	}
+	repo.Save(ctx, order)
+
+	// Act
+	err := svc.CancelOrder(ctx, "ORD-001")
+
+	// Assert
+	if err != nil {
+		t.Fatalf("expected no error, got: %v", err)
+	}
+
+	updated, _ := repo.FindByID(ctx, "ORD-001")
+	if updated.Status != domain.StatusCancelled {
+		t.Errorf("expected cancelled, got %s", updated.Status)
+	}
+}
+
+func TestCancelOrder_ExpiredOrder(t *testing.T) {
+	repo := infrastructure.NewInMemoryOrderRepo()
+	svc := application.NewOrderService(repo)
+	ctx := context.Background()
+
+	order := &domain.Order{
+		ID:        "ORD-002",
+		Status:    domain.StatusPending,
+		ExpiresAt: time.Now().Add(-1 * time.Hour), // already expired
+	}
+	repo.Save(ctx, order)
+
+	err := svc.CancelOrder(ctx, "ORD-002")
+	if err == nil {
+		t.Fatal("expected error for expired order")
+	}
+}</code></pre>
+      </div>
+
+      <div class="code-file">
+        <div class="code-file-header">cmd/main.go — Wiring with Dependency Injection</div>
+        <pre><code class="language-go">package main
+
+import (
+	"database/sql"
+	"log"
+	"net/http"
+
+	_ "github.com/lib/pq"
+	"myapp/application"
+	"myapp/infrastructure"
+	"myapp/presentation"
+)
+
+func main() {
+	db, err := sql.Open("postgres", "postgres://user:pass@localhost/orders")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	// Dependency Injection — swap repo here, nothing else changes
+	repo := infrastructure.NewPostgresOrderRepo(db)
+	// repo := infrastructure.NewInMemoryOrderRepo()  // ← swap for tests
+
+	svc := application.NewOrderService(repo)
+	handler := presentation.NewOrderHandler(svc)
+
+	http.HandleFunc("/orders/", handler.GetOrder)
+	log.Println("Server running on :8080")
+	log.Fatal(http.ListenAndServe(":8080", nil))
+}</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- When to use -->
+  <section>
+    <h2>Best Practices</h2>
+    <div class="vb-wrap">
+      <div class="vb-grid vb-2">
+        <div class="vbox">
+          <div class="vb-icon">✅</div>
+          <div class="vb-title">ควรทำ</div>
+          <ul class="vb-list">
+            <li>Define interface ใน domain layer ไม่ใช่ infrastructure</li>
+            <li>Return domain errors เช่น ErrNotFound ไม่ใช่ sql.ErrNoRows</li>
+            <li>ใช้ Context ทุก method เพื่อรองรับ cancellation</li>
+            <li>InMemoryRepo สำหรับ unit tests ทุกครั้ง</li>
+            <li>1 repository ต่อ 1 aggregate root</li>
+          </ul>
+        </div>
+        <div class="vbox">
+          <div class="vb-icon">⚠️</div>
+          <div class="vb-title">ระวัง</div>
+          <ul class="vb-list">
+            <li>อย่า leak SQL errors ขึ้นมา business layer</li>
+            <li>อย่าใส่ business logic ใน repository</li>
+            <li>อย่าสร้าง Generic Repository ที่ไม่มี type safety</li>
+            <li>อย่า query ข้าม aggregate ใน 1 repository</li>
+            <li>อย่าลืม Close() rows ใน query loops</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>hljs.highlightAll();</script>
+</body>
+</html>

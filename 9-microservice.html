@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Microservice Architecture — สื่อการสอน</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#07090f;color:#e2e8f0;line-height:1.7}
+a{color:#fb923c;text-decoration:none}
+.topnav{display:flex;align-items:center;gap:1rem;padding:1rem 2rem;background:#0d1117;border-bottom:1px solid #1e293b;position:sticky;top:0;z-index:100}
+.back-btn{color:#64748b;font-size:.85rem}.back-btn:hover{color:#e2e8f0;text-decoration:none}
+.nav-title{color:#475569;font-size:.85rem}.nav-title span{color:#fdba74;font-weight:600}
+.hero{padding:4rem 2rem 3rem;text-align:center;background:linear-gradient(160deg,#07090f,#180a00)}
+.hero-badge{display:inline-block;background:rgba(251,146,60,.1);border:1px solid rgba(251,146,60,.3);color:#fdba74;padding:.35rem 1rem;border-radius:999px;font-size:.8rem;font-weight:600;margin-bottom:1.5rem}
+.hero h1{font-size:clamp(1.8rem,4vw,3rem);font-weight:800;background:linear-gradient(135deg,#fb923c,#ea580c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:1rem}
+.hero p{color:#64748b;max-width:640px;margin:0 auto;font-size:1rem}
+.content{max-width:960px;margin:0 auto;padding:2rem 1.5rem 5rem}
+.section{margin-bottom:4rem}
+.section-title{font-size:1.5rem;font-weight:700;color:#fb923c;margin-bottom:.3rem;display:flex;align-items:center;gap:.6rem}
+.section-sub{color:#475569;font-size:.88rem;margin-bottom:2rem;padding-left:2rem}
+.callout{background:#0f172a;border-left:3px solid #fb923c;border-radius:0 8px 8px 0;padding:1rem 1.2rem;margin:1.5rem 0;font-size:.87rem;color:#94a3b8}
+.callout strong{color:#fdba74}
+.callout.tip{border-color:#10b981}.callout.tip strong{color:#6ee7b7}
+.callout.warn{border-color:#ef4444}.callout.warn strong{color:#fca5a5}
+.code-block{margin:1.5rem 0;border-radius:12px;overflow:hidden;border:1px solid #1e293b}
+.code-header{background:#111827;padding:.7rem 1rem;display:flex;justify-content:space-between;align-items:center}
+.code-header span{font-size:.78rem;color:#64748b;font-weight:600}
+.code-header .lang{background:rgba(251,146,60,.12);color:#fb923c;padding:.15rem .6rem;border-radius:4px;font-size:.72rem;font-weight:700}
+.code-block pre{margin:0!important;border-radius:0!important;border:none!important;font-size:.83rem!important;line-height:1.6!important}
+/* VB */
+.vb-wrap{margin:2rem 0}
+.vb-label{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#475569;margin-bottom:.9rem;display:flex;align-items:center;gap:.6rem}
+.vb-label::after{content:'';flex:1;height:1px;background:#1e293b}
+.vb-grid{display:grid;gap:.85rem}
+.vb-2{grid-template-columns:repeat(2,1fr)}
+.vb-3{grid-template-columns:repeat(3,1fr)}
+.vb-4{grid-template-columns:repeat(auto-fit,minmax(145px,1fr))}
+@media(max-width:580px){.vb-2,.vb-3{grid-template-columns:1fr}}
+.vbox{background:#0d1117;border:1.5px solid #1e293b;border-radius:12px;padding:1.1rem 1.2rem;position:relative;overflow:hidden;transition:border-color .2s,transform .2s}
+.vbox:hover{border-color:#334155;transform:translateY(-2px)}
+.vbox::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--ac,#fb923c)}
+.vb-icon{font-size:1.7rem;display:block;margin-bottom:.5rem}
+.vb-title{font-size:.87rem;font-weight:700;color:#f1f5f9;margin-bottom:.35rem}
+.vb-body{font-size:.77rem;color:#64748b;line-height:1.55}
+.vb-list{margin-top:.5rem;display:flex;flex-direction:column;gap:.2rem;list-style:none}
+.vb-list li{font-size:.73rem;color:#475569;padding-left:1rem;position:relative}
+.vb-list li::before{content:'▸';position:absolute;left:0;color:var(--ac,#fb923c);font-size:.6rem;top:.08rem}
+.vb-chip{display:inline-block;margin-top:.5rem;font-size:.64rem;font-weight:700;padding:.12rem .5rem;border-radius:999px;background:rgba(251,146,60,.12);color:var(--ac,#fdba74)}
+.diagram{background:#0d1117;border:1px solid #1e293b;border-radius:16px;padding:2rem;margin:2rem 0;text-align:center;overflow:hidden}
+.diagram-title{font-size:.75rem;color:#475569;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:1.5rem}
+/* Monolith vs Micro compare */
+.compare-split{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1.5rem 0}
+@media(max-width:580px){.compare-split{grid-template-columns:1fr}}
+.compare-box{background:#0d1117;border:1.5px solid #1e293b;border-radius:12px;padding:1.2rem}
+</style>
+</head>
+<body>
+<nav class="topnav">
+  <a href="index.html" class="back-btn">← กลับหน้าหลัก</a>
+  <span class="nav-title">10 / <span>Microservice Architecture</span></span>
+</nav>
+<div class="hero">
+  <div class="hero-badge">🏗️ Distributed Architecture</div>
+  <h1>Microservice Architecture</h1>
+  <p>แบ่ง Application ใหญ่เป็น Services เล็กๆ อิสระ — Deploy แยก, Scale แยก, Fail แยก ทำให้ทีมใหญ่ทำงานขนานกันได้โดยไม่ชนกัน</p>
+</div>
+<div class="content">
+
+<!-- ── MONOLITH VS MICRO ── -->
+<div class="section">
+  <div class="section-title">💡 Monolith vs Microservices</div>
+  <div class="section-sub">เข้าใจปัญหาของ Monolith ก่อนจะเข้าใจว่าทำไมต้องมี Microservices</div>
+
+  <div class="compare-split">
+    <div class="compare-box" style="border-color:#ef4444">
+      <div style="font-size:1.4rem;margin-bottom:.5rem">🧱 Monolith</div>
+      <div style="font-size:.85rem;font-weight:700;color:#fca5a5;margin-bottom:.7rem">ทุกอย่างอยู่ใน 1 Process</div>
+      <div style="background:#0a0a0a;border-radius:8px;padding:.8rem;margin-bottom:.7rem;font-size:.72rem;text-align:center">
+        <div style="background:#1e1010;border:1px solid #3d1010;border-radius:6px;padding:.4rem;color:#fca5a5;margin-bottom:.3rem">User Module</div>
+        <div style="background:#1e1010;border:1px solid #3d1010;border-radius:6px;padding:.4rem;color:#fca5a5;margin-bottom:.3rem">Order Module</div>
+        <div style="background:#1e1010;border:1px solid #3d1010;border-radius:6px;padding:.4rem;color:#fca5a5;margin-bottom:.3rem">Payment Module</div>
+        <div style="background:#1e1010;border:1px solid #3d1010;border-radius:6px;padding:.4rem;color:#fca5a5">Notification Module</div>
+        <div style="font-size:.65rem;color:#475569;margin-top:.4rem">↑ ทุกอย่างใน 1 Binary, 1 DB</div>
+      </div>
+      <ul style="list-style:none;display:flex;flex-direction:column;gap:.25rem">
+        <li style="font-size:.75rem;color:#64748b;padding-left:.9rem;position:relative"><span style="position:absolute;left:0;color:#ef4444">✗</span> Deploy ทั้งหมดพร้อมกัน</li>
+        <li style="font-size:.75rem;color:#64748b;padding-left:.9rem;position:relative"><span style="position:absolute;left:0;color:#ef4444">✗</span> Scale ทั้งหมดหรือไม่ scale</li>
+        <li style="font-size:.75rem;color:#64748b;padding-left:.9rem;position:relative"><span style="position:absolute;left:0;color:#ef4444">✗</span> Bug หนึ่งล้มทั้งระบบ</li>
+        <li style="font-size:.75rem;color:#64748b;padding-left:.9rem;position:relative"><span style="position:absolute;left:0;color:#10b981">✓</span> ง่ายสำหรับ early stage</li>
+      </ul>
+    </div>
+    <div class="compare-box" style="border-color:#10b981">
+      <div style="font-size:1.4rem;margin-bottom:.5rem">🏗️ Microservices</div>
+      <div style="font-size:.85rem;font-weight:700;color:#6ee7b7;margin-bottom:.7rem">แต่ละ Service อิสระ</div>
+      <div style="background:#0a0a0a;border-radius:8px;padding:.8rem;margin-bottom:.7rem;font-size:.72rem;display:grid;grid-template-columns:1fr 1fr;gap:.3rem">
+        <div style="background:#041008;border:1px solid #0a3020;border-radius:6px;padding:.4rem;color:#6ee7b7;text-align:center">👤 User Svc<br><span style="color:#334155">:3001</span></div>
+        <div style="background:#041008;border:1px solid #0a3020;border-radius:6px;padding:.4rem;color:#6ee7b7;text-align:center">📦 Order Svc<br><span style="color:#334155">:3002</span></div>
+        <div style="background:#041008;border:1px solid #0a3020;border-radius:6px;padding:.4rem;color:#6ee7b7;text-align:center">💳 Payment Svc<br><span style="color:#334155">:3003</span></div>
+        <div style="background:#041008;border:1px solid #0a3020;border-radius:6px;padding:.4rem;color:#6ee7b7;text-align:center">📧 Notify Svc<br><span style="color:#334155">:3004</span></div>
+      </div>
+      <ul style="list-style:none;display:flex;flex-direction:column;gap:.25rem">
+        <li style="font-size:.75rem;color:#64748b;padding-left:.9rem;position:relative"><span style="position:absolute;left:0;color:#10b981">✓</span> Deploy แยกกันได้</li>
+        <li style="font-size:.75rem;color:#64748b;padding-left:.9rem;position:relative"><span style="position:absolute;left:0;color:#10b981">✓</span> Scale เฉพาะ Service ที่ต้องการ</li>
+        <li style="font-size:.75rem;color:#64748b;padding-left:.9rem;position:relative"><span style="position:absolute;left:0;color:#10b981">✓</span> Service ล้มไม่กระทบทั้งระบบ</li>
+        <li style="font-size:.75rem;color:#64748b;padding-left:.9rem;position:relative"><span style="position:absolute;left:0;color:#ef4444">✗</span> ซับซ้อนกว่า Monolith มาก</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- VISUAL: Core Components -->
+  <div class="vb-wrap">
+    <div class="vb-label">🧩 ส่วนประกอบหลักของ Microservice System</div>
+    <div class="vb-grid vb-4">
+      <div class="vbox" style="--ac:#fb923c">
+        <span class="vb-icon">🚪</span>
+        <div class="vb-title">API Gateway</div>
+        <div class="vb-body">จุดเข้าเดียว (Single Entry Point) สำหรับทุก Client</div>
+        <ul class="vb-list">
+          <li>Route → Service</li>
+          <li>Auth / Rate Limit</li>
+          <li>SSL Termination</li>
+        </ul>
+        <span class="vb-chip">Kong · Nginx · Traefik</span>
+      </div>
+      <div class="vbox" style="--ac:#6366f1">
+        <span class="vb-icon">🗂️</span>
+        <div class="vb-title">Service Discovery</div>
+        <div class="vb-body">Services ค้นหากันเองแบบ dynamic</div>
+        <ul class="vb-list">
+          <li>Register เมื่อ start</li>
+          <li>Deregister เมื่อ stop</li>
+          <li>Health check</li>
+        </ul>
+        <span class="vb-chip">Consul · etcd · K8s</span>
+      </div>
+      <div class="vbox" style="--ac:#10b981">
+        <span class="vb-icon">📨</span>
+        <div class="vb-title">Message Bus</div>
+        <div class="vb-body">Async communication ระหว่าง services</div>
+        <ul class="vb-list">
+          <li>Decouple producers/consumers</li>
+          <li>Buffer load spikes</li>
+          <li>Event-driven flow</li>
+        </ul>
+        <span class="vb-chip">Kafka · RabbitMQ · NATS</span>
+      </div>
+      <div class="vbox" style="--ac:#22d3ee">
+        <span class="vb-icon">🔌</span>
+        <div class="vb-title">Circuit Breaker</div>
+        <div class="vb-body">ป้องกัน cascade failure ระหว่าง services</div>
+        <ul class="vb-list">
+          <li>Open เมื่อ error มาก</li>
+          <li>Half-open ทดสอบ</li>
+          <li>Close เมื่อปกติ</li>
+        </ul>
+        <span class="vb-chip">Hystrix · Resilience4j</span>
+      </div>
+      <div class="vbox" style="--ac:#8b5cf6">
+        <span class="vb-icon">⚖️</span>
+        <div class="vb-title">Load Balancer</div>
+        <div class="vb-body">กระจาย traffic ไปยัง instances หลายตัว</div>
+        <ul class="vb-list">
+          <li>Round Robin</li>
+          <li>Least Connections</li>
+          <li>Health-aware routing</li>
+        </ul>
+        <span class="vb-chip">Nginx · HAProxy · AWS ALB</span>
+      </div>
+      <div class="vbox" style="--ac:#f59e0b">
+        <span class="vb-icon">📊</span>
+        <div class="vb-title">Observability</div>
+        <div class="vb-body">Monitor, Log, Trace across all services</div>
+        <ul class="vb-list">
+          <li>Distributed Tracing</li>
+          <li>Centralized Logging</li>
+          <li>Metrics / Alerting</li>
+        </ul>
+        <span class="vb-chip">Jaeger · ELK · Prometheus</span>
+      </div>
+      <div class="vbox" style="--ac:#ec4899">
+        <span class="vb-icon">🐳</span>
+        <div class="vb-title">Container Orchestration</div>
+        <div class="vb-body">Deploy, Scale, Manage containers</div>
+        <ul class="vb-list">
+          <li>Auto-scaling</li>
+          <li>Self-healing</li>
+          <li>Rolling deployments</li>
+        </ul>
+        <span class="vb-chip">Kubernetes · Docker Swarm</span>
+      </div>
+      <div class="vbox" style="--ac:#34d399">
+        <span class="vb-icon">🛡️</span>
+        <div class="vb-title">Service Mesh</div>
+        <div class="vb-body">Infra layer สำหรับ service-to-service</div>
+        <ul class="vb-list">
+          <li>mTLS (mutual auth)</li>
+          <li>Traffic management</li>
+          <li>Automatic retry</li>
+        </ul>
+        <span class="vb-chip">Istio · Linkerd · Envoy</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- VISUAL: Communication Patterns -->
+  <div class="vb-wrap">
+    <div class="vb-label">📡 วิธีสื่อสารระหว่าง Services</div>
+    <div class="vb-grid vb-3">
+      <div class="vbox" style="--ac:#22d3ee">
+        <span class="vb-icon">🔁</span>
+        <div class="vb-title">Synchronous (REST/gRPC)</div>
+        <div class="vb-body">Service A รอผล Service B</div>
+        <ul class="vb-list">
+          <li>ง่าย, response ทันที</li>
+          <li>Tight coupling มากขึ้น</li>
+          <li>เหมาะกับ: Query, Auth</li>
+        </ul>
+      </div>
+      <div class="vbox" style="--ac:#10b981">
+        <span class="vb-icon">📨</span>
+        <div class="vb-title">Asynchronous (Events)</div>
+        <div class="vb-body">Service A publish แล้วไม่รอ</div>
+        <ul class="vb-list">
+          <li>Loose coupling</li>
+          <li>Scale ได้ดีกว่า</li>
+          <li>เหมาะกับ: Notifications, Processing</li>
+        </ul>
+      </div>
+      <div class="vbox" style="--ac:#f59e0b">
+        <span class="vb-icon">📋</span>
+        <div class="vb-title">Saga Pattern</div>
+        <div class="vb-body">Distributed transaction ข้าม services</div>
+        <ul class="vb-list">
+          <li>Choreography (event-based)</li>
+          <li>Orchestration (central coordinator)</li>
+          <li>Compensating transactions</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>สำคัญ:</strong> แต่ละ Microservice ควรมี <strong>Database ของตัวเอง</strong> (Database per Service)
+    ห้ามแชร์ DB ระหว่าง services — เพราะจะทำให้ tight coupling และเปลี่ยน schema ไม่ได้
+  </div>
+</div>
+
+<!-- ── DIAGRAM ── -->
+<div class="section">
+  <div class="section-title">📊 Microservice Architecture Diagram</div>
+  <div class="diagram">
+    <div class="diagram-title">E-Commerce Microservices — Full System</div>
+    <svg viewBox="0 0 700 350" fill="none" xmlns="http://www.w3.org/2000/svg" style="max-width:700px;width:100%">
+      <!-- Clients -->
+      <rect x="10" y="20" width="70" height="35" rx="6" fill="#001820" stroke="#22d3ee" stroke-width="1"/>
+      <text x="45" y="41" text-anchor="middle" fill="#67e8f9" font-size="8" font-weight="700">🌐 Web</text>
+
+      <rect x="10" y="65" width="70" height="35" rx="6" fill="#001820" stroke="#22d3ee" stroke-width="1"/>
+      <text x="45" y="86" text-anchor="middle" fill="#67e8f9" font-size="8" font-weight="700">📱 Mobile</text>
+
+      <!-- API Gateway -->
+      <rect x="120" y="30" width="100" height="70" rx="10" fill="#1a0800" stroke="#fb923c" stroke-width="2"/>
+      <text x="170" y="55" text-anchor="middle" fill="#fdba74" font-size="9" font-weight="700">🚪 API</text>
+      <text x="170" y="68" text-anchor="middle" fill="#fdba74" font-size="9" font-weight="700">Gateway</text>
+      <text x="170" y="82" text-anchor="middle" fill="#475569" font-size="7">Auth · Rate Limit</text>
+      <text x="170" y="94" text-anchor="middle" fill="#475569" font-size="7">SSL · Routing</text>
+
+      <!-- Microservices -->
+      <rect x="270" y="15" width="95" height="55" rx="8" fill="#040f0a" stroke="#10b981" stroke-width="1.5"/>
+      <text x="317" y="37" text-anchor="middle" fill="#6ee7b7" font-size="9" font-weight="700">👤 User</text>
+      <text x="317" y="50" text-anchor="middle" fill="#6ee7b7" font-size="9" font-weight="700">Service</text>
+      <text x="317" y="63" text-anchor="middle" fill="#334155" font-size="7">:3001 | PostgreSQL</text>
+
+      <rect x="270" y="85" width="95" height="55" rx="8" fill="#040f0a" stroke="#10b981" stroke-width="1.5"/>
+      <text x="317" y="107" text-anchor="middle" fill="#6ee7b7" font-size="9" font-weight="700">📦 Order</text>
+      <text x="317" y="120" text-anchor="middle" fill="#6ee7b7" font-size="9" font-weight="700">Service</text>
+      <text x="317" y="133" text-anchor="middle" fill="#334155" font-size="7">:3002 | PostgreSQL</text>
+
+      <rect x="270" y="155" width="95" height="55" rx="8" fill="#040f0a" stroke="#10b981" stroke-width="1.5"/>
+      <text x="317" y="177" text-anchor="middle" fill="#6ee7b7" font-size="9" font-weight="700">💳 Payment</text>
+      <text x="317" y="190" text-anchor="middle" fill="#6ee7b7" font-size="9" font-weight="700">Service</text>
+      <text x="317" y="203" text-anchor="middle" fill="#334155" font-size="7">:3003 | PostgreSQL</text>
+
+      <rect x="270" y="225" width="95" height="55" rx="8" fill="#040f0a" stroke="#10b981" stroke-width="1.5"/>
+      <text x="317" y="247" text-anchor="middle" fill="#6ee7b7" font-size="9" font-weight="700">📧 Notif.</text>
+      <text x="317" y="260" text-anchor="middle" fill="#6ee7b7" font-size="9" font-weight="700">Service</text>
+      <text x="317" y="273" text-anchor="middle" fill="#334155" font-size="7">:3004 | MongoDB</text>
+
+      <!-- Message Bus -->
+      <rect x="420" y="130" width="120" height="70" rx="10" fill="#111827" stroke="#334155" stroke-width="1.5" stroke-dasharray="5,3"/>
+      <text x="480" y="158" text-anchor="middle" fill="#64748b" font-size="9" font-weight="700">📨 Kafka</text>
+      <text x="480" y="172" text-anchor="middle" fill="#475569" font-size="8">Message Bus</text>
+      <text x="480" y="187" text-anchor="middle" fill="#334155" font-size="7">order.placed</text>
+      <text x="480" y="199" text-anchor="middle" fill="#334155" font-size="7">payment.done</text>
+
+      <!-- Observability -->
+      <rect x="560" y="20" width="120" height="55" rx="8" fill="#0a0820" stroke="#6366f1" stroke-width="1" stroke-dasharray="4,2"/>
+      <text x="620" y="42" text-anchor="middle" fill="#818cf8" font-size="8" font-weight="700">📊 Observability</text>
+      <text x="620" y="55" text-anchor="middle" fill="#475569" font-size="7">Prometheus+Grafana</text>
+      <text x="620" y="67" text-anchor="middle" fill="#475569" font-size="7">Jaeger (Tracing)</text>
+
+      <!-- Service Discovery -->
+      <rect x="560" y="95" width="120" height="40" rx="8" fill="#0a0820" stroke="#8b5cf6" stroke-width="1" stroke-dasharray="4,2"/>
+      <text x="620" y="112" text-anchor="middle" fill="#a5b4fc" font-size="8" font-weight="700">🗂️ Service Discovery</text>
+      <text x="620" y="126" text-anchor="middle" fill="#475569" font-size="7">Consul / K8s DNS</text>
+
+      <!-- Arrows Client → Gateway -->
+      <line x1="80" y1="37" x2="118" y2="60" stroke="#22d3ee" stroke-width="1.5">
+        <animate attributeName="stroke-dasharray" values="0,40;40,0" dur="1.2s" repeatCount="indefinite"/>
+      </line>
+      <line x1="80" y1="82" x2="118" y2="80" stroke="#22d3ee" stroke-width="1.5">
+        <animate attributeName="stroke-dasharray" values="0,40;40,0" dur="1.2s" begin=".3s" repeatCount="indefinite"/>
+      </line>
+
+      <!-- Gateway → Services -->
+      <line x1="220" y1="58" x2="268" y2="42" stroke="#fb923c" stroke-width="1.5">
+        <animate attributeName="stroke-dasharray" values="0,60;60,0" dur="1s" repeatCount="indefinite"/>
+      </line>
+      <line x1="220" y1="68" x2="268" y2="112" stroke="#fb923c" stroke-width="1.5">
+        <animate attributeName="stroke-dasharray" values="0,60;60,0" dur="1s" begin=".2s" repeatCount="indefinite"/>
+      </line>
+      <line x1="220" y1="78" x2="268" y2="182" stroke="#fb923c" stroke-width="1.5">
+        <animate attributeName="stroke-dasharray" values="0,60;60,0" dur="1s" begin=".4s" repeatCount="indefinite"/>
+      </line>
+
+      <!-- Services → Bus -->
+      <line x1="365" y1="112" x2="418" y2="155" stroke="#10b981" stroke-width="1" stroke-dasharray="4,2">
+        <animate attributeName="stroke-dashoffset" from="0" to="-10" dur=".8s" repeatCount="indefinite"/>
+      </line>
+      <line x1="365" y1="182" x2="418" y2="170" stroke="#10b981" stroke-width="1" stroke-dasharray="4,2">
+        <animate attributeName="stroke-dashoffset" from="0" to="-10" dur=".8s" begin=".2s" repeatCount="indefinite"/>
+      </line>
+
+      <!-- Bus → Notification -->
+      <line x1="480" y1="200" x2="368" y2="250" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4,2">
+        <animate attributeName="stroke-dashoffset" from="0" to="-10" dur=".8s" repeatCount="indefinite"/>
+      </line>
+
+      <!-- All services → Observability (dotted) -->
+      <line x1="365" y1="42" x2="558" y2="45" stroke="#475569" stroke-width="1" stroke-dasharray="3,4" opacity=".4"/>
+      <line x1="365" y1="112" x2="558" y2="55" stroke="#475569" stroke-width="1" stroke-dasharray="3,4" opacity=".3"/>
+
+      <!-- Labels -->
+      <text x="50" y="330" text-anchor="middle" fill="#22d3ee" font-size="7">Clients</text>
+      <text x="170" y="330" text-anchor="middle" fill="#fb923c" font-size="7">API Gateway</text>
+      <text x="317" y="330" text-anchor="middle" fill="#10b981" font-size="7">Microservices (each owns DB)</text>
+      <text x="480" y="330" text-anchor="middle" fill="#64748b" font-size="7">Event Bus</text>
+    </svg>
+  </div>
+</div>
+
+<!-- ── CODE ── -->
+<div class="section">
+  <div class="section-title">💻 ตัวอย่าง Go — Microservices ในชีวิตจริง</div>
+
+  <div class="code-block">
+    <div class="code-header"><span>user-service/main.go — User Microservice</span><span class="lang">Go</span></div>
+    <pre><code class="language-go">package main
+
+import (
+    "encoding/json"
+    "log"
+    "net/http"
+    "os"
+    "time"
+)
+
+// ── User Microservice — standalone process ─────────────────────────────────
+// มี DB ของตัวเอง, Deploy แยก, Scale แยก
+
+type User struct {
+    ID        string    `json:"id"`
+    Name      string    `json:"name"`
+    Email     string    `json:"email"`
+    CreatedAt time.Time `json:"created_at"`
+}
+
+// Health check — สำหรับ Load Balancer & Service Discovery
+func healthHandler(w http.ResponseWriter, r *http.Request) {
+    json.NewEncoder(w).Encode(map[string]string{
+        "service": "user-service",
+        "status":  "healthy",
+        "version": "1.0.0",
+    })
+}
+
+// GetUser — synchronous API call
+func getUserHandler(w http.ResponseWriter, r *http.Request) {
+    // ดึง user ID จาก path หรือ header
+    userID := r.Header.Get("X-User-ID")
+    if userID == "" {
+        userID = r.URL.Query().Get("id")
+    }
+
+    // ดึงจาก DB ของ User Service
+    user := &User{
+        ID:        userID,
+        Name:      "สมชาย ใจดี",
+        Email:     "somchai@example.com",
+        CreatedAt: time.Now(),
+    }
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(user)
+}
+
+func main() {
+    port := os.Getenv("PORT")
+    if port == "" { port = "3001" }
+
+    // Register กับ Service Discovery (Consul)
+    // consul.Register("user-service", port)
+
+    mux := http.NewServeMux()
+    mux.HandleFunc("/health", healthHandler)
+    mux.HandleFunc("/users",  getUserHandler)
+
+    log.Printf("User Service running on :%s", port)
+    log.Fatal(http.ListenAndServe(":"+port, mux))
+}</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><span>api-gateway/main.go — API Gateway</span><span class="lang">Go</span></div>
+    <pre><code class="language-go">package main
+
+import (
+    "context"
+    "encoding/json"
+    "fmt"
+    "log"
+    "net/http"
+    "net/http/httputil"
+    "net/url"
+    "os"
+    "strings"
+    "time"
+)
+
+// ── API Gateway — Single Entry Point ──────────────────────────────────────
+// ทุก request เข้ามาที่นี่ก่อน ก่อนจะ route ไปหา service ที่เหมาะสม
+
+type ServiceRegistry map[string]string
+
+var services = ServiceRegistry{
+    "users":    "http://user-service:3001",
+    "orders":   "http://order-service:3002",
+    "payments": "http://payment-service:3003",
+    "products": "http://product-service:3005",
+}
+
+// ── Middleware: Authentication ─────────────────────────────────────────────
+func authMiddleware(next http.Handler) http.Handler {
+    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+        // Skip auth for health checks
+        if r.URL.Path == "/health" {
+            next.ServeHTTP(w, r)
+            return
+        }
+
+        token := r.Header.Get("Authorization")
+        if !strings.HasPrefix(token, "Bearer ") {
+            http.Error(w, `{"error":"unauthorized"}`, http.StatusUnauthorized)
+            return
+        }
+
+        // Validate token (จริงๆ ต้อง verify JWT หรือ call auth service)
+        userID := validateToken(token[7:])
+        if userID == "" {
+            http.Error(w, `{"error":"invalid token"}`, http.StatusUnauthorized)
+            return
+        }
+
+        // Forward user identity ไปยัง downstream services
+        r.Header.Set("X-User-ID", userID)
+        next.ServeHTTP(w, r)
+    })
+}
+
+// ── Middleware: Rate Limiting (simple token bucket) ────────────────────────
+func rateLimitMiddleware(next http.Handler) http.Handler {
+    // Production: ใช้ Redis-based rate limiter
+    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+        // Check rate limit...
+        next.ServeHTTP(w, r)
+    })
+}
+
+// ── Router: ส่ง request ไปยัง microservice ที่ถูกต้อง ─────────────────────
+func routeHandler(w http.ResponseWriter, r *http.Request) {
+    // /api/users/123 → user-service:3001/users/123
+    parts := strings.SplitN(r.URL.Path[5:], "/", 2) // strip /api/
+    if len(parts) == 0 || parts[0] == "" {
+        http.Error(w, `{"error":"not found"}`, http.StatusNotFound)
+        return
+    }
+
+    serviceName := parts[0]
+    targetBase, ok := services[serviceName]
+    if !ok {
+        http.Error(w, fmt.Sprintf(`{"error":"service %q not found"}`, serviceName), http.StatusNotFound)
+        return
+    }
+
+    // Reverse proxy ไปยัง microservice
+    target, _ := url.Parse(targetBase)
+    proxy := httputil.NewSingleHostReverseProxy(target)
+    proxy.ModifyResponse = func(resp *http.Response) error {
+        // Add CORS headers
+        resp.Header.Set("X-Gateway", "go-api-gateway/1.0")
+        return nil
+    }
+    proxy.ErrorHandler = func(w http.ResponseWriter, r *http.Request, err error) {
+        log.Printf("Gateway error for %s: %v", serviceName, err)
+        http.Error(w, `{"error":"service unavailable"}`, http.StatusServiceUnavailable)
+    }
+
+    // Rewrite path: /api/users → /users
+    r.URL.Path = "/" + strings.Join(parts[1:], "/")
+    proxy.ServeHTTP(w, r)
+}
+
+func validateToken(token string) string {
+    // JWT validation ในชีวิตจริง
+    if token == "test-token" { return "user-123" }
+    return ""
+}
+
+func main() {
+    mux := http.NewServeMux()
+    mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+        json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
+    })
+    mux.HandleFunc("/api/", routeHandler)
+
+    // Chain middleware
+    handler := authMiddleware(rateLimitMiddleware(mux))
+
+    port := os.Getenv("PORT")
+    if port == "" { port = "8080" }
+    log.Printf("API Gateway running on :%s", port)
+    log.Fatal(http.ListenAndServe(":"+port, handler))
+}</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><span>order-service/client.go — Inter-service HTTP Client with Circuit Breaker</span><span class="lang">Go</span></div>
+    <pre><code class="language-go">package main
+
+import (
+    "context"
+    "encoding/json"
+    "fmt"
+    "net/http"
+    "sync/atomic"
+    "time"
+)
+
+// ── Circuit Breaker ────────────────────────────────────────────────────────
+// ป้องกัน cascade failure: ถ้า User Service ล้ม → Order Service ไม่ล้มตาม
+
+type CircuitState int32
+const (
+    StateClosed   CircuitState = 0 // ปกติ — ส่ง request ได้
+    StateOpen     CircuitState = 1 // เปิด — ไม่ส่ง request (fail fast)
+    StateHalfOpen CircuitState = 2 // ทดสอบว่าปกติแล้วหรือยัง
+)
+
+type CircuitBreaker struct {
+    state       atomic.Int32
+    failures    atomic.Int32
+    maxFailures int32
+    resetAfter  time.Duration
+    lastFailure time.Time
+}
+
+func NewCircuitBreaker(maxFailures int32, resetAfter time.Duration) *CircuitBreaker {
+    return &CircuitBreaker{maxFailures: maxFailures, resetAfter: resetAfter}
+}
+
+func (cb *CircuitBreaker) CanRequest() bool {
+    state := CircuitState(cb.state.Load())
+    switch state {
+    case StateClosed:
+        return true
+    case StateOpen:
+        if time.Since(cb.lastFailure) > cb.resetAfter {
+            cb.state.Store(int32(StateHalfOpen))
+            return true
+        }
+        return false
+    case StateHalfOpen:
+        return true
+    }
+    return true
+}
+
+func (cb *CircuitBreaker) RecordSuccess() {
+    cb.failures.Store(0)
+    cb.state.Store(int32(StateClosed))
+}
+
+func (cb *CircuitBreaker) RecordFailure() {
+    fails := cb.failures.Add(1)
+    cb.lastFailure = time.Now()
+    if fails >= cb.maxFailures {
+        cb.state.Store(int32(StateOpen))
+    }
+}
+
+// ── UserServiceClient — ใช้ใน Order Service ──────────────────────────────
+type UserServiceClient struct {
+    baseURL string
+    http    *http.Client
+    cb      *CircuitBreaker
+}
+
+func NewUserServiceClient(baseURL string) *UserServiceClient {
+    return &UserServiceClient{
+        baseURL: baseURL,
+        http:    &http.Client{Timeout: 3 * time.Second},
+        cb:      NewCircuitBreaker(5, 30*time.Second),
+    }
+}
+
+type UserInfo struct {
+    ID    string `json:"id"`
+    Name  string `json:"name"`
+    Email string `json:"email"`
+}
+
+func (c *UserServiceClient) GetUser(ctx context.Context, userID string) (*UserInfo, error) {
+    // Circuit breaker check
+    if !c.cb.CanRequest() {
+        return nil, fmt.Errorf("circuit open: user-service unavailable")
+    }
+
+    req, err := http.NewRequestWithContext(ctx, "GET",
+        fmt.Sprintf("%s/users?id=%s", c.baseURL, userID), nil)
+    if err != nil {
+        return nil, err
+    }
+
+    resp, err := c.http.Do(req)
+    if err != nil {
+        c.cb.RecordFailure()
+        return nil, fmt.Errorf("user-service request failed: %w", err)
+    }
+    defer resp.Body.Close()
+
+    if resp.StatusCode != http.StatusOK {
+        c.cb.RecordFailure()
+        return nil, fmt.Errorf("user-service returned %d", resp.StatusCode)
+    }
+
+    var user UserInfo
+    if err := json.NewDecoder(resp.Body).Decode(&user); err != nil {
+        return nil, err
+    }
+
+    c.cb.RecordSuccess()
+    return &user, nil
+}</code></pre>
+  </div>
+</div>
+
+<!-- ── SUMMARY ── -->
+<div class="section">
+  <div class="section-title">✅ สรุป — เมื่อไหร่ควรใช้ Microservices?</div>
+  <div class="vb-grid vb-2">
+    <div class="vbox" style="--ac:#10b981">
+      <span class="vb-icon">✅</span>
+      <div class="vb-title">ควรใช้เมื่อ</div>
+      <ul class="vb-list">
+        <li>ทีมใหญ่ (10+ คน) ต้องการ autonomy</li>
+        <li>Services ต้อง scale ต่างกัน (checkout ≠ browse)</li>
+        <li>Technology stack แต่ละส่วนต่างกัน</li>
+        <li>System ต้องการ high availability แต่ละส่วน</li>
+      </ul>
+    </div>
+    <div class="vbox" style="--ac:#ef4444">
+      <span class="vb-icon">⚠️</span>
+      <div class="vb-title">ไม่ควรใช้เมื่อ</div>
+      <ul class="vb-list">
+        <li>Startup ขนาดเล็ก (ทีม 1-5 คน)</li>
+        <li>ยังไม่รู้ domain boundaries ชัดเจน</li>
+        <li>ไม่มี infrastructure ที่พร้อม (K8s, monitoring)</li>
+        <li>"Premature optimization" — เริ่ม Monolith ก่อน</li>
+      </ul>
+    </div>
+  </div>
+  <div class="callout warn">
+    <strong>Martin Fowler's Advice:</strong> "Don't start with microservices.
+    Start with a monolith, understand your domain, then extract services when you need to."
+    — อย่า over-engineer ตั้งแต่ต้น
+  </div>
+</div>
+
+<div style="text-align:center;margin:3rem 0;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+  <a href="8-client-server.html" style="background:#0d1117;border:1px solid #1e293b;color:#64748b;padding:.7rem 1.5rem;border-radius:10px;font-size:.88rem">← Client-Server</a>
+  <a href="10-mvc.html" style="background:#0d1117;border:1px solid #1e293b;color:#fb923c;padding:.7rem 1.5rem;border-radius:10px;font-weight:600;font-size:.88rem">MVC Pattern →</a>
+</div>
+</div>
+<script>hljs.highlightAll()</script>
+</body>
+</html>

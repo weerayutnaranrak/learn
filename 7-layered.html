@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Layered / N-Tier Architecture — สื่อการสอน</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#07090f;color:#e2e8f0;line-height:1.7}
+a{color:#a78bfa;text-decoration:none}
+.topnav{display:flex;align-items:center;gap:1rem;padding:1rem 2rem;background:#0d1117;border-bottom:1px solid #1e293b;position:sticky;top:0;z-index:100}
+.back-btn{color:#64748b;font-size:.85rem;transition:color .2s}.back-btn:hover{color:#e2e8f0;text-decoration:none}
+.nav-title{color:#475569;font-size:.85rem}.nav-title span{color:#c4b5fd;font-weight:600}
+.hero{padding:4rem 2rem 3rem;text-align:center;background:linear-gradient(160deg,#07090f,#12091f)}
+.hero-badge{display:inline-block;background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.3);color:#c4b5fd;padding:.35rem 1rem;border-radius:999px;font-size:.8rem;font-weight:600;margin-bottom:1.5rem}
+.hero h1{font-size:clamp(1.8rem,4vw,3rem);font-weight:800;background:linear-gradient(135deg,#a78bfa,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:1rem}
+.hero p{color:#64748b;max-width:640px;margin:0 auto;font-size:1rem}
+.content{max-width:960px;margin:0 auto;padding:2rem 1.5rem 5rem}
+.section{margin-bottom:4rem}
+.section-title{font-size:1.5rem;font-weight:700;color:#a78bfa;margin-bottom:.3rem;display:flex;align-items:center;gap:.6rem}
+.section-sub{color:#475569;font-size:.88rem;margin-bottom:2rem;padding-left:2rem}
+.callout{background:#0f172a;border-left:3px solid #a78bfa;border-radius:0 8px 8px 0;padding:1rem 1.2rem;margin:1.5rem 0;font-size:.87rem;color:#94a3b8}
+.callout strong{color:#c4b5fd}
+.callout.tip{border-color:#10b981}.callout.tip strong{color:#6ee7b7}
+.callout.warn{border-color:#f59e0b}.callout.warn strong{color:#fcd34d}
+.code-block{margin:1.5rem 0;border-radius:12px;overflow:hidden;border:1px solid #1e293b}
+.code-header{background:#111827;padding:.7rem 1rem;display:flex;justify-content:space-between;align-items:center}
+.code-header span{font-size:.78rem;color:#64748b;font-weight:600}
+.code-header .lang{background:rgba(167,139,250,.12);color:#c4b5fd;padding:.15rem .6rem;border-radius:4px;font-size:.72rem;font-weight:700}
+.code-block pre{margin:0!important;border-radius:0!important;border:none!important;font-size:.83rem!important;line-height:1.6!important}
+
+/* ── VISUAL BOX SYSTEM ── */
+.vb-wrap{margin:2rem 0}
+.vb-label{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#475569;margin-bottom:.9rem;display:flex;align-items:center;gap:.6rem}
+.vb-label::after{content:'';flex:1;height:1px;background:#1e293b}
+.vb-grid{display:grid;gap:.85rem}
+.vb-2{grid-template-columns:repeat(2,1fr)}
+.vb-3{grid-template-columns:repeat(3,1fr)}
+.vb-4{grid-template-columns:repeat(auto-fit,minmax(145px,1fr))}
+@media(max-width:580px){.vb-2,.vb-3{grid-template-columns:1fr}}
+.vbox{background:#0d1117;border:1.5px solid #1e293b;border-radius:12px;padding:1.1rem 1.2rem;position:relative;overflow:hidden;transition:border-color .2s,transform .2s}
+.vbox:hover{border-color:#334155;transform:translateY(-2px)}
+.vbox::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--ac,#a78bfa)}
+.vb-icon{font-size:1.7rem;display:block;margin-bottom:.5rem}
+.vb-title{font-size:.87rem;font-weight:700;color:#f1f5f9;margin-bottom:.35rem}
+.vb-body{font-size:.77rem;color:#64748b;line-height:1.55}
+.vb-list{margin-top:.5rem;display:flex;flex-direction:column;gap:.2rem;list-style:none}
+.vb-list li{font-size:.73rem;color:#475569;padding-left:1rem;position:relative}
+.vb-list li::before{content:'▸';position:absolute;left:0;color:var(--ac,#a78bfa);font-size:.6rem;top:.08rem}
+.vb-chip{display:inline-block;margin-top:.5rem;font-size:.64rem;font-weight:700;padding:.12rem .5rem;border-radius:999px;background:rgba(167,139,250,.12);color:var(--ac,#c4b5fd)}
+
+/* Layer Stack */
+.ls-wrap{display:flex;flex-direction:column;gap:0;max-width:540px;margin:1.5rem auto}
+.ls-item{border:1.5px solid var(--lc);padding:.8rem 1.3rem;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:.9rem;background:color-mix(in srgb,var(--lc) 5%,#07090f)}
+.ls-item:first-child{border-radius:12px 12px 0 0}
+.ls-item:last-child{border-radius:0 0 12px 12px}
+.ls-item+.ls-item{border-top:none}
+.ls-num{width:2rem;height:2rem;border-radius:7px;background:color-mix(in srgb,var(--lc) 22%,transparent);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:800;color:var(--lc);flex-shrink:0}
+.ls-title{font-size:.87rem;font-weight:700;color:#f1f5f9}
+.ls-sub{font-size:.73rem;color:#64748b;margin-top:.05rem}
+.ls-tech{font-size:.68rem;color:var(--lc);font-weight:600;margin-top:.08rem}
+.ls-arrow{text-align:center;color:#334155;font-size:1.3rem;padding:.1rem;line-height:1}
+
+/* Flow row */
+.flow-h{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin:1.2rem 0}
+.flow-node{flex:1;min-width:80px;background:#0d1117;border:1.5px solid var(--nc,#1e293b);border-radius:10px;padding:.6rem .8rem;text-align:center}
+.fn-icon{font-size:1.3rem;display:block;margin-bottom:.2rem}
+.fn-title{font-size:.77rem;font-weight:700;color:#f1f5f9}
+.fn-sub{font-size:.66rem;color:#64748b}
+.flow-arrow{font-size:1.2rem;color:#334155;flex-shrink:0}
+
+.diagram{background:#0d1117;border:1px solid #1e293b;border-radius:16px;padding:2rem;margin:2rem 0;text-align:center;overflow:hidden}
+.diagram-title{font-size:.75rem;color:#475569;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:1.5rem}
+</style>
+</head>
+<body>
+<nav class="topnav">
+  <a href="index.html" class="back-btn">← กลับหน้าหลัก</a>
+  <span class="nav-title">05 / <span>Layered / N-Tier Architecture</span></span>
+</nav>
+<div class="hero">
+  <div class="hero-badge">🍰 สถาปัตยกรรมชั้น</div>
+  <h1>Layered / N-Tier Architecture</h1>
+  <p>แบ่ง Application ออกเป็นชั้น (Layers) ที่มีหน้าที่ชัดเจน แต่ละชั้นสื่อสารกับชั้นถัดไปเท่านั้น — สถาปัตยกรรมที่นิยมที่สุดสำหรับ Business Applications</p>
+</div>
+<div class="content">
+
+<!-- ── WHAT IS ── -->
+<div class="section">
+  <div class="section-title">💡 Layered Architecture คืออะไร?</div>
+  <div class="section-sub">Organization of code into distinct horizontal layers with clear responsibilities</div>
+  <p style="color:#94a3b8;margin-bottom:1.5rem">
+    แนวคิดหลักคือ <strong style="color:#e2e8f0">Separation of Concerns</strong> — แต่ละ Layer มีหน้าที่ของตัวเอง
+    และ depend เฉพาะ Layer ที่อยู่ด้านล่าง (Dependency Rule: บนลงล่าง)
+  </p>
+
+  <!-- VISUAL: Layer Stack -->
+  <div class="vb-wrap">
+    <div class="vb-label">🍰 โครงสร้าง Layers (ข้อมูลไหลจากบนลงล่าง)</div>
+    <div class="ls-wrap">
+      <div class="ls-item" style="--lc:#6366f1">
+        <div class="ls-num">1</div>
+        <div>
+          <div class="ls-title">🖥️ Presentation Layer</div>
+          <div class="ls-sub">รับ input จากผู้ใช้ / แสดงผล</div>
+          <div class="ls-tech">HTTP Handler · HTML Template · REST API · gRPC</div>
+        </div>
+        <span style="font-size:.7rem;color:#6366f1;font-weight:700">ผู้ใช้</span>
+      </div>
+      <div class="ls-arrow">↕</div>
+      <div class="ls-item" style="--lc:#06b6d4">
+        <div class="ls-num">2</div>
+        <div>
+          <div class="ls-title">⚙️ Application / Service Layer</div>
+          <div class="ls-sub">Orchestrate use cases — ไม่มี business logic</div>
+          <div class="ls-tech">Use Cases · DTOs · Transactions · Authorization</div>
+        </div>
+        <span style="font-size:.7rem;color:#06b6d4;font-weight:700">Workflow</span>
+      </div>
+      <div class="ls-arrow">↕</div>
+      <div class="ls-item" style="--lc:#10b981">
+        <div class="ls-num">3</div>
+        <div>
+          <div class="ls-title">🏛️ Business / Domain Layer</div>
+          <div class="ls-sub">Business rules, Domain objects — หัวใจของระบบ</div>
+          <div class="ls-tech">Entities · Domain Services · Business Rules · Validation</div>
+        </div>
+        <span style="font-size:.7rem;color:#10b981;font-weight:700">Core</span>
+      </div>
+      <div class="ls-arrow">↕</div>
+      <div class="ls-item" style="--lc:#f59e0b">
+        <div class="ls-num">4</div>
+        <div>
+          <div class="ls-title">🗄️ Data Access / Infrastructure Layer</div>
+          <div class="ls-sub">Interact กับ external systems — DB, APIs, Files</div>
+          <div class="ls-tech">Repositories · ORM · External APIs · Cache · Queue</div>
+        </div>
+        <span style="font-size:.7rem;color:#f59e0b;font-weight:700">Storage</span>
+      </div>
+      <div class="ls-arrow">↕</div>
+      <div class="ls-item" style="--lc:#475569">
+        <div class="ls-num">🗃️</div>
+        <div>
+          <div class="ls-title">💾 Database / External Services</div>
+          <div class="ls-sub">ข้อมูลจริง — ไม่ใช่ส่วนหนึ่งของ Application Code</div>
+          <div class="ls-tech">PostgreSQL · MongoDB · Redis · S3 · Kafka</div>
+        </div>
+        <span style="font-size:.7rem;color:#475569;font-weight:700">Data</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- VISUAL: N-Tier variants -->
+  <div class="vb-wrap">
+    <div class="vb-label">📊 ประเภทของ N-Tier (2-Tier, 3-Tier, N-Tier)</div>
+    <div class="vb-grid vb-3">
+      <div class="vbox" style="--ac:#6366f1">
+        <span class="vb-icon">2️⃣</span>
+        <div class="vb-title">2-Tier</div>
+        <div class="vb-body">Client ↔ Server โดยตรง</div>
+        <ul class="vb-list">
+          <li>Desktop App + Database</li>
+          <li>ง่าย แต่ scale ยาก</li>
+          <li>Business logic อยู่ใน client</li>
+        </ul>
+        <span class="vb-chip">Legacy Apps</span>
+      </div>
+      <div class="vbox" style="--ac:#10b981">
+        <span class="vb-icon">3️⃣</span>
+        <div class="vb-title">3-Tier</div>
+        <div class="vb-body">Presentation + Application + Data</div>
+        <ul class="vb-list">
+          <li>Web App (HTML → Server → DB)</li>
+          <li>ที่นิยมที่สุดสำหรับ Web</li>
+          <li>Scale application tier ได้</li>
+        </ul>
+        <span class="vb-chip">Web Apps</span>
+      </div>
+      <div class="vbox" style="--ac:#f59e0b">
+        <span class="vb-icon">♾️</span>
+        <div class="vb-title">N-Tier</div>
+        <div class="vb-body">หลายชั้นตามความซับซ้อน</div>
+        <ul class="vb-list">
+          <li>API Gateway + Microservices</li>
+          <li>แต่ละชั้นแยก Deploy ได้</li>
+          <li>Enterprise Systems</li>
+        </ul>
+        <span class="vb-chip">Enterprise</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- VISUAL: Key concepts -->
+  <div class="vb-wrap">
+    <div class="vb-label">🔑 หลักการสำคัญ</div>
+    <div class="vb-grid vb-4">
+      <div class="vbox" style="--ac:#a78bfa">
+        <span class="vb-icon">⬇️</span>
+        <div class="vb-title">One-Direction Dependency</div>
+        <div class="vb-body">ชั้นบนเรียกชั้นล่าง — ชั้นล่าง<strong style="color:#f1f5f9">ไม่รู้</strong>จักชั้นบน</div>
+      </div>
+      <div class="vbox" style="--ac:#06b6d4">
+        <span class="vb-icon">🔒</span>
+        <div class="vb-title">Encapsulation</div>
+        <div class="vb-body">แต่ละชั้นซ่อน implementation detail — เปิดเผยแค่ interface</div>
+      </div>
+      <div class="vbox" style="--ac:#10b981">
+        <span class="vb-icon">🔄</span>
+        <div class="vb-title">Reusability</div>
+        <div class="vb-body">Business Layer ใช้ซ้ำได้กับหลาย Presentation (Web + Mobile + CLI)</div>
+      </div>
+      <div class="vbox" style="--ac:#f59e0b">
+        <span class="vb-icon">🧪</span>
+        <div class="vb-title">Testability</div>
+        <div class="vb-body">Test แต่ละชั้นแยกกันได้ด้วย Mock/Stub สำหรับชั้นด้านล่าง</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>Dependency Rule:</strong> ทุก dependency ชี้ลง — Presentation รู้จัก Business, Business รู้จัก Data Access
+    แต่ Data Access <strong>ไม่รู้จัก</strong> Business และ Business <strong>ไม่รู้จัก</strong> Presentation
+  </div>
+</div>
+
+<!-- ── DIAGRAM ── -->
+<div class="section">
+  <div class="section-title">📊 Architecture Diagram</div>
+  <div class="diagram">
+    <div class="diagram-title">3-Tier Web Application — Request Flow</div>
+    <svg viewBox="0 0 680 320" fill="none" xmlns="http://www.w3.org/2000/svg" style="max-width:680px;width:100%">
+      <!-- Client -->
+      <rect x="20" y="130" width="100" height="60" rx="10" fill="#0a0820" stroke="#6366f1" stroke-width="1.5"/>
+      <text x="70" y="153" text-anchor="middle" fill="#a5b4fc" font-size="9" font-weight="700">🌐 Browser</text>
+      <text x="70" y="168" text-anchor="middle" fill="#818cf8" font-size="8">React / Vue</text>
+      <text x="70" y="182" text-anchor="middle" fill="#475569" font-size="7">Port :3000</text>
+
+      <!-- Layer 1: Presentation -->
+      <rect x="160" y="40" width="130" height="240" rx="10" fill="#0d1117" stroke="#6366f1" stroke-width="1.5"/>
+      <text x="225" y="65" text-anchor="middle" fill="#6366f1" font-size="9" font-weight="700">PRESENTATION</text>
+      <rect x="175" y="75" width="100" height="28" rx="5" fill="#0a0820" stroke="#6366f1" stroke-width="1"/>
+      <text x="225" y="93" text-anchor="middle" fill="#a5b4fc" font-size="8">HTTP Router</text>
+      <rect x="175" y="110" width="100" height="28" rx="5" fill="#0a0820" stroke="#6366f1" stroke-width="1"/>
+      <text x="225" y="128" text-anchor="middle" fill="#a5b4fc" font-size="8">Request Handler</text>
+      <rect x="175" y="145" width="100" height="28" rx="5" fill="#0a0820" stroke="#6366f1" stroke-width="1"/>
+      <text x="225" y="163" text-anchor="middle" fill="#a5b4fc" font-size="8">Response Builder</text>
+      <rect x="175" y="180" width="100" height="28" rx="5" fill="#0a0820" stroke="#6366f1" stroke-width="1"/>
+      <text x="225" y="198" text-anchor="middle" fill="#a5b4fc" font-size="8">Middleware</text>
+      <rect x="175" y="215" width="100" height="28" rx="5" fill="#0a0820" stroke="#6366f1" stroke-width="1"/>
+      <text x="225" y="233" text-anchor="middle" fill="#a5b4fc" font-size="8">Input Validation</text>
+
+      <!-- Layer 2: Business -->
+      <rect x="320" y="40" width="130" height="240" rx="10" fill="#0d1117" stroke="#10b981" stroke-width="1.5"/>
+      <text x="385" y="65" text-anchor="middle" fill="#10b981" font-size="9" font-weight="700">BUSINESS</text>
+      <rect x="335" y="75" width="100" height="28" rx="5" fill="#041008" stroke="#10b981" stroke-width="1"/>
+      <text x="385" y="93" text-anchor="middle" fill="#6ee7b7" font-size="8">Domain Service</text>
+      <rect x="335" y="110" width="100" height="28" rx="5" fill="#041008" stroke="#10b981" stroke-width="1"/>
+      <text x="385" y="128" text-anchor="middle" fill="#6ee7b7" font-size="8">Business Rules</text>
+      <rect x="335" y="145" width="100" height="28" rx="5" fill="#041008" stroke="#10b981" stroke-width="1"/>
+      <text x="385" y="163" text-anchor="middle" fill="#6ee7b7" font-size="8">Domain Entities</text>
+      <rect x="335" y="180" width="100" height="28" rx="5" fill="#041008" stroke="#10b981" stroke-width="1"/>
+      <text x="385" y="198" text-anchor="middle" fill="#6ee7b7" font-size="8">Use Case Logic</text>
+      <rect x="335" y="215" width="100" height="28" rx="5" fill="#041008" stroke="#10b981" stroke-width="1"/>
+      <text x="385" y="233" text-anchor="middle" fill="#6ee7b7" font-size="8">Events / Notifications</text>
+
+      <!-- Layer 3: Data Access -->
+      <rect x="480" y="40" width="130" height="240" rx="10" fill="#0d1117" stroke="#f59e0b" stroke-width="1.5"/>
+      <text x="545" y="65" text-anchor="middle" fill="#f59e0b" font-size="9" font-weight="700">DATA ACCESS</text>
+      <rect x="495" y="75" width="100" height="28" rx="5" fill="#100800" stroke="#f59e0b" stroke-width="1"/>
+      <text x="545" y="93" text-anchor="middle" fill="#fcd34d" font-size="8">Repository</text>
+      <rect x="495" y="110" width="100" height="28" rx="5" fill="#100800" stroke="#f59e0b" stroke-width="1"/>
+      <text x="545" y="128" text-anchor="middle" fill="#fcd34d" font-size="8">ORM / Query Builder</text>
+      <rect x="495" y="145" width="100" height="28" rx="5" fill="#100800" stroke="#f59e0b" stroke-width="1"/>
+      <text x="545" y="163" text-anchor="middle" fill="#fcd34d" font-size="8">DB Connection Pool</text>
+      <rect x="495" y="180" width="100" height="28" rx="5" fill="#100800" stroke="#f59e0b" stroke-width="1"/>
+      <text x="545" y="198" text-anchor="middle" fill="#fcd34d" font-size="8">Cache Layer</text>
+      <rect x="495" y="215" width="100" height="28" rx="5" fill="#100800" stroke="#f59e0b" stroke-width="1"/>
+      <text x="545" y="233" text-anchor="middle" fill="#fcd34d" font-size="8">External API Client</text>
+
+      <!-- Request arrows -->
+      <line x1="120" y1="155" x2="158" y2="155" stroke="#6366f1" stroke-width="1.8" marker-end="url(#p1)">
+        <animate attributeName="stroke-dasharray" values="0,60;60,0" dur="1.5s" repeatCount="indefinite"/>
+      </line>
+      <line x1="290" y1="155" x2="318" y2="155" stroke="#10b981" stroke-width="1.8" marker-end="url(#p2)">
+        <animate attributeName="stroke-dasharray" values="0,60;60,0" dur="1.5s" begin=".3s" repeatCount="indefinite"/>
+      </line>
+      <line x1="450" y1="155" x2="478" y2="155" stroke="#f59e0b" stroke-width="1.8" marker-end="url(#p3)">
+        <animate attributeName="stroke-dasharray" values="0,60;60,0" dur="1.5s" begin=".6s" repeatCount="indefinite"/>
+      </line>
+      <!-- Labels -->
+      <text x="70" y="300" text-anchor="middle" fill="#475569" font-size="8">Client</text>
+      <text x="225" y="300" text-anchor="middle" fill="#6366f1" font-size="8">Layer 1</text>
+      <text x="385" y="300" text-anchor="middle" fill="#10b981" font-size="8">Layer 2</text>
+      <text x="545" y="300" text-anchor="middle" fill="#f59e0b" font-size="8">Layer 3</text>
+      <defs>
+        <marker id="p1" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#6366f1"/></marker>
+        <marker id="p2" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#10b981"/></marker>
+        <marker id="p3" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#f59e0b"/></marker>
+      </defs>
+    </svg>
+  </div>
+</div>
+
+<!-- ── CODE ── -->
+<div class="section">
+  <div class="section-title">💻 ตัวอย่าง Go — Blog Application (3 Layers)</div>
+  <div class="section-sub">แสดง Presentation → Business → Data Access อย่างชัดเจน</div>
+
+  <div class="code-block">
+    <div class="code-header"><span>domain/post.go — Business Layer (Domain)</span><span class="lang">Go</span></div>
+    <pre><code class="language-go">package domain
+
+import (
+    "errors"
+    "strings"
+    "time"
+)
+
+// ── Business Layer: Domain Objects และ Rules ──────────────────────────────
+// ไม่รู้จัก HTTP, Database, หรือ Framework ใดๆ
+
+type PostID int64
+type UserID int64
+
+type Post struct {
+    ID        PostID
+    Title     string
+    Body      string
+    AuthorID  UserID
+    Tags      []string
+    Published bool
+    CreatedAt time.Time
+    UpdatedAt time.Time
+}
+
+// Business Rule: Title ต้องไม่ว่างและไม่เกิน 200 ตัวอักษร
+func (p *Post) SetTitle(title string) error {
+    title = strings.TrimSpace(title)
+    if title == "" {
+        return errors.New("title cannot be empty")
+    }
+    if len(title) > 200 {
+        return errors.New("title must not exceed 200 characters")
+    }
+    p.Title = title
+    return nil
+}
+
+// Business Rule: publish ได้เมื่อมี body เท่านั้น
+func (p *Post) Publish() error {
+    if strings.TrimSpace(p.Body) == "" {
+        return errors.New("cannot publish post without body")
+    }
+    p.Published = true
+    p.UpdatedAt = time.Now()
+    return nil
+}
+
+// Repository Interface — Business Layer กำหนด, Data Layer implement
+type PostRepository interface {
+    Create(post *Post) (*Post, error)
+    FindByID(id PostID) (*Post, error)
+    FindPublished(limit, offset int) ([]*Post, error)
+    Update(post *Post) (*Post, error)
+    Delete(id PostID) error
+}
+
+// ── Business Service ────────────────────────────────────────────────────────
+type PostService struct {
+    repo PostRepository
+}
+
+func NewPostService(repo PostRepository) *PostService {
+    return &PostService{repo: repo}
+}
+
+func (s *PostService) CreateDraft(title, body string, authorID UserID, tags []string) (*Post, error) {
+    post := &Post{
+        Body:      body,
+        AuthorID:  authorID,
+        Tags:      tags,
+        CreatedAt: time.Now(),
+        UpdatedAt: time.Now(),
+    }
+    if err := post.SetTitle(title); err != nil { // Business rule
+        return nil, err
+    }
+    return s.repo.Create(post)
+}
+
+func (s *PostService) PublishPost(id PostID) (*Post, error) {
+    post, err := s.repo.FindByID(id)
+    if err != nil {
+        return nil, err
+    }
+    if err := post.Publish(); err != nil { // Business rule
+        return nil, err
+    }
+    return s.repo.Update(post)
+}
+
+func (s *PostService) GetFeed(page, pageSize int) ([]*Post, error) {
+    if page < 1 { page = 1 }
+    if pageSize < 1 || pageSize > 50 { pageSize = 20 }
+    offset := (page - 1) * pageSize
+    return s.repo.FindPublished(pageSize, offset)
+}</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><span>dataaccess/postgres_repo.go — Data Access Layer</span><span class="lang">Go</span></div>
+    <pre><code class="language-go">package dataaccess
+
+import (
+    "database/sql"
+    "fmt"
+    "myapp/domain"
+    "time"
+)
+
+// ── Data Access Layer: implements domain.PostRepository ────────────────────
+// รู้จัก PostgreSQL, SQL — Business Layer ไม่รู้
+type PostgresPostRepository struct {
+    db *sql.DB
+}
+
+func NewPostgresPostRepository(db *sql.DB) domain.PostRepository {
+    return &PostgresPostRepository{db: db}
+}
+
+func (r *PostgresPostRepository) Create(post *domain.Post) (*domain.Post, error) {
+    row := r.db.QueryRow(`
+        INSERT INTO posts (title, body, author_id, published, created_at, updated_at)
+        VALUES ($1, $2, $3, $4, $5, $6)
+        RETURNING id`,
+        post.Title, post.Body, post.AuthorID,
+        post.Published, post.CreatedAt, post.UpdatedAt,
+    )
+    return post, row.Scan(&post.ID)
+}
+
+func (r *PostgresPostRepository) FindByID(id domain.PostID) (*domain.Post, error) {
+    var p domain.Post
+    err := r.db.QueryRow(
+        `SELECT id,title,body,author_id,published,created_at,updated_at FROM posts WHERE id=$1`, id,
+    ).Scan(&p.ID, &p.Title, &p.Body, &p.AuthorID, &p.Published, &p.CreatedAt, &p.UpdatedAt)
+    if err == sql.ErrNoRows {
+        return nil, fmt.Errorf("post %d not found", id)
+    }
+    return &p, err
+}
+
+func (r *PostgresPostRepository) FindPublished(limit, offset int) ([]*domain.Post, error) {
+    rows, err := r.db.Query(
+        `SELECT id,title,body,author_id,created_at FROM posts WHERE published=true ORDER BY created_at DESC LIMIT $1 OFFSET $2`,
+        limit, offset,
+    )
+    if err != nil { return nil, err }
+    defer rows.Close()
+    var posts []*domain.Post
+    for rows.Next() {
+        var p domain.Post
+        rows.Scan(&p.ID, &p.Title, &p.Body, &p.AuthorID, &p.CreatedAt)
+        posts = append(posts, &p)
+    }
+    return posts, nil
+}
+
+func (r *PostgresPostRepository) Update(post *domain.Post) (*domain.Post, error) {
+    post.UpdatedAt = time.Now()
+    _, err := r.db.Exec(
+        `UPDATE posts SET title=$1,body=$2,published=$3,updated_at=$4 WHERE id=$5`,
+        post.Title, post.Body, post.Published, post.UpdatedAt, post.ID,
+    )
+    return post, err
+}
+
+func (r *PostgresPostRepository) Delete(id domain.PostID) error {
+    _, err := r.db.Exec(`DELETE FROM posts WHERE id=$1`, id)
+    return err
+}</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><span>presentation/handler.go — Presentation Layer (HTTP)</span><span class="lang">Go</span></div>
+    <pre><code class="language-go">package presentation
+
+import (
+    "encoding/json"
+    "net/http"
+    "strconv"
+    "myapp/domain"
+)
+
+// ── Presentation Layer: HTTP Handlers ──────────────────────────────────────
+// รู้จัก HTTP แต่ไม่รู้จัก Database
+// เรียก Business Layer ผ่าน Service
+
+type PostHandler struct {
+    svc *domain.PostService
+}
+
+func NewPostHandler(svc *domain.PostService) *PostHandler {
+    return &PostHandler{svc: svc}
+}
+
+// Request/Response DTOs — ไม่ใช่ Domain objects โดยตรง
+type CreatePostRequest struct {
+    Title string   `json:"title"`
+    Body  string   `json:"body"`
+    Tags  []string `json:"tags"`
+}
+
+type PostResponse struct {
+    ID        int64    `json:"id"`
+    Title     string   `json:"title"`
+    Body      string   `json:"body"`
+    Tags      []string `json:"tags"`
+    Published bool     `json:"published"`
+    CreatedAt string   `json:"created_at"`
+}
+
+func toPostResponse(p *domain.Post) PostResponse {
+    return PostResponse{
+        ID: int64(p.ID), Title: p.Title, Body: p.Body,
+        Tags: p.Tags, Published: p.Published,
+        CreatedAt: p.CreatedAt.Format("2006-01-02T15:04:05Z"),
+    }
+}
+
+func (h *PostHandler) CreatePost(w http.ResponseWriter, r *http.Request) {
+    var req CreatePostRequest
+    if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+        writeError(w, http.StatusBadRequest, "invalid request body")
+        return
+    }
+
+    // เรียก Business Layer (ไม่ใช่ DB โดยตรง!)
+    post, err := h.svc.CreateDraft(req.Title, req.Body, 1, req.Tags)
+    if err != nil {
+        writeError(w, http.StatusBadRequest, err.Error())
+        return
+    }
+
+    w.Header().Set("Content-Type", "application/json")
+    w.WriteHeader(http.StatusCreated)
+    json.NewEncoder(w).Encode(toPostResponse(post))
+}
+
+func (h *PostHandler) PublishPost(w http.ResponseWriter, r *http.Request) {
+    idStr := r.URL.Query().Get("id")
+    id, err := strconv.ParseInt(idStr, 10, 64)
+    if err != nil {
+        writeError(w, http.StatusBadRequest, "invalid post id")
+        return
+    }
+    post, err := h.svc.PublishPost(domain.PostID(id))
+    if err != nil {
+        writeError(w, http.StatusBadRequest, err.Error())
+        return
+    }
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(toPostResponse(post))
+}
+
+func (h *PostHandler) GetFeed(w http.ResponseWriter, r *http.Request) {
+    page, _ := strconv.Atoi(r.URL.Query().Get("page"))
+    posts, err := h.svc.GetFeed(page, 20)
+    if err != nil {
+        writeError(w, http.StatusInternalServerError, "failed to get feed")
+        return
+    }
+    result := make([]PostResponse, len(posts))
+    for i, p := range posts { result[i] = toPostResponse(p) }
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(result)
+}
+
+func writeError(w http.ResponseWriter, code int, msg string) {
+    w.Header().Set("Content-Type", "application/json")
+    w.WriteHeader(code)
+    json.NewEncoder(w).Encode(map[string]string{"error": msg})
+}</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><span>cmd/main.go — Wire all 3 layers together</span><span class="lang">Go</span></div>
+    <pre><code class="language-go">package main
+
+import (
+    "database/sql"
+    "log"
+    "net/http"
+    "myapp/dataaccess"
+    "myapp/domain"
+    "myapp/presentation"
+    _ "github.com/lib/pq"
+)
+
+func main() {
+    // Layer 3: Data Access
+    db, _ := sql.Open("postgres", "postgres://localhost/blog")
+
+    // Layer 2: Business
+    repo := dataaccess.NewPostgresPostRepository(db)
+    svc  := domain.NewPostService(repo)
+
+    // Layer 1: Presentation
+    handler := presentation.NewPostHandler(svc)
+
+    mux := http.NewServeMux()
+    mux.HandleFunc("POST /posts",        handler.CreatePost)
+    mux.HandleFunc("POST /posts/publish", handler.PublishPost)
+    mux.HandleFunc("GET  /feed",         handler.GetFeed)
+
+    log.Println("Blog API running on :8080")
+    log.Fatal(http.ListenAndServe(":8080", mux))
+}</code></pre>
+  </div>
+
+  <div class="callout tip">
+    <strong>File Structure:</strong>
+    <pre style="font-size:.78rem;margin-top:.5rem;color:#94a3b8">blog/
+├── domain/           ← Layer 2: Business (ไม่ depend อะไรเลย)
+│   ├── post.go       (Domain Objects + Business Rules)
+│   └── service.go    (Use Cases)
+├── dataaccess/       ← Layer 3: Data Access
+│   └── postgres.go   (implements domain.PostRepository)
+├── presentation/     ← Layer 1: HTTP Handlers
+│   └── handler.go    (DTOs + HTTP responses)
+└── cmd/main.go       ← Wire layers together</pre>
+  </div>
+</div>
+
+<!-- ── SUMMARY ── -->
+<div class="section">
+  <div class="section-title">✅ สรุป</div>
+  <div class="vb-grid vb-2">
+    <div class="vbox" style="--ac:#10b981">
+      <span class="vb-icon">✅</span>
+      <div class="vb-title">เหมาะกับ</div>
+      <ul class="vb-list">
+        <li>Business Applications ทั่วไป</li>
+        <li>ทีมที่เพิ่งเริ่มต้น — เข้าใจง่าย</li>
+        <li>Monolithic applications</li>
+        <li>Projects ที่ต้องการ structure ชัดเจน</li>
+      </ul>
+    </div>
+    <div class="vbox" style="--ac:#ef4444">
+      <span class="vb-icon">⚠️</span>
+      <div class="vb-title">ข้อจำกัด</div>
+      <ul class="vb-list">
+        <li>อาจ scale ยากถ้าโต (จำเป็นต้อง scale ทั้งหมด)</li>
+        <li>Strict layer → request ต้องผ่านทุก layer</li>
+        <li>ไม่เหมาะกับ high-performance scenarios</li>
+        <li>Dependency ชี้ลงเท่านั้น — ระวัง cross-layer calls</li>
+      </ul>
+    </div>
+  </div>
+  <div class="callout warn">
+    <strong>Anti-pattern ที่พบบ่อย:</strong> "Layer Skipping" — Presentation เรียก Data Access โดยตรง (ข้าม Business Layer)
+    ทำให้ Business Rules กระจัดกระจาย ควรบังคับให้ทุก call ผ่าน Business Layer เสมอ
+  </div>
+</div>
+
+<div style="text-align:center;margin:3rem 0;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+  <a href="index.html" style="background:#0d1117;border:1px solid #1e293b;color:#64748b;padding:.7rem 1.5rem;border-radius:10px;font-size:.88rem">← หน้าหลัก</a>
+  <a href="2-hexagonal.html" style="background:#0d1117;border:1px solid #1e293b;color:#a78bfa;padding:.7rem 1.5rem;border-radius:10px;font-weight:600;font-size:.88rem">Hexagonal Architecture →</a>
+</div>
+</div>
+<script>hljs.highlightAll()</script>
+</body>
+</html>

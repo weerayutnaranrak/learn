@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Client-Server Pattern — สื่อการสอน</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#07090f;color:#e2e8f0;line-height:1.7}
+a{color:#22d3ee;text-decoration:none}
+.topnav{display:flex;align-items:center;gap:1rem;padding:1rem 2rem;background:#0d1117;border-bottom:1px solid #1e293b;position:sticky;top:0;z-index:100}
+.back-btn{color:#64748b;font-size:.85rem}.back-btn:hover{color:#e2e8f0;text-decoration:none}
+.nav-title{color:#475569;font-size:.85rem}.nav-title span{color:#67e8f9;font-weight:600}
+.hero{padding:4rem 2rem 3rem;text-align:center;background:linear-gradient(160deg,#07090f,#001820)}
+.hero-badge{display:inline-block;background:rgba(34,211,238,.1);border:1px solid rgba(34,211,238,.3);color:#67e8f9;padding:.35rem 1rem;border-radius:999px;font-size:.8rem;font-weight:600;margin-bottom:1.5rem}
+.hero h1{font-size:clamp(1.8rem,4vw,3rem);font-weight:800;background:linear-gradient(135deg,#22d3ee,#0891b2);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:1rem}
+.hero p{color:#64748b;max-width:640px;margin:0 auto;font-size:1rem}
+.content{max-width:960px;margin:0 auto;padding:2rem 1.5rem 5rem}
+.section{margin-bottom:4rem}
+.section-title{font-size:1.5rem;font-weight:700;color:#22d3ee;margin-bottom:.3rem;display:flex;align-items:center;gap:.6rem}
+.section-sub{color:#475569;font-size:.88rem;margin-bottom:2rem;padding-left:2rem}
+.callout{background:#0f172a;border-left:3px solid #22d3ee;border-radius:0 8px 8px 0;padding:1rem 1.2rem;margin:1.5rem 0;font-size:.87rem;color:#94a3b8}
+.callout strong{color:#67e8f9}
+.callout.tip{border-color:#10b981}.callout.tip strong{color:#6ee7b7}
+.code-block{margin:1.5rem 0;border-radius:12px;overflow:hidden;border:1px solid #1e293b}
+.code-header{background:#111827;padding:.7rem 1rem;display:flex;justify-content:space-between;align-items:center}
+.code-header span{font-size:.78rem;color:#64748b;font-weight:600}
+.code-header .lang{background:rgba(34,211,238,.12);color:#22d3ee;padding:.15rem .6rem;border-radius:4px;font-size:.72rem;font-weight:700}
+.code-block pre{margin:0!important;border-radius:0!important;border:none!important;font-size:.83rem!important;line-height:1.6!important}
+/* VB system */
+.vb-wrap{margin:2rem 0}
+.vb-label{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#475569;margin-bottom:.9rem;display:flex;align-items:center;gap:.6rem}
+.vb-label::after{content:'';flex:1;height:1px;background:#1e293b}
+.vb-grid{display:grid;gap:.85rem}
+.vb-2{grid-template-columns:repeat(2,1fr)}
+.vb-3{grid-template-columns:repeat(3,1fr)}
+.vb-4{grid-template-columns:repeat(auto-fit,minmax(145px,1fr))}
+@media(max-width:580px){.vb-2,.vb-3{grid-template-columns:1fr}}
+.vbox{background:#0d1117;border:1.5px solid #1e293b;border-radius:12px;padding:1.1rem 1.2rem;position:relative;overflow:hidden;transition:border-color .2s,transform .2s}
+.vbox:hover{border-color:#334155;transform:translateY(-2px)}
+.vbox::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--ac,#22d3ee)}
+.vb-icon{font-size:1.7rem;display:block;margin-bottom:.5rem}
+.vb-title{font-size:.87rem;font-weight:700;color:#f1f5f9;margin-bottom:.35rem}
+.vb-body{font-size:.77rem;color:#64748b;line-height:1.55}
+.vb-list{margin-top:.5rem;display:flex;flex-direction:column;gap:.2rem;list-style:none}
+.vb-list li{font-size:.73rem;color:#475569;padding-left:1rem;position:relative}
+.vb-list li::before{content:'▸';position:absolute;left:0;color:var(--ac,#22d3ee);font-size:.6rem;top:.08rem}
+.vb-chip{display:inline-block;margin-top:.5rem;font-size:.64rem;font-weight:700;padding:.12rem .5rem;border-radius:999px;background:rgba(34,211,238,.1);color:var(--ac,#67e8f9)}
+/* Request-Response boxes */
+.rr-flow{display:grid;grid-template-columns:1fr auto 1fr;gap:1rem;align-items:center;margin:1.5rem 0}
+.rr-box{background:#0d1117;border:1.5px solid var(--bc,#1e293b);border-radius:14px;padding:1.3rem;text-align:center}
+.rr-mid{display:flex;flex-direction:column;gap:.5rem;align-items:center}
+.rr-arrow{background:#111827;border:1px solid #1e293b;border-radius:8px;padding:.4rem .8rem;font-size:.72rem;font-weight:600;display:flex;align-items:center;gap:.4rem;white-space:nowrap}
+.diagram{background:#0d1117;border:1px solid #1e293b;border-radius:16px;padding:2rem;margin:2rem 0;text-align:center;overflow:hidden}
+.diagram-title{font-size:.75rem;color:#475569;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:1.5rem}
+</style>
+</head>
+<body>
+<nav class="topnav">
+  <a href="index.html" class="back-btn">← กลับหน้าหลัก</a>
+  <span class="nav-title">09 / <span>Client-Server Pattern</span></span>
+</nav>
+<div class="hero">
+  <div class="hero-badge">🖥️ สถาปัตยกรรมพื้นฐาน</div>
+  <h1>Client-Server Pattern</h1>
+  <p>รากฐานของระบบ Networked ทุกประเภท — Client ส่ง Request, Server ประมวลผลและส่ง Response กลับ ทำให้แยก Concern ระหว่างผู้ขอและผู้ให้บริการ</p>
+</div>
+<div class="content">
+
+<div class="section">
+  <div class="section-title">💡 Client-Server Pattern คืออะไร?</div>
+  <div class="section-sub">The foundation of all networked applications</div>
+  <p style="color:#94a3b8;margin-bottom:1.5rem">
+    แบ่งระบบออกเป็น 2 ฝ่าย: <strong style="color:#e2e8f0">Client</strong> (ผู้ขอบริการ) กับ <strong style="color:#e2e8f0">Server</strong> (ผู้ให้บริการ)
+    Client ส่ง Request → Server ประมวลผล → ส่ง Response กลับ
+  </p>
+
+  <!-- VISUAL: Request-Response Flow -->
+  <div class="vb-wrap">
+    <div class="vb-label">🔄 Request-Response Cycle</div>
+    <div class="rr-flow">
+      <div class="rr-box" style="--bc:#22d3ee">
+        <div style="font-size:2rem;margin-bottom:.5rem">💻</div>
+        <div style="font-weight:700;color:#67e8f9;margin-bottom:.3rem">CLIENT</div>
+        <div style="font-size:.75rem;color:#64748b">ส่ง Request<br>รอ Response<br>แสดงผล</div>
+      </div>
+      <div class="rr-mid">
+        <div class="rr-arrow" style="color:#22d3ee">→ Request (HTTP/TCP/gRPC)</div>
+        <div style="font-size:.7rem;color:#334155">⬆️ URL + Method + Headers + Body</div>
+        <div style="height:1px;width:100%;background:#1e293b"></div>
+        <div style="font-size:.7rem;color:#334155">⬇️ Status + Headers + Body</div>
+        <div class="rr-arrow" style="color:#10b981">← Response (JSON/HTML/Binary)</div>
+      </div>
+      <div class="rr-box" style="--bc:#10b981">
+        <div style="font-size:2rem;margin-bottom:.5rem">🖥️</div>
+        <div style="font-weight:700;color:#6ee7b7;margin-bottom:.3rem">SERVER</div>
+        <div style="font-size:.75rem;color:#64748b">รับ Request<br>ประมวลผล<br>ส่งผลลัพธ์</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VISUAL: Client Types -->
+  <div class="vb-wrap">
+    <div class="vb-label">👤 ประเภทของ Client</div>
+    <div class="vb-grid vb-3">
+      <div class="vbox" style="--ac:#22d3ee">
+        <span class="vb-icon">🌐</span>
+        <div class="vb-title">Thin Client</div>
+        <div class="vb-body">Logic เกือบทั้งหมดอยู่ที่ Server</div>
+        <ul class="vb-list">
+          <li>Web Browser (HTML)</li>
+          <li>Terminal / SSH</li>
+          <li>Dumb Terminal</li>
+        </ul>
+        <span class="vb-chip">Stateless</span>
+      </div>
+      <div class="vbox" style="--ac:#8b5cf6">
+        <span class="vb-icon">📱</span>
+        <div class="vb-title">Fat / Rich Client</div>
+        <div class="vb-body">มี Business Logic บางส่วนอยู่ที่ Client</div>
+        <ul class="vb-list">
+          <li>Mobile App (iOS/Android)</li>
+          <li>Desktop App (Electron)</li>
+          <li>React SPA (GraphQL)</li>
+        </ul>
+        <span class="vb-chip">Stateful</span>
+      </div>
+      <div class="vbox" style="--ac:#10b981">
+        <span class="vb-icon">🤖</span>
+        <div class="vb-title">API Client</div>
+        <div class="vb-body">Service อื่นที่ call API</div>
+        <ul class="vb-list">
+          <li>Microservice ที่ call upstream</li>
+          <li>Script / Bot / Crawler</li>
+          <li>SDK / Library</li>
+        </ul>
+        <span class="vb-chip">Programmatic</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- VISUAL: Server Types -->
+  <div class="vb-wrap">
+    <div class="vb-label">🖥️ ประเภทของ Server</div>
+    <div class="vb-grid vb-4">
+      <div class="vbox" style="--ac:#6366f1">
+        <span class="vb-icon">🌐</span>
+        <div class="vb-title">Web Server</div>
+        <div class="vb-body">serve static files + HTML</div>
+        <ul class="vb-list"><li>Nginx, Caddy</li><li>Port 80/443</li></ul>
+      </div>
+      <div class="vbox" style="--ac:#06b6d4">
+        <span class="vb-icon">⚙️</span>
+        <div class="vb-title">Application Server</div>
+        <div class="vb-body">Business logic + API</div>
+        <ul class="vb-list"><li>Go, Node, Java</li><li>REST / gRPC</li></ul>
+      </div>
+      <div class="vbox" style="--ac:#f59e0b">
+        <span class="vb-icon">🗄️</span>
+        <div class="vb-title">Database Server</div>
+        <div class="vb-body">Store และ retrieve data</div>
+        <ul class="vb-list"><li>PostgreSQL, MongoDB</li><li>Port 5432 / 27017</li></ul>
+      </div>
+      <div class="vbox" style="--ac:#10b981">
+        <span class="vb-icon">⚡</span>
+        <div class="vb-title">Cache Server</div>
+        <div class="vb-body">Fast in-memory storage</div>
+        <ul class="vb-list"><li>Redis, Memcached</li><li>Sub-ms response</li></ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- VISUAL: Protocols -->
+  <div class="vb-wrap">
+    <div class="vb-label">📡 Protocol ที่ใช้สื่อสาร</div>
+    <div class="vb-grid vb-4">
+      <div class="vbox" style="--ac:#22d3ee">
+        <span class="vb-icon">🌐</span>
+        <div class="vb-title">HTTP/HTTPS</div>
+        <div class="vb-body">Request-Response, Stateless</div>
+        <span class="vb-chip">REST APIs</span>
+      </div>
+      <div class="vbox" style="--ac:#6366f1">
+        <span class="vb-icon">⚡</span>
+        <div class="vb-title">WebSocket</div>
+        <div class="vb-body">Bi-directional, Persistent connection</div>
+        <span class="vb-chip">Real-time</span>
+      </div>
+      <div class="vbox" style="--ac:#10b981">
+        <span class="vb-icon">🔌</span>
+        <div class="vb-title">gRPC</div>
+        <div class="vb-body">Binary protocol, Streaming, Fast</div>
+        <span class="vb-chip">Microservices</span>
+      </div>
+      <div class="vbox" style="--ac:#f59e0b">
+        <span class="vb-icon">📨</span>
+        <div class="vb-title">TCP/UDP</div>
+        <div class="vb-body">Low-level, Custom protocols</div>
+        <span class="vb-chip">Gaming/IoT</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>Key Insight:</strong> Client-Server ไม่ได้หมายถึง browser กับ web server เท่านั้น —
+    ทุก Service ที่ call API ของ Service อื่น ก็เป็น Client-Server relationship เช่นกัน
+    แม้แต่ Microservices ก็ใช้ pattern นี้ในระดับ service-to-service
+  </div>
+</div>
+
+<!-- ── DIAGRAM ── -->
+<div class="section">
+  <div class="section-title">📊 Multi-Tier Client-Server Diagram</div>
+  <div class="diagram">
+    <div class="diagram-title">Typical Web Application — 3 Server Tiers</div>
+    <svg viewBox="0 0 680 260" fill="none" xmlns="http://www.w3.org/2000/svg" style="max-width:680px;width:100%">
+      <!-- Clients -->
+      <rect x="10" y="40" width="80" height="45" rx="8" fill="#001820" stroke="#22d3ee" stroke-width="1.5"/>
+      <text x="50" y="60" text-anchor="middle" fill="#67e8f9" font-size="9" font-weight="700">🌐 Browser</text>
+      <text x="50" y="74" text-anchor="middle" fill="#475569" font-size="7">HTML/JS</text>
+
+      <rect x="10" y="100" width="80" height="45" rx="8" fill="#001820" stroke="#22d3ee" stroke-width="1.5"/>
+      <text x="50" y="120" text-anchor="middle" fill="#67e8f9" font-size="9" font-weight="700">📱 Mobile</text>
+      <text x="50" y="134" text-anchor="middle" fill="#475569" font-size="7">iOS/Android</text>
+
+      <rect x="10" y="160" width="80" height="45" rx="8" fill="#001820" stroke="#22d3ee" stroke-width="1.5"/>
+      <text x="50" y="180" text-anchor="middle" fill="#67e8f9" font-size="9" font-weight="700">🤖 API Client</text>
+      <text x="50" y="194" text-anchor="middle" fill="#475569" font-size="7">curl / SDK</text>
+
+      <!-- Load Balancer -->
+      <rect x="130" y="90" width="100" height="80" rx="10" fill="#0a0820" stroke="#6366f1" stroke-width="1.5"/>
+      <text x="180" y="120" text-anchor="middle" fill="#a5b4fc" font-size="9" font-weight="700">⚖️ Load</text>
+      <text x="180" y="133" text-anchor="middle" fill="#a5b4fc" font-size="9" font-weight="700">Balancer</text>
+      <text x="180" y="150" text-anchor="middle" fill="#475569" font-size="7">Nginx/HAProxy</text>
+      <text x="180" y="162" text-anchor="middle" fill="#475569" font-size="7">:443</text>
+
+      <!-- App Servers -->
+      <rect x="270" y="40" width="100" height="55" rx="8" fill="#04100a" stroke="#10b981" stroke-width="1.5"/>
+      <text x="320" y="62" text-anchor="middle" fill="#6ee7b7" font-size="9" font-weight="700">⚙️ App Server</text>
+      <text x="320" y="75" text-anchor="middle" fill="#34d399" font-size="8">Instance 1</text>
+      <text x="320" y="87" text-anchor="middle" fill="#475569" font-size="7">Go :8080</text>
+
+      <rect x="270" y="110" width="100" height="55" rx="8" fill="#04100a" stroke="#10b981" stroke-width="1.5"/>
+      <text x="320" y="132" text-anchor="middle" fill="#6ee7b7" font-size="9" font-weight="700">⚙️ App Server</text>
+      <text x="320" y="145" text-anchor="middle" fill="#34d399" font-size="8">Instance 2</text>
+      <text x="320" y="157" text-anchor="middle" fill="#475569" font-size="7">Go :8080</text>
+
+      <rect x="270" y="180" width="100" height="55" rx="8" fill="#04100a" stroke="#10b981" stroke-width="1.5"/>
+      <text x="320" y="202" text-anchor="middle" fill="#6ee7b7" font-size="9" font-weight="700">⚙️ App Server</text>
+      <text x="320" y="215" text-anchor="middle" fill="#34d399" font-size="8">Instance 3</text>
+      <text x="320" y="227" text-anchor="middle" fill="#475569" font-size="7">Go :8080</text>
+
+      <!-- DB + Cache -->
+      <rect x="430" y="60" width="110" height="55" rx="8" fill="#100a00" stroke="#f59e0b" stroke-width="1.5"/>
+      <text x="485" y="82" text-anchor="middle" fill="#fcd34d" font-size="9" font-weight="700">🗄️ PostgreSQL</text>
+      <text x="485" y="96" text-anchor="middle" fill="#fbbf24" font-size="8">Primary DB</text>
+      <text x="485" y="108" text-anchor="middle" fill="#475569" font-size="7">:5432</text>
+
+      <rect x="430" y="130" width="110" height="55" rx="8" fill="#04100a" stroke="#10b981" stroke-width="1.5"/>
+      <text x="485" y="152" text-anchor="middle" fill="#6ee7b7" font-size="9" font-weight="700">⚡ Redis Cache</text>
+      <text x="485" y="166" text-anchor="middle" fill="#34d399" font-size="8">Session + Cache</text>
+      <text x="485" y="178" text-anchor="middle" fill="#475569" font-size="7">:6379</text>
+
+      <!-- Arrows Client → LB -->
+      <line x1="90" y1="62" x2="128" y2="115" stroke="#22d3ee" stroke-width="1.5">
+        <animate attributeName="stroke-dasharray" values="0,50;50,0" dur="1.5s" repeatCount="indefinite"/>
+      </line>
+      <line x1="90" y1="122" x2="128" y2="128" stroke="#22d3ee" stroke-width="1.5">
+        <animate attributeName="stroke-dasharray" values="0,50;50,0" dur="1.5s" begin=".3s" repeatCount="indefinite"/>
+      </line>
+      <line x1="90" y1="182" x2="128" y2="145" stroke="#22d3ee" stroke-width="1.5">
+        <animate attributeName="stroke-dasharray" values="0,50;50,0" dur="1.5s" begin=".6s" repeatCount="indefinite"/>
+      </line>
+
+      <!-- LB → App Servers -->
+      <line x1="230" y1="120" x2="268" y2="70" stroke="#6366f1" stroke-width="1.5">
+        <animate attributeName="stroke-dasharray" values="0,60;60,0" dur="1s" repeatCount="indefinite"/>
+      </line>
+      <line x1="230" y1="130" x2="268" y2="137" stroke="#6366f1" stroke-width="1.5">
+        <animate attributeName="stroke-dasharray" values="0,60;60,0" dur="1s" begin=".3s" repeatCount="indefinite"/>
+      </line>
+      <line x1="230" y1="140" x2="268" y2="200" stroke="#6366f1" stroke-width="1.5">
+        <animate attributeName="stroke-dasharray" values="0,60;60,0" dur="1s" begin=".6s" repeatCount="indefinite"/>
+      </line>
+
+      <!-- App → DB/Cache -->
+      <line x1="370" y1="80" x2="428" y2="87" stroke="#f59e0b" stroke-width="1.5">
+        <animate attributeName="stroke-dasharray" values="0,60;60,0" dur="1.2s" repeatCount="indefinite"/>
+      </line>
+      <line x1="370" y1="137" x2="428" y2="155" stroke="#10b981" stroke-width="1.5">
+        <animate attributeName="stroke-dasharray" values="0,60;60,0" dur="1.2s" begin=".4s" repeatCount="independite"/>
+      </line>
+
+      <!-- Labels -->
+      <text x="50" y="250" text-anchor="middle" fill="#22d3ee" font-size="7">Clients</text>
+      <text x="180" y="190" text-anchor="middle" fill="#6366f1" font-size="7">Load Balancer</text>
+      <text x="320" y="250" text-anchor="middle" fill="#10b981" font-size="7">Application Tier</text>
+      <text x="485" y="210" text-anchor="middle" fill="#f59e0b" font-size="7">Data Tier</text>
+    </svg>
+  </div>
+</div>
+
+<!-- ── CODE ── -->
+<div class="section">
+  <div class="section-title">💻 ตัวอย่าง Go — HTTP Server &amp; Client</div>
+
+  <div class="code-block">
+    <div class="code-header"><span>server/main.go — Go HTTP Server</span><span class="lang">Go</span></div>
+    <pre><code class="language-go">package main
+
+import (
+    "encoding/json"
+    "log"
+    "net/http"
+    "sync"
+    "time"
+)
+
+// ── Simple In-Memory Product Server ──────────────────────────────────────
+
+type Product struct {
+    ID        int       `json:"id"`
+    Name      string    `json:"name"`
+    Price     float64   `json:"price"`
+    CreatedAt time.Time `json:"created_at"`
+}
+
+type ProductStore struct {
+    mu       sync.RWMutex
+    products map[int]*Product
+    nextID   int
+}
+
+func NewStore() *ProductStore {
+    s := &ProductStore{products: make(map[int]*Product), nextID: 1}
+    // Seed data
+    s.products[1] = &Product{1, "MacBook Pro", 89900, time.Now()}
+    s.products[2] = &Product{2, "iPhone 15", 32900, time.Now()}
+    s.nextID = 3
+    return s
+}
+
+type Server struct{ store *ProductStore }
+
+func (s *Server) handleProducts(w http.ResponseWriter, r *http.Request) {
+    w.Header().Set("Content-Type", "application/json")
+
+    switch r.Method {
+    case http.MethodGet:
+        s.store.mu.RLock()
+        defer s.store.mu.RUnlock()
+        products := make([]*Product, 0, len(s.store.products))
+        for _, p := range s.store.products { products = append(products, p) }
+        json.NewEncoder(w).Encode(products)
+
+    case http.MethodPost:
+        var input struct{ Name string; Price float64 }
+        if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+            http.Error(w, `{"error":"invalid body"}`, http.StatusBadRequest)
+            return
+        }
+        s.store.mu.Lock()
+        defer s.store.mu.Unlock()
+        p := &Product{
+            ID: s.store.nextID, Name: input.Name,
+            Price: input.Price, CreatedAt: time.Now(),
+        }
+        s.store.products[p.ID] = p
+        s.store.nextID++
+        w.WriteHeader(http.StatusCreated)
+        json.NewEncoder(w).Encode(p)
+
+    default:
+        http.Error(w, `{"error":"method not allowed"}`, http.StatusMethodNotAllowed)
+    }
+}
+
+func (s *Server) handleHealth(w http.ResponseWriter, r *http.Request) {
+    json.NewEncoder(w).Encode(map[string]string{
+        "status": "ok", "time": time.Now().Format(time.RFC3339),
+    })
+}
+
+func main() {
+    store  := NewStore()
+    server := &Server{store: store}
+
+    mux := http.NewServeMux()
+    mux.HandleFunc("/products", server.handleProducts)
+    mux.HandleFunc("/health",   server.handleHealth)
+
+    // Middleware: logging
+    handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+        start := time.Now()
+        mux.ServeHTTP(w, r)
+        log.Printf("%s %s %v", r.Method, r.URL.Path, time.Since(start))
+    })
+
+    log.Println("Server listening on :8080")
+    log.Fatal(http.ListenAndServe(":8080", handler))
+}</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><span>client/main.go — Go HTTP Client</span><span class="lang">Go</span></div>
+    <pre><code class="language-go">package main
+
+import (
+    "bytes"
+    "context"
+    "encoding/json"
+    "fmt"
+    "log"
+    "net/http"
+    "time"
+)
+
+// ── ProductClient — wraps HTTP communication ──────────────────────────────
+
+type Product struct {
+    ID    int     `json:"id"`
+    Name  string  `json:"name"`
+    Price float64 `json:"price"`
+}
+
+type ProductClient struct {
+    baseURL    string
+    httpClient *http.Client
+}
+
+func NewProductClient(baseURL string) *ProductClient {
+    return &ProductClient{
+        baseURL: baseURL,
+        httpClient: &http.Client{
+            Timeout: 10 * time.Second,
+            // Transport สำหรับ connection pooling
+            Transport: &http.Transport{
+                MaxIdleConns:       100,
+                MaxIdleConnsPerHost: 10,
+                IdleConnTimeout:    90 * time.Second,
+            },
+        },
+    }
+}
+
+func (c *ProductClient) ListProducts(ctx context.Context) ([]Product, error) {
+    req, err := http.NewRequestWithContext(ctx, http.MethodGet,
+        c.baseURL+"/products", nil)
+    if err != nil {
+        return nil, fmt.Errorf("create request: %w", err)
+    }
+    req.Header.Set("Accept", "application/json")
+
+    resp, err := c.httpClient.Do(req)
+    if err != nil {
+        return nil, fmt.Errorf("do request: %w", err)
+    }
+    defer resp.Body.Close()
+
+    if resp.StatusCode != http.StatusOK {
+        return nil, fmt.Errorf("server returned %d", resp.StatusCode)
+    }
+
+    var products []Product
+    if err := json.NewDecoder(resp.Body).Decode(&products); err != nil {
+        return nil, fmt.Errorf("decode response: %w", err)
+    }
+    return products, nil
+}
+
+func (c *ProductClient) CreateProduct(ctx context.Context, name string, price float64) (*Product, error) {
+    body, _ := json.Marshal(map[string]interface{}{"name": name, "price": price})
+
+    req, _ := http.NewRequestWithContext(ctx, http.MethodPost,
+        c.baseURL+"/products", bytes.NewReader(body))
+    req.Header.Set("Content-Type", "application/json")
+
+    resp, err := c.httpClient.Do(req)
+    if err != nil {
+        return nil, fmt.Errorf("do request: %w", err)
+    }
+    defer resp.Body.Close()
+
+    if resp.StatusCode != http.StatusCreated {
+        return nil, fmt.Errorf("server returned %d", resp.StatusCode)
+    }
+
+    var p Product
+    if err := json.NewDecoder(resp.Body).Decode(&p); err != nil {
+        return nil, fmt.Errorf("decode: %w", err)
+    }
+    return &p, nil
+}
+
+func main() {
+    client := NewProductClient("http://localhost:8080")
+    ctx    := context.Background()
+
+    // LIST products
+    products, err := client.ListProducts(ctx)
+    if err != nil {
+        log.Fatalf("list: %v", err)
+    }
+    fmt.Println("=== สินค้าทั้งหมด ===")
+    for _, p := range products {
+        fmt.Printf("  [%d] %s — ฿%.2f\n", p.ID, p.Name, p.Price)
+    }
+
+    // CREATE product
+    newProduct, err := client.CreateProduct(ctx, "AirPods Pro", 9900)
+    if err != nil {
+        log.Fatalf("create: %v", err)
+    }
+    fmt.Printf("\n✅ สร้างสินค้าใหม่: [%d] %s\n", newProduct.ID, newProduct.Name)
+}</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><span>websocket/realtime.go — WebSocket Client-Server (Real-time)</span><span class="lang">Go</span></div>
+    <pre><code class="language-go">package main
+
+import (
+    "encoding/json"
+    "log"
+    "net/http"
+    "sync"
+    "golang.org/x/net/websocket"
+)
+
+// ── WebSocket: Bi-directional persistent connection ────────────────────────
+
+type Message struct {
+    Type    string      `json:"type"`
+    Payload interface{} `json:"payload"`
+}
+
+type Hub struct {
+    mu      sync.RWMutex
+    clients map[*websocket.Conn]bool
+}
+
+func (h *Hub) broadcast(msg Message) {
+    data, _ := json.Marshal(msg)
+    h.mu.RLock()
+    defer h.mu.RUnlock()
+    for conn := range h.clients {
+        websocket.Message.Send(conn, string(data))
+    }
+}
+
+func (h *Hub) handleWS(ws *websocket.Conn) {
+    // Register
+    h.mu.Lock()
+    h.clients[ws] = true
+    h.mu.Unlock()
+    log.Printf("Client connected: %s", ws.RemoteAddr())
+
+    // Send welcome
+    h.broadcast(Message{Type: "connected", Payload: "Welcome!"})
+
+    // Read loop (Client → Server)
+    for {
+        var raw string
+        if err := websocket.Message.Receive(ws, &raw); err != nil {
+            break
+        }
+        var msg Message
+        json.Unmarshal([]byte(raw), &msg)
+
+        // Echo back to all clients (broadcast)
+        h.broadcast(Message{Type: "chat", Payload: msg.Payload})
+    }
+
+    // Deregister
+    h.mu.Lock()
+    delete(h.clients, ws)
+    h.mu.Unlock()
+    log.Printf("Client disconnected: %s", ws.RemoteAddr())
+}
+
+func main() {
+    hub := &Hub{clients: make(map[*websocket.Conn]bool)}
+
+    http.Handle("/ws", websocket.Handler(hub.handleWS))
+    http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+        w.Write([]byte(`&lt;html&gt;&lt;body&gt;
+          &lt;script&gt;
+            const ws = new WebSocket('ws://localhost:8080/ws');
+            ws.onmessage = e => console.log(JSON.parse(e.data));
+            ws.onopen = () => ws.send(JSON.stringify({type:'chat', payload:'Hello!'}));
+          &lt;/script&gt;
+          &lt;/body&gt;&lt;/html&gt;`))
+    })
+
+    log.Println("WebSocket server on :8080")
+    log.Fatal(http.ListenAndServe(":8080", nil))
+}</code></pre>
+  </div>
+</div>
+
+<!-- ── SUMMARY ── -->
+<div class="section">
+  <div class="section-title">✅ สรุป Client-Server Patterns</div>
+  <div class="vb-wrap">
+    <div class="vb-label">📊 เปรียบเทียบ Protocols</div>
+    <div class="vb-grid vb-2">
+      <div class="vbox" style="--ac:#22d3ee">
+        <span class="vb-icon">🔁</span>
+        <div class="vb-title">HTTP/REST — Request-Response</div>
+        <ul class="vb-list">
+          <li>Stateless — แต่ละ request อิสระ</li>
+          <li>เหมาะกับ CRUD Operations</li>
+          <li>ง่าย, cache ได้, scale ง่าย</li>
+          <li>ไม่ดีสำหรับ real-time</li>
+        </ul>
+      </div>
+      <div class="vbox" style="--ac:#6366f1">
+        <span class="vb-icon">⚡</span>
+        <div class="vb-title">WebSocket — Bi-directional</div>
+        <ul class="vb-list">
+          <li>Persistent connection</li>
+          <li>Server สามารถ push ไปหา client</li>
+          <li>เหมาะกับ Chat, Games, Live Data</li>
+          <li>Resource หนักกว่า HTTP</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="text-align:center;margin:3rem 0;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+  <a href="index.html" style="background:#0d1117;border:1px solid #1e293b;color:#64748b;padding:.7rem 1.5rem;border-radius:10px;font-size:.88rem">← หน้าหลัก</a>
+  <a href="9-microservice.html" style="background:#0d1117;border:1px solid #1e293b;color:#22d3ee;padding:.7rem 1.5rem;border-radius:10px;font-weight:600;font-size:.88rem">Microservice Architecture →</a>
+</div>
+</div>
+<script>hljs.highlightAll()</script>
+</body>
+</html>

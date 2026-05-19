@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Domain Driven Design — สื่อการสอน</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#07090f;color:#e2e8f0;line-height:1.7}
+a{color:#818cf8;text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* NAV */
+.topnav{display:flex;align-items:center;gap:1rem;padding:1rem 2rem;background:#0d1117;border-bottom:1px solid #1e293b;position:sticky;top:0;z-index:100}
+.back-btn{display:flex;align-items:center;gap:.4rem;color:#64748b;font-size:.85rem;transition:color .2s}
+.back-btn:hover{color:#e2e8f0;text-decoration:none}
+.nav-title{color:#475569;font-size:.85rem}
+.nav-title span{color:#a5b4fc;font-weight:600}
+
+/* HERO */
+.hero{padding:4rem 2rem 3rem;text-align:center;background:linear-gradient(160deg,#07090f,#0f1020)}
+.hero-badge{display:inline-block;background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.3);color:#a5b4fc;padding:.35rem 1rem;border-radius:999px;font-size:.8rem;font-weight:600;margin-bottom:1.5rem}
+.hero h1{font-size:clamp(1.8rem,4vw,3rem);font-weight:800;background:linear-gradient(135deg,#6366f1,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:1rem}
+.hero p{color:#64748b;max-width:600px;margin:0 auto;font-size:1rem}
+
+/* LAYOUT */
+.content{max-width:900px;margin:0 auto;padding:2rem 1.5rem 5rem}
+
+/* SECTIONS */
+.section{margin-bottom:4rem}
+.section-title{font-size:1.6rem;font-weight:700;color:#6366f1;margin-bottom:.4rem;display:flex;align-items:center;gap:.6rem}
+.section-sub{color:#475569;font-size:.9rem;margin-bottom:2rem;padding-left:2rem}
+
+/* CONCEPT CARDS */
+.concept-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;margin-bottom:2rem}
+.concept-card{background:#0d1117;border:1px solid #1e293b;border-radius:12px;padding:1.4rem;border-left:3px solid var(--c,#6366f1)}
+.concept-card h3{font-size:.95rem;font-weight:700;color:#f1f5f9;margin-bottom:.4rem}
+.concept-card p{font-size:.83rem;color:#64748b;line-height:1.6}
+.concept-card .label{font-size:.7rem;color:var(--c,#6366f1);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.4rem}
+
+/* COMPARISON TABLE */
+.compare{width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:.88rem}
+.compare th{background:#111827;color:#94a3b8;padding:.8rem 1rem;text-align:left;border-bottom:2px solid #1e293b}
+.compare td{padding:.7rem 1rem;border-bottom:1px solid #111827;color:#cbd5e1}
+.compare tr:hover td{background:#0d1117}
+.yes{color:#10b981;font-weight:700}
+.no{color:#ef4444;font-weight:700}
+
+/* CODE BLOCKS */
+.code-block{margin:1.5rem 0;border-radius:12px;overflow:hidden;border:1px solid #1e293b}
+.code-header{background:#111827;padding:.7rem 1rem;display:flex;justify-content:space-between;align-items:center}
+.code-header span{font-size:.78rem;color:#64748b;font-weight:600}
+.code-header .lang{background:rgba(99,102,241,.15);color:#818cf8;padding:.15rem .6rem;border-radius:4px;font-size:.72rem;font-weight:700}
+.code-block pre{margin:0!important;border-radius:0!important;border:none!important;font-size:.83rem!important;line-height:1.6!important}
+
+/* DIAGRAM */
+.diagram{background:#0d1117;border:1px solid #1e293b;border-radius:16px;padding:2rem;margin:2rem 0;text-align:center;overflow:hidden}
+.diagram-title{font-size:.8rem;color:#475569;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:1.5rem}
+
+/* CALLOUT */
+.callout{background:#0f172a;border-left:3px solid #6366f1;border-radius:0 8px 8px 0;padding:1rem 1.2rem;margin:1.5rem 0;font-size:.88rem;color:#94a3b8}
+.callout strong{color:#a5b4fc}
+.callout.warning{border-color:#f59e0b}.callout.success{border-color:#10b981}
+
+/* STEP */
+.steps{display:flex;flex-direction:column;gap:1rem;margin:1.5rem 0}
+.step{display:flex;gap:1rem;align-items:flex-start}
+.step-num{min-width:2rem;height:2rem;border-radius:999px;background:rgba(99,102,241,.2);border:1px solid rgba(99,102,241,.4);color:#818cf8;font-size:.8rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:.1rem}
+.step-body h4{font-size:.92rem;font-weight:700;color:#f1f5f9;margin-bottom:.2rem}
+.step-body p{font-size:.84rem;color:#64748b;line-height:1.6}
+
+/* ANIMATIONS */
+@keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.hero{animation:rise .5s ease}
+@keyframes flow{0%{stroke-dashoffset:100}100%{stroke-dashoffset:0}}
+@keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
+
+/* Bounded Context Diagram */
+.bc-diagram svg{width:100%;max-width:700px}
+
+/* LAYER BOX */
+.layer-box{border:1px solid #1e293b;border-radius:8px;padding:1rem 1.2rem;margin:.5rem 0}
+.layer-box h4{font-size:.82rem;font-weight:700;margin-bottom:.3rem}
+.layer-box p{font-size:.78rem;color:#64748b}
+
+/* tag */
+.pill{display:inline-block;padding:.15rem .55rem;border-radius:4px;font-size:.72rem;font-weight:700}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="index.html" class="back-btn">← กลับหน้าหลัก</a>
+  <span class="nav-title">01 / <span>Domain Driven Design</span></span>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">🏛️ หัวข้อที่ 1</div>
+  <h1>Domain Driven Design</h1>
+  <p>ออกแบบซอฟต์แวร์โดยให้ Business Domain เป็นหัวใจ — code สะท้อนความเป็นจริงของธุรกิจ ไม่ใช่แค่ database schema</p>
+</div>
+
+<div class="content">
+
+<!-- ───────── WHAT IS DDD ───────── -->
+<div class="section">
+  <div class="section-title">💡 DDD คืออะไร?</div>
+  <div class="section-sub">แนวคิดที่ Eric Evans เสนอในหนังสือ "Domain-Driven Design" ปี 2003</div>
+
+  <p style="color:#94a3b8;margin-bottom:1.5rem">
+    DDD เป็น <strong style="color:#e2e8f0">วิธีคิด</strong> ในการออกแบบซอฟต์แวร์ที่ซับซ้อน
+    โดยให้ <strong style="color:#a5b4fc">Domain (ขอบเขตธุรกิจ)</strong> เป็นตัวกำหนดโครงสร้างของโค้ด
+    แทนที่จะออกแบบจาก database หรือ framework
+  </p>
+
+  <div class="callout">
+    <strong>Core Idea:</strong> "The domain model and the code should be so closely linked that changing one means changing the other."
+    — แบบจำลองธุรกิจและโค้ดต้องสอดคล้องกันอย่างใกล้ชิด
+  </div>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h4>Focus on the Core Domain</h4>
+        <p>ทำความเข้าใจธุรกิจ (Domain) อย่างลึกซึ้ง ทำงานร่วมกับ Domain Expert เพื่อให้ code สะท้อน business logic ที่แท้จริง</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h4>Ubiquitous Language (ภาษาร่วม)</h4>
+        <p>Developer และ Domain Expert ใช้ภาษาเดียวกัน คำว่า "Order", "Invoice", "Customer" มีความหมายเดียวกันในทุกที่ — ใน code, ในเอกสาร, ในการพูดคุย</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h4>Model-Driven Design</h4>
+        <p>สร้าง Domain Model (แบบจำลอง) ที่ชัดเจน แล้วแปลง Model นั้นเป็น code โดยตรง — ไม่ต้อง translate ระหว่างชั้น</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ───────── BOUNDED CONTEXT ───────── -->
+<div class="section">
+  <div class="section-title">🗺️ Bounded Context</div>
+  <div class="section-sub">ขอบเขตที่ Model หนึ่งๆ มีความหมายชัดเจน</div>
+
+  <p style="color:#94a3b8;margin-bottom:1.5rem">
+    ในระบบขนาดใหญ่ คำเดียวกันอาจมีความหมายต่างกันในแต่ละส่วน
+    เช่น "Customer" ในระบบขาย vs ระบบบัญชี vs ระบบส่งของ — ต่างกันมาก
+    <strong style="color:#e2e8f0">Bounded Context</strong> คือการกำหนดขอบเขตที่ Model นั้นมีความหมายชัดเจน
+  </p>
+
+  <!-- Animated Bounded Context Diagram -->
+  <div class="diagram">
+    <div class="diagram-title">ระบบ E-Commerce — แบ่งเป็น 4 Bounded Contexts</div>
+    <svg viewBox="0 0 680 300" fill="none" xmlns="http://www.w3.org/2000/svg" style="max-width:680px;width:100%">
+      <!-- Order Context -->
+      <rect x="20" y="30" width="150" height="110" rx="12" fill="#1a1040" stroke="#6366f1" stroke-width="1.5"/>
+      <text x="95" y="55" text-anchor="middle" fill="#a5b4fc" font-size="11" font-weight="700">Order Context</text>
+      <rect x="35" y="65" width="120" height="18" rx="4" fill="#0f0a2a"/>
+      <text x="95" y="78" text-anchor="middle" fill="#818cf8" font-size="9">Order (Aggregate Root)</text>
+      <rect x="35" y="88" width="120" height="18" rx="4" fill="#0f0a2a"/>
+      <text x="95" y="101" text-anchor="middle" fill="#818cf8" font-size="9">OrderLine (Entity)</text>
+      <rect x="35" y="111" width="120" height="18" rx="4" fill="#0f0a2a"/>
+      <text x="95" y="124" text-anchor="middle" fill="#818cf8" font-size="9">Money (Value Object)</text>
+
+      <!-- Inventory Context -->
+      <rect x="200" y="30" width="150" height="110" rx="12" fill="#0a1a10" stroke="#10b981" stroke-width="1.5"/>
+      <text x="275" y="55" text-anchor="middle" fill="#6ee7b7" font-size="11" font-weight="700">Inventory Context</text>
+      <rect x="215" y="65" width="120" height="18" rx="4" fill="#041008"/>
+      <text x="275" y="78" text-anchor="middle" fill="#34d399" font-size="9">Product (Aggregate)</text>
+      <rect x="215" y="88" width="120" height="18" rx="4" fill="#041008"/>
+      <text x="275" y="101" text-anchor="middle" fill="#34d399" font-size="9">StockLevel (Value Object)</text>
+      <rect x="215" y="111" width="120" height="18" rx="4" fill="#041008"/>
+      <text x="275" y="124" text-anchor="middle" fill="#34d399" font-size="9">Warehouse (Entity)</text>
+
+      <!-- Shipping Context -->
+      <rect x="20" y="170" width="150" height="110" rx="12" fill="#1a1000" stroke="#f59e0b" stroke-width="1.5"/>
+      <text x="95" y="195" text-anchor="middle" fill="#fcd34d" font-size="11" font-weight="700">Shipping Context</text>
+      <rect x="35" y="205" width="120" height="18" rx="4" fill="#100a00"/>
+      <text x="95" y="218" text-anchor="middle" fill="#fbbf24" font-size="9">Shipment (Aggregate)</text>
+      <rect x="35" y="228" width="120" height="18" rx="4" fill="#100a00"/>
+      <text x="95" y="241" text-anchor="middle" fill="#fbbf24" font-size="9">Recipient (Value Object)</text>
+      <rect x="35" y="251" width="120" height="18" rx="4" fill="#100a00"/>
+      <text x="95" y="264" text-anchor="middle" fill="#fbbf24" font-size="9">TrackingCode (VO)</text>
+
+      <!-- Payment Context -->
+      <rect x="200" y="170" width="150" height="110" rx="12" fill="#1a0010" stroke="#ec4899" stroke-width="1.5"/>
+      <text x="275" y="195" text-anchor="middle" fill="#f9a8d4" font-size="11" font-weight="700">Payment Context</text>
+      <rect x="215" y="205" width="120" height="18" rx="4" fill="#10000a"/>
+      <text x="275" y="218" text-anchor="middle" fill="#f472b6" font-size="9">Payment (Aggregate)</text>
+      <rect x="215" y="228" width="120" height="18" rx="4" fill="#10000a"/>
+      <text x="275" y="241" text-anchor="middle" fill="#f472b6" font-size="9">Invoice (Entity)</text>
+      <rect x="215" y="251" width="120" height="18" rx="4" fill="#10000a"/>
+      <text x="275" y="264" text-anchor="middle" fill="#f472b6" font-size="9">Amount (Value Object)</text>
+
+      <!-- Event Bus -->
+      <rect x="390" y="110" width="130" height="60" rx="10" fill="#111827" stroke="#334155" stroke-width="1.5" stroke-dasharray="5,3"/>
+      <text x="455" y="134" text-anchor="middle" fill="#64748b" font-size="10" font-weight="700">Event Bus</text>
+      <text x="455" y="151" text-anchor="middle" fill="#475569" font-size="8">Domain Events</text>
+
+      <!-- Arrows (events) -->
+      <!-- Order → Bus -->
+      <line x1="170" y1="85" x2="388" y2="130" stroke="#6366f1" stroke-width="1.5" marker-end="url(#arr)" opacity=".7">
+        <animate attributeName="stroke-dasharray" from="0,200" to="200,0" dur="2s" repeatCount="indefinite"/>
+      </line>
+      <!-- Bus → Inventory -->
+      <line x1="390" y1="130" x2="352" y2="85" stroke="#10b981" stroke-width="1.5" marker-end="url(#arr2)" opacity=".7">
+        <animate attributeName="stroke-dasharray" from="0,200" to="200,0" dur="2s" begin=".5s" repeatCount="indefinite"/>
+      </line>
+      <!-- Bus → Shipping -->
+      <line x1="390" y1="155" x2="172" y2="210" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#arr3)" opacity=".7">
+        <animate attributeName="stroke-dasharray" from="0,200" to="200,0" dur="2s" begin="1s" repeatCount="indefinite"/>
+      </line>
+      <!-- Bus → Payment -->
+      <line x1="390" y1="155" x2="352" y2="210" stroke="#ec4899" stroke-width="1.5" marker-end="url(#arr4)" opacity=".7">
+        <animate attributeName="stroke-dasharray" from="0,200" to="200,0" dur="2s" begin="1.5s" repeatCount="indefinite"/>
+      </line>
+
+      <!-- Event label -->
+      <text x="540" y="105" fill="#475569" font-size="8" text-anchor="middle">order.placed</text>
+      <text x="540" y="115" fill="#475569" font-size="8" text-anchor="middle">order.confirmed</text>
+      <text x="540" y="125" fill="#475569" font-size="8" text-anchor="middle">payment.received</text>
+
+      <defs>
+        <marker id="arr" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+          <path d="M0,0 L6,3 L0,6 Z" fill="#6366f1"/>
+        </marker>
+        <marker id="arr2" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+          <path d="M0,0 L6,3 L0,6 Z" fill="#10b981"/>
+        </marker>
+        <marker id="arr3" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+          <path d="M0,0 L6,3 L0,6 Z" fill="#f59e0b"/>
+        </marker>
+        <marker id="arr4" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+          <path d="M0,0 L6,3 L0,6 Z" fill="#ec4899"/>
+        </marker>
+      </defs>
+    </svg>
+  </div>
+
+  <div class="callout">
+    <strong>Context Map:</strong> แต่ละ Bounded Context มี <strong>Ubiquitous Language</strong> ของตัวเอง
+    — คำว่า "Customer" ในระบบ Order อาจมีแค่ ID และ Address
+    แต่ใน Payment Context อาจมี credit score, payment method ด้วย
+  </div>
+</div>
+
+<!-- ───────── TACTICAL PATTERNS ───────── -->
+<div class="section">
+  <div class="section-title">🧱 Building Blocks (Tactical Patterns)</div>
+  <div class="section-sub">ส่วนประกอบที่ใช้สร้าง Domain Model</div>
+
+  <div class="concept-grid">
+    <div class="concept-card" style="--c:#6366f1">
+      <div class="label">Entity</div>
+      <h3>Entity</h3>
+      <p>สิ่งที่มี <strong>Identity</strong> ชัดเจน (ID) และ State ที่เปลี่ยนได้ตามเวลา เช่น Order, Customer, User — แม้ข้อมูลจะเปลี่ยน แต่ยังเป็น object เดิม</p>
+    </div>
+    <div class="concept-card" style="--c:#8b5cf6">
+      <div class="label">Value Object</div>
+      <h3>Value Object</h3>
+      <p>ไม่มี Identity — กำหนดจาก <strong>ค่า</strong> ของมัน เช่น Money(100, "THB") — ถ้าค่าเท่ากัน ก็เป็น object เดียวกัน, Immutable เสมอ</p>
+    </div>
+    <div class="concept-card" style="--c:#06b6d4">
+      <div class="label">Aggregate</div>
+      <h3>Aggregate Root</h3>
+      <p>กลุ่มของ Entities + VOs ที่รวมกันเป็นหน่วยเดียว มี <strong>Aggregate Root</strong> เป็นประตูเดียวในการเข้าถึง — รับประกัน consistency</p>
+    </div>
+    <div class="concept-card" style="--c:#10b981">
+      <div class="label">Repository</div>
+      <h3>Repository</h3>
+      <p>Interface สำหรับ persist และ retrieve Aggregates — ซ่อน Storage detail ไว้ใน Infrastructure ทำให้ Domain ไม่รู้จัก database</p>
+    </div>
+    <div class="concept-card" style="--c:#f59e0b">
+      <div class="label">Domain Service</div>
+      <h3>Domain Service</h3>
+      <p>Business logic ที่ <strong>ไม่เป็นธรรมชาติ</strong>ของ Entity ใดๆ เช่น การคำนวณราคาที่ซับซ้อนซึ่งต้องใช้หลาย Aggregates</p>
+    </div>
+    <div class="concept-card" style="--c:#ec4899">
+      <div class="label">Domain Event</div>
+      <h3>Domain Event</h3>
+      <p>เหตุการณ์ที่เกิดใน Domain — "สิ่งที่เกิดขึ้นแล้วในอดีต" เช่น OrderPlaced, PaymentReceived — ใช้สื่อสารระหว่าง Contexts</p>
+    </div>
+  </div>
+
+  <!-- Entity vs VO Table -->
+  <h3 style="color:#a5b4fc;margin-bottom:1rem;margin-top:2rem">Entity vs Value Object</h3>
+  <table class="compare">
+    <tr>
+      <th>คุณสมบัติ</th>
+      <th>Entity</th>
+      <th>Value Object</th>
+    </tr>
+    <tr>
+      <td>Identity (ID)</td>
+      <td class="yes">✓ มี ID ชัดเจน</td>
+      <td class="no">✗ ไม่มี</td>
+    </tr>
+    <tr>
+      <td>Mutability</td>
+      <td class="yes">✓ เปลี่ยนได้</td>
+      <td class="no">✗ Immutable</td>
+    </tr>
+    <tr>
+      <td>Equality</td>
+      <td>เปรียบ ID</td>
+      <td>เปรียบค่า</td>
+    </tr>
+    <tr>
+      <td>Lifecycle</td>
+      <td>มี lifecycle ยาวนาน</td>
+      <td>สั้น — สร้างใหม่ทุกครั้ง</td>
+    </tr>
+    <tr>
+      <td>ตัวอย่าง</td>
+      <td>Order, Customer, Product</td>
+      <td>Money, Address, Email, DateRange</td>
+    </tr>
+  </table>
+</div>
+
+<!-- ───────── CODE EXAMPLE ───────── -->
+<div class="section">
+  <div class="section-title">💻 ตัวอย่าง Go — ระบบ E-Commerce</div>
+  <div class="section-sub">ครอบคลุม Entity, Value Object, Aggregate, Repository, Domain Event, Application Service</div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>domain/money.go — Value Object</span>
+      <span class="lang">Go</span>
+    </div>
+    <pre><code class="language-go">package domain
+
+import (
+    "errors"
+    "fmt"
+)
+
+// Money เป็น Value Object — ไม่มี ID, Immutable, เปรียบจากค่า
+type Money struct {
+    amount   int64  // เก็บเป็น satang (หน่วยเล็กสุด) เพื่อหลีก floating point error
+    currency string
+}
+
+// constructor — สร้าง Money ใหม่เสมอ (ไม่ mutate)
+func NewMoney(amount int64, currency string) (Money, error) {
+    if amount < 0 {
+        return Money{}, errors.New("amount must be non-negative")
+    }
+    if currency == "" {
+        return Money{}, errors.New("currency required")
+    }
+    return Money{amount: amount, currency: currency}, nil
+}
+
+func (m Money) Amount() int64    { return m.amount }
+func (m Money) Currency() string { return m.currency }
+
+// Baht แสดงค่าเป็น Baht (amount / 100)
+func (m Money) Baht() float64 { return float64(m.amount) / 100 }
+
+// Add คืน Money ใหม่ — ไม่ mutate ตัวเอง
+func (m Money) Add(other Money) (Money, error) {
+    if m.currency != other.currency {
+        return Money{}, fmt.Errorf("currency mismatch: %s vs %s", m.currency, other.currency)
+    }
+    return Money{amount: m.amount + other.amount, currency: m.currency}, nil
+}
+
+func (m Money) Multiply(qty int) Money {
+    return Money{amount: m.amount * int64(qty), currency: m.currency}
+}
+
+// Equal — Value Object เปรียบเทียบจากค่า ไม่ใช่ pointer
+func (m Money) Equal(other Money) bool {
+    return m.amount == other.amount && m.currency == other.currency
+}
+
+func (m Money) String() string {
+    return fmt.Sprintf("%.2f %s", m.Baht(), m.currency)
+}</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>domain/order.go — Aggregate Root</span>
+      <span class="lang">Go</span>
+    </div>
+    <pre><code class="language-go">package domain
+
+import (
+    "errors"
+    "time"
+)
+
+// ── Types (Ubiquitous Language) ──────────────────────────────────────────
+type OrderID    string
+type CustomerID string
+type ProductID  string
+
+type OrderStatus string
+const (
+    StatusPending   OrderStatus = "pending"
+    StatusConfirmed OrderStatus = "confirmed"
+    StatusShipped   OrderStatus = "shipped"
+    StatusCancelled OrderStatus = "cancelled"
+)
+
+// ── OrderLine — Entity ภายใน Aggregate ──────────────────────────────────
+type OrderLine struct {
+    productID ProductID
+    name      string
+    unitPrice Money
+    quantity  int
+}
+
+func NewOrderLine(productID ProductID, name string, unitPrice Money, qty int) (OrderLine, error) {
+    if qty <= 0 {
+        return OrderLine{}, errors.New("quantity must be positive")
+    }
+    return OrderLine{productID: productID, name: name, unitPrice: unitPrice, quantity: qty}, nil
+}
+
+func (l OrderLine) ProductID() ProductID { return l.productID }
+func (l OrderLine) Name() string         { return l.name }
+func (l OrderLine) Quantity() int        { return l.quantity }
+func (l OrderLine) LineTotal() Money     { return l.unitPrice.Multiply(l.quantity) }
+
+// ── Order — Aggregate Root ───────────────────────────────────────────────
+// ทุก access ต้องผ่าน Order เท่านั้น — ไม่ไปแตะ OrderLine โดยตรงจากข้างนอก
+type Order struct {
+    id         OrderID
+    customerID CustomerID
+    lines      []OrderLine
+    status     OrderStatus
+    createdAt  time.Time
+    events     []DomainEvent // Domain Events รอ publish
+}
+
+func NewOrder(id OrderID, customerID CustomerID) *Order {
+    o := &Order{
+        id:         id,
+        customerID: customerID,
+        status:     StatusPending,
+        createdAt:  time.Now(),
+    }
+    // ทุกครั้งที่สร้าง Order ใหม่ ให้ raise event
+    o.raise(OrderCreatedEvent{
+        OrderID:    id,
+        CustomerID: customerID,
+        OccurredAt: o.createdAt,
+    })
+    return o
+}
+
+// Getters — ข้อมูล read-only สำหรับ outside world
+func (o *Order) ID() OrderID           { return o.id }
+func (o *Order) CustomerID() CustomerID { return o.customerID }
+func (o *Order) Status() OrderStatus    { return o.status }
+func (o *Order) Lines() []OrderLine     { return append([]OrderLine{}, o.lines...) } // copy
+
+// AddLine — เพิ่มสินค้า (เฉพาะตอน Pending)
+func (o *Order) AddLine(line OrderLine) error {
+    if o.status != StatusPending {
+        return errors.New("cannot modify non-pending order")
+    }
+    // ถ้า product ซ้ำ ให้รวม quantity
+    for i, l := range o.lines {
+        if l.productID == line.productID {
+            newQty := l.quantity + line.quantity
+            o.lines[i].quantity = newQty
+            return nil
+        }
+    }
+    o.lines = append(o.lines, line)
+    return nil
+}
+
+// Total — คำนวณยอดรวม (Domain logic อยู่ใน Aggregate)
+func (o *Order) Total() (Money, error) {
+    if len(o.lines) == 0 {
+        return Money{}, errors.New("order is empty")
+    }
+    total, _ := NewMoney(0, "THB")
+    for _, l := range o.lines {
+        var err error
+        total, err = total.Add(l.LineTotal())
+        if err != nil {
+            return Money{}, err
+        }
+    }
+    return total, nil
+}
+
+// Confirm — Business Rule: ต้องมีสินค้าก่อน confirm
+func (o *Order) Confirm() error {
+    if o.status != StatusPending {
+        return errors.New("only pending orders can be confirmed")
+    }
+    if len(o.lines) == 0 {
+        return errors.New("cannot confirm empty order")
+    }
+    total, err := o.Total()
+    if err != nil {
+        return err
+    }
+    o.status = StatusConfirmed
+    o.raise(OrderConfirmedEvent{
+        OrderID:    o.id,
+        Total:      total,
+        OccurredAt: time.Now(),
+    })
+    return nil
+}
+
+// Cancel — Business Rule: ไม่ cancel หลังส่งแล้ว
+func (o *Order) Cancel(reason string) error {
+    if o.status == StatusShipped {
+        return errors.New("shipped orders cannot be cancelled")
+    }
+    if o.status == StatusCancelled {
+        return errors.New("order already cancelled")
+    }
+    o.status = StatusCancelled
+    o.raise(OrderCancelledEvent{
+        OrderID:    o.id,
+        Reason:     reason,
+        OccurredAt: time.Now(),
+    })
+    return nil
+}
+
+// Domain Event management
+func (o *Order) raise(e DomainEvent) {
+    o.events = append(o.events, e)
+}
+
+// PopEvents — เอา events ออกเพื่อ publish (clear หลัง pop)
+func (o *Order) PopEvents() []DomainEvent {
+    evts := make([]DomainEvent, len(o.events))
+    copy(evts, o.events)
+    o.events = nil
+    return evts
+}</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>domain/events.go — Domain Events</span>
+      <span class="lang">Go</span>
+    </div>
+    <pre><code class="language-go">package domain
+
+import "time"
+
+// DomainEvent — interface สำหรับทุก event ใน Domain
+type DomainEvent interface {
+    EventName() string
+    OccurredAt() time.Time
+}
+
+// OrderCreatedEvent — เกิดเมื่อสร้าง Order ใหม่
+type OrderCreatedEvent struct {
+    OrderID    OrderID
+    CustomerID CustomerID
+    OccurredAt time.Time
+}
+
+func (e OrderCreatedEvent) EventName() string    { return "order.created" }
+func (e OrderCreatedEvent) OccurredAt() time.Time { return e.OccurredAt }
+
+// OrderConfirmedEvent — เกิดเมื่อ Confirm Order
+type OrderConfirmedEvent struct {
+    OrderID    OrderID
+    Total      Money
+    OccurredAt time.Time
+}
+
+func (e OrderConfirmedEvent) EventName() string    { return "order.confirmed" }
+func (e OrderConfirmedEvent) OccurredAt() time.Time { return e.OccurredAt }
+
+// OrderCancelledEvent — เกิดเมื่อยกเลิก Order
+type OrderCancelledEvent struct {
+    OrderID    OrderID
+    Reason     string
+    OccurredAt time.Time
+}
+
+func (e OrderCancelledEvent) EventName() string    { return "order.cancelled" }
+func (e OrderCancelledEvent) OccurredAt() time.Time { return e.OccurredAt }</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>domain/repository.go — Port (Interface)</span>
+      <span class="lang">Go</span>
+    </div>
+    <pre><code class="language-go">package domain
+
+import "context"
+
+// OrderRepository — Domain รู้แค่ interface ไม่รู้ว่า implement ด้วยอะไร
+// (PostgreSQL? MongoDB? in-memory? — Domain ไม่สน)
+type OrderRepository interface {
+    Save(ctx context.Context, order *Order) error
+    FindByID(ctx context.Context, id OrderID) (*Order, error)
+    FindByCustomer(ctx context.Context, customerID CustomerID) ([]*Order, error)
+    NextID(ctx context.Context) (OrderID, error)
+}
+
+// EventPublisher — publish domain events ออกไป
+type EventPublisher interface {
+    Publish(ctx context.Context, events []DomainEvent) error
+}</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>application/order_service.go — Application Service</span>
+      <span class="lang">Go</span>
+    </div>
+    <pre><code class="language-go">package application
+
+import (
+    "context"
+    "fmt"
+    "myapp/domain"
+)
+
+// PlaceOrderCommand — Input DTO สำหรับ Use Case นี้
+type PlaceOrderCommand struct {
+    CustomerID string
+    Items      []OrderItem
+}
+
+type OrderItem struct {
+    ProductID string
+    Name      string
+    UnitPrice int64 // satang
+    Quantity  int
+}
+
+// PlaceOrderResult — Output DTO
+type PlaceOrderResult struct {
+    OrderID string
+    Total   float64
+}
+
+// OrderApplicationService — orchestrates domain objects
+// ไม่มี business logic ที่นี่! — แค่ coordinate
+type OrderApplicationService struct {
+    orderRepo domain.OrderRepository
+    publisher domain.EventPublisher
+}
+
+func NewOrderApplicationService(
+    repo domain.OrderRepository,
+    pub domain.EventPublisher,
+) *OrderApplicationService {
+    return &OrderApplicationService{orderRepo: repo, publisher: pub}
+}
+
+func (s *OrderApplicationService) PlaceOrder(ctx context.Context, cmd PlaceOrderCommand) (*PlaceOrderResult, error) {
+    // 1. Generate new ID
+    orderID, err := s.orderRepo.NextID(ctx)
+    if err != nil {
+        return nil, fmt.Errorf("generate order id: %w", err)
+    }
+
+    // 2. สร้าง Aggregate
+    order := domain.NewOrder(orderID, domain.CustomerID(cmd.CustomerID))
+
+    // 3. ใส่สินค้า — business rules อยู่ใน AddLine
+    for _, item := range cmd.Items {
+        price, err := domain.NewMoney(item.UnitPrice, "THB")
+        if err != nil {
+            return nil, fmt.Errorf("invalid price for %s: %w", item.ProductID, err)
+        }
+        line, err := domain.NewOrderLine(
+            domain.ProductID(item.ProductID), item.Name, price, item.Quantity,
+        )
+        if err != nil {
+            return nil, fmt.Errorf("invalid line: %w", err)
+        }
+        if err := order.AddLine(line); err != nil {
+            return nil, fmt.Errorf("add line: %w", err)
+        }
+    }
+
+    // 4. Confirm — business rule ใน Aggregate
+    if err := order.Confirm(); err != nil {
+        return nil, fmt.Errorf("confirm order: %w", err)
+    }
+
+    // 5. Persist
+    if err := s.orderRepo.Save(ctx, order); err != nil {
+        return nil, fmt.Errorf("save order: %w", err)
+    }
+
+    // 6. Publish Domain Events
+    events := order.PopEvents()
+    if err := s.publisher.Publish(ctx, events); err != nil {
+        return nil, fmt.Errorf("publish events: %w", err)
+    }
+
+    total, _ := order.Total()
+    return &PlaceOrderResult{
+        OrderID: string(order.ID()),
+        Total:   total.Baht(),
+    }, nil
+}
+
+func (s *OrderApplicationService) CancelOrder(ctx context.Context, orderID, reason string) error {
+    order, err := s.orderRepo.FindByID(ctx, domain.OrderID(orderID))
+    if err != nil {
+        return fmt.Errorf("find order: %w", err)
+    }
+
+    // Business rule อยู่ใน Aggregate.Cancel()
+    if err := order.Cancel(reason); err != nil {
+        return fmt.Errorf("cancel order: %w", err)
+    }
+
+    if err := s.orderRepo.Save(ctx, order); err != nil {
+        return fmt.Errorf("save order: %w", err)
+    }
+
+    return s.publisher.Publish(ctx, order.PopEvents())
+}</code></pre>
+  </div>
+
+  <div class="callout success">
+    <strong>สังเกต:</strong> Application Service (<code>PlaceOrder</code>) ไม่มี if/else logic ที่เกี่ยวกับ business
+    — ทุก rule อยู่ใน Domain Objects (<code>order.Confirm()</code>, <code>order.Cancel()</code>)
+    Application Service แค่ <strong>orchestrate</strong> ขั้นตอน
+  </div>
+</div>
+
+<!-- ───────── LAYER SUMMARY ───────── -->
+<div class="section">
+  <div class="section-title">📦 DDD Layers</div>
+  <div class="section-sub">4 ชั้นของ DDD Application</div>
+
+  <div style="display:flex;flex-direction:column;gap:.8rem;max-width:500px">
+    <div class="layer-box" style="border-color:#6366f1">
+      <h4 style="color:#a5b4fc">🖥️ Presentation Layer</h4>
+      <p>HTTP Handlers, gRPC, CLI — รับ input จากผู้ใช้/client แปลงเป็น Commands แล้วส่งให้ Application Layer</p>
+    </div>
+    <div style="text-align:center;color:#334155;font-size:1.2rem">↕</div>
+    <div class="layer-box" style="border-color:#06b6d4">
+      <h4 style="color:#67e8f9">⚙️ Application Layer</h4>
+      <p>Application Services — Orchestrates use cases, ไม่มี business logic เอง แค่ coordinate</p>
+    </div>
+    <div style="text-align:center;color:#334155;font-size:1.2rem">↕</div>
+    <div class="layer-box" style="border-color:#10b981;background:rgba(16,185,129,.05)">
+      <h4 style="color:#6ee7b7">🏛️ Domain Layer ← หัวใจหลัก</h4>
+      <p>Entities, Value Objects, Aggregates, Domain Services, Domain Events — ไม่ depend ชั้นอื่นเลย</p>
+    </div>
+    <div style="text-align:center;color:#334155;font-size:1.2rem">↕</div>
+    <div class="layer-box" style="border-color:#f59e0b">
+      <h4 style="color:#fcd34d">🗄️ Infrastructure Layer</h4>
+      <p>Repositories (PostgreSQL, MongoDB), Email Service, Event Bus — implement interfaces ที่ Domain กำหนด</p>
+    </div>
+  </div>
+
+  <div class="callout" style="margin-top:2rem">
+    <strong>Dependency Rule:</strong> ทุก Layer depend inward — Presentation → Application → Domain ← Infrastructure
+    Domain ไม่ depend ชั้นใดเลย! ทำให้ test ได้ง่ายมาก
+  </div>
+</div>
+
+<!-- ───────── SUMMARY ───────── -->
+<div class="section">
+  <div class="section-title">✅ สรุป DDD</div>
+  <div class="concept-grid">
+    <div class="concept-card" style="--c:#10b981">
+      <div class="label">ข้อดี</div>
+      <h3>เมื่อไหร่ควรใช้</h3>
+      <p>• Business logic ซับซ้อน<br>• Team ต้องทำงานร่วมกับ Domain Expert<br>• System ต้องการ maintainability สูง<br>• Long-lived applications</p>
+    </div>
+    <div class="concept-card" style="--c:#ef4444">
+      <div class="label">ข้อเสีย</div>
+      <h3>เมื่อไหร่ไม่ควรใช้</h3>
+      <p>• CRUD applications ง่ายๆ<br>• Prototypes หรือ early-stage<br>• Team ไม่คุ้นเคยกับ Domain<br>• Business rules ไม่ซับซ้อน</p>
+    </div>
+  </div>
+</div>
+
+<div style="text-align:center;margin:3rem 0">
+  <a href="2-hexagonal.html" style="display:inline-flex;align-items:center;gap:.6rem;background:#0d1117;border:1px solid #1e293b;color:#818cf8;padding:.8rem 1.8rem;border-radius:10px;font-weight:600;font-size:.9rem;transition:all .2s">
+    หัวข้อถัดไป: Hexagonal Architecture →
+  </a>
+</div>
+
+</div><!-- /content -->
+
+<script>hljs.highlightAll()</script>
+</body>
+</html>

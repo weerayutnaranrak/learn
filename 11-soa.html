@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Service-Oriented Architecture (SOA)</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',sans-serif;background:#0f0f1a;color:#e2e8f0;line-height:1.7}
+.hero{background:linear-gradient(135deg,#1a0a2e 0%,#2d1b4e 50%,#1a0a2e 100%);padding:60px 40px;text-align:center;border-bottom:1px solid #e879f933;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,#e879f922 0%,transparent 70%)}
+.hero-badge{display:inline-block;background:#e879f920;border:1px solid #e879f960;color:#e879f9;padding:6px 18px;border-radius:20px;font-size:.8rem;letter-spacing:2px;text-transform:uppercase;margin-bottom:20px}
+.hero h1{font-size:3rem;font-weight:800;background:linear-gradient(135deg,#e879f9,#a855f7,#e879f9);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:16px}
+.hero p{font-size:1.15rem;color:#94a3b8;max-width:700px;margin:0 auto}
+nav{background:#1e1e2e;padding:16px 40px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #ffffff10;position:sticky;top:0;z-index:100}
+.nav-home{color:#e879f9;text-decoration:none;font-weight:600;font-size:.9rem}
+.nav-links{display:flex;gap:16px}
+.nav-links a{color:#94a3b8;text-decoration:none;font-size:.85rem;padding:6px 14px;border-radius:8px;border:1px solid #ffffff15;transition:all .2s}
+.nav-links a:hover{color:#e2e8f0;border-color:#e879f940}
+.container{max-width:1100px;margin:0 auto;padding:40px 20px}
+section{margin-bottom:56px}
+h2{font-size:1.7rem;font-weight:700;color:#e879f9;margin-bottom:8px;padding-bottom:8px;border-bottom:2px solid #e879f930}
+h3{font-size:1.2rem;font-weight:600;color:#c084fc;margin:28px 0 14px}
+p{color:#94a3b8;margin-bottom:14px}
+
+/* VB System */
+.vb-wrap{margin:24px 0}
+.vb-label{font-size:.75rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#e879f9;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.vb-label::after{content:'';flex:1;height:1px;background:#e879f920}
+.vb-grid{display:grid;gap:14px}
+.vb-2{grid-template-columns:repeat(2,1fr)}
+.vb-3{grid-template-columns:repeat(3,1fr)}
+.vb-4{grid-template-columns:repeat(4,1fr)}
+.vbox{background:#1e1e2e;border:1px solid #e879f930;border-radius:14px;padding:20px;transition:transform .2s,border-color .2s}
+.vbox:hover{transform:translateY(-3px);border-color:#e879f960}
+.vb-icon{font-size:1.8rem;margin-bottom:10px}
+.vb-title{font-size:.95rem;font-weight:700;color:#e2e8f0;margin-bottom:8px}
+.vb-body{font-size:.84rem;color:#94a3b8;line-height:1.6}
+.vb-list{list-style:none;margin-top:8px}
+.vb-list li{font-size:.82rem;color:#94a3b8;padding:3px 0;padding-left:14px;position:relative}
+.vb-list li::before{content:'›';position:absolute;left:0;color:#e879f9}
+.vb-chip{display:inline-block;background:#e879f915;border:1px solid #e879f940;color:#e879f9;padding:3px 10px;border-radius:12px;font-size:.75rem;margin:3px 2px}
+
+/* Role boxes */
+.role-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin:24px 0}
+.role-box{border-radius:16px;padding:24px;text-align:center;border:2px solid transparent}
+.role-box.provider{background:linear-gradient(135deg,#1a2a3a,#1e3a2a);border-color:#4ade8040}
+.role-box.consumer{background:linear-gradient(135deg,#1a1a3a,#2a1a3a);border-color:#818cf840}
+.role-box.registry{background:linear-gradient(135deg,#2a1a1a,#3a2a1a);border-color:#fb923c40}
+.role-box .role-icon{font-size:2.5rem;margin-bottom:12px}
+.role-box .role-name{font-size:1.1rem;font-weight:700;color:#e2e8f0;margin-bottom:8px}
+.role-box .role-desc{font-size:.84rem;color:#94a3b8;margin-bottom:12px}
+.role-box ul{list-style:none;text-align:left}
+.role-box ul li{font-size:.8rem;color:#94a3b8;padding:2px 0 2px 12px;position:relative}
+.role-box ul li::before{content:'✓';position:absolute;left:0;color:#e879f9}
+
+/* ESB Box */
+.esb-box{background:linear-gradient(135deg,#1e1230,#2d1b4e);border:2px solid #e879f950;border-radius:16px;padding:28px;margin:24px 0;text-align:center}
+.esb-title{font-size:1.3rem;font-weight:700;color:#e879f9;margin-bottom:8px}
+.esb-subtitle{font-size:.9rem;color:#94a3b8;margin-bottom:20px}
+.esb-features{display:flex;flex-wrap:wrap;justify-content:center;gap:10px}
+.esb-feature{background:#e879f915;border:1px solid #e879f940;color:#e2e8f0;padding:8px 16px;border-radius:10px;font-size:.84rem;display:flex;align-items:center;gap:6px}
+
+/* Comparison */
+.vs-grid{display:grid;grid-template-columns:1fr auto 1fr;gap:20px;align-items:start;margin:24px 0}
+.vs-col{background:#1e1e2e;border-radius:14px;padding:22px;border:1px solid #ffffff15}
+.vs-col.soa-col{border-color:#e879f940}
+.vs-col.micro-col{border-color:#60a5fa40}
+.vs-header{font-size:1rem;font-weight:700;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid #ffffff15}
+.vs-header.pink{color:#e879f9}
+.vs-header.blue{color:#60a5fa}
+.vs-divider{display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:800;color:#64748b;align-self:center}
+.vs-item{font-size:.83rem;color:#94a3b8;padding:6px 0;border-bottom:1px solid #ffffff08;display:flex;align-items:flex-start;gap:8px}
+.vs-item:last-child{border-bottom:none}
+.vs-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:6px}
+.vs-dot.pink{background:#e879f9}
+.vs-dot.blue{background:#60a5fa}
+
+/* SVG diagram */
+.diagram-wrap{background:#141425;border:1px solid #e879f930;border-radius:16px;padding:20px;margin:28px 0;overflow:hidden}
+.diagram-wrap svg{width:100%;height:auto}
+
+/* Code */
+.code-section{margin:24px 0}
+.code-file{background:#1a1a2e;border:1px solid #e879f930;border-radius:12px;margin-bottom:20px;overflow:hidden}
+.code-file-header{background:#e879f915;padding:10px 16px;font-size:.82rem;color:#e879f9;font-family:monospace;border-bottom:1px solid #e879f930;display:flex;align-items:center;gap:8px}
+.code-file-header::before{content:'📄'}
+.code-file pre{margin:0}
+.code-file code{font-size:.82rem!important;padding:20px!important}
+
+@media(max-width:768px){
+  .hero h1{font-size:2rem}
+  .vb-3,.vb-4{grid-template-columns:repeat(2,1fr)}
+  .role-grid{grid-template-columns:1fr}
+  .vs-grid{grid-template-columns:1fr}
+  .vs-divider{display:none}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-home">← กลับหน้าหลัก</a>
+  <div class="nav-links">
+    <a href="10-mvc.html">← MVC</a>
+    <a href="12-repository.html">Repository →</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">Architecture Pattern #11</div>
+  <h1>Service-Oriented Architecture</h1>
+  <p>ระบบที่ประกอบด้วย Services อิสระที่สื่อสารกันผ่าน Standard Protocol — รากฐานของ Enterprise Integration</p>
+</div>
+
+<div class="container">
+
+  <!-- Core Concept -->
+  <section>
+    <h2>SOA คืออะไร?</h2>
+    <p>SOA (Service-Oriented Architecture) คือ architectural style ที่ระบบซอฟต์แวร์ถูกออกแบบในรูปของ <strong>Services</strong> ที่มีขอบเขตชัดเจน สามารถค้นหาได้ผ่าน Registry และสื่อสารกันผ่าน Standard Protocol เช่น SOAP, REST หรือ Message Queue</p>
+
+    <div class="role-grid">
+      <div class="role-box provider">
+        <div class="role-icon">🏭</div>
+        <div class="role-name">Service Provider</div>
+        <div class="role-desc">ผู้ให้บริการ — publish service เข้า registry พร้อม contract</div>
+        <ul>
+          <li>Implement business logic</li>
+          <li>Expose เป็น endpoint</li>
+          <li>Publish WSDL/OpenAPI</li>
+          <li>Handle versioning</li>
+        </ul>
+      </div>
+      <div class="role-box consumer">
+        <div class="role-icon">💻</div>
+        <div class="role-name">Service Consumer</div>
+        <div class="role-desc">ผู้ใช้บริการ — ค้นหา service จาก registry แล้วเรียกใช้</div>
+        <ul>
+          <li>ค้นหาจาก Registry</li>
+          <li>Bind ตาม contract</li>
+          <li>Handle errors/timeouts</li>
+          <li>Manage retries</li>
+        </ul>
+      </div>
+      <div class="role-box registry">
+        <div class="role-icon">📋</div>
+        <div class="role-name">Service Registry</div>
+        <div class="role-desc">ตัวกลาง — เก็บรายการ services ที่ available พร้อม metadata</div>
+        <ul>
+          <li>UDDI (Universal Description)</li>
+          <li>Discovery & Integration</li>
+          <li>Health checking</li>
+          <li>Metadata management</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ESB -->
+  <section>
+    <h2>Enterprise Service Bus (ESB)</h2>
+    <p>ESB เป็นหัวใจของ SOA — ทำหน้าที่เป็น middleware ที่เชื่อม services เข้าหากัน โดยจัดการ routing, transformation, orchestration, และ protocol mediation</p>
+
+    <div class="esb-box">
+      <div class="esb-title">🚌 Enterprise Service Bus</div>
+      <div class="esb-subtitle">Middleware backbone ที่เชื่อม services ทั้งหมดเข้าหากัน</div>
+      <div class="esb-features">
+        <div class="esb-feature">🔀 Message Routing</div>
+        <div class="esb-feature">🔄 Data Transformation</div>
+        <div class="esb-feature">🎭 Protocol Mediation</div>
+        <div class="esb-feature">🔒 Security & Auth</div>
+        <div class="esb-feature">📊 Monitoring</div>
+        <div class="esb-feature">📝 Audit Logging</div>
+        <div class="esb-feature">⚡ Load Balancing</div>
+        <div class="esb-feature">🔁 Service Orchestration</div>
+      </div>
+    </div>
+
+    <div class="vb-wrap">
+      <div class="vb-label">Service Contract Components</div>
+      <div class="vb-grid vb-4">
+        <div class="vbox">
+          <div class="vb-icon">📄</div>
+          <div class="vb-title">WSDL / OpenAPI</div>
+          <div class="vb-body">คำอธิบาย service interface — operations, parameters, data types, endpoints</div>
+        </div>
+        <div class="vbox">
+          <div class="vb-icon">📦</div>
+          <div class="vb-title">Service Schema</div>
+          <div class="vb-body">กำหนด structure ของ request/response — XML Schema, JSON Schema</div>
+        </div>
+        <div class="vbox">
+          <div class="vb-icon">📜</div>
+          <div class="vb-title">SLA Policy</div>
+          <div class="vb-body">ข้อตกลง quality of service — availability 99.9%, latency &lt; 200ms, throughput</div>
+        </div>
+        <div class="vbox">
+          <div class="vb-icon">🔐</div>
+          <div class="vb-title">Security Policy</div>
+          <div class="vb-body">WS-Security, OAuth, mutual TLS, certificate-based authentication</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Architecture Diagram -->
+  <section>
+    <h2>SOA Architecture Diagram</h2>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 900 520" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#e879f9"/>
+          </marker>
+          <marker id="arrow-blue" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#60a5fa"/>
+          </marker>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="3" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <style>
+            .soa-label{font-family:sans-serif;font-size:11px;fill:#94a3b8}
+            .soa-title{font-family:sans-serif;font-size:12px;font-weight:bold;fill:#e2e8f0}
+            .soa-small{font-family:sans-serif;font-size:10px;fill:#64748b}
+          </style>
+        </defs>
+        <rect width="900" height="520" fill="#0d0d1a" rx="12"/>
+
+        <!-- Consumers (left) -->
+        <g transform="translate(20,80)">
+          <rect width="130" height="60" rx="10" fill="#1e2a3a" stroke="#60a5fa50"/>
+          <text x="65" y="25" text-anchor="middle" class="soa-title">🌐 Web App</text>
+          <text x="65" y="42" text-anchor="middle" class="soa-label">Service Consumer</text>
+        </g>
+        <g transform="translate(20,180)">
+          <rect width="130" height="60" rx="10" fill="#1e2a3a" stroke="#60a5fa50"/>
+          <text x="65" y="25" text-anchor="middle" class="soa-title">📱 Mobile App</text>
+          <text x="65" y="42" text-anchor="middle" class="soa-label">Service Consumer</text>
+        </g>
+        <g transform="translate(20,280)">
+          <rect width="130" height="60" rx="10" fill="#1e2a3a" stroke="#60a5fa50"/>
+          <text x="65" y="25" text-anchor="middle" class="soa-title">🏢 Partner</text>
+          <text x="65" y="42" text-anchor="middle" class="soa-label">Service Consumer</text>
+        </g>
+        <g transform="translate(20,380)">
+          <rect width="130" height="60" rx="10" fill="#1e2a3a" stroke="#60a5fa50"/>
+          <text x="65" y="25" text-anchor="middle" class="soa-title">📊 BI System</text>
+          <text x="65" y="42" text-anchor="middle" class="soa-label">Service Consumer</text>
+        </g>
+
+        <!-- ESB Center -->
+        <rect x="230" y="60" width="440" height="400" rx="16" fill="#1a0d2e" stroke="#e879f950" stroke-width="2"/>
+        <text x="450" y="92" text-anchor="middle" font-family="sans-serif" font-size="16" font-weight="bold" fill="#e879f9">🚌 Enterprise Service Bus (ESB)</text>
+        <text x="450" y="110" text-anchor="middle" class="soa-label">Message Backbone</text>
+
+        <!-- ESB inner modules -->
+        <rect x="250" y="125" width="120" height="45" rx="8" fill="#e879f918" stroke="#e879f940"/>
+        <text x="310" y="147" text-anchor="middle" class="soa-title">🔀 Router</text>
+        <text x="310" y="162" text-anchor="middle" class="soa-small">Content-based routing</text>
+
+        <rect x="390" y="125" width="120" height="45" rx="8" fill="#e879f918" stroke="#e879f940"/>
+        <text x="450" y="147" text-anchor="middle" class="soa-title">🔄 Transform</text>
+        <text x="450" y="162" text-anchor="middle" class="soa-small">XML↔JSON mediation</text>
+
+        <rect x="530" y="125" width="120" height="45" rx="8" fill="#e879f918" stroke="#e879f940"/>
+        <text x="590" y="147" text-anchor="middle" class="soa-title">🔒 Security</text>
+        <text x="590" y="162" text-anchor="middle" class="soa-small">Auth & policy</text>
+
+        <!-- Service Registry -->
+        <rect x="340" y="190" width="220" height="70" rx="10" fill="#2d1a0a" stroke="#fb923c50"/>
+        <text x="450" y="218" text-anchor="middle" class="soa-title">📋 Service Registry</text>
+        <text x="450" y="234" text-anchor="middle" class="soa-label">UDDI / Service Discovery</text>
+        <text x="450" y="250" text-anchor="middle" class="soa-small">Publish · Find · Bind</text>
+
+        <!-- Orchestration -->
+        <rect x="250" y="278" width="180" height="55" rx="8" fill="#e879f912" stroke="#e879f930"/>
+        <text x="340" y="302" text-anchor="middle" class="soa-title">🎭 Orchestration</text>
+        <text x="340" y="317" text-anchor="middle" class="soa-small">BPEL / Workflow engine</text>
+
+        <!-- Monitoring -->
+        <rect x="450" y="278" width="180" height="55" rx="8" fill="#e879f912" stroke="#e879f930"/>
+        <text x="540" y="302" text-anchor="middle" class="soa-title">📊 BAM / Monitoring</text>
+        <text x="540" y="317" text-anchor="middle" class="soa-small">Business Activity Monitoring</text>
+
+        <!-- Message Queue -->
+        <rect x="250" y="350" width="380" height="45" rx="8" fill="#1a1a2e" stroke="#a78bfa40"/>
+        <text x="440" y="368" text-anchor="middle" class="soa-title">📨 Message Queue (MQ)</text>
+        <text x="440" y="383" text-anchor="middle" class="soa-small">Async reliable delivery · JMS · AMQP</text>
+
+        <!-- Providers (right) -->
+        <g transform="translate(750,80)">
+          <rect width="130" height="60" rx="10" fill="#1e2a1a" stroke="#4ade8050"/>
+          <text x="65" y="22" text-anchor="middle" class="soa-title">💳 Payment</text>
+          <text x="65" y="38" text-anchor="middle" class="soa-label">Service Provider</text>
+          <text x="65" y="52" text-anchor="middle" class="soa-small">SOAP/REST</text>
+        </g>
+        <g transform="translate(750,180)">
+          <rect width="130" height="60" rx="10" fill="#1e2a1a" stroke="#4ade8050"/>
+          <text x="65" y="22" text-anchor="middle" class="soa-title">👤 Customer</text>
+          <text x="65" y="38" text-anchor="middle" class="soa-label">Service Provider</text>
+          <text x="65" y="52" text-anchor="middle" class="soa-small">SOAP/REST</text>
+        </g>
+        <g transform="translate(750,280)">
+          <rect width="130" height="60" rx="10" fill="#1e2a1a" stroke="#4ade8050"/>
+          <text x="65" y="22" text-anchor="middle" class="soa-title">📦 Inventory</text>
+          <text x="65" y="38" text-anchor="middle" class="soa-label">Service Provider</text>
+          <text x="65" y="52" text-anchor="middle" class="soa-small">SOAP/REST</text>
+        </g>
+        <g transform="translate(750,380)">
+          <rect width="130" height="60" rx="10" fill="#1e2a1a" stroke="#4ade8050"/>
+          <text x="65" y="22" text-anchor="middle" class="soa-title">📧 Notification</text>
+          <text x="65" y="38" text-anchor="middle" class="soa-label">Service Provider</text>
+          <text x="65" y="52" text-anchor="middle" class="soa-small">SOAP/REST</text>
+        </g>
+
+        <!-- Consumer → ESB arrows -->
+        <line x1="150" y1="110" x2="230" y2="260" stroke="#60a5fa60" stroke-width="1.5" marker-end="url(#arrow-blue)" stroke-dasharray="4,3"/>
+        <line x1="150" y1="210" x2="230" y2="270" stroke="#60a5fa60" stroke-width="1.5" marker-end="url(#arrow-blue)" stroke-dasharray="4,3"/>
+        <line x1="150" y1="310" x2="230" y2="280" stroke="#60a5fa60" stroke-width="1.5" marker-end="url(#arrow-blue)" stroke-dasharray="4,3"/>
+        <line x1="150" y1="410" x2="230" y2="290" stroke="#60a5fa60" stroke-width="1.5" marker-end="url(#arrow-blue)" stroke-dasharray="4,3"/>
+
+        <!-- ESB → Provider arrows -->
+        <line x1="670" y1="260" x2="750" y2="110" stroke="#4ade8060" stroke-width="1.5" marker-end="url(#arrow)" stroke-dasharray="4,3"/>
+        <line x1="670" y1="270" x2="750" y2="210" stroke="#4ade8060" stroke-width="1.5" marker-end="url(#arrow)" stroke-dasharray="4,3"/>
+        <line x1="670" y1="280" x2="750" y2="310" stroke="#4ade8060" stroke-width="1.5" marker-end="url(#arrow)" stroke-dasharray="4,3"/>
+        <line x1="670" y1="290" x2="750" y2="410" stroke="#4ade8060" stroke-width="1.5" marker-end="url(#arrow)" stroke-dasharray="4,3"/>
+
+        <!-- Animated message -->
+        <circle r="5" fill="#e879f9" filter="url(#glow)">
+          <animateMotion dur="3s" repeatCount="indefinite">
+            <mpath href="#msgpath"/>
+          </animateMotion>
+        </circle>
+        <path id="msgpath" d="M 85 110 L 450 225" fill="none"/>
+
+        <!-- Legend -->
+        <line x1="30" y1="490" x2="60" y2="490" stroke="#60a5fa" stroke-width="2" stroke-dasharray="4,3"/>
+        <text x="68" y="494" class="soa-small" fill="#60a5fa">Consumer → ESB</text>
+        <line x1="180" y1="490" x2="210" y2="490" stroke="#4ade80" stroke-width="2" stroke-dasharray="4,3"/>
+        <text x="218" y="494" class="soa-small" fill="#4ade80">ESB → Provider</text>
+        <circle cx="340" cy="490" r="5" fill="#e879f9"/>
+        <text x="350" y="494" class="soa-small" fill="#e879f9">Message in transit</text>
+      </svg>
+    </div>
+  </section>
+
+  <!-- Patterns -->
+  <section>
+    <h2>SOA Design Patterns</h2>
+
+    <div class="vb-wrap">
+      <div class="vb-label">Interaction Patterns</div>
+      <div class="vb-grid vb-3">
+        <div class="vbox">
+          <div class="vb-icon">🔄</div>
+          <div class="vb-title">Orchestration</div>
+          <div class="vb-body">Central coordinator (ESB/BPM) ควบคุม flow ระหว่าง services ทั้งหมด</div>
+          <ul class="vb-list">
+            <li>Centralized control</li>
+            <li>BPEL workflows</li>
+            <li>Clear process visibility</li>
+            <li>Single point of failure risk</li>
+          </ul>
+        </div>
+        <div class="vbox">
+          <div class="vb-icon">🎵</div>
+          <div class="vb-title">Choreography</div>
+          <div class="vb-body">Services ตัดสินใจเองว่าจะ react กับ events อย่างไร ไม่มี central controller</div>
+          <ul class="vb-list">
+            <li>Decentralized</li>
+            <li>Event-driven</li>
+            <li>More resilient</li>
+            <li>Harder to debug</li>
+          </ul>
+        </div>
+        <div class="vbox">
+          <div class="vb-icon">🔌</div>
+          <div class="vb-title">Service Facade</div>
+          <div class="vb-body">Expose simplified interface สำหรับ client ซ่อนความซับซ้อนภายใน</div>
+          <ul class="vb-list">
+            <li>Coarse-grained API</li>
+            <li>Hides internal complexity</li>
+            <li>Protocol abstraction</li>
+            <li>Easier client integration</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="vb-wrap">
+      <div class="vb-label">Service Granularity</div>
+      <div class="vb-grid vb-3">
+        <div class="vbox">
+          <div class="vb-icon">🧩</div>
+          <div class="vb-title">Atomic Service</div>
+          <div class="vb-body">Service ขนาดเล็ก ทำสิ่งเดียว เช่น getCustomer(), validatePayment()</div>
+          <span class="vb-chip">Fine-grained</span>
+          <span class="vb-chip">Reusable</span>
+        </div>
+        <div class="vbox">
+          <div class="vb-icon">📦</div>
+          <div class="vb-title">Composite Service</div>
+          <div class="vb-body">รวม Atomic services หลายตัวเป็น higher-level operation เช่น placeOrder()</div>
+          <span class="vb-chip">Orchestrated</span>
+          <span class="vb-chip">Business Process</span>
+        </div>
+        <div class="vbox">
+          <div class="vb-icon">🏢</div>
+          <div class="vb-title">Process Service</div>
+          <div class="vb-body">Long-running business process ที่ span หลาย services มี state management</div>
+          <span class="vb-chip">Stateful</span>
+          <span class="vb-chip">Long-lived</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOA vs Microservices -->
+  <section>
+    <h2>SOA vs Microservices</h2>
+    <div class="vs-grid">
+      <div class="vs-col soa-col">
+        <div class="vs-header pink">🏛️ SOA</div>
+        <div class="vs-item"><span class="vs-dot pink"></span>Enterprise-wide integration</div>
+        <div class="vs-item"><span class="vs-dot pink"></span>ESB เป็น central backbone</div>
+        <div class="vs-item"><span class="vs-dot pink"></span>SOAP, XML, WSDL</div>
+        <div class="vs-item"><span class="vs-dot pink"></span>Coarse-grained services</div>
+        <div class="vs-item"><span class="vs-dot pink"></span>Share database ได้</div>
+        <div class="vs-item"><span class="vs-dot pink"></span>Deploy พร้อมกัน</div>
+        <div class="vs-item"><span class="vs-dot pink"></span>เหมาะกับ Legacy integration</div>
+      </div>
+      <div class="vs-divider">VS</div>
+      <div class="vs-col micro-col">
+        <div class="vs-header blue">🔬 Microservices</div>
+        <div class="vs-item"><span class="vs-dot blue"></span>Application-level decomposition</div>
+        <div class="vs-item"><span class="vs-dot blue"></span>API Gateway เป็น entry point</div>
+        <div class="vs-item"><span class="vs-dot blue"></span>REST, gRPC, Message Queue</div>
+        <div class="vs-item"><span class="vs-dot blue"></span>Fine-grained services</div>
+        <div class="vs-item"><span class="vs-dot blue"></span>Database per service</div>
+        <div class="vs-item"><span class="vs-dot blue"></span>Deploy อิสระ</div>
+        <div class="vs-item"><span class="vs-dot blue"></span>เหมาะกับ Cloud-native</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Go Code -->
+  <section>
+    <h2>ตัวอย่าง Code (Go)</h2>
+
+    <div class="code-section">
+      <div class="code-file">
+        <div class="code-file-header">registry/registry.go — Service Registry</div>
+        <pre><code class="language-go">package registry
+
+import (
+	"fmt"
+	"sync"
+	"time"
+)
+
+type ServiceEndpoint struct {
+	Name     string
+	Version  string
+	URL      string
+	Protocol string // "soap", "rest", "grpc"
+	WSDL     string
+	Healthy  bool
+	RegisteredAt time.Time
+}
+
+type ServiceRegistry struct {
+	mu       sync.RWMutex
+	services map[string]*ServiceEndpoint
+}
+
+func NewRegistry() *ServiceRegistry {
+	return &ServiceRegistry{
+		services: make(map[string]*ServiceEndpoint),
+	}
+}
+
+// Publish — Service Provider registers itself
+func (r *ServiceRegistry) Publish(svc *ServiceEndpoint) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	key := fmt.Sprintf("%s@%s", svc.Name, svc.Version)
+	svc.RegisteredAt = time.Now()
+	svc.Healthy = true
+	r.services[key] = svc
+	return nil
+}
+
+// Find — Service Consumer discovers a service
+func (r *ServiceRegistry) Find(name, version string) (*ServiceEndpoint, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	key := fmt.Sprintf("%s@%s", name, version)
+	svc, ok := r.services[key]
+	if !ok || !svc.Healthy {
+		return nil, fmt.Errorf("service %s v%s not available", name, version)
+	}
+	return svc, nil
+}</code></pre>
+      </div>
+
+      <div class="code-file">
+        <div class="code-file-header">services/payment_service.go — Service Provider</div>
+        <pre><code class="language-go">package services
+
+import (
+	"context"
+	"fmt"
+	"time"
+)
+
+type PaymentRequest struct {
+	OrderID  string
+	Amount   float64
+	Currency string
+	Method   string
+}
+
+type PaymentResponse struct {
+	TransactionID string
+	Status        string
+	ProcessedAt   time.Time
+}
+
+// PaymentService implements a SOA service contract
+type PaymentService struct {
+	gatewayURL string
+}
+
+func NewPaymentService(gatewayURL string) *PaymentService {
+	return &PaymentService{gatewayURL: gatewayURL}
+}
+
+func (s *PaymentService) ProcessPayment(ctx context.Context, req PaymentRequest) (*PaymentResponse, error) {
+	if req.Amount <= 0 {
+		return nil, fmt.Errorf("invalid amount: %v", req.Amount)
+	}
+
+	// Business logic here
+	txID := fmt.Sprintf("TXN-%s-%d", req.OrderID, time.Now().UnixNano())
+
+	return &PaymentResponse{
+		TransactionID: txID,
+		Status:        "SUCCESS",
+		ProcessedAt:   time.Now(),
+	}, nil
+}
+
+// RegisterToESB — Provider publishes itself to registry
+func (s *PaymentService) RegisterToESB(reg interface{ Publish(svc interface{}) }) {
+	// Register service metadata/contract
+}</code></pre>
+      </div>
+
+      <div class="code-file">
+        <div class="code-file-header">esb/esb.go — Enterprise Service Bus (simplified)</div>
+        <pre><code class="language-go">package esb
+
+import (
+	"context"
+	"fmt"
+	"log"
+	"time"
+)
+
+type Message struct {
+	ID          string
+	ServiceName string
+	Version     string
+	Operation   string
+	Payload     []byte
+	Headers     map[string]string
+	Timestamp   time.Time
+}
+
+type Handler func(ctx context.Context, msg Message) ([]byte, error)
+
+type ESB struct {
+	routes      map[string]Handler
+	middlewares []func(Handler) Handler
+}
+
+func NewESB() *ESB {
+	return &ESB{
+		routes: make(map[string]Handler),
+	}
+}
+
+// RegisterService wires a service into the ESB
+func (e *ESB) RegisterService(name, operation string, handler Handler) {
+	key := fmt.Sprintf("%s.%s", name, operation)
+	// Apply middleware chain
+	h := handler
+	for i := len(e.middlewares) - 1; i >= 0; i-- {
+		h = e.middlewares[i](h)
+	}
+	e.routes[key] = h
+}
+
+// Use adds ESB middleware (logging, auth, transform)
+func (e *ESB) Use(mw func(Handler) Handler) {
+	e.middlewares = append(e.middlewares, mw)
+}
+
+// Route dispatches a message to the correct service
+func (e *ESB) Route(ctx context.Context, msg Message) ([]byte, error) {
+	key := fmt.Sprintf("%s.%s", msg.ServiceName, msg.Operation)
+	handler, ok := e.routes[key]
+	if !ok {
+		return nil, fmt.Errorf("no handler for %s", key)
+	}
+	return handler(ctx, msg)
+}
+
+// LoggingMiddleware — ESB cross-cutting concern
+func LoggingMiddleware(next Handler) Handler {
+	return func(ctx context.Context, msg Message) ([]byte, error) {
+		log.Printf("[ESB] routing %s.%s id=%s", msg.ServiceName, msg.Operation, msg.ID)
+		start := time.Now()
+		resp, err := next(ctx, msg)
+		log.Printf("[ESB] completed in %v err=%v", time.Since(start), err)
+		return resp, err
+	}
+}</code></pre>
+      </div>
+
+      <div class="code-file">
+        <div class="code-file-header">cmd/main.go — Wiring it all together</div>
+        <pre><code class="language-go">package main
+
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"log"
+
+	"myapp/esb"
+	"myapp/registry"
+	"myapp/services"
+)
+
+func main() {
+	// 1. Setup Service Registry
+	reg := registry.NewRegistry()
+
+	// 2. Setup ESB with middleware
+	bus := esb.NewESB()
+	bus.Use(esb.LoggingMiddleware)
+
+	// 3. Register Payment Service (Provider publishes itself)
+	paymentSvc := services.NewPaymentService("https://payment-gateway.internal")
+	reg.Publish(&registry.ServiceEndpoint{
+		Name:     "PaymentService",
+		Version:  "1.0",
+		URL:      "http://localhost:8081",
+		Protocol: "rest",
+	})
+
+	// 4. Wire service operations to ESB
+	bus.RegisterService("PaymentService", "processPayment", func(ctx context.Context, msg esb.Message) ([]byte, error) {
+		var req services.PaymentRequest
+		if err := json.Unmarshal(msg.Payload, &req); err != nil {
+			return nil, err
+		}
+		resp, err := paymentSvc.ProcessPayment(ctx, req)
+		if err != nil {
+			return nil, err
+		}
+		return json.Marshal(resp)
+	})
+
+	// 5. Consumer discovers and calls service via ESB
+	endpoint, err := reg.Find("PaymentService", "1.0")
+	if err != nil {
+		log.Fatal("service not found:", err)
+	}
+	fmt.Printf("Found service at: %s\n", endpoint.URL)
+
+	payload, _ := json.Marshal(services.PaymentRequest{
+		OrderID: "ORD-001", Amount: 299.99, Currency: "THB", Method: "credit_card",
+	})
+
+	result, err := bus.Route(context.Background(), esb.Message{
+		ID:          "MSG-001",
+		ServiceName: "PaymentService",
+		Operation:   "processPayment",
+		Payload:     payload,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf("Payment result: %s\n", result)
+}</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- When to use -->
+  <section>
+    <h2>เมื่อไหร่ควรใช้ SOA?</h2>
+    <div class="vb-wrap">
+      <div class="vb-grid vb-2">
+        <div class="vbox">
+          <div class="vb-icon">✅</div>
+          <div class="vb-title">เหมาะกับ</div>
+          <ul class="vb-list">
+            <li>Large enterprise ที่มี legacy systems หลายระบบ</li>
+            <li>ต้องการ integrate ระบบที่ใช้ต่าง protocol (SOAP, REST, MQ)</li>
+            <li>Business processes ซับซ้อน ต้อง orchestrate หลาย services</li>
+            <li>ต้องการ governance และ SLA ที่ชัดเจน</li>
+            <li>Enterprise-wide service reuse</li>
+          </ul>
+        </div>
+        <div class="vbox">
+          <div class="vb-icon">⚠️</div>
+          <div class="vb-title">ระวัง</div>
+          <ul class="vb-list">
+            <li>ESB กลายเป็น single point of failure</li>
+            <li>"ESB spaghetti" — logic รั่วเข้า ESB มากเกินไป</li>
+            <li>ค่าใช้จ่าย ESB software สูง (Oracle, MuleSoft, IBM)</li>
+            <li>Performance overhead จาก transformation</li>
+            <li>Complexity สูงสำหรับ small team</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>hljs.highlightAll();</script>
+</body>
+</html>

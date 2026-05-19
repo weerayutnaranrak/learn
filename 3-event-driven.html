@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Event Driven Design — สื่อการสอน</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#07090f;color:#e2e8f0;line-height:1.7}
+a{color:#34d399;text-decoration:none}
+
+.topnav{display:flex;align-items:center;gap:1rem;padding:1rem 2rem;background:#0d1117;border-bottom:1px solid #1e293b;position:sticky;top:0;z-index:100}
+.back-btn{color:#64748b;font-size:.85rem;transition:color .2s}
+.back-btn:hover{color:#e2e8f0;text-decoration:none}
+.nav-title{color:#475569;font-size:.85rem}
+.nav-title span{color:#6ee7b7;font-weight:600}
+
+.hero{padding:4rem 2rem 3rem;text-align:center;background:linear-gradient(160deg,#07090f,#041209)}
+.hero-badge{display:inline-block;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);color:#6ee7b7;padding:.35rem 1rem;border-radius:999px;font-size:.8rem;font-weight:600;margin-bottom:1.5rem}
+.hero h1{font-size:clamp(1.8rem,4vw,3rem);font-weight:800;background:linear-gradient(135deg,#10b981,#059669);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:1rem}
+.hero p{color:#64748b;max-width:640px;margin:0 auto;font-size:1rem}
+
+.content{max-width:900px;margin:0 auto;padding:2rem 1.5rem 5rem}
+.section{margin-bottom:4rem}
+.section-title{font-size:1.6rem;font-weight:700;color:#10b981;margin-bottom:.4rem;display:flex;align-items:center;gap:.6rem}
+.section-sub{color:#475569;font-size:.9rem;margin-bottom:2rem;padding-left:2rem}
+
+.callout{background:#0f172a;border-left:3px solid #10b981;border-radius:0 8px 8px 0;padding:1rem 1.2rem;margin:1.5rem 0;font-size:.88rem;color:#94a3b8}
+.callout strong{color:#6ee7b7}
+.callout.blue{border-color:#38bdf8}.callout.blue strong{color:#7dd3fc}
+.callout.warn{border-color:#f59e0b}.callout.warn strong{color:#fcd34d}
+
+.code-block{margin:1.5rem 0;border-radius:12px;overflow:hidden;border:1px solid #1e293b}
+.code-header{background:#111827;padding:.7rem 1rem;display:flex;justify-content:space-between;align-items:center}
+.code-header span{font-size:.78rem;color:#64748b;font-weight:600}
+.code-header .lang{background:rgba(16,185,129,.12);color:#34d399;padding:.15rem .6rem;border-radius:4px;font-size:.72rem;font-weight:700}
+.code-block pre{margin:0!important;border-radius:0!important;border:none!important;font-size:.83rem!important;line-height:1.6!important}
+
+.diagram{background:#0d1117;border:1px solid #1e293b;border-radius:16px;padding:2rem;margin:2rem 0;text-align:center;overflow:hidden}
+.diagram-title{font-size:.8rem;color:#475569;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:1.5rem}
+
+.concept-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;margin:1.5rem 0}
+.concept-card{background:#0d1117;border:1px solid #1e293b;border-radius:12px;padding:1.4rem;border-left:3px solid var(--c,#10b981)}
+.concept-card h3{font-size:.95rem;font-weight:700;color:#f1f5f9;margin-bottom:.4rem}
+.concept-card p{font-size:.83rem;color:#64748b;line-height:1.6}
+.concept-card .label{font-size:.7rem;color:var(--c,#10b981);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.4rem}
+
+.compare{width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:.88rem}
+.compare th{background:#111827;color:#94a3b8;padding:.8rem 1rem;text-align:left;border-bottom:2px solid #1e293b}
+.compare td{padding:.7rem 1rem;border-bottom:1px solid #111827;color:#cbd5e1;vertical-align:top}
+
+/* Event flow animation */
+@keyframes eventFlow{
+  0%{opacity:0;transform:translateX(-30px)}
+  20%{opacity:1;transform:translateX(0)}
+  80%{opacity:1;transform:translateX(0)}
+  100%{opacity:0;transform:translateX(30px)}
+}
+@keyframes appear{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:scale(1)}}
+@keyframes dash{to{stroke-dashoffset:-20}}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="index.html" class="back-btn">← กลับหน้าหลัก</a>
+  <span class="nav-title">03 / <span>Event Driven Design</span></span>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">⚡ หัวข้อที่ 3</div>
+  <h1>Event Driven Design</h1>
+  <p>ออกแบบระบบที่สื่อสารกันผ่าน Events — ลด Coupling ระหว่าง Services ทำให้ Scale ได้ง่าย และทนต่อ Failure</p>
+</div>
+
+<div class="content">
+
+<!-- ── CONCEPT ── -->
+<div class="section">
+  <div class="section-title">💡 Event Driven คืออะไร?</div>
+  <div class="section-sub">Pattern ที่ Components สื่อสารกันผ่าน Events แทนการ call กันโดยตรง</div>
+
+  <p style="color:#94a3b8;margin-bottom:1.5rem">
+    แทนที่ Service A จะ <strong>call</strong> Service B โดยตรง (Tight Coupling) —
+    Service A จะ <strong>publish event</strong> ว่า "มีอะไรเกิดขึ้น"
+    แล้ว Service B, C, D จะ <strong>subscribe</strong> event นั้นเอง
+  </p>
+
+  <!-- Event Flow Diagram -->
+  <div class="diagram">
+    <div class="diagram-title">Event Flow — Order Placed</div>
+    <svg viewBox="0 0 680 280" fill="none" xmlns="http://www.w3.org/2000/svg" style="max-width:680px;width:100%">
+      <!-- Publisher -->
+      <rect x="20" y="100" width="130" height="60" rx="10" fill="#0a1a0e" stroke="#10b981" stroke-width="1.5"/>
+      <text x="85" y="127" text-anchor="middle" fill="#6ee7b7" font-size="10" font-weight="700">Order Service</text>
+      <text x="85" y="143" text-anchor="middle" fill="#34d399" font-size="8">(Publisher)</text>
+
+      <!-- Event Bus -->
+      <rect x="240" y="85" width="140" height="90" rx="10" fill="#111827" stroke="#334155" stroke-width="1.5"/>
+      <text x="310" y="112" text-anchor="middle" fill="#64748b" font-size="10" font-weight="700">⚡ Event Bus</text>
+      <rect x="255" y="118" width="110" height="16" rx="3" fill="#0d1117"/>
+      <text x="310" y="130" text-anchor="middle" fill="#475569" font-size="8">order.placed</text>
+      <rect x="255" y="138" width="110" height="16" rx="3" fill="#0d1117"/>
+      <text x="310" y="150" text-anchor="middle" fill="#475569" font-size="8">order.confirmed</text>
+      <rect x="255" y="158" width="110" height="16" rx="3" fill="#0d1117"/>
+
+      <!-- Subscribers -->
+      <rect x="490" y="30" width="140" height="50" rx="10" fill="#0a0e1a" stroke="#6366f1" stroke-width="1.5"/>
+      <text x="560" y="52" text-anchor="middle" fill="#a5b4fc" font-size="10" font-weight="700">Notification Svc</text>
+      <text x="560" y="66" text-anchor="middle" fill="#818cf8" font-size="8">Send email / SMS</text>
+
+      <rect x="490" y="100" width="140" height="50" rx="10" fill="#0a1510" stroke="#10b981" stroke-width="1.5"/>
+      <text x="560" y="122" text-anchor="middle" fill="#6ee7b7" font-size="10" font-weight="700">Inventory Svc</text>
+      <text x="560" y="136" text-anchor="middle" fill="#34d399" font-size="8">Reserve stock</text>
+
+      <rect x="490" y="170" width="140" height="50" rx="10" fill="#1a1000" stroke="#f59e0b" stroke-width="1.5"/>
+      <text x="560" y="192" text-anchor="middle" fill="#fcd34d" font-size="10" font-weight="700">Analytics Svc</text>
+      <text x="560" y="206" text-anchor="middle" fill="#fbbf24" font-size="8">Track metrics</text>
+
+      <!-- Arrow: Publisher → Bus -->
+      <g>
+        <line x1="150" y1="130" x2="238" y2="130" stroke="#10b981" stroke-width="2" stroke-dasharray="6,3">
+          <animate attributeName="stroke-dashoffset" from="0" to="-18" dur=".8s" repeatCount="indefinite"/>
+        </line>
+        <polygon points="234,125 244,130 234,135" fill="#10b981"/>
+        <text x="193" y="123" text-anchor="middle" fill="#10b981" font-size="8" font-weight="600">order.placed</text>
+      </g>
+
+      <!-- Arrow: Bus → Notification -->
+      <line x1="380" y1="115" x2="488" y2="55" stroke="#6366f1" stroke-width="1.5" stroke-dasharray="5,3">
+        <animate attributeName="stroke-dashoffset" from="0" to="-16" dur=".8s" begin=".3s" repeatCount="indefinite"/>
+      </line>
+      <polygon points="484,52 494,55 484,60" fill="#6366f1" transform="rotate(-30,490,57)"/>
+
+      <!-- Arrow: Bus → Inventory -->
+      <line x1="380" y1="130" x2="488" y2="125" stroke="#10b981" stroke-width="1.5" stroke-dasharray="5,3">
+        <animate attributeName="stroke-dashoffset" from="0" to="-16" dur=".8s" begin=".5s" repeatCount="indefinite"/>
+      </line>
+      <polygon points="484,120 494,125 484,130" fill="#10b981"/>
+
+      <!-- Arrow: Bus → Analytics -->
+      <line x1="380" y1="145" x2="488" y2="190" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="5,3">
+        <animate attributeName="stroke-dashoffset" from="0" to="-16" dur=".8s" begin=".7s" repeatCount="indefinite"/>
+      </line>
+      <polygon points="484,187 494,192 484,197" fill="#f59e0b" transform="rotate(25,490,192)"/>
+
+      <!-- Labels -->
+      <text x="310" y="245" text-anchor="middle" fill="#334155" font-size="9">Order Service ไม่รู้จัก Notification/Inventory/Analytics เลย</text>
+      <text x="310" y="260" text-anchor="middle" fill="#334155" font-size="9">แค่ publish event — Subscribers จัดการเอง</text>
+    </svg>
+  </div>
+
+  <div class="callout">
+    <strong>Key Insight:</strong> Order Service <strong>ไม่รู้</strong> ว่ามีใครฟัง event อยู่บ้าง
+    — เพิ่ม subscriber ใหม่ได้โดยไม่ต้องแก้ Order Service เลย! นี่คือ <strong>Open/Closed Principle</strong>
+  </div>
+</div>
+
+<!-- ── CORE CONCEPTS ── -->
+<div class="section">
+  <div class="section-title">🧩 ส่วนประกอบหลัก</div>
+
+  <div class="concept-grid">
+    <div class="concept-card" style="--c:#10b981">
+      <div class="label">Event</div>
+      <h3>Event</h3>
+      <p>บันทึกว่า <strong>"มีอะไรเกิดขึ้นแล้ว"</strong> — Past tense เสมอ เช่น <code>OrderPlaced</code>, <code>PaymentReceived</code>. มี metadata: ID, timestamp, payload</p>
+    </div>
+    <div class="concept-card" style="--c:#6366f1">
+      <div class="label">Publisher</div>
+      <h3>Publisher (Producer)</h3>
+      <p>สร้างและ publish events เมื่อมีสิ่งเกิดขึ้น ไม่รู้ว่าใคร subscribe อยู่ — Fire and forget</p>
+    </div>
+    <div class="concept-card" style="--c:#f59e0b">
+      <div class="label">Subscriber</div>
+      <h3>Subscriber (Consumer)</h3>
+      <p>รับและประมวล events — สามารถมีหลาย Subscriber สำหรับ event เดียวกัน แต่ละตัวทำ logic ของตัวเอง</p>
+    </div>
+    <div class="concept-card" style="--c:#06b6d4">
+      <div class="label">Event Bus / Broker</div>
+      <h3>Event Bus</h3>
+      <p>ตัวกลางรับและส่ง events เช่น In-Memory Bus, Kafka, RabbitMQ, NATS — รับประกันว่า events ถึง subscribers</p>
+    </div>
+  </div>
+</div>
+
+<!-- ── CODE ── -->
+<div class="section">
+  <div class="section-title">💻 ตัวอย่าง Go — ระบบ Order Processing</div>
+  <div class="section-sub">Event Bus, Publisher, Subscribers, Retry, Error Handling</div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>events/event.go — Event Types</span>
+      <span class="lang">Go</span>
+    </div>
+    <pre><code class="language-go">package events
+
+import (
+    "encoding/json"
+    "time"
+)
+
+// Event — structure พื้นฐานของทุก event
+type Event struct {
+    ID        string          `json:"id"`
+    Type      string          `json:"type"`
+    Payload   json.RawMessage `json:"payload"`
+    OccuredAt time.Time       `json:"occured_at"`
+    Version   int             `json:"version"`
+}
+
+// Handler — function ที่ประมวล event
+type Handler func(ctx context.Context, event Event) error
+
+// ── Domain Events (Payload Types) ─────────────────────────────────────────────
+
+type OrderPlacedPayload struct {
+    OrderID    string  `json:"order_id"`
+    CustomerID string  `json:"customer_id"`
+    Total      float64 `json:"total"`
+    Items      int     `json:"items"`
+}
+
+type PaymentReceivedPayload struct {
+    PaymentID string  `json:"payment_id"`
+    OrderID   string  `json:"order_id"`
+    Amount    float64 `json:"amount"`
+    Method    string  `json:"method"`
+}
+
+type OrderShippedPayload struct {
+    OrderID      string `json:"order_id"`
+    TrackingCode string `json:"tracking_code"`
+    Carrier      string `json:"carrier"`
+}
+
+// ── Event Constants ────────────────────────────────────────────────────────────
+const (
+    EventOrderPlaced    = "order.placed"
+    EventOrderConfirmed = "order.confirmed"
+    EventOrderShipped   = "order.shipped"
+    EventPaymentReceived = "payment.received"
+)
+
+// NewEvent — helper สร้าง Event พร้อม ID และ timestamp
+func NewEvent(eventType string, payload interface{}) (Event, error) {
+    data, err := json.Marshal(payload)
+    if err != nil {
+        return Event{}, err
+    }
+    return Event{
+        ID:        generateID(), // uuid
+        Type:      eventType,
+        Payload:   data,
+        OccuredAt: time.Now(),
+        Version:   1,
+    }, nil
+}</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>events/bus.go — Event Bus (In-Memory Implementation)</span>
+      <span class="lang">Go</span>
+    </div>
+    <pre><code class="language-go">package events
+
+import (
+    "context"
+    "fmt"
+    "log"
+    "sync"
+    "time"
+)
+
+// Bus — interface ของ Event Bus
+type Bus interface {
+    Subscribe(eventType string, handler Handler)
+    Publish(ctx context.Context, event Event) error
+    PublishAll(ctx context.Context, events []Event) error
+}
+
+// InMemoryBus — Synchronous bus สำหรับ development/testing
+// สำหรับ production ใช้ Kafka/RabbitMQ/NATS แทน
+type InMemoryBus struct {
+    mu       sync.RWMutex
+    handlers map[string][]Handler
+}
+
+func NewInMemoryBus() *InMemoryBus {
+    return &InMemoryBus{handlers: make(map[string][]Handler)}
+}
+
+func (b *InMemoryBus) Subscribe(eventType string, handler Handler) {
+    b.mu.Lock()
+    defer b.mu.Unlock()
+    b.handlers[eventType] = append(b.handlers[eventType], handler)
+    log.Printf("[Bus] Subscribed to %s", eventType)
+}
+
+func (b *InMemoryBus) Publish(ctx context.Context, event Event) error {
+    b.mu.RLock()
+    handlers := append([]Handler{}, b.handlers[event.Type]...) // copy slice
+    b.mu.RUnlock()
+
+    if len(handlers) == 0 {
+        log.Printf("[Bus] No subscribers for %s", event.Type)
+        return nil
+    }
+
+    var wg sync.WaitGroup
+    errCh := make(chan error, len(handlers))
+
+    for _, h := range handlers {
+        wg.Add(1)
+        go func(handler Handler) {
+            defer wg.Done()
+            // Retry 3 ครั้ง ถ้า handler fail
+            if err := retryHandler(ctx, handler, event, 3); err != nil {
+                errCh <- fmt.Errorf("handler for %s: %w", event.Type, err)
+            }
+        }(h)
+    }
+
+    wg.Wait()
+    close(errCh)
+
+    var errs []error
+    for err := range errCh {
+        errs = append(errs, err)
+    }
+    if len(errs) > 0 {
+        return fmt.Errorf("some handlers failed: %v", errs)
+    }
+    return nil
+}
+
+func (b *InMemoryBus) PublishAll(ctx context.Context, events []Event) error {
+    for _, e := range events {
+        if err := b.Publish(ctx, e); err != nil {
+            return err
+        }
+    }
+    return nil
+}
+
+// retryHandler — retry ด้วย exponential backoff
+func retryHandler(ctx context.Context, h Handler, event Event, maxRetries int) error {
+    var err error
+    for attempt := 0; attempt < maxRetries; attempt++ {
+        if attempt > 0 {
+            wait := time.Duration(attempt*attempt) * 100 * time.Millisecond
+            log.Printf("[Bus] Retry %d for %s after %v", attempt, event.Type, wait)
+            select {
+            case <-time.After(wait):
+            case <-ctx.Done():
+                return ctx.Err()
+            }
+        }
+        if err = h(ctx, event); err == nil {
+            return nil
+        }
+    }
+    return fmt.Errorf("after %d retries: %w", maxRetries, err)
+}</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>services/order_service.go — Publisher</span>
+      <span class="lang">Go</span>
+    </div>
+    <pre><code class="language-go">package services
+
+import (
+    "context"
+    "fmt"
+    "myapp/events"
+)
+
+// OrderService — publishes events เมื่อสิ่งเกิดขึ้น
+type OrderService struct {
+    repo orderRepo
+    bus  events.Bus
+}
+
+func NewOrderService(repo orderRepo, bus events.Bus) *OrderService {
+    return &OrderService{repo: repo, bus: bus}
+}
+
+type PlaceOrderRequest struct {
+    CustomerID string
+    Items      []OrderItem
+}
+
+func (s *OrderService) PlaceOrder(ctx context.Context, req PlaceOrderRequest) (*Order, error) {
+    // 1. Business logic
+    order, err := s.repo.Create(ctx, req)
+    if err != nil {
+        return nil, fmt.Errorf("create order: %w", err)
+    }
+
+    // 2. Publish event — บอกโลกว่า "order ถูกสร้างแล้ว"
+    event, err := events.NewEvent(events.EventOrderPlaced, events.OrderPlacedPayload{
+        OrderID:    order.ID,
+        CustomerID: req.CustomerID,
+        Total:      order.Total,
+        Items:      len(req.Items),
+    })
+    if err != nil {
+        return nil, fmt.Errorf("create event: %w", err)
+    }
+
+    // Fire — ไม่รอ response ว่า subscribers ทำอะไร
+    if err := s.bus.Publish(ctx, event); err != nil {
+        // Log แต่ไม่ fail — order สร้างแล้ว
+        // (หรือใช้ Outbox Pattern สำหรับ at-least-once delivery)
+        log.Printf("warn: publish event failed: %v", err)
+    }
+
+    return order, nil
+}
+
+func (s *OrderService) ConfirmOrder(ctx context.Context, orderID string) error {
+    order, err := s.repo.FindByID(ctx, orderID)
+    if err != nil {
+        return err
+    }
+    if err := order.Confirm(); err != nil {
+        return err
+    }
+    if err := s.repo.Save(ctx, order); err != nil {
+        return err
+    }
+
+    // Publish ว่า confirmed แล้ว
+    event, _ := events.NewEvent(events.EventOrderConfirmed, map[string]string{
+        "order_id": orderID,
+    })
+    return s.bus.Publish(ctx, event)
+}</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>services/notification_service.go — Subscriber</span>
+      <span class="lang">Go</span>
+    </div>
+    <pre><code class="language-go">package services
+
+import (
+    "context"
+    "encoding/json"
+    "fmt"
+    "log"
+    "myapp/events"
+)
+
+// NotificationService — Subscribe to events และส่ง notifications
+type NotificationService struct {
+    emailClient emailClient
+    smsClient   smsClient
+}
+
+func NewNotificationService(email emailClient, sms smsClient) *NotificationService {
+    return &NotificationService{emailClient: email, smsClient: sms}
+}
+
+// RegisterHandlers — register ทุก handler ที่ service นี้ต้องการ
+func (s *NotificationService) RegisterHandlers(bus events.Bus) {
+    bus.Subscribe(events.EventOrderPlaced,    s.onOrderPlaced)
+    bus.Subscribe(events.EventOrderShipped,   s.onOrderShipped)
+    bus.Subscribe(events.EventPaymentReceived, s.onPaymentReceived)
+}
+
+func (s *NotificationService) onOrderPlaced(ctx context.Context, event events.Event) error {
+    var payload events.OrderPlacedPayload
+    if err := json.Unmarshal(event.Payload, &payload); err != nil {
+        return fmt.Errorf("unmarshal payload: %w", err)
+    }
+
+    log.Printf("[Notification] Order placed: %s — sending confirmation email", payload.OrderID)
+
+    // ส่ง email ยืนยัน order
+    if err := s.emailClient.Send(ctx, emailRequest{
+        To:      getCustomerEmail(ctx, payload.CustomerID),
+        Subject: fmt.Sprintf("ยืนยันคำสั่งซื้อ #%s", payload.OrderID),
+        Body:    fmt.Sprintf("ขอบคุณ! คำสั่งซื้อของท่านมูลค่า %.2f บาท ได้รับการยืนยันแล้ว", payload.Total),
+    }); err != nil {
+        return fmt.Errorf("send confirmation email: %w", err)
+    }
+
+    return nil
+}
+
+func (s *NotificationService) onOrderShipped(ctx context.Context, event events.Event) error {
+    var payload events.OrderShippedPayload
+    if err := json.Unmarshal(event.Payload, &payload); err != nil {
+        return err
+    }
+
+    log.Printf("[Notification] Order shipped: %s, tracking: %s", payload.OrderID, payload.TrackingCode)
+
+    // ส่ง SMS พร้อม tracking code
+    return s.smsClient.Send(ctx, smsRequest{
+        To:   getCustomerPhone(ctx, payload.OrderID),
+        Text: fmt.Sprintf("พัสดุของท่านกำลังส่ง Tracking: %s (via %s)", payload.TrackingCode, payload.Carrier),
+    })
+}
+
+func (s *NotificationService) onPaymentReceived(ctx context.Context, event events.Event) error {
+    var payload events.PaymentReceivedPayload
+    if err := json.Unmarshal(event.Payload, &payload); err != nil {
+        return err
+    }
+    log.Printf("[Notification] Payment received: %.2f for order %s", payload.Amount, payload.OrderID)
+    // ส่งใบเสร็จ...
+    return nil
+}</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>services/inventory_service.go — Another Subscriber</span>
+      <span class="lang">Go</span>
+    </div>
+    <pre><code class="language-go">package services
+
+import (
+    "context"
+    "encoding/json"
+    "fmt"
+    "log"
+    "myapp/events"
+)
+
+// InventoryService — จัดการ stock เมื่อ order เกิดขึ้น
+type InventoryService struct {
+    stockRepo stockRepository
+}
+
+func NewInventoryService(repo stockRepository) *InventoryService {
+    return &InventoryService{stockRepo: repo}
+}
+
+func (s *InventoryService) RegisterHandlers(bus events.Bus) {
+    bus.Subscribe(events.EventOrderPlaced,    s.onOrderPlaced)    // จอง stock
+    bus.Subscribe(events.EventOrderConfirmed, s.onOrderConfirmed) // lock stock จริงๆ
+}
+
+func (s *InventoryService) onOrderPlaced(ctx context.Context, event events.Event) error {
+    var payload events.OrderPlacedPayload
+    if err := json.Unmarshal(event.Payload, &payload); err != nil {
+        return err
+    }
+
+    log.Printf("[Inventory] Reserving stock for order %s", payload.OrderID)
+
+    // จอง stock ชั่วคราว (soft reservation)
+    if err := s.stockRepo.Reserve(ctx, payload.OrderID); err != nil {
+        return fmt.Errorf("reserve stock: %w", err)
+    }
+
+    return nil
+}
+
+func (s *InventoryService) onOrderConfirmed(ctx context.Context, event events.Event) error {
+    // Convert soft reservation → hard deduction
+    var p map[string]string
+    json.Unmarshal(event.Payload, &p)
+    log.Printf("[Inventory] Confirmed stock deduction for order %s", p["order_id"])
+    return s.stockRepo.Deduct(ctx, p["order_id"])
+}</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>cmd/main.go — Wiring (ประกอบ Event Bus)</span>
+      <span class="lang">Go</span>
+    </div>
+    <pre><code class="language-go">package main
+
+import (
+    "myapp/events"
+    "myapp/services"
+)
+
+func main() {
+    // ── Event Bus ─────────────────────────────────────────────────────────
+    bus := events.NewInMemoryBus()
+    // Production: ใช้ KafkaBus หรือ RabbitMQBus แทน
+
+    // ── Services ──────────────────────────────────────────────────────────
+    orderSvc       := services.NewOrderService(orderRepo, bus)
+    notificationSvc := services.NewNotificationService(emailClient, smsClient)
+    inventorySvc    := services.NewInventoryService(stockRepo)
+    analyticsSvc    := services.NewAnalyticsService(analyticsRepo)
+
+    // ── Register Subscribers ───────────────────────────────────────────────
+    // แต่ละ service register handlers ของตัวเอง
+    notificationSvc.RegisterHandlers(bus)
+    inventorySvc.RegisterHandlers(bus)
+    analyticsSvc.RegisterHandlers(bus)
+
+    // ── เพิ่ม Subscriber ใหม่ได้ง่ายๆ โดยไม่แก้ Order Service ────────────
+    // loyaltySvc.RegisterHandlers(bus)     // ← แค่เพิ่มบรรทัดนี้
+    // fraudDetectionSvc.RegisterHandlers(bus)
+
+    // ── HTTP Server ────────────────────────────────────────────────────────
+    // ... setup routes ...
+    log.Fatal(http.ListenAndServe(":8080", router))
+}</code></pre>
+  </div>
+</div>
+
+<!-- ── EVENT SOURCING ── -->
+<div class="section">
+  <div class="section-title">🗂️ Event Sourcing</div>
+  <div class="section-sub">เก็บ State เป็น Sequence of Events แทนที่จะเก็บ Current State</div>
+
+  <p style="color:#94a3b8;margin-bottom:1.5rem">
+    แทนที่จะ UPDATE ข้อมูลใน database — เราเพิ่ม event ใหม่เสมอ
+    แล้ว rebuild state ปัจจุบันจากการ "replay" events ทั้งหมด
+  </p>
+
+  <div class="diagram">
+    <div class="diagram-title">Event Sourcing — Order Timeline</div>
+    <svg viewBox="0 0 680 180" fill="none" xmlns="http://www.w3.org/2000/svg" style="max-width:680px;width:100%">
+      <!-- Timeline -->
+      <line x1="30" y1="90" x2="650" y2="90" stroke="#1e293b" stroke-width="2"/>
+
+      <!-- Events on timeline -->
+      <!-- Event 1 -->
+      <circle cx="100" cy="90" r="8" fill="#6366f1" opacity=".9"/>
+      <text x="100" y="75" text-anchor="middle" fill="#a5b4fc" font-size="8" font-weight="700">OrderCreated</text>
+      <text x="100" y="115" text-anchor="middle" fill="#475569" font-size="7">ยอด: ฿0</text>
+      <text x="100" y="125" text-anchor="middle" fill="#334155" font-size="7">09:00</text>
+
+      <!-- Event 2 -->
+      <circle cx="220" cy="90" r="8" fill="#06b6d4" opacity=".9"/>
+      <text x="220" y="75" text-anchor="middle" fill="#67e8f9" font-size="8" font-weight="700">ItemAdded</text>
+      <text x="220" y="115" text-anchor="middle" fill="#475569" font-size="7">ยอด: ฿500</text>
+      <text x="220" y="125" text-anchor="middle" fill="#334155" font-size="7">09:01</text>
+
+      <!-- Event 3 -->
+      <circle cx="340" cy="90" r="8" fill="#06b6d4" opacity=".9"/>
+      <text x="340" y="75" text-anchor="middle" fill="#67e8f9" font-size="8" font-weight="700">ItemAdded</text>
+      <text x="340" y="115" text-anchor="middle" fill="#475569" font-size="7">ยอด: ฿1200</text>
+      <text x="340" y="125" text-anchor="middle" fill="#334155" font-size="7">09:02</text>
+
+      <!-- Event 4 -->
+      <circle cx="460" cy="90" r="8" fill="#10b981" opacity=".9"/>
+      <text x="460" y="75" text-anchor="middle" fill="#6ee7b7" font-size="8" font-weight="700">OrderConfirmed</text>
+      <text x="460" y="115" text-anchor="middle" fill="#475569" font-size="7">ยอด: ฿1200</text>
+      <text x="460" y="125" text-anchor="middle" fill="#334155" font-size="7">09:05</text>
+
+      <!-- Event 5 -->
+      <circle cx="580" cy="90" r="8" fill="#f59e0b" opacity=".9"/>
+      <text x="580" y="75" text-anchor="middle" fill="#fcd34d" font-size="8" font-weight="700">OrderShipped</text>
+      <text x="580" y="115" text-anchor="middle" fill="#475569" font-size="7">Status: Shipped</text>
+      <text x="580" y="125" text-anchor="middle" fill="#334155" font-size="7">14:00</text>
+
+      <!-- Current State arrow -->
+      <text x="340" y="160" text-anchor="middle" fill="#334155" font-size="9">← Replay events เพื่อได้ Current State</text>
+    </svg>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>event_sourcing/order_aggregate.go — Event Sourced Aggregate</span>
+      <span class="lang">Go</span>
+    </div>
+    <pre><code class="language-go">package eventsourcing
+
+import (
+    "encoding/json"
+    "time"
+)
+
+// OrderAggregate — State ถูก rebuild จาก Events
+type OrderAggregate struct {
+    ID         string
+    CustomerID string
+    Items      []Item
+    Status     string
+    Total      float64
+    Version    int // Optimistic concurrency control
+
+    uncommitted []StoredEvent // Events ที่ยังไม่ได้ persist
+}
+
+// StoredEvent — Event ที่ persist ใน Event Store
+type StoredEvent struct {
+    AggregateID string
+    EventType   string
+    Data        json.RawMessage
+    OccurredAt  time.Time
+    Version     int
+}
+
+// ── Apply Methods — rebuild state จาก events ──────────────────────────────────
+
+// Apply — dispatch event ไปยัง handler ที่เหมาะสม
+func (o *OrderAggregate) Apply(event StoredEvent) {
+    switch event.EventType {
+    case "OrderCreated":
+        var e struct{ CustomerID string }
+        json.Unmarshal(event.Data, &e)
+        o.CustomerID = e.CustomerID
+        o.Status = "pending"
+
+    case "ItemAdded":
+        var e struct{ Name string; Price float64; Qty int }
+        json.Unmarshal(event.Data, &e)
+        o.Items = append(o.Items, Item{Name: e.Name, Price: e.Price, Qty: e.Qty})
+        o.Total += e.Price * float64(e.Qty)
+
+    case "ItemRemoved":
+        var e struct{ Name string; Price float64; Qty int }
+        json.Unmarshal(event.Data, &e)
+        o.Total -= e.Price * float64(e.Qty)
+        // remove from items...
+
+    case "OrderConfirmed":
+        o.Status = "confirmed"
+
+    case "OrderShipped":
+        o.Status = "shipped"
+    }
+    o.Version = event.Version
+}
+
+// ── Command Methods — produce events ──────────────────────────────────────────
+
+func (o *OrderAggregate) AddItem(name string, price float64, qty int) {
+    data, _ := json.Marshal(map[string]interface{}{
+        "name": name, "price": price, "qty": qty,
+    })
+    o.raise(StoredEvent{
+        AggregateID: o.ID,
+        EventType:   "ItemAdded",
+        Data:        data,
+        OccurredAt:  time.Now(),
+        Version:     o.Version + 1,
+    })
+}
+
+func (o *OrderAggregate) Confirm() error {
+    if o.Status != "pending" {
+        return fmt.Errorf("cannot confirm %s order", o.Status)
+    }
+    data, _ := json.Marshal(map[string]interface{}{"order_id": o.ID})
+    o.raise(StoredEvent{
+        AggregateID: o.ID,
+        EventType:   "OrderConfirmed",
+        Data:        data,
+        OccurredAt:  time.Now(),
+        Version:     o.Version + 1,
+    })
+    return nil
+}
+
+func (o *OrderAggregate) raise(event StoredEvent) {
+    o.Apply(event)           // อัพเดท in-memory state ทันที
+    o.uncommitted = append(o.uncommitted, event)
+}
+
+func (o *OrderAggregate) PopUncommitted() []StoredEvent {
+    evts := o.uncommitted
+    o.uncommitted = nil
+    return evts
+}
+
+// ── Rebuild from history ────────────────────────────────────────────────────
+
+// Reconstitute — สร้าง aggregate จาก event history
+func Reconstitute(id string, events []StoredEvent) *OrderAggregate {
+    agg := &OrderAggregate{ID: id}
+    for _, e := range events {
+        agg.Apply(e)
+    }
+    return agg
+}</code></pre>
+  </div>
+</div>
+
+<!-- ── CQRS ── -->
+<div class="section">
+  <div class="section-title">📊 CQRS — Command Query Responsibility Segregation</div>
+  <div class="section-sub">แยก Write Model (Command) ออกจาก Read Model (Query)</div>
+
+  <p style="color:#94a3b8;margin-bottom:1.5rem">
+    Write Side (Command) — ทำ business logic, validate, save events<br>
+    Read Side (Query) — Denormalized views สำหรับ query เร็วๆ (ไม่ต้อง join หลายตาราง)
+  </p>
+
+  <div class="diagram">
+    <div class="diagram-title">CQRS Flow</div>
+    <svg viewBox="0 0 680 220" fill="none" xmlns="http://www.w3.org/2000/svg" style="max-width:680px;width:100%">
+      <!-- Client -->
+      <rect x="280" y="10" width="120" height="40" rx="8" fill="#111827" stroke="#334155"/>
+      <text x="340" y="35" text-anchor="middle" fill="#94a3b8" font-size="10" font-weight="600">Client</text>
+
+      <!-- Command Side -->
+      <rect x="40" y="80" width="240" height="100" rx="10" fill="#0a1020" stroke="#6366f1" stroke-width="1.5"/>
+      <text x="160" y="105" text-anchor="middle" fill="#a5b4fc" font-size="10" font-weight="700">✍ COMMAND SIDE (Write)</text>
+      <text x="160" y="125" text-anchor="middle" fill="#818cf8" font-size="9">Command Handler</text>
+      <text x="160" y="141" text-anchor="middle" fill="#6366f1" font-size="8">Domain Aggregate</text>
+      <text x="160" y="157" text-anchor="middle" fill="#475569" font-size="8">Event Store (PostgreSQL)</text>
+
+      <!-- Query Side -->
+      <rect x="400" y="80" width="240" height="100" rx="10" fill="#0a1a0e" stroke="#10b981" stroke-width="1.5"/>
+      <text x="520" y="105" text-anchor="middle" fill="#6ee7b7" font-size="10" font-weight="700">📖 QUERY SIDE (Read)</text>
+      <text x="520" y="125" text-anchor="middle" fill="#34d399" font-size="9">Query Handler</text>
+      <text x="520" y="141" text-anchor="middle" fill="#059669" font-size="8">Read Model (Projections)</text>
+      <text x="520" y="157" text-anchor="middle" fill="#475569" font-size="8">Read DB (Elasticsearch/Redis)</text>
+
+      <!-- Event Bus middle -->
+      <rect x="280" y="195" width="120" height="20" rx="4" fill="#111827" stroke="#334155" stroke-dasharray="3,2"/>
+      <text x="340" y="209" text-anchor="middle" fill="#475569" font-size="8">Event Bus (sync projections)</text>
+
+      <!-- Arrows -->
+      <!-- Client → Command -->
+      <line x1="300" y1="50" x2="200" y2="80" stroke="#6366f1" stroke-width="1.5" marker-end="url(#pi)"/>
+      <text x="230" y="68" fill="#6366f1" font-size="8">Command</text>
+
+      <!-- Client → Query -->
+      <line x1="380" y1="50" x2="480" y2="80" stroke="#10b981" stroke-width="1.5" marker-end="url(#gi)"/>
+      <text x="445" y="68" fill="#10b981" font-size="8">Query</text>
+
+      <!-- Command → Event Bus -->
+      <line x1="200" y1="180" x2="295" y2="195" stroke="#6366f1" stroke-width="1" stroke-dasharray="4,2" marker-end="url(#pi)"/>
+
+      <!-- Event Bus → Query -->
+      <line x1="385" y1="205" x2="455" y2="185" stroke="#10b981" stroke-width="1" stroke-dasharray="4,2" marker-end="url(#gi)"/>
+
+      <defs>
+        <marker id="pi" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+          <path d="M0,0 L6,3 L0,6 Z" fill="#6366f1"/>
+        </marker>
+        <marker id="gi" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+          <path d="M0,0 L6,3 L0,6 Z" fill="#10b981"/>
+        </marker>
+      </defs>
+    </svg>
+  </div>
+
+  <div class="callout warn">
+    <strong>เมื่อไหร่ควรใช้ CQRS:</strong> เมื่อ Read และ Write มีความต้องการต่างกันมาก เช่น
+    Write ต้องการ consistency สูง แต่ Read ต้องการ performance สูง
+    <br><br>
+    <strong>ไม่ต้องใช้ CQRS:</strong> สำหรับ CRUD ธรรมดา — เพิ่ม complexity โดยไม่จำเป็น
+  </div>
+</div>
+
+<!-- ── WHEN TO USE ── -->
+<div class="section">
+  <div class="section-title">✅ สรุปและเมื่อไหร่ควรใช้</div>
+
+  <div class="concept-grid">
+    <div class="concept-card" style="--c:#10b981">
+      <div class="label">ควรใช้เมื่อ</div>
+      <h3>เหมาะกับ</h3>
+      <p>• Microservices ที่ต้องการ decoupling<br>• Systems ที่มีหลาย consumers สำหรับ event เดียว<br>• Audit trail / ประวัติย้อนหลัง<br>• Async processing ที่ tolerates delay</p>
+    </div>
+    <div class="concept-card" style="--c:#ef4444">
+      <div class="label">ระวัง</div>
+      <h3>ความท้าทาย</h3>
+      <p>• Eventual Consistency — ข้อมูลอาจไม่ sync ทันที<br>• Event Schema versioning — เปลี่ยน event structure ยาก<br>• Debugging — trace events ข้าม services<br>• Message ordering ต้องดูแล</p>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>Production Tools:</strong><br>
+    • <strong>Kafka</strong> — High throughput, persistent, replay ได้<br>
+    • <strong>RabbitMQ</strong> — Feature rich routing, exchange patterns<br>
+    • <strong>NATS</strong> — Ultra low latency, Go-native<br>
+    • <strong>Google Pub/Sub</strong> — Managed, scalable, cloud-native
+  </div>
+</div>
+
+<div style="text-align:center;margin:3rem 0;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+  <a href="2-hexagonal.html" style="display:inline-flex;align-items:center;gap:.5rem;background:#0d1117;border:1px solid #1e293b;color:#64748b;padding:.7rem 1.5rem;border-radius:10px;font-size:.88rem">← Hexagonal</a>
+  <a href="4-bff.html" style="display:inline-flex;align-items:center;gap:.5rem;background:#0d1117;border:1px solid #1e293b;color:#34d399;padding:.7rem 1.5rem;border-radius:10px;font-weight:600;font-size:.88rem">หัวข้อถัดไป: BFF Architecture →</a>
+</div>
+
+</div>
+<script>hljs.highlightAll()</script>
+</body>
+</html>

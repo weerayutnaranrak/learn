@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HTDP — How to Design Programs</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#07090f;color:#e2e8f0;line-height:1.7}
+a{color:#fca5a5;text-decoration:none}
+
+.topnav{display:flex;align-items:center;gap:1rem;padding:1rem 2rem;background:#0d1117;border-bottom:1px solid #1e293b;position:sticky;top:0;z-index:100}
+.back-btn{color:#64748b;font-size:.85rem;transition:color .2s}
+.back-btn:hover{color:#e2e8f0;text-decoration:none}
+.nav-title{color:#475569;font-size:.85rem}
+.nav-title span{color:#fca5a5;font-weight:600}
+
+.hero{padding:4rem 2rem 3rem;text-align:center;background:linear-gradient(160deg,#07090f,#1a0000)}
+.hero-badge{display:inline-block;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#fca5a5;padding:.35rem 1rem;border-radius:999px;font-size:.8rem;font-weight:600;margin-bottom:1.5rem}
+.hero h1{font-size:clamp(1.8rem,4vw,3rem);font-weight:800;background:linear-gradient(135deg,#ef4444,#dc2626);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:1rem}
+.hero p{color:#64748b;max-width:640px;margin:0 auto;font-size:1rem}
+
+.content{max-width:900px;margin:0 auto;padding:2rem 1.5rem 5rem}
+.section{margin-bottom:4rem}
+.section-title{font-size:1.6rem;font-weight:700;color:#ef4444;margin-bottom:.4rem;display:flex;align-items:center;gap:.6rem}
+.section-sub{color:#475569;font-size:.9rem;margin-bottom:2rem;padding-left:2rem}
+
+.callout{background:#0f172a;border-left:3px solid #ef4444;border-radius:0 8px 8px 0;padding:1rem 1.2rem;margin:1.5rem 0;font-size:.88rem;color:#94a3b8}
+.callout strong{color:#fca5a5}
+.callout.tip{border-color:#10b981}.callout.tip strong{color:#6ee7b7}
+.callout.blue{border-color:#38bdf8}.callout.blue strong{color:#7dd3fc}
+
+.code-block{margin:1.5rem 0;border-radius:12px;overflow:hidden;border:1px solid #1e293b}
+.code-header{background:#111827;padding:.7rem 1rem;display:flex;justify-content:space-between;align-items:center}
+.code-header span{font-size:.78rem;color:#64748b;font-weight:600}
+.code-header .lang{background:rgba(239,68,68,.12);color:#fca5a5;padding:.15rem .6rem;border-radius:4px;font-size:.72rem;font-weight:700}
+.code-block pre{margin:0!important;border-radius:0!important;border:none!important;font-size:.83rem!important;line-height:1.6!important}
+
+/* Recipe Steps */
+.recipe-steps{display:flex;flex-direction:column;gap:0;margin:2rem 0}
+.recipe-step{display:flex;gap:0;position:relative}
+.recipe-step:not(:last-child)::after{content:'';position:absolute;left:1.2rem;top:3rem;bottom:0;width:2px;background:#1e293b}
+.step-marker{display:flex;flex-direction:column;align-items:center;gap:.3rem;margin-right:1rem;flex-shrink:0}
+.step-circle{width:2.4rem;height:2.4rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:800;border:2px solid;flex-shrink:0;position:relative;z-index:1}
+.step-content{flex:1;padding-bottom:2rem}
+.step-content h3{font-size:1rem;font-weight:700;margin-bottom:.3rem}
+.step-content p{font-size:.85rem;color:#64748b;line-height:1.65;margin-bottom:.5rem}
+
+.concept-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;margin:1.5rem 0}
+.concept-card{background:#0d1117;border:1px solid #1e293b;border-radius:12px;padding:1.4rem;border-left:3px solid var(--c,#ef4444)}
+.concept-card h3{font-size:.95rem;font-weight:700;color:#f1f5f9;margin-bottom:.4rem}
+.concept-card p{font-size:.83rem;color:#64748b;line-height:1.6}
+.concept-card .label{font-size:.7rem;color:var(--c,#ef4444);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.4rem}
+
+/* Inline badge */
+.step-badge{display:inline-block;padding:.15rem .55rem;border-radius:4px;font-size:.72rem;font-weight:700;margin-right:.4rem}
+
+/* Data type box */
+.type-box{background:#0d1117;border:1px solid #1e293b;border-radius:8px;padding:1rem 1.2rem;margin:.8rem 0}
+.type-box h4{font-size:.85rem;font-weight:700;color:#fca5a5;margin-bottom:.3rem}
+.type-box p{font-size:.8rem;color:#64748b;line-height:1.6}
+.type-box code{background:#111827;padding:.1rem .35rem;border-radius:3px;font-size:.78rem;color:#94a3b8;font-family:monospace}
+
+/* Tabs */
+.tabs{display:flex;gap:0;border-bottom:1px solid #1e293b;margin-bottom:1.5rem;flex-wrap:wrap}
+.tab{padding:.6rem 1.2rem;font-size:.82rem;font-weight:600;color:#475569;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s}
+.tab.active{color:#ef4444;border-color:#ef4444}
+.tab-content{display:none}.tab-content.active{display:block}
+
+/* Example boxes */
+.example-row{display:flex;gap:1rem;margin:.6rem 0;align-items:flex-start;flex-wrap:wrap}
+.example-in{background:#0a1a0e;border:1px solid #1e2e1e;border-radius:6px;padding:.4rem .7rem;font-size:.8rem;font-family:monospace;color:#6ee7b7;flex:1;min-width:120px}
+.example-out{background:#0a0e1a;border:1px solid #1e1e2e;border-radius:6px;padding:.4rem .7rem;font-size:.8rem;font-family:monospace;color:#a5b4fc;flex:1;min-width:120px}
+.example-arrow{color:#334155;align-self:center;font-size:.9rem;flex-shrink:0}
+.example-label{font-size:.7rem;color:#334155;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="index.html" class="back-btn">← กลับหน้าหลัก</a>
+  <span class="nav-title">06 / <span>HTDP — How to Design Programs</span></span>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">📐 หัวข้อที่ 6</div>
+  <h1>HTDP</h1>
+  <p>How to Design Programs — วิธีคิดเกี่ยวกับการเขียนโปรแกรมอย่างเป็นระบบ ด้วย Design Recipe 6 ขั้นตอน ก่อน code ทุกครั้ง</p>
+</div>
+
+<div class="content">
+
+<!-- ── WHAT IS ── -->
+<div class="section">
+  <div class="section-title">💡 HTDP คืออะไร?</div>
+  <div class="section-sub">หนังสือและ methodology โดย Matthias Felleisen et al. — "ออกแบบก่อน code"</div>
+
+  <p style="color:#94a3b8;margin-bottom:1.5rem">
+    HTDP สอนว่าการเขียนโปรแกรมที่ดีต้องเริ่มจาก <strong style="color:#e2e8f0">การคิดและออกแบบ</strong> ก่อนเสมอ
+    ไม่ใช่นั่ง code ทันที — ด้วย <strong style="color:#fca5a5">Design Recipe</strong> ที่เป็น step-by-step process
+    ทำให้โค้ดอ่านง่าย ทดสอบได้ และ correct มากขึ้น
+  </p>
+
+  <div class="callout">
+    <strong>Core Philosophy:</strong> "A good program is not just code that works — it's code that <em>communicates</em> its intent clearly."
+    <br><br>โปรแกรมที่ดีไม่ใช่แค่ทำงานได้ — แต่ต้องสื่อสาร <strong>intent</strong> ของตัวเองได้ชัดเจน
+  </div>
+
+  <div class="concept-grid">
+    <div class="concept-card" style="--c:#ef4444">
+      <div class="label">ปัญหาที่ HTDP แก้</div>
+      <h3>นักพัฒนา code ก่อนคิด</h3>
+      <p>เขียน code ทันที → ไม่รู้ว่าจะ handle ข้อมูลอะไร → แก้ bug ไม่หมด → code ยุ่งเหยิง</p>
+    </div>
+    <div class="concept-card" style="--c:#10b981">
+      <div class="label">วิธีแก้</div>
+      <h3>Design Recipe 6 ขั้นตอน</h3>
+      <p>กำหนด Data → กำหนด Signature → เขียน Purpose → สร้าง Examples → Template → เขียน Body → Test</p>
+    </div>
+  </div>
+</div>
+
+<!-- ── DESIGN RECIPE ── -->
+<div class="section">
+  <div class="section-title">📐 Design Recipe — 6 ขั้นตอน</div>
+  <div class="section-sub">ทำตามทุกครั้งก่อนเขียน function — ไม่ข้ามขั้นตอน</div>
+
+  <div class="recipe-steps">
+
+    <div class="recipe-step">
+      <div class="step-marker">
+        <div class="step-circle" style="background:rgba(99,102,241,.15);border-color:#6366f1;color:#a5b4fc">1</div>
+      </div>
+      <div class="step-content">
+        <h3 style="color:#a5b4fc">📊 Data Definition — กำหนดข้อมูล</h3>
+        <p>ก่อนอื่น — <strong style="color:#e2e8f0">คิดว่า data ที่ function รับและคืนคืออะไร?</strong>
+        กำหนด type ให้ชัดเจน บอกว่าข้อมูลแต่ละชนิดหมายความว่าอะไร มีข้อจำกัดอะไรบ้าง</p>
+        <div class="type-box">
+          <h4>ตัวอย่าง: ระบบคะแนนนักเรียน</h4>
+          <p>
+            <code>Grade</code> คือคะแนน: เป็น int ในช่วง 0–100<br>
+            <code>LetterGrade</code> คือเกรด: หนึ่งใน "A", "B", "C", "D", "F"<br>
+            <code>Student</code> คือนักเรียน: มี Name (string) และ Score (Grade)<br>
+            <br>
+            ข้อจำกัด: Grade ต้องไม่ติดลบ, ไม่เกิน 100
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="recipe-step">
+      <div class="step-marker">
+        <div class="step-circle" style="background:rgba(6,182,212,.15);border-color:#06b6d4;color:#67e8f9">2</div>
+      </div>
+      <div class="step-content">
+        <h3 style="color:#67e8f9">✍️ Signature + Purpose — ลายเซ็นและจุดประสงค์</h3>
+        <p>เขียน <strong style="color:#e2e8f0">Function Signature</strong> (input types → output type)
+        และ <strong style="color:#e2e8f0">Purpose Statement</strong> ในบรรทัดเดียวว่า "function นี้ทำอะไร?"
+        ห้ามบอก HOW — บอกแค่ WHAT</p>
+        <div class="type-box">
+          <h4>ตัวอย่าง</h4>
+          <p>
+            <code>// scoreToGrade รับคะแนน 0-100 คืน letter grade (A/B/C/D/F)</code><br>
+            <code>func scoreToGrade(score int) string</code><br><br>
+            <code>// averageScore คำนวณคะแนนเฉลี่ยของนักเรียนในกลุ่ม</code><br>
+            <code>func averageScore(students []Student) float64</code>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="recipe-step">
+      <div class="step-marker">
+        <div class="step-circle" style="background:rgba(16,185,129,.15);border-color:#10b981;color:#6ee7b7">3</div>
+      </div>
+      <div class="step-content">
+        <h3 style="color:#6ee7b7">📝 Examples — ตัวอย่าง Input/Output</h3>
+        <p>ก่อน code! เขียน <strong style="color:#e2e8f0">ตัวอย่างที่คาดหวัง</strong> ว่า function จะทำงานอย่างไร
+        ครอบคลุม normal cases, edge cases, และ boundary conditions</p>
+        <div class="type-box">
+          <h4>ตัวอย่าง (เขียนเป็น test cases ก่อนเลย)</h4>
+          <div class="example-row">
+            <span class="example-label">Input</span>
+            <span class="example-label">Output</span>
+            <span class="example-label">เหตุผล</span>
+          </div>
+          <div class="example-row">
+            <span class="example-in">score = 90</span>
+            <span class="example-arrow">→</span>
+            <span class="example-out">"A"</span>
+          </div>
+          <div class="example-row">
+            <span class="example-in">score = 80</span>
+            <span class="example-arrow">→</span>
+            <span class="example-out">"B"</span>
+          </div>
+          <div class="example-row">
+            <span class="example-in">score = 50</span>
+            <span class="example-arrow">→</span>
+            <span class="example-out">"F"</span>
+          </div>
+          <div class="example-row">
+            <span class="example-in">score = 0</span>
+            <span class="example-arrow">→</span>
+            <span class="example-out">"F"</span>
+            <small style="color:#334155;align-self:center">edge: ต่ำสุด</small>
+          </div>
+          <div class="example-row">
+            <span class="example-in">score = 100</span>
+            <span class="example-arrow">→</span>
+            <span class="example-out">"A"</span>
+            <small style="color:#334155;align-self:center">edge: สูงสุด</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="recipe-step">
+      <div class="step-marker">
+        <div class="step-circle" style="background:rgba(245,158,11,.15);border-color:#f59e0b;color:#fcd34d">4</div>
+      </div>
+      <div class="step-content">
+        <h3 style="color:#fcd34d">🏗️ Template — โครงสร้าง</h3>
+        <p>เขียน <strong style="color:#e2e8f0">skeleton ของ function</strong> ตามโครงสร้างของ data
+        ถ้า input เป็น if/else condition → template มี if/else
+        ถ้า input เป็น list → template มี loop</p>
+        <div class="type-box">
+          <h4>Template สำหรับ scoreToGrade (input เป็น range → ใช้ if-else chain)</h4>
+          <p>
+            <code>func scoreToGrade(score int) string &#123;</code><br>
+            <code>&nbsp;&nbsp;if score >= ... &#123;</code><br>
+            <code>&nbsp;&nbsp;&nbsp;&nbsp;return "..."</code><br>
+            <code>&nbsp;&nbsp;&#125; else if score >= ... &#123;</code><br>
+            <code>&nbsp;&nbsp;&nbsp;&nbsp;return "..."</code><br>
+            <code>&nbsp;&nbsp;&#125; else &#123;</code><br>
+            <code>&nbsp;&nbsp;&nbsp;&nbsp;return "..."</code><br>
+            <code>&nbsp;&nbsp;&#125;</code><br>
+            <code>&#125;</code>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="recipe-step">
+      <div class="step-marker">
+        <div class="step-circle" style="background:rgba(236,72,153,.15);border-color:#ec4899;color:#f9a8d4">5</div>
+      </div>
+      <div class="step-content">
+        <h3 style="color:#f9a8d4">💻 Body — เขียน Code จริง</h3>
+        <p>ตอนนี้แหละถึงเวลา code! ใส่ logic เข้าไปใน template ที่เตรียมไว้
+        เพราะเรามี signature, examples และ template แล้ว — code ตรงนี้จะ<strong style="color:#e2e8f0"> ง่ายมาก</strong></p>
+      </div>
+    </div>
+
+    <div class="recipe-step">
+      <div class="step-marker">
+        <div class="step-circle" style="background:rgba(239,68,68,.15);border-color:#ef4444;color:#fca5a5">6</div>
+      </div>
+      <div class="step-content">
+        <h3 style="color:#fca5a5">✅ Tests — ทดสอบจาก Examples</h3>
+        <p>นำ examples จากขั้นตอนที่ 3 มาเป็น test cases
+        ถ้าทำตาม Design Recipe ตั้งแต่ต้น — tests ส่วนใหญ่ผ่านได้ทันที
+        เพราะเราคิด examples ก่อน code แล้ว</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── FULL EXAMPLE 1 ── -->
+<div class="section">
+  <div class="section-title">💻 ตัวอย่างที่ 1 — Grade System (ง่าย)</div>
+  <div class="section-sub">ใช้ Design Recipe ทั้ง 6 ขั้นตอน</div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>grade/grade.go — ครบทุกขั้นตอน</span>
+      <span class="lang">Go</span>
+    </div>
+    <pre><code class="language-go">package grade
+
+import "fmt"
+
+// ═══════════════════════════════════════════════════════════════════════════
+// STEP 1: DATA DEFINITION
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Grade คือคะแนนสอบ: เป็น int ในช่วง [0, 100]
+// Invariant: 0 <= Grade <= 100
+type Grade int
+
+// LetterGrade คือเกรดตัวอักษร: หนึ่งใน "A", "B", "C", "D", "F"
+type LetterGrade string
+
+const (
+    LetterA LetterGrade = "A" // 80-100
+    LetterB LetterGrade = "B" // 70-79
+    LetterC LetterGrade = "C" // 60-69
+    LetterD LetterGrade = "D" // 50-59
+    LetterF LetterGrade = "F" // 0-49
+)
+
+// Student คือนักเรียนที่มีชื่อและคะแนน
+type Student struct {
+    Name  string
+    Score Grade
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// STEP 2: SIGNATURE + PURPOSE
+// ═══════════════════════════════════════════════════════════════════════════
+
+// ToLetterGrade รับคะแนน 0-100 คืน letter grade ตามเกณฑ์:
+// A=80+, B=70-79, C=60-69, D=50-59, F=0-49
+func (g Grade) ToLetterGrade() (LetterGrade, error) {
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // STEP 3: EXAMPLES (documented ไว้เป็น reference)
+    // g=90  → LetterA (in A range)
+    // g=80  → LetterA (boundary: ต่ำสุดของ A)
+    // g=79  → LetterB (boundary: สูงสุดของ B)
+    // g=0   → LetterF (ต่ำสุด)
+    // g=100 → LetterA (สูงสุด)
+    // g=-1  → error (ออกนอกช่วง)
+    // g=101 → error (ออกนอกช่วง)
+    // ═══════════════════════════════════════════════════════════════════════
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // STEP 4: TEMPLATE — input เป็น range ของตัวเลข → if-else chain
+    // ═══════════════════════════════════════════════════════════════════════
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // STEP 5: BODY
+    // ═══════════════════════════════════════════════════════════════════════
+    if g < 0 || g > 100 {
+        return "", fmt.Errorf("invalid grade %d: must be 0-100", g)
+    }
+
+    switch {
+    case g >= 80:
+        return LetterA, nil
+    case g >= 70:
+        return LetterB, nil
+    case g >= 60:
+        return LetterC, nil
+    case g >= 50:
+        return LetterD, nil
+    default:
+        return LetterF, nil
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// STEP 2: SIGNATURE + PURPOSE (function ที่ 2)
+// averageGrade คำนวณคะแนนเฉลี่ยของนักเรียนทั้งหมดในกลุ่ม
+// คืน 0 ถ้ากลุ่มว่าง
+func averageGrade(students []Student) float64 {
+
+    // STEP 3: EXAMPLES
+    // []                          → 0.0        (empty → 0)
+    // [{A,90}]                    → 90.0       (single)
+    // [{A,90},{B,80}]             → 85.0       (two students)
+    // [{A,100},{B,0},{C,50}]      → 50.0       (three students)
+
+    // STEP 4: TEMPLATE — input เป็น list → ใช้ loop
+    // if empty → return 0
+    // else → sum all → divide by count
+
+    // STEP 5: BODY
+    if len(students) == 0 {
+        return 0
+    }
+    var sum int
+    for _, s := range students {
+        sum += int(s.Score)
+    }
+    return float64(sum) / float64(len(students))
+}
+
+// topStudents คืนนักเรียนที่ได้เกรด A ทั้งหมด (เรียงตามคะแนนสูงสุด)
+// คืน empty slice ถ้าไม่มีใครได้ A
+func topStudents(students []Student) []Student {
+    // STEP 3: EXAMPLES
+    // []                          → []
+    // [{A,70}]                    → [] (ไม่ได้ A)
+    // [{A,90},{B,85}]             → [{A,90}]
+    // [{A,90},{B,85},{C,82}]      → [{A,90},{B,82}] (เรียงตาม score)
+
+    // STEP 4: TEMPLATE — input เป็น list → filter + sort
+
+    // STEP 5: BODY
+    var result []Student
+    for _, s := range students {
+        grade, err := s.Score.ToLetterGrade()
+        if err == nil && grade == LetterA {
+            result = append(result, s)
+        }
+    }
+    // Sort by score descending
+    for i := 0; i < len(result)-1; i++ {
+        for j := i + 1; j < len(result); j++ {
+            if result[j].Score > result[i].Score {
+                result[i], result[j] = result[j], result[i]
+            }
+        }
+    }
+    return result
+}</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>grade/grade_test.go — STEP 6: Tests (มาจาก Examples ในขั้นที่ 3)</span>
+      <span class="lang">Go</span>
+    </div>
+    <pre><code class="language-go">package grade_test
+
+import (
+    "testing"
+    "myapp/grade"
+)
+
+// ═══════════════════════════════════════════════════════════════════════════
+// STEP 6: TESTS — ใช้ examples จาก step 3 เป็น test cases โดยตรง
+// ═══════════════════════════════════════════════════════════════════════════
+
+func TestToLetterGrade(t *testing.T) {
+    tests := []struct {
+        name  string
+        input grade.Grade
+        want  grade.LetterGrade
+        err   bool
+    }{
+        // Normal cases
+        {"A range",      90,  grade.LetterA, false},
+        {"B range",      75,  grade.LetterB, false},
+        {"C range",      65,  grade.LetterC, false},
+        {"D range",      55,  grade.LetterD, false},
+        {"F range",      45,  grade.LetterF, false},
+        // Boundaries — ขอบเขตสำคัญมาก!
+        {"A lower bound", 80, grade.LetterA, false},
+        {"B upper bound", 79, grade.LetterB, false},
+        {"B lower bound", 70, grade.LetterB, false},
+        {"zero",           0, grade.LetterF, false},
+        {"max",          100, grade.LetterA, false},
+        // Edge cases — ข้อมูลไม่ valid
+        {"negative",     -1,  "",            true},
+        {"over 100",    101,  "",            true},
+    }
+
+    for _, tc := range tests {
+        t.Run(tc.name, func(t *testing.T) {
+            got, err := tc.input.ToLetterGrade()
+            if tc.err {
+                if err == nil {
+                    t.Errorf("expected error for input %d", tc.input)
+                }
+                return
+            }
+            if err != nil {
+                t.Fatalf("unexpected error: %v", err)
+            }
+            if got != tc.want {
+                t.Errorf("ToLetterGrade(%d) = %q, want %q", tc.input, got, tc.want)
+            }
+        })
+    }
+}
+
+func TestAverageGrade(t *testing.T) {
+    tests := []struct {
+        name     string
+        students []grade.Student
+        want     float64
+    }{
+        {"empty",    []grade.Student{},                                        0},
+        {"single",   []grade.Student{{"ก", 90}},                              90},
+        {"two",      []grade.Student{{"ก", 90}, {"ข", 80}},                   85},
+        {"three",    []grade.Student{{"ก", 100}, {"ข", 0}, {"ค", 50}},        50},
+    }
+    for _, tc := range tests {
+        t.Run(tc.name, func(t *testing.T) {
+            got := averageGrade(tc.students)
+            if got != tc.want {
+                t.Errorf("averageGrade() = %v, want %v", got, tc.want)
+            }
+        })
+    }
+}</code></pre>
+  </div>
+</div>
+
+<!-- ── FULL EXAMPLE 2 ── -->
+<div class="section">
+  <div class="section-title">💻 ตัวอย่างที่ 2 — ระบบ Shopping Cart (ซับซ้อนขึ้น)</div>
+  <div class="section-sub">HTDP กับ Recursive Data Structures และ Complex Business Rules</div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>cart/cart.go — Design Recipe กับ Complex Data</span>
+      <span class="lang">Go</span>
+    </div>
+    <pre><code class="language-go">package cart
+
+import (
+    "errors"
+    "fmt"
+)
+
+// ═══════════════════════════════════════════════════════════════════════════
+// STEP 1: DATA DEFINITION
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Price คือราคาเป็นสตางค์ (หน่วย: satang): เป็น int64 >= 0
+type Price int64
+
+func (p Price) Baht() float64 { return float64(p) / 100 }
+func (p Price) String() string { return fmt.Sprintf("฿%.2f", p.Baht()) }
+
+// Quantity คือจำนวนสินค้า: เป็น int > 0
+type Quantity int
+
+// CartItem คือรายการสินค้าใน cart:
+// ProductID ต้องไม่ว่าง
+// UnitPrice >= 0
+// Qty > 0
+type CartItem struct {
+    ProductID string
+    Name      string
+    UnitPrice Price
+    Qty       Quantity
+}
+
+// Subtotal คือยอดรวมของ item นี้
+func (i CartItem) Subtotal() Price { return Price(int64(i.UnitPrice) * int64(i.Qty)) }
+
+// Cart คือตะกร้าสินค้า:
+// Items เป็น slice — อาจว่างก็ได้
+// แต่ละ ProductID ต้องไม่ซ้ำกัน
+type Cart struct {
+    ID    string
+    Items []CartItem
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// STEP 2: SIGNATURE + PURPOSE
+// AddItem เพิ่มสินค้าลงใน cart
+// ถ้า ProductID เดิมมีอยู่แล้ว ให้เพิ่ม Qty แทน
+// ถ้า item ไม่ valid คืน error
+func (c *Cart) AddItem(item CartItem) error {
+
+    // STEP 3: EXAMPLES
+    // (empty cart) + {P1, "ข้าว", 3000, 1} → [{P1, "ข้าว", 3000, 1}]
+    // [{P1, "ข้าว", 3000, 1}] + {P1, "ข้าว", 3000, 2} → [{P1, "ข้าว", 3000, 3}] (merge)
+    // [] + {P1, "", 3000, 1} → error (name ว่าง)
+    // [] + {P1, "ข้าว", -100, 1} → error (ราคาติดลบ)
+    // [] + {P1, "ข้าว", 3000, 0} → error (qty ไม่บวก)
+
+    // STEP 4: TEMPLATE — validate → find existing → add/merge
+
+    // STEP 5: BODY
+    if item.ProductID == "" {
+        return errors.New("product ID required")
+    }
+    if item.Name == "" {
+        return errors.New("product name required")
+    }
+    if item.UnitPrice < 0 {
+        return errors.New("price must be non-negative")
+    }
+    if item.Qty <= 0 {
+        return errors.New("quantity must be positive")
+    }
+
+    // ถ้ามีอยู่แล้ว ให้รวม quantity
+    for i, existing := range c.Items {
+        if existing.ProductID == item.ProductID {
+            c.Items[i].Qty += item.Qty
+            return nil
+        }
+    }
+    // เพิ่มใหม่
+    c.Items = append(c.Items, item)
+    return nil
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// STEP 2: SIGNATURE + PURPOSE
+// RemoveItem ลบสินค้าออกจาก cart ด้วย ProductID
+// ถ้าไม่พบ ProductID คืน error
+func (c *Cart) RemoveItem(productID string) error {
+    // STEP 3: EXAMPLES
+    // [{P1}, {P2}] remove P1 → [{P2}]
+    // [{P1}]       remove P1 → []
+    // [{P1}]       remove P2 → error (ไม่พบ)
+    // []            remove P1 → error (cart ว่าง)
+
+    // STEP 4: TEMPLATE — ค้นหา index → ลบ (filter out)
+
+    // STEP 5: BODY
+    for i, item := range c.Items {
+        if item.ProductID == productID {
+            c.Items = append(c.Items[:i], c.Items[i+1:]...)
+            return nil
+        }
+    }
+    return fmt.Errorf("product %s not found in cart", productID)
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// STEP 2: SIGNATURE + PURPOSE
+// Total คำนวณยอดรวมทั้ง cart ก่อนส่วนลด
+// คืน 0 ถ้า cart ว่าง
+func (c *Cart) Total() Price {
+    // STEP 3: EXAMPLES
+    // []                         → 0
+    // [{P1, 3000, 1}]            → 3000
+    // [{P1, 3000, 2}]            → 6000
+    // [{P1, 3000, 1}, {P2, 2000, 3}] → 9000
+
+    // STEP 4: TEMPLATE — list → fold/reduce (sum)
+
+    // STEP 5: BODY
+    var total Price
+    for _, item := range c.Items {
+        total += item.Subtotal()
+    }
+    return total
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// STEP 2: SIGNATURE + PURPOSE
+// ApplyDiscount คิดราคาหลังส่วนลด pct (0-100%)
+// ถ้า pct ไม่อยู่ในช่วง [0,100] คืน error
+func (c *Cart) ApplyDiscount(pct int) (Price, error) {
+    // STEP 3: EXAMPLES
+    // total=10000, pct=0    → 10000  (ไม่ลด)
+    // total=10000, pct=10   → 9000   (ลด 10%)
+    // total=10000, pct=100  → 0      (ฟรี)
+    // total=10000, pct=-1   → error
+    // total=10000, pct=101  → error
+    // total=0,     pct=50   → 0      (cart ว่าง)
+
+    // STEP 4: TEMPLATE — validate pct → compute
+
+    // STEP 5: BODY
+    if pct < 0 || pct > 100 {
+        return 0, fmt.Errorf("discount %d%% out of range [0,100]", pct)
+    }
+    total := c.Total()
+    discount := Price(int64(total) * int64(pct) / 100)
+    return total - discount, nil
+}</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>cart/cart_test.go — Tests จาก Examples</span>
+      <span class="lang">Go</span>
+    </div>
+    <pre><code class="language-go">package cart_test
+
+import (
+    "testing"
+    "myapp/cart"
+)
+
+func makeItem(id, name string, price int64, qty int) cart.CartItem {
+    return cart.CartItem{
+        ProductID: id, Name: name,
+        UnitPrice: cart.Price(price),
+        Qty:       cart.Quantity(qty),
+    }
+}
+
+// Tests สำหรับ AddItem
+func TestCart_AddItem(t *testing.T) {
+    t.Run("add new item", func(t *testing.T) {
+        c := &cart.Cart{}
+        if err := c.AddItem(makeItem("P1", "ข้าว", 3000, 1)); err != nil {
+            t.Fatal(err)
+        }
+        if len(c.Items) != 1 {
+            t.Errorf("expected 1 item, got %d", len(c.Items))
+        }
+    })
+
+    t.Run("add duplicate merges qty", func(t *testing.T) {
+        c := &cart.Cart{}
+        c.AddItem(makeItem("P1", "ข้าว", 3000, 1))
+        c.AddItem(makeItem("P1", "ข้าว", 3000, 2))
+        if len(c.Items) != 1 {
+            t.Errorf("expected 1 item (merged), got %d", len(c.Items))
+        }
+        if c.Items[0].Qty != 3 {
+            t.Errorf("expected qty 3, got %d", c.Items[0].Qty)
+        }
+    })
+
+    t.Run("reject empty name", func(t *testing.T) {
+        c := &cart.Cart{}
+        if err := c.AddItem(makeItem("P1", "", 3000, 1)); err == nil {
+            t.Error("expected error for empty name")
+        }
+    })
+
+    t.Run("reject zero quantity", func(t *testing.T) {
+        c := &cart.Cart{}
+        if err := c.AddItem(makeItem("P1", "ข้าว", 3000, 0)); err == nil {
+            t.Error("expected error for zero qty")
+        }
+    })
+}
+
+// Tests สำหรับ Total
+func TestCart_Total(t *testing.T) {
+    t.Run("empty cart", func(t *testing.T) {
+        c := &cart.Cart{}
+        if got := c.Total(); got != 0 {
+            t.Errorf("empty cart total = %v, want 0", got)
+        }
+    })
+
+    t.Run("single item", func(t *testing.T) {
+        c := &cart.Cart{}
+        c.AddItem(makeItem("P1", "ข้าว", 3000, 2)) // 3000 * 2 = 6000
+        if got := c.Total(); got != 6000 {
+            t.Errorf("total = %v, want 6000", got)
+        }
+    })
+
+    t.Run("multiple items", func(t *testing.T) {
+        c := &cart.Cart{}
+        c.AddItem(makeItem("P1", "ข้าว", 3000, 1))  // 3000
+        c.AddItem(makeItem("P2", "น้ำ", 2000, 3))   // 6000
+        if got := c.Total(); got != 9000 {           // 9000
+            t.Errorf("total = %v, want 9000", got)
+        }
+    })
+}
+
+// Tests สำหรับ ApplyDiscount
+func TestCart_ApplyDiscount(t *testing.T) {
+    tests := []struct {
+        name    string
+        total   int64
+        pct     int
+        want    int64
+        wantErr bool
+    }{
+        {"no discount",   10000, 0,    10000, false},
+        {"10% off",       10000, 10,   9000,  false},
+        {"50% off",       10000, 50,   5000,  false},
+        {"100% off",      10000, 100,  0,     false},
+        {"empty cart",    0,     50,   0,     false},
+        {"negative pct",  10000, -1,   0,     true},
+        {"over 100 pct",  10000, 101,  0,     true},
+    }
+    for _, tc := range tests {
+        t.Run(tc.name, func(t *testing.T) {
+            c := &cart.Cart{}
+            if tc.total > 0 {
+                c.AddItem(makeItem("P1", "สินค้า", tc.total, 1))
+            }
+            got, err := c.ApplyDiscount(tc.pct)
+            if tc.wantErr {
+                if err == nil { t.Error("expected error") }
+                return
+            }
+            if err != nil { t.Fatalf("unexpected error: %v", err) }
+            if int64(got) != tc.want {
+                t.Errorf("ApplyDiscount(%d%%) = %d, want %d", tc.pct, got, tc.want)
+            }
+        })
+    }
+}</code></pre>
+  </div>
+</div>
+
+<!-- ── WHEN TO USE ── -->
+<div class="section">
+  <div class="section-title">🎯 Key Principles ของ HTDP</div>
+
+  <div class="concept-grid">
+    <div class="concept-card" style="--c:#6366f1">
+      <div class="label">หลักที่ 1</div>
+      <h3>Think Before Code</h3>
+      <p>ใช้เวลา 80% คิด 20% code — ทำให้ bug ในขั้น coding น้อยลงมาก เพราะคิดครบแล้ว</p>
+    </div>
+    <div class="concept-card" style="--c:#10b981">
+      <div class="label">หลักที่ 2</div>
+      <h3>Examples First</h3>
+      <p>เขียน examples ก่อน code เสมอ — examples บังคับให้คิดถึง edge cases ที่อาจลืม</p>
+    </div>
+    <div class="concept-card" style="--c:#06b6d4">
+      <div class="label">หลักที่ 3</div>
+      <h3>Data Drives Design</h3>
+      <p>Shape ของ code ควรสะท้อน shape ของ data — data เป็น list → code ใช้ loop, data เป็น tree → code ใช้ recursion</p>
+    </div>
+    <div class="concept-card" style="--c:#f59e0b">
+      <div class="label">หลักที่ 4</div>
+      <h3>Small, Composable Functions</h3>
+      <p>แต่ละ function ทำสิ่งเดียว (Single Responsibility) ทดสอบได้ง่าย และ compose ต่อกันเป็น complex logic ได้</p>
+    </div>
+    <div class="concept-card" style="--c:#ec4899">
+      <div class="label">หลักที่ 5</div>
+      <h3>Explicit Contracts</h3>
+      <p>Signature และ Purpose Statement เป็น "สัญญา" ของ function — ผู้เรียกรู้ว่าจะได้อะไร, ต้องส่งอะไร</p>
+    </div>
+    <div class="concept-card" style="--c:#ef4444">
+      <div class="label">หลักที่ 6</div>
+      <h3>Tests as Specification</h3>
+      <p>Tests ไม่ใช่แค่ "ทดสอบ" — มันคือ specification ของ behavior ที่ชัดเจนที่สุด readable โดยทีม</p>
+    </div>
+  </div>
+
+  <div class="callout tip">
+    <strong>HTDP + TDD:</strong> HTDP Design Recipe เข้ากันได้ดีมากกับ TDD (Test Driven Development)
+    เพราะทั้งคู่สอนให้ <strong>เขียน test ก่อน code</strong> — examples ในขั้นที่ 3 ของ HTDP คือ failing test ที่ต้องทำให้ผ่าน
+  </div>
+
+  <div class="callout blue">
+    <strong>สรุป Design Recipe:</strong><br>
+    <span style="color:#38bdf8">1. Data</span> → กำหนด types ที่ชัดเจน<br>
+    <span style="color:#67e8f9">2. Signature</span> → บอก input/output types<br>
+    <span style="color:#38bdf8">3. Examples</span> → ตัวอย่าง expected behavior<br>
+    <span style="color:#67e8f9">4. Template</span> → skeleton ตาม data structure<br>
+    <span style="color:#38bdf8">5. Body</span> → เขียน code จริง<br>
+    <span style="color:#67e8f9">6. Tests</span> → verify ด้วย examples จากข้อ 3
+  </div>
+</div>
+
+<div style="text-align:center;margin:3rem 0;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+  <a href="5-atomic.html" style="display:inline-flex;align-items:center;gap:.5rem;background:#0d1117;border:1px solid #1e293b;color:#64748b;padding:.7rem 1.5rem;border-radius:10px;font-size:.88rem">← Atomic Design</a>
+  <a href="index.html" style="display:inline-flex;align-items:center;gap:.5rem;background:#0d1117;border:1px solid #1e293b;color:#fca5a5;padding:.7rem 1.5rem;border-radius:10px;font-weight:600;font-size:.88rem">🏠 กลับหน้าหลัก</a>
+</div>
+
+</div>
+<script>hljs.highlightAll()</script>
+</body>
+</html>

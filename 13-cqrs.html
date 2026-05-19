@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CQRS — Command Query Responsibility Segregation</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',sans-serif;background:#0f0f1a;color:#e2e8f0;line-height:1.7}
+.hero{background:linear-gradient(135deg,#1a0a0a 0%,#2d1010 50%,#1a0a0a 100%);padding:60px 40px;text-align:center;border-bottom:1px solid #f8717133;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,#f8717122 0%,transparent 70%)}
+.hero-badge{display:inline-block;background:#f8717120;border:1px solid #f8717160;color:#f87171;padding:6px 18px;border-radius:20px;font-size:.8rem;letter-spacing:2px;text-transform:uppercase;margin-bottom:20px}
+.hero h1{font-size:3rem;font-weight:800;background:linear-gradient(135deg,#f87171,#fb923c,#f87171);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:16px}
+.hero p{font-size:1.15rem;color:#94a3b8;max-width:700px;margin:0 auto}
+nav{background:#1e1e2e;padding:16px 40px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #ffffff10;position:sticky;top:0;z-index:100}
+.nav-home{color:#f87171;text-decoration:none;font-weight:600;font-size:.9rem}
+.nav-links{display:flex;gap:16px}
+.nav-links a{color:#94a3b8;text-decoration:none;font-size:.85rem;padding:6px 14px;border-radius:8px;border:1px solid #ffffff15;transition:all .2s}
+.nav-links a:hover{color:#e2e8f0;border-color:#f8717140}
+.container{max-width:1100px;margin:0 auto;padding:40px 20px}
+section{margin-bottom:56px}
+h2{font-size:1.7rem;font-weight:700;color:#f87171;margin-bottom:8px;padding-bottom:8px;border-bottom:2px solid #f8717130}
+h3{font-size:1.2rem;font-weight:600;color:#fb923c;margin:28px 0 14px}
+p{color:#94a3b8;margin-bottom:14px}
+
+/* VB System */
+.vb-wrap{margin:24px 0}
+.vb-label{font-size:.75rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#f87171;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.vb-label::after{content:'';flex:1;height:1px;background:#f8717120}
+.vb-grid{display:grid;gap:14px}
+.vb-2{grid-template-columns:repeat(2,1fr)}
+.vb-3{grid-template-columns:repeat(3,1fr)}
+.vb-4{grid-template-columns:repeat(4,1fr)}
+.vbox{background:#1e1e2e;border:1px solid #f8717130;border-radius:14px;padding:20px;transition:transform .2s,border-color .2s}
+.vbox:hover{transform:translateY(-3px);border-color:#f8717160}
+.vb-icon{font-size:1.8rem;margin-bottom:10px}
+.vb-title{font-size:.95rem;font-weight:700;color:#e2e8f0;margin-bottom:8px}
+.vb-body{font-size:.84rem;color:#94a3b8;line-height:1.6}
+.vb-list{list-style:none;margin-top:8px}
+.vb-list li{font-size:.82rem;color:#94a3b8;padding:3px 0;padding-left:14px;position:relative}
+.vb-list li::before{content:'›';position:absolute;left:0;color:#f87171}
+.vb-chip{display:inline-block;background:#f8717115;border:1px solid #f8717140;color:#f87171;padding:3px 10px;border-radius:12px;font-size:.75rem;margin:3px 2px}
+
+/* Big split */
+.cqrs-split{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin:28px 0}
+.cqrs-side{border-radius:16px;padding:24px}
+.cmd-side{background:linear-gradient(135deg,#1a0a0a,#2a1010);border:2px solid #f8717150}
+.qry-side{background:linear-gradient(135deg,#0a1628,#1a2d4e);border:2px solid #60a5fa50}
+.side-header{font-size:1.3rem;font-weight:800;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #ffffff15}
+.side-header.red{color:#f87171}
+.side-header.blue{color:#60a5fa}
+.side-tag{display:inline-block;padding:4px 12px;border-radius:8px;font-size:.8rem;font-weight:600;margin-bottom:12px}
+.side-tag.red{background:#f8717120;color:#f87171}
+.side-tag.blue{background:#60a5fa20;color:#60a5fa}
+.side-item{font-size:.88rem;color:#94a3b8;padding:6px 0;border-bottom:1px solid #ffffff08;display:flex;align-items:flex-start;gap:10px}
+.side-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:6px}
+.side-dot.red{background:#f87171}
+.side-dot.blue{background:#60a5fa}
+
+/* Event Sourcing flow */
+.es-flow{display:flex;align-items:center;gap:0;margin:24px 0;overflow-x:auto;padding-bottom:8px}
+.es-step{background:#1e1e2e;border:1px solid #f8717130;border-radius:12px;padding:14px 18px;min-width:140px;text-align:center;flex-shrink:0}
+.es-step-icon{font-size:1.4rem;margin-bottom:6px}
+.es-step-name{font-size:.82rem;font-weight:700;color:#e2e8f0;margin-bottom:4px}
+.es-step-desc{font-size:.75rem;color:#94a3b8}
+.es-arrow{font-size:1.4rem;color:#f8717160;margin:0 8px;flex-shrink:0}
+
+/* Diagram */
+.diagram-wrap{background:#141425;border:1px solid #f8717130;border-radius:16px;padding:20px;margin:28px 0;overflow:hidden}
+.diagram-wrap svg{width:100%;height:auto}
+
+/* Code */
+.code-section{margin:24px 0}
+.code-file{background:#1a1a2e;border:1px solid #f8717130;border-radius:12px;margin-bottom:20px;overflow:hidden}
+.code-file-header{background:#f8717115;padding:10px 16px;font-size:.82rem;color:#f87171;font-family:monospace;border-bottom:1px solid #f8717130;display:flex;align-items:center;gap:8px}
+.code-file-header::before{content:'📄'}
+.code-file pre{margin:0}
+.code-file code{font-size:.82rem!important;padding:20px!important}
+
+@media(max-width:768px){
+  .hero h1{font-size:2rem}
+  .vb-3,.vb-4{grid-template-columns:repeat(2,1fr)}
+  .cqrs-split{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-home">← กลับหน้าหลัก</a>
+  <div class="nav-links">
+    <a href="12-repository.html">← Repository</a>
+    <a href="14-p2p.html">P2P →</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">Design Pattern #13</div>
+  <h1>CQRS</h1>
+  <p>Command Query Responsibility Segregation — แยก "การเขียน" และ "การอ่าน" ออกจากกันอย่างสมบูรณ์ เพื่อ Performance และ Scalability สูงสุด</p>
+</div>
+
+<div class="container">
+
+  <!-- Core Concept -->
+  <section>
+    <h2>CQRS คืออะไร?</h2>
+    <p>CQRS คือ pattern ที่แบ่งระบบออกเป็น 2 ด้านชัดเจน: <strong>Command Side</strong> (เขียน/แก้ไขข้อมูล) และ <strong>Query Side</strong> (อ่านข้อมูล) แต่ละด้านมี model, database, และ handler ของตัวเอง ทำให้ optimize แต่ละด้านได้อิสระ</p>
+    <p>หลักการพื้นฐานมาจาก CQS (Command Query Separation) ของ Bertrand Meyer: <em>"A function should either change state, or return a value — never both."</em></p>
+
+    <div class="cqrs-split">
+      <div class="cqrs-side cmd-side">
+        <div class="side-header red">⚡ Command Side (Write)</div>
+        <div class="side-tag red">แก้ไขสถานะของระบบ</div>
+        <div class="side-item"><span class="side-dot red"></span>Commands: CreateOrder, CancelOrder, UpdateStock</div>
+        <div class="side-item"><span class="side-dot red"></span>Validates business rules</div>
+        <div class="side-item"><span class="side-dot red"></span>Produces Domain Events</div>
+        <div class="side-item"><span class="side-dot red"></span>Write-optimized database (normalized)</div>
+        <div class="side-item"><span class="side-dot red"></span>Returns void / error เท่านั้น</div>
+        <div class="side-item"><span class="side-dot red"></span>Consistency: strong</div>
+        <div class="side-item"><span class="side-dot red"></span>Throughput: medium</div>
+      </div>
+      <div class="cqrs-side qry-side">
+        <div class="side-header blue">🔍 Query Side (Read)</div>
+        <div class="side-tag blue">คืนค่าโดยไม่แก้ไขข้อมูล</div>
+        <div class="side-item"><span class="side-dot blue"></span>Queries: GetOrder, ListOrders, GetSummary</div>
+        <div class="side-item"><span class="side-dot blue"></span>No business rule validation</div>
+        <div class="side-item"><span class="side-dot blue"></span>Consumes Domain Events → updates projections</div>
+        <div class="side-item"><span class="side-dot blue"></span>Read-optimized database (denormalized)</div>
+        <div class="side-item"><span class="side-dot blue"></span>Returns DTOs / View Models</div>
+        <div class="side-item"><span class="side-dot blue"></span>Consistency: eventual</div>
+        <div class="side-item"><span class="side-dot blue"></span>Throughput: very high</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sub-concepts -->
+  <section>
+    <h2>Concepts ที่เกี่ยวข้อง</h2>
+    <div class="vb-wrap">
+      <div class="vb-grid vb-4">
+        <div class="vbox">
+          <div class="vb-icon">📩</div>
+          <div class="vb-title">Command</div>
+          <div class="vb-body">Intent ที่จะเปลี่ยน state — ตั้งชื่อด้วย imperative verb</div>
+          <ul class="vb-list">
+            <li>PlaceOrderCmd</li>
+            <li>CancelOrderCmd</li>
+            <li>ConfirmPaymentCmd</li>
+          </ul>
+          <span class="vb-chip">Intent</span>
+        </div>
+        <div class="vbox">
+          <div class="vb-icon">🔎</div>
+          <div class="vb-title">Query</div>
+          <div class="vb-body">ขอข้อมูลโดยไม่มี side effects — pure read operation</div>
+          <ul class="vb-list">
+            <li>GetOrderByIDQuery</li>
+            <li>ListOrdersQuery</li>
+            <li>GetDashboardQuery</li>
+          </ul>
+          <span class="vb-chip">Read-only</span>
+        </div>
+        <div class="vbox">
+          <div class="vb-icon">📢</div>
+          <div class="vb-title">Domain Event</div>
+          <div class="vb-body">สิ่งที่เกิดขึ้นแล้ว — Command Side publish, Query Side subscribe</div>
+          <ul class="vb-list">
+            <li>OrderPlacedEvent</li>
+            <li>PaymentConfirmedEvent</li>
+            <li>OrderShippedEvent</li>
+          </ul>
+          <span class="vb-chip">Past tense</span>
+        </div>
+        <div class="vbox">
+          <div class="vb-icon">📊</div>
+          <div class="vb-title">Projection / Read Model</div>
+          <div class="vb-body">Denormalized view ที่สร้างจาก events — optimized สำหรับ query หนึ่งๆ</div>
+          <ul class="vb-list">
+            <li>OrderSummaryView</li>
+            <li>CustomerDashboard</li>
+            <li>InventoryReport</li>
+          </ul>
+          <span class="vb-chip">Eventual consistent</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="vb-wrap">
+      <div class="vb-label">Handler Types</div>
+      <div class="vb-grid vb-3">
+        <div class="vbox">
+          <div class="vb-icon">🎯</div>
+          <div class="vb-title">Command Handler</div>
+          <div class="vb-body">รับ Command → validate → update aggregate → publish events → return void/error ไม่ return data</div>
+        </div>
+        <div class="vbox">
+          <div class="vb-icon">📖</div>
+          <div class="vb-title">Query Handler</div>
+          <div class="vb-body">รับ Query → query read model โดยตรง → return DTO ไม่แตะ write database เลย</div>
+        </div>
+        <div class="vbox">
+          <div class="vb-icon">⚙️</div>
+          <div class="vb-title">Event Handler / Projector</div>
+          <div class="vb-body">Subscribe events จาก Command side → อัพเดท read model/projections ให้ query side</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CQRS Diagram -->
+  <section>
+    <h2>CQRS Architecture Diagram</h2>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 900 500" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arr-r" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#f87171"/>
+          </marker>
+          <marker id="arr-b" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#60a5fa"/>
+          </marker>
+          <marker id="arr-g" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#4ade80"/>
+          </marker>
+          <style>
+            .cl{font-family:sans-serif;font-size:11px;fill:#94a3b8}
+            .ct{font-family:sans-serif;font-size:12px;font-weight:bold;fill:#e2e8f0}
+            .cs{font-family:sans-serif;font-size:10px;fill:#64748b}
+          </style>
+        </defs>
+        <rect width="900" height="500" fill="#0d0d1a" rx="12"/>
+
+        <!-- Client -->
+        <rect x="20" y="210" width="100" height="80" rx="10" fill="#1e1e2e" stroke="#ffffff20"/>
+        <text x="70" y="245" text-anchor="middle" class="ct">💻 Client</text>
+        <text x="70" y="262" text-anchor="middle" class="cl">sends cmd</text>
+        <text x="70" y="276" text-anchor="middle" class="cl">& queries</text>
+
+        <!-- Command Bus -->
+        <rect x="180" y="80" width="160" height="50" rx="8" fill="#2a1010" stroke="#f8717140"/>
+        <text x="260" y="108" text-anchor="middle" class="ct" fill="#f87171">📩 Command Bus</text>
+
+        <!-- Command Handler -->
+        <rect x="180" y="160" width="160" height="60" rx="8" fill="#1a1010" stroke="#f8717130"/>
+        <text x="260" y="186" text-anchor="middle" class="ct">⚡ Cmd Handler</text>
+        <text x="260" y="202" text-anchor="middle" class="cl">validate + execute</text>
+
+        <!-- Aggregate -->
+        <rect x="180" y="250" width="160" height="60" rx="8" fill="#1a1010" stroke="#f8717130"/>
+        <text x="260" y="275" text-anchor="middle" class="ct">🏗️ Aggregate</text>
+        <text x="260" y="291" text-anchor="middle" class="cl">domain logic</text>
+
+        <!-- Write DB -->
+        <rect x="180" y="340" width="160" height="50" rx="8" fill="#2a1a0a" stroke="#fb923c40"/>
+        <text x="260" y="366" text-anchor="middle" class="ct" fill="#fb923c">💾 Write DB</text>
+        <text x="260" y="382" text-anchor="middle" class="cl">normalized</text>
+
+        <!-- Event Bus (center) -->
+        <rect x="390" y="240" width="120" height="60" rx="8" fill="#1a1a2e" stroke="#a78bfa60" stroke-width="1.5"/>
+        <text x="450" y="267" text-anchor="middle" class="ct" fill="#a78bfa">📢 Event Bus</text>
+        <text x="450" y="283" text-anchor="middle" class="cl">domain events</text>
+
+        <!-- Projector -->
+        <rect x="570" y="240" width="160" height="60" rx="8" fill="#0a1628" stroke="#60a5fa30"/>
+        <text x="650" y="267" text-anchor="middle" class="ct">⚙️ Projector</text>
+        <text x="650" y="283" text-anchor="middle" class="cl">updates read model</text>
+
+        <!-- Read DB -->
+        <rect x="570" y="340" width="160" height="50" rx="8" fill="#0a1a2a" stroke="#60a5fa40"/>
+        <text x="650" y="366" text-anchor="middle" class="ct" fill="#60a5fa">📊 Read DB</text>
+        <text x="650" y="382" text-anchor="middle" class="cl">denormalized views</text>
+
+        <!-- Query Bus -->
+        <rect x="760" y="80" width="120" height="50" rx="8" fill="#0a1628" stroke="#60a5fa40"/>
+        <text x="820" y="108" text-anchor="middle" class="ct" fill="#60a5fa">🔎 Query Bus</text>
+
+        <!-- Query Handler -->
+        <rect x="760" y="160" width="120" height="60" rx="8" fill="#0a1628" stroke="#60a5fa30"/>
+        <text x="820" y="186" text-anchor="middle" class="ct">📖 Qry Handler</text>
+        <text x="820" y="202" text-anchor="middle" class="cl">read-only</text>
+
+        <!-- Arrows -->
+        <!-- Client → Command Bus -->
+        <line x1="120" y1="235" x2="180" y2="105" stroke="#f87171" stroke-width="1.5" marker-end="url(#arr-r)"/>
+        <text x="145" y="168" class="cs" fill="#f87171">cmd</text>
+
+        <!-- Client → Query Bus -->
+        <line x1="120" y1="255" x2="760" y2="105" stroke="#60a5fa" stroke-width="1.5" marker-end="url(#arr-b)" stroke-dasharray="4,3"/>
+        <text x="440" y="165" class="cs" fill="#60a5fa">query</text>
+
+        <!-- Command Bus → Command Handler -->
+        <line x1="260" y1="130" x2="260" y2="160" stroke="#f87171" stroke-width="1.5" marker-end="url(#arr-r)"/>
+
+        <!-- Command Handler → Aggregate -->
+        <line x1="260" y1="220" x2="260" y2="250" stroke="#f87171" stroke-width="1.5" marker-end="url(#arr-r)"/>
+
+        <!-- Aggregate → Write DB -->
+        <line x1="260" y1="310" x2="260" y2="340" stroke="#fb923c" stroke-width="1.5" marker-end="url(#arr-r)"/>
+
+        <!-- Aggregate → Event Bus (publish event) -->
+        <path d="M 340 280 Q 395 280 390 270" stroke="#a78bfa" stroke-width="2" fill="none" marker-end="url(#arr-g)"/>
+        <text x="370" y="268" class="cs" fill="#a78bfa">event</text>
+
+        <!-- Event Bus → Projector -->
+        <line x1="510" y1="270" x2="570" y2="270" stroke="#4ade80" stroke-width="1.5" marker-end="url(#arr-g)"/>
+
+        <!-- Projector → Read DB -->
+        <line x1="650" y1="300" x2="650" y2="340" stroke="#60a5fa" stroke-width="1.5" marker-end="url(#arr-b)"/>
+
+        <!-- Query Handler → Read DB -->
+        <line x1="820" y1="220" x2="760" y2="380" stroke="#60a5fa" stroke-width="1.5" marker-end="url(#arr-b)" stroke-dasharray="4,3"/>
+
+        <!-- Query Bus → Query Handler -->
+        <line x1="820" y1="130" x2="820" y2="160" stroke="#60a5fa" stroke-width="1.5" marker-end="url(#arr-b)"/>
+
+        <!-- Client gets result back -->
+        <line x1="760" y1="190" x2="120" y2="268" stroke="#60a5fa40" stroke-width="1" stroke-dasharray="3,4"/>
+        <text x="440" y="244" class="cs" fill="#60a5fa">result DTO</text>
+
+        <!-- Command Side boundary -->
+        <rect x="170" y="60" width="190" height="350" rx="12" fill="none" stroke="#f8717120" stroke-dasharray="6,4" stroke-width="1.5"/>
+        <text x="265" y="430" text-anchor="middle" class="cl" fill="#f87171">WRITE SIDE</text>
+
+        <!-- Query Side boundary -->
+        <rect x="750" y="60" width="140" height="220" rx="12" fill="none" stroke="#60a5fa20" stroke-dasharray="6,4" stroke-width="1.5"/>
+        <text x="820" y="300" text-anchor="middle" class="cl" fill="#60a5fa">READ SIDE</text>
+
+        <!-- Legend -->
+        <line x1="20" y1="480" x2="50" y2="480" stroke="#f87171" stroke-width="2"/>
+        <text x="58" y="484" class="cs" fill="#f87171">Command flow</text>
+        <line x1="160" y1="480" x2="190" y2="480" stroke="#60a5fa" stroke-width="2" stroke-dasharray="4,3"/>
+        <text x="198" y="484" class="cs" fill="#60a5fa">Query flow</text>
+        <line x1="290" y1="480" x2="320" y2="480" stroke="#a78bfa" stroke-width="2"/>
+        <text x="328" y="484" class="cs" fill="#a78bfa">Domain event</text>
+
+        <!-- Animated command pulse -->
+        <circle r="4" fill="#f87171" opacity="0.8">
+          <animateMotion dur="2s" repeatCount="indefinite">
+            <mpath href="#cmdpath"/>
+          </animateMotion>
+        </circle>
+        <path id="cmdpath" d="M 70 235 L 260 105 L 260 160 L 260 250 L 260 340" fill="none"/>
+
+        <!-- Animated query pulse -->
+        <circle r="4" fill="#60a5fa" opacity="0.8">
+          <animateMotion dur="2.5s" repeatCount="indefinite" begin="1s">
+            <mpath href="#qrypath"/>
+          </animateMotion>
+        </circle>
+        <path id="qrypath" d="M 70 255 L 820 105 L 820 160 L 650 370" fill="none"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- Event Sourcing combo -->
+  <section>
+    <h2>CQRS + Event Sourcing</h2>
+    <p>CQRS มักใช้คู่กับ Event Sourcing — แทนที่จะเก็บ current state เก็บ events ทุกตัวที่เคยเกิด แล้ว replay เพื่อสร้าง state ปัจจุบัน</p>
+
+    <div class="es-flow">
+      <div class="es-step">
+        <div class="es-step-icon">📩</div>
+        <div class="es-step-name">Command</div>
+        <div class="es-step-desc">PlaceOrder</div>
+      </div>
+      <div class="es-arrow">→</div>
+      <div class="es-step">
+        <div class="es-step-icon">🏗️</div>
+        <div class="es-step-name">Aggregate</div>
+        <div class="es-step-desc">validate + apply</div>
+      </div>
+      <div class="es-arrow">→</div>
+      <div class="es-step">
+        <div class="es-step-icon">📝</div>
+        <div class="es-step-name">Event Store</div>
+        <div class="es-step-desc">append events</div>
+      </div>
+      <div class="es-arrow">→</div>
+      <div class="es-step">
+        <div class="es-step-icon">📢</div>
+        <div class="es-step-name">Event Bus</div>
+        <div class="es-step-desc">publish events</div>
+      </div>
+      <div class="es-arrow">→</div>
+      <div class="es-step">
+        <div class="es-step-icon">⚙️</div>
+        <div class="es-step-name">Projector</div>
+        <div class="es-step-desc">update read model</div>
+      </div>
+      <div class="es-arrow">→</div>
+      <div class="es-step">
+        <div class="es-step-icon">📊</div>
+        <div class="es-step-name">Read Model</div>
+        <div class="es-step-desc">query-ready view</div>
+      </div>
+    </div>
+
+    <div class="vb-wrap">
+      <div class="vb-label">Event Sourcing Benefits</div>
+      <div class="vb-grid vb-4">
+        <div class="vbox">
+          <div class="vb-icon">⏪</div>
+          <div class="vb-title">Complete Audit Trail</div>
+          <div class="vb-body">ทุก event ถูกเก็บ รู้ได้ว่าระบบอยู่ในสถานะอะไรตอนไหน temporal query ได้</div>
+        </div>
+        <div class="vbox">
+          <div class="vb-icon">🔄</div>
+          <div class="vb-title">Replay & Rebuild</div>
+          <div class="vb-body">Rebuild read model ใหม่ทั้งหมดได้ด้วยการ replay events — เพิ่ม projection ใหม่ได้เสมอ</div>
+        </div>
+        <div class="vbox">
+          <div class="vb-icon">🐛</div>
+          <div class="vb-title">Debugging</div>
+          <div class="vb-body">Debug ง่าย — replay events ถึง point ที่มีปัญหา เห็น state ได้ทุก step</div>
+        </div>
+        <div class="vbox">
+          <div class="vb-icon">📈</div>
+          <div class="vb-title">Multiple Projections</div>
+          <div class="vb-body">Events เดียวกัน → หลาย read models แต่ละอย่าง optimized สำหรับ use case ต่าง</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Go Code -->
+  <section>
+    <h2>ตัวอย่าง Code (Go)</h2>
+
+    <div class="code-section">
+      <div class="code-file">
+        <div class="code-file-header">command/commands.go — Command definitions</div>
+        <pre><code class="language-go">package command
+
+import "time"
+
+// PlaceOrderCommand — intent to create an order (write, no return data)
+type PlaceOrderCommand struct {
+	OrderID    string
+	CustomerID string
+	Items      []OrderItem
+	PlacedAt   time.Time
+}
+
+type OrderItem struct {
+	ProductID string
+	Qty       int
+	Price     float64
+}
+
+// CancelOrderCommand — intent to cancel
+type CancelOrderCommand struct {
+	OrderID   string
+	Reason    string
+	CancelledAt time.Time
+}</code></pre>
+      </div>
+
+      <div class="code-file">
+        <div class="code-file-header">query/queries.go — Query definitions</div>
+        <pre><code class="language-go">package query
+
+// GetOrderByIDQuery — read-only, no side effects
+type GetOrderByIDQuery struct {
+	OrderID string
+}
+
+// ListOrdersByCustomerQuery — paginated list
+type ListOrdersByCustomerQuery struct {
+	CustomerID string
+	Page       int
+	PageSize   int
+}
+
+// OrderSummaryDTO — data returned to caller (not domain entity)
+type OrderSummaryDTO struct {
+	OrderID    string  `json:"order_id"`
+	Status     string  `json:"status"`
+	Total      float64 `json:"total"`
+	ItemCount  int     `json:"item_count"`
+	CustomerID string  `json:"customer_id"`
+	CreatedAt  string  `json:"created_at"`
+}</code></pre>
+      </div>
+
+      <div class="code-file">
+        <div class="code-file-header">domain/order_aggregate.go — Aggregate with events</div>
+        <pre><code class="language-go">package domain
+
+import (
+	"fmt"
+	"time"
+)
+
+type OrderStatus string
+
+const (
+	StatusPending   OrderStatus = "pending"
+	StatusCancelled OrderStatus = "cancelled"
+)
+
+// Domain Events — things that happened (past tense)
+type OrderPlacedEvent struct {
+	OrderID    string
+	CustomerID string
+	Total      float64
+	OccurredAt time.Time
+}
+
+type OrderCancelledEvent struct {
+	OrderID     string
+	Reason      string
+	OccurredAt  time.Time
+}
+
+// Order aggregate — maintains invariants
+type Order struct {
+	ID         string
+	CustomerID string
+	Status     OrderStatus
+	Total      float64
+	Events     []interface{} // uncommitted events
+}
+
+func NewOrder(id, customerID string, total float64) *Order {
+	o := &Order{ID: id, CustomerID: customerID, Status: StatusPending, Total: total}
+	o.Events = append(o.Events, OrderPlacedEvent{
+		OrderID: id, CustomerID: customerID, Total: total,
+		OccurredAt: time.Now(),
+	})
+	return o
+}
+
+func (o *Order) Cancel(reason string) error {
+	if o.Status == StatusCancelled {
+		return fmt.Errorf("order already cancelled")
+	}
+	o.Status = StatusCancelled
+	o.Events = append(o.Events, OrderCancelledEvent{
+		OrderID: o.ID, Reason: reason, OccurredAt: time.Now(),
+	})
+	return nil
+}</code></pre>
+      </div>
+
+      <div class="code-file">
+        <div class="code-file-header">handler/command_handler.go — Command Side Handler</div>
+        <pre><code class="language-go">package handler
+
+import (
+	"context"
+	"fmt"
+
+	"myapp/command"
+	"myapp/domain"
+	"myapp/event"
+)
+
+type OrderCommandHandler struct {
+	writeRepo domain.OrderWriteRepository
+	eventBus  event.Bus
+}
+
+func NewOrderCommandHandler(repo domain.OrderWriteRepository, bus event.Bus) *OrderCommandHandler {
+	return &OrderCommandHandler{writeRepo: repo, eventBus: bus}
+}
+
+// HandlePlaceOrder — Command handler returns ONLY error, not data
+func (h *OrderCommandHandler) HandlePlaceOrder(ctx context.Context, cmd command.PlaceOrderCommand) error {
+	// 1. Calculate total
+	var total float64
+	for _, item := range cmd.Items {
+		total += float64(item.Qty) * item.Price
+	}
+
+	// 2. Create aggregate (enforces business rules)
+	order := domain.NewOrder(cmd.OrderID, cmd.CustomerID, total)
+
+	// 3. Persist to write database
+	if err := h.writeRepo.Save(ctx, order); err != nil {
+		return fmt.Errorf("save order: %w", err)
+	}
+
+	// 4. Publish domain events → Query side will update projections
+	for _, evt := range order.Events {
+		if err := h.eventBus.Publish(ctx, evt); err != nil {
+			return fmt.Errorf("publish event: %w", err)
+		}
+	}
+	return nil
+}
+
+func (h *OrderCommandHandler) HandleCancelOrder(ctx context.Context, cmd command.CancelOrderCommand) error {
+	order, err := h.writeRepo.FindByID(ctx, cmd.OrderID)
+	if err != nil {
+		return err
+	}
+	if err := order.Cancel(cmd.Reason); err != nil {
+		return err
+	}
+	if err := h.writeRepo.Save(ctx, order); err != nil {
+		return err
+	}
+	for _, evt := range order.Events {
+		h.eventBus.Publish(ctx, evt)
+	}
+	return nil
+}</code></pre>
+      </div>
+
+      <div class="code-file">
+        <div class="code-file-header">handler/query_handler.go — Query Side Handler</div>
+        <pre><code class="language-go">package handler
+
+import (
+	"context"
+
+	"myapp/query"
+)
+
+// OrderReadRepository — interface for read-optimized database
+type OrderReadRepository interface {
+	FindSummaryByID(ctx context.Context, id string) (*query.OrderSummaryDTO, error)
+	ListByCustomer(ctx context.Context, customerID string, page, pageSize int) ([]*query.OrderSummaryDTO, error)
+}
+
+type OrderQueryHandler struct {
+	readRepo OrderReadRepository
+}
+
+func NewOrderQueryHandler(repo OrderReadRepository) *OrderQueryHandler {
+	return &OrderQueryHandler{readRepo: repo}
+}
+
+// HandleGetOrder — Query handler returns data (DTO), never modifies state
+func (h *OrderQueryHandler) HandleGetOrder(ctx context.Context, q query.GetOrderByIDQuery) (*query.OrderSummaryDTO, error) {
+	return h.readRepo.FindSummaryByID(ctx, q.OrderID)
+}
+
+func (h *OrderQueryHandler) HandleListOrders(ctx context.Context, q query.ListOrdersByCustomerQuery) ([]*query.OrderSummaryDTO, error) {
+	return h.readRepo.ListByCustomer(ctx, q.CustomerID, q.Page, q.PageSize)
+}</code></pre>
+      </div>
+
+      <div class="code-file">
+        <div class="code-file-header">projector/order_projector.go — Updates Read Model from Events</div>
+        <pre><code class="language-go">package projector
+
+import (
+	"context"
+	"database/sql"
+	"log"
+
+	"myapp/domain"
+)
+
+// OrderProjector listens to domain events and updates the read model
+type OrderProjector struct {
+	readDB *sql.DB
+}
+
+func NewOrderProjector(readDB *sql.DB) *OrderProjector {
+	return &OrderProjector{readDB: readDB}
+}
+
+// OnOrderPlaced — updates the denormalized read table
+func (p *OrderProjector) OnOrderPlaced(ctx context.Context, evt domain.OrderPlacedEvent) {
+	_, err := p.readDB.ExecContext(ctx,
+		`INSERT INTO order_summaries (order_id, customer_id, status, total, item_count, created_at)
+		 VALUES ($1, $2, 'pending', $3, 0, $4)`,
+		evt.OrderID, evt.CustomerID, evt.Total, evt.OccurredAt)
+	if err != nil {
+		log.Printf("projector OnOrderPlaced error: %v", err)
+	}
+}
+
+func (p *OrderProjector) OnOrderCancelled(ctx context.Context, evt domain.OrderCancelledEvent) {
+	_, err := p.readDB.ExecContext(ctx,
+		`UPDATE order_summaries SET status = 'cancelled' WHERE order_id = $1`,
+		evt.OrderID)
+	if err != nil {
+		log.Printf("projector OnOrderCancelled error: %v", err)
+	}
+}</code></pre>
+      </div>
+
+      <div class="code-file">
+        <div class="code-file-header">cmd/main.go — HTTP API wiring Command & Query handlers</div>
+        <pre><code class="language-go">package main
+
+import (
+	"encoding/json"
+	"net/http"
+	"time"
+
+	"myapp/command"
+	"myapp/handler"
+	"myapp/query"
+)
+
+func main() {
+	// ... setup DBs, repos, event bus ...
+
+	cmdHandler := handler.NewOrderCommandHandler(writeRepo, eventBus)
+	qryHandler := handler.NewOrderQueryHandler(readRepo)
+
+	// Command endpoint — returns 202 Accepted, no body
+	http.HandleFunc("POST /orders", func(w http.ResponseWriter, r *http.Request) {
+		var cmd command.PlaceOrderCommand
+		if err := json.NewDecoder(r.Body).Decode(&cmd); err != nil {
+			http.Error(w, err.Error(), 400)
+			return
+		}
+		cmd.PlacedAt = time.Now()
+		if err := cmdHandler.HandlePlaceOrder(r.Context(), cmd); err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+		w.WriteHeader(http.StatusAccepted) // 202: accepted for processing
+	})
+
+	// Query endpoint — returns data (from read model)
+	http.HandleFunc("GET /orders/{id}", func(w http.ResponseWriter, r *http.Request) {
+		orderID := r.PathValue("id")
+		result, err := qryHandler.HandleGetOrder(r.Context(), query.GetOrderByIDQuery{OrderID: orderID})
+		if err != nil {
+			http.Error(w, err.Error(), 404)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(result)
+	})
+
+	http.ListenAndServe(":8080", nil)
+}</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- When to use -->
+  <section>
+    <h2>เมื่อไหร่ควรใช้ CQRS?</h2>
+    <div class="vb-wrap">
+      <div class="vb-grid vb-2">
+        <div class="vbox">
+          <div class="vb-icon">✅</div>
+          <div class="vb-title">เหมาะกับ</div>
+          <ul class="vb-list">
+            <li>Read/Write ratio ไม่สมดุล (read มากกว่า write 10x+)</li>
+            <li>Complex business logic ฝั่ง write, complex reporting ฝั่ง read</li>
+            <li>ต้องการ audit trail / event history สมบูรณ์</li>
+            <li>Scalability — scale read/write tier อิสระ</li>
+            <li>ระบบที่ต้องการ multiple views ของ data เดียวกัน</li>
+          </ul>
+        </div>
+        <div class="vbox">
+          <div class="vb-icon">⚠️</div>
+          <div class="vb-title">ระวัง</div>
+          <ul class="vb-list">
+            <li>Complexity สูงมาก — ไม่เหมาะกับ CRUD อย่างเดียว</li>
+            <li>Eventual consistency — user อาจเห็น data เก่า momentarily</li>
+            <li>ต้องเขียน code เยอะขึ้น — 2 models, 2 databases, projectors</li>
+            <li>Debug ยากกว่า — trace event flow ข้าม services</li>
+            <li>Overkill สำหรับ small/simple applications</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>hljs.highlightAll();</script>
+</body>
+</html>

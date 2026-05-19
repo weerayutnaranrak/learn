@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BFF Architecture — สื่อการสอน</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#07090f;color:#e2e8f0;line-height:1.7}
+a{color:#fbbf24;text-decoration:none}
+
+.topnav{display:flex;align-items:center;gap:1rem;padding:1rem 2rem;background:#0d1117;border-bottom:1px solid #1e293b;position:sticky;top:0;z-index:100}
+.back-btn{color:#64748b;font-size:.85rem;transition:color .2s}
+.back-btn:hover{color:#e2e8f0;text-decoration:none}
+.nav-title{color:#475569;font-size:.85rem}
+.nav-title span{color:#fcd34d;font-weight:600}
+
+.hero{padding:4rem 2rem 3rem;text-align:center;background:linear-gradient(160deg,#07090f,#120e00)}
+.hero-badge{display:inline-block;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);color:#fcd34d;padding:.35rem 1rem;border-radius:999px;font-size:.8rem;font-weight:600;margin-bottom:1.5rem}
+.hero h1{font-size:clamp(1.8rem,4vw,3rem);font-weight:800;background:linear-gradient(135deg,#f59e0b,#d97706);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:1rem}
+.hero p{color:#64748b;max-width:640px;margin:0 auto;font-size:1rem}
+
+.content{max-width:900px;margin:0 auto;padding:2rem 1.5rem 5rem}
+.section{margin-bottom:4rem}
+.section-title{font-size:1.6rem;font-weight:700;color:#f59e0b;margin-bottom:.4rem;display:flex;align-items:center;gap:.6rem}
+.section-sub{color:#475569;font-size:.9rem;margin-bottom:2rem;padding-left:2rem}
+
+.callout{background:#0f172a;border-left:3px solid #f59e0b;border-radius:0 8px 8px 0;padding:1rem 1.2rem;margin:1.5rem 0;font-size:.88rem;color:#94a3b8}
+.callout strong{color:#fcd34d}
+.callout.tip{border-color:#10b981}.callout.tip strong{color:#6ee7b7}
+.callout.warn{border-color:#ef4444}.callout.warn strong{color:#fca5a5}
+
+.code-block{margin:1.5rem 0;border-radius:12px;overflow:hidden;border:1px solid #1e293b}
+.code-header{background:#111827;padding:.7rem 1rem;display:flex;justify-content:space-between;align-items:center}
+.code-header span{font-size:.78rem;color:#64748b;font-weight:600}
+.code-header .lang{background:rgba(245,158,11,.12);color:#fbbf24;padding:.15rem .6rem;border-radius:4px;font-size:.72rem;font-weight:700}
+.code-block pre{margin:0!important;border-radius:0!important;border:none!important;font-size:.83rem!important;line-height:1.6!important}
+
+.diagram{background:#0d1117;border:1px solid #1e293b;border-radius:16px;padding:2rem;margin:2rem 0;text-align:center;overflow:hidden}
+.diagram-title{font-size:.8rem;color:#475569;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:1.5rem}
+
+.concept-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;margin:1.5rem 0}
+.concept-card{background:#0d1117;border:1px solid #1e293b;border-radius:12px;padding:1.4rem;border-left:3px solid var(--c,#f59e0b)}
+.concept-card h3{font-size:.95rem;font-weight:700;color:#f1f5f9;margin-bottom:.4rem}
+.concept-card p{font-size:.83rem;color:#64748b;line-height:1.6}
+.concept-card .label{font-size:.7rem;color:var(--c,#f59e0b);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.4rem}
+
+.compare{width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:.88rem}
+.compare th{background:#111827;color:#94a3b8;padding:.8rem 1rem;text-align:left;border-bottom:2px solid #1e293b}
+.compare td{padding:.7rem 1rem;border-bottom:1px solid #111827;color:#cbd5e1;vertical-align:top;font-size:.85rem}
+
+@keyframes flowDown{0%{stroke-dashoffset:-30}100%{stroke-dashoffset:0}}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="index.html" class="back-btn">← กลับหน้าหลัก</a>
+  <span class="nav-title">04 / <span>BFF Architecture</span></span>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">🔀 หัวข้อที่ 4</div>
+  <h1>BFF Architecture</h1>
+  <p>Backend for Frontend — สร้าง Backend Layer ที่ tailored สำหรับแต่ละ Client Type แทนที่จะมี Generic API เดียวสำหรับทุกคน</p>
+</div>
+
+<div class="content">
+
+<!-- ── PROBLEM ── -->
+<div class="section">
+  <div class="section-title">😣 ปัญหาที่ BFF แก้</div>
+  <div class="section-sub">ทำไม Generic API เดียวไม่พอ?</div>
+
+  <p style="color:#94a3b8;margin-bottom:1.5rem">
+    เมื่อระบบมีหลาย client (Web, Mobile App, Smart TV, IoT) แต่ละตัวมีความต้องการต่างกันมาก:
+  </p>
+
+  <div class="concept-grid">
+    <div class="concept-card" style="--c:#ef4444">
+      <div class="label">ปัญหา 1</div>
+      <h3>Over-fetching / Under-fetching</h3>
+      <p>Web ต้องการข้อมูลเยอะ, Mobile ต้องการแค่บางส่วน — Generic API ให้มาเท่ากัน ทำให้ mobile โหลดข้อมูลเกินความจำเป็น</p>
+    </div>
+    <div class="concept-card" style="--c:#f59e0b">
+      <div class="label">ปัญหา 2</div>
+      <h3>N+1 Client Calls</h3>
+      <p>Mobile ต้อง call 5 endpoints เพื่อแสดง 1 หน้า ทำให้ช้า และ battery drain — เพราะ microservices ไม่รู้จัก client context</p>
+    </div>
+    <div class="concept-card" style="--c:#ef4444">
+      <div class="label">ปัญหา 3</div>
+      <h3>Coupling ระหว่าง Client และ Microservices</h3>
+      <p>Client รู้จัก microservices ทุกตัว — เปลี่ยน internal structure ทีไร client ต้องอัพเดทตาม</p>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>BFF Pattern แก้ด้วย:</strong> สร้าง "Backend" แยกสำหรับแต่ละ client type
+    — Web BFF, Mobile BFF, Smart TV BFF
+    แต่ละตัว aggregate data จาก microservices แล้วส่งเฉพาะที่ client นั้นต้องการ
+  </div>
+
+  <!-- BFF Diagram -->
+  <div class="diagram">
+    <div class="diagram-title">BFF Architecture Overview</div>
+    <svg viewBox="0 0 680 320" fill="none" xmlns="http://www.w3.org/2000/svg" style="max-width:680px;width:100%">
+      <!-- Clients -->
+      <rect x="15" y="15" width="90" height="55" rx="8" fill="#0a1020" stroke="#6366f1" stroke-width="1.5"/>
+      <text x="60" y="38" text-anchor="middle" fill="#a5b4fc" font-size="9" font-weight="700">🖥️ Web</text>
+      <text x="60" y="53" text-anchor="middle" fill="#818cf8" font-size="8">React / Vue</text>
+      <text x="60" y="64" text-anchor="middle" fill="#475569" font-size="7">Full data needed</text>
+
+      <rect x="15" y="90" width="90" height="55" rx="8" fill="#0a1510" stroke="#10b981" stroke-width="1.5"/>
+      <text x="60" y="113" text-anchor="middle" fill="#6ee7b7" font-size="9" font-weight="700">📱 Mobile</text>
+      <text x="60" y="128" text-anchor="middle" fill="#34d399" font-size="8">iOS / Android</text>
+      <text x="60" y="139" text-anchor="middle" fill="#475569" font-size="7">Minimal data</text>
+
+      <rect x="15" y="165" width="90" height="55" rx="8" fill="#0f0a00" stroke="#f59e0b" stroke-width="1.5"/>
+      <text x="60" y="188" text-anchor="middle" fill="#fcd34d" font-size="9" font-weight="700">📺 Smart TV</text>
+      <text x="60" y="203" text-anchor="middle" fill="#fbbf24" font-size="8">TV App</text>
+      <text x="60" y="214" text-anchor="middle" fill="#475569" font-size="7">Media focused</text>
+
+      <!-- BFFs -->
+      <rect x="170" y="10" width="120" height="65" rx="10" fill="#0d1030" stroke="#6366f1" stroke-width="2"/>
+      <text x="230" y="33" text-anchor="middle" fill="#a5b4fc" font-size="10" font-weight="700">Web BFF</text>
+      <text x="230" y="50" text-anchor="middle" fill="#6366f1" font-size="8">Aggregate + Transform</text>
+      <text x="230" y="63" text-anchor="middle" fill="#475569" font-size="7">:8081</text>
+
+      <rect x="170" y="90" width="120" height="65" rx="10" fill="#0d2510" stroke="#10b981" stroke-width="2"/>
+      <text x="230" y="113" text-anchor="middle" fill="#6ee7b7" font-size="10" font-weight="700">Mobile BFF</text>
+      <text x="230" y="130" text-anchor="middle" fill="#10b981" font-size="8">Lightweight + Compress</text>
+      <text x="230" y="143" text-anchor="middle" fill="#475569" font-size="7">:8082</text>
+
+      <rect x="170" y="170" width="120" height="65" rx="10" fill="#201000" stroke="#f59e0b" stroke-width="2"/>
+      <text x="230" y="193" text-anchor="middle" fill="#fcd34d" font-size="10" font-weight="700">TV BFF</text>
+      <text x="230" y="210" text-anchor="middle" fill="#f59e0b" font-size="8">Media + Streaming</text>
+      <text x="230" y="223" text-anchor="middle" fill="#475569" font-size="7">:8083</text>
+
+      <!-- Microservices -->
+      <rect x="390" y="30" width="110" height="40" rx="8" fill="#111827" stroke="#334155"/>
+      <text x="445" y="55" text-anchor="middle" fill="#94a3b8" font-size="9" font-weight="600">Product Service</text>
+
+      <rect x="390" y="85" width="110" height="40" rx="8" fill="#111827" stroke="#334155"/>
+      <text x="445" y="110" text-anchor="middle" fill="#94a3b8" font-size="9" font-weight="600">User Service</text>
+
+      <rect x="390" y="140" width="110" height="40" rx="8" fill="#111827" stroke="#334155"/>
+      <text x="445" y="165" text-anchor="middle" fill="#94a3b8" font-size="9" font-weight="600">Order Service</text>
+
+      <rect x="390" y="195" width="110" height="40" rx="8" fill="#111827" stroke="#334155"/>
+      <text x="445" y="220" text-anchor="middle" fill="#94a3b8" font-size="9" font-weight="600">Review Service</text>
+
+      <rect x="390" y="250" width="110" height="40" rx="8" fill="#111827" stroke="#334155"/>
+      <text x="445" y="275" text-anchor="middle" fill="#94a3b8" font-size="9" font-weight="600">Inventory Service</text>
+
+      <!-- Client → BFF arrows -->
+      <line x1="105" y1="42" x2="168" y2="42" stroke="#6366f1" stroke-width="1.5" marker-end="url(#pa)">
+        <animate attributeName="stroke-dasharray" values="0,50;50,0" dur="1.2s" repeatCount="indefinite"/>
+      </line>
+      <line x1="105" y1="118" x2="168" y2="122" stroke="#10b981" stroke-width="1.5" marker-end="url(#ga)">
+        <animate attributeName="stroke-dasharray" values="0,50;50,0" dur="1.2s" begin=".3s" repeatCount="indefinite"/>
+      </line>
+      <line x1="105" y1="192" x2="168" y2="200" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#ya)">
+        <animate attributeName="stroke-dasharray" values="0,50;50,0" dur="1.2s" begin=".6s" repeatCount="indefinite"/>
+      </line>
+
+      <!-- Web BFF → Services (fan-out) -->
+      <line x1="290" y1="35" x2="388" y2="50" stroke="#6366f1" stroke-width="1" stroke-dasharray="4,2" opacity=".7">
+        <animate attributeName="stroke-dasharray" values="0,40;40,0" dur="1s" repeatCount="indefinite"/>
+      </line>
+      <line x1="290" y1="42" x2="388" y2="105" stroke="#6366f1" stroke-width="1" stroke-dasharray="4,2" opacity=".7">
+        <animate attributeName="stroke-dasharray" values="0,40;40,0" dur="1s" begin=".2s" repeatCount="indefinite"/>
+      </line>
+      <line x1="290" y1="55" x2="388" y2="160" stroke="#6366f1" stroke-width="1" stroke-dasharray="4,2" opacity=".7">
+        <animate attributeName="stroke-dasharray" values="0,40;40,0" dur="1s" begin=".4s" repeatCount="indefinite"/>
+      </line>
+      <line x1="290" y1="60" x2="388" y2="215" stroke="#6366f1" stroke-width="1" stroke-dasharray="4,2" opacity=".4">
+        <animate attributeName="stroke-dasharray" values="0,40;40,0" dur="1s" begin=".6s" repeatCount="indefinite"/>
+      </line>
+
+      <!-- Mobile BFF → Services (minimal) -->
+      <line x1="290" y1="120" x2="388" y2="105" stroke="#10b981" stroke-width="1" stroke-dasharray="4,2" opacity=".7">
+        <animate attributeName="stroke-dasharray" values="0,40;40,0" dur="1s" begin=".1s" repeatCount="indefinite"/>
+      </line>
+      <line x1="290" y1="130" x2="388" y2="160" stroke="#10b981" stroke-width="1" stroke-dasharray="4,2" opacity=".7">
+        <animate attributeName="stroke-dasharray" values="0,40;40,0" dur="1s" begin=".3s" repeatCount="indefinite"/>
+      </line>
+
+      <!-- TV BFF → Services -->
+      <line x1="290" y1="200" x2="388" y2="55" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4,2" opacity=".5">
+        <animate attributeName="stroke-dasharray" values="0,40;40,0" dur="1s" begin=".2s" repeatCount="indefinite"/>
+      </line>
+      <line x1="290" y1="210" x2="388" y2="270" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4,2" opacity=".5">
+        <animate attributeName="stroke-dasharray" values="0,40;40,0" dur="1s" begin=".5s" repeatCount="indefinite"/>
+      </line>
+
+      <!-- Labels -->
+      <text x="340" y="308" text-anchor="middle" fill="#334155" font-size="9">แต่ละ BFF เรียก services ที่ต้องการ — Aggregate เป็น response เดียว</text>
+
+      <defs>
+        <marker id="pa" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#6366f1"/></marker>
+        <marker id="ga" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#10b981"/></marker>
+        <marker id="ya" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#f59e0b"/></marker>
+      </defs>
+    </svg>
+  </div>
+</div>
+
+<!-- ── CODE ── -->
+<div class="section">
+  <div class="section-title">💻 ตัวอย่าง Go — Web BFF vs Mobile BFF</div>
+  <div class="section-sub">แสดงความแตกต่างของ Response ที่แต่ละ BFF ส่งให้ Client</div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>clients/upstream.go — Upstream Service Clients (Shared)</span>
+      <span class="lang">Go</span>
+    </div>
+    <pre><code class="language-go">package clients
+
+import (
+    "context"
+    "encoding/json"
+    "fmt"
+    "net/http"
+    "time"
+)
+
+// ── Models จาก Upstream Microservices ────────────────────────────────────────
+
+// Product — full model จาก Product Service
+type Product struct {
+    ID            string    `json:"id"`
+    Name          string    `json:"name"`
+    Description   string    `json:"description"`    // ยาวมาก
+    Price         float64   `json:"price"`
+    OriginalPrice float64   `json:"original_price"`
+    Currency      string    `json:"currency"`
+    Images        []string  `json:"images"`         // หลายรูป
+    Category      string    `json:"category"`
+    Tags          []string  `json:"tags"`
+    Rating        float64   `json:"rating"`
+    ReviewCount   int       `json:"review_count"`
+    StockCount    int       `json:"stock_count"`
+    Weight        float64   `json:"weight_kg"`
+    Dimensions    Dimension `json:"dimensions"`
+    CreatedAt     time.Time `json:"created_at"`
+    UpdatedAt     time.Time `json:"updated_at"`
+}
+
+type Dimension struct{ Width, Height, Depth float64 }
+
+// Cart — จาก Cart Service
+type Cart struct {
+    ID    string      `json:"id"`
+    Items []CartItem  `json:"items"`
+    Total float64     `json:"total"`
+}
+type CartItem struct{ ProductID, Name string; Price float64; Qty int }
+
+// Recommendation — จาก Recommendation Service
+type Recommendation struct{ ProductID, Name string; Score float64 }
+
+// ── HTTP Clients ───────────────────────────────────────────────────────────────
+
+type ProductClient struct{ baseURL string; http *http.Client }
+
+func NewProductClient(baseURL string) *ProductClient {
+    return &ProductClient{
+        baseURL: baseURL,
+        http:    &http.Client{Timeout: 5 * time.Second},
+    }
+}
+
+func (c *ProductClient) GetProduct(ctx context.Context, id string) (*Product, error) {
+    req, _ := http.NewRequestWithContext(ctx, "GET",
+        fmt.Sprintf("%s/products/%s", c.baseURL, id), nil)
+    resp, err := c.http.Do(req)
+    if err != nil {
+        return nil, fmt.Errorf("fetch product: %w", err)
+    }
+    defer resp.Body.Close()
+    var p Product
+    return &p, json.NewDecoder(resp.Body).Decode(&p)
+}
+
+func (c *ProductClient) GetRecommendations(ctx context.Context, productID string) ([]Recommendation, error) {
+    req, _ := http.NewRequestWithContext(ctx, "GET",
+        fmt.Sprintf("%s/products/%s/recommendations", c.baseURL, productID), nil)
+    resp, err := c.http.Do(req)
+    if err != nil {
+        return nil, err
+    }
+    defer resp.Body.Close()
+    var recs []Recommendation
+    return recs, json.NewDecoder(resp.Body).Decode(&recs)
+}
+
+type CartClient struct{ baseURL string; http *http.Client }
+func NewCartClient(baseURL string) *CartClient {
+    return &CartClient{baseURL: baseURL, http: &http.Client{Timeout: 3 * time.Second}}
+}
+func (c *CartClient) GetCart(ctx context.Context, userID string) (*Cart, error) {
+    req, _ := http.NewRequestWithContext(ctx, "GET",
+        fmt.Sprintf("%s/carts/%s", c.baseURL, userID), nil)
+    resp, err := c.http.Do(req)
+    if err != nil {
+        return nil, err
+    }
+    defer resp.Body.Close()
+    var cart Cart
+    return &cart, json.NewDecoder(resp.Body).Decode(&cart)
+}</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>webbff/handler.go — Web BFF (Full Data + Aggregation)</span>
+      <span class="lang">Go</span>
+    </div>
+    <pre><code class="language-go">package webbff
+
+import (
+    "context"
+    "encoding/json"
+    "net/http"
+    "sync"
+    "myapp/clients"
+)
+
+// ── Web Response Models (tailored for Web) ───────────────────────────────────
+
+// WebProductPage — response สำหรับ Web หน้า Product Detail
+// รวมข้อมูลจากหลาย services ในการ call เดียว
+type WebProductPage struct {
+    Product         WebProduct         `json:"product"`
+    Cart            *WebCart           `json:"cart,omitempty"`
+    Recommendations []WebRecommendation `json:"recommendations"`
+    RelatedProducts []WebProductSummary `json:"related_products"`
+}
+
+// WebProduct — ข้อมูลสำหรับ Web (full detail)
+type WebProduct struct {
+    ID            string   `json:"id"`
+    Name          string   `json:"name"`
+    Description   string   `json:"description"`   // Web แสดง description เต็ม
+    Price         float64  `json:"price"`
+    OriginalPrice float64  `json:"original_price"`
+    DiscountPct   int      `json:"discount_pct"`  // คำนวณใน BFF
+    Currency      string   `json:"currency"`
+    Images        []string `json:"images"`         // ทุกรูป
+    PrimaryImage  string   `json:"primary_image"`
+    Rating        float64  `json:"rating"`
+    ReviewCount   int      `json:"review_count"`
+    InStock       bool     `json:"in_stock"`
+    Tags          []string `json:"tags"`
+}
+
+type WebCart struct {
+    ItemCount int     `json:"item_count"`
+    Total     float64 `json:"total"`
+}
+
+type WebRecommendation struct {
+    ProductID string  `json:"product_id"`
+    Name      string  `json:"name"`
+    Score     float64 `json:"score"`
+}
+
+type WebProductSummary struct {
+    ID    string  `json:"id"`
+    Name  string  `json:"name"`
+    Price float64 `json:"price"`
+    Image string  `json:"image"`
+}
+
+// ── Web BFF Handler ───────────────────────────────────────────────────────────
+
+type WebBFFHandler struct {
+    products *clients.ProductClient
+    carts    *clients.CartClient
+}
+
+func NewWebBFFHandler(products *clients.ProductClient, carts *clients.CartClient) *WebBFFHandler {
+    return &WebBFFHandler{products: products, carts: carts}
+}
+
+// GetProductPage — Aggregate หลาย calls เป็น response เดียวสำหรับ Web
+// Fan-out parallel calls แล้วรวมผล
+func (h *WebBFFHandler) GetProductPage(w http.ResponseWriter, r *http.Request) {
+    productID := r.URL.Query().Get("id")
+    userID    := r.URL.Query().Get("user")
+
+    ctx := r.Context()
+
+    // ── Fan-out: call 3 services พร้อมกัน ────────────────────────────────
+    var (
+        product *clients.Product
+        cart    *clients.Cart
+        recs    []clients.Recommendation
+        mu      sync.Mutex
+        wg      sync.WaitGroup
+    )
+
+    wg.Add(3)
+
+    go func() {
+        defer wg.Done()
+        p, err := h.products.GetProduct(ctx, productID)
+        if err == nil {
+            mu.Lock()
+            product = p
+            mu.Unlock()
+        }
+    }()
+
+    go func() {
+        defer wg.Done()
+        if userID != "" {
+            c, err := h.carts.GetCart(ctx, userID)
+            if err == nil {
+                mu.Lock()
+                cart = c
+                mu.Unlock()
+            }
+        }
+    }()
+
+    go func() {
+        defer wg.Done()
+        r, err := h.products.GetRecommendations(ctx, productID)
+        if err == nil {
+            mu.Lock()
+            recs = r
+            mu.Unlock()
+        }
+    }()
+
+    wg.Wait()
+
+    if product == nil {
+        http.Error(w, "product not found", http.StatusNotFound)
+        return
+    }
+
+    // ── Transform: แปลง upstream models เป็น Web models ─────────────────
+    webProduct := toWebProduct(product)
+
+    var webCart *WebCart
+    if cart != nil {
+        webCart = &WebCart{ItemCount: len(cart.Items), Total: cart.Total}
+    }
+
+    webRecs := make([]WebRecommendation, len(recs))
+    for i, r := range recs {
+        webRecs[i] = WebRecommendation{ProductID: r.ProductID, Name: r.Name, Score: r.Score}
+    }
+
+    page := WebProductPage{
+        Product:         webProduct,
+        Cart:            webCart,
+        Recommendations: webRecs,
+    }
+
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(page)
+}
+
+func toWebProduct(p *clients.Product) WebProduct {
+    primaryImage := ""
+    if len(p.Images) > 0 {
+        primaryImage = p.Images[0]
+    }
+
+    discountPct := 0
+    if p.OriginalPrice > p.Price && p.OriginalPrice > 0 {
+        discountPct = int((p.OriginalPrice - p.Price) / p.OriginalPrice * 100)
+    }
+
+    return WebProduct{
+        ID: p.ID, Name: p.Name, Description: p.Description,
+        Price: p.Price, OriginalPrice: p.OriginalPrice, DiscountPct: discountPct,
+        Currency: p.Currency, Images: p.Images, PrimaryImage: primaryImage,
+        Rating: p.Rating, ReviewCount: p.ReviewCount,
+        InStock: p.StockCount > 0, Tags: p.Tags,
+    }
+}</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>mobilebff/handler.go — Mobile BFF (Lightweight + Bandwidth-conscious)</span>
+      <span class="lang">Go</span>
+    </div>
+    <pre><code class="language-go">package mobilebff
+
+import (
+    "encoding/json"
+    "net/http"
+    "myapp/clients"
+)
+
+// ── Mobile Response Models (Minimal) ────────────────────────────────────────
+// Mobile ใช้ bandwidth จำกัด + CPU น้อยกว่า Web
+// ดังนั้น response ต้องเล็กและ simple
+
+// MobileProduct — ข้อมูลสั้นๆ สำหรับ Mobile List View
+type MobileProduct struct {
+    ID      string  `json:"id"`
+    Name    string  `json:"name"`
+    Price   float64 `json:"price"`
+    Image   string  `json:"image"`    // รูปเดียว ไม่ใช่ array
+    Rating  float64 `json:"rating"`
+    InStock bool    `json:"in_stock"`
+    // ไม่มี: description, dimensions, weight, tags, reviews, etc.
+}
+
+// MobileProductDetail — สำหรับ Detail View
+type MobileProductDetail struct {
+    ID          string  `json:"id"`
+    Name        string  `json:"name"`
+    Price       float64 `json:"price"`
+    Currency    string  `json:"currency"`
+    Image       string  `json:"image"`
+    Images      []string `json:"images,omitempty"` // max 3 รูป เท่านั้น
+    Rating      float64 `json:"rating"`
+    ReviewCount int     `json:"review_count"`
+    InStock     bool    `json:"in_stock"`
+    ShortDesc   string  `json:"short_description"` // ตัดสั้น ไม่เกิน 150 ตัวอักษร
+}
+
+// ── Mobile BFF Handler ────────────────────────────────────────────────────────
+
+type MobileBFFHandler struct {
+    products *clients.ProductClient
+}
+
+func NewMobileBFFHandler(products *clients.ProductClient) *MobileBFFHandler {
+    return &MobileBFFHandler{products: products}
+}
+
+// GetProduct — Simple single call, minimal response
+func (h *MobileBFFHandler) GetProduct(w http.ResponseWriter, r *http.Request) {
+    productID := r.URL.Query().Get("id")
+
+    product, err := h.products.GetProduct(r.Context(), productID)
+    if err != nil {
+        http.Error(w, "not found", http.StatusNotFound)
+        return
+    }
+
+    // Transform เป็น minimal model
+    mobile := toMobileDetail(product)
+
+    w.Header().Set("Content-Type", "application/json")
+    // Gzip compress สำหรับ mobile bandwidth
+    w.Header().Set("Content-Encoding", "gzip")
+    json.NewEncoder(w).Encode(mobile)
+}
+
+// GetProductList — Optimized list สำหรับ mobile infinite scroll
+func (h *MobileBFFHandler) GetProductList(w http.ResponseWriter, r *http.Request) {
+    // mobile ได้รับ cursor-based pagination แทน offset
+    // เพราะ infinite scroll ต้องการ cursor
+    cursor := r.URL.Query().Get("cursor")
+    _ = cursor
+
+    // Call upstream — ใช้ fields filter เพื่อ bandwidth
+    // ใน production อาจส่ง fields=id,name,price,image ไปให้ upstream filter
+    // ...
+
+    // Return compact list
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(map[string]interface{}{
+        "items":      []MobileProduct{},
+        "next_cursor": "xyz123",
+        "has_more":    false,
+    })
+}
+
+func toMobileDetail(p *clients.Product) MobileProductDetail {
+    primaryImage := ""
+    images := []string{}
+    for i, img := range p.Images {
+        if i == 0 {
+            primaryImage = img
+        }
+        if i < 3 { // Mobile: max 3 รูป
+            images = append(images, img)
+        }
+    }
+
+    // ตัด description ให้สั้น (150 chars)
+    shortDesc := p.Description
+    if len(shortDesc) > 150 {
+        shortDesc = shortDesc[:147] + "..."
+    }
+
+    return MobileProductDetail{
+        ID:          p.ID,
+        Name:        p.Name,
+        Price:       p.Price,
+        Currency:    p.Currency,
+        Image:       primaryImage,
+        Images:      images,
+        Rating:      p.Rating,
+        ReviewCount: p.ReviewCount,
+        InStock:     p.StockCount > 0,
+        ShortDesc:   shortDesc,
+    }
+}</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>cmd/main.go — Run ทั้ง 2 BFF Servers</span>
+      <span class="lang">Go</span>
+    </div>
+    <pre><code class="language-go">package main
+
+import (
+    "log"
+    "net/http"
+    "myapp/clients"
+    "myapp/webbff"
+    "myapp/mobilebff"
+)
+
+func main() {
+    // Shared upstream clients
+    productClient := clients.NewProductClient("http://product-service:3001")
+    cartClient    := clients.NewCartClient("http://cart-service:3002")
+
+    // ── Web BFF — Port 8081 ──────────────────────────────────────────────
+    webHandler := webbff.NewWebBFFHandler(productClient, cartClient)
+    webMux := http.NewServeMux()
+    webMux.HandleFunc("/api/product-page", webHandler.GetProductPage)
+
+    go func() {
+        log.Println("Web BFF running on :8081")
+        log.Fatal(http.ListenAndServe(":8081", webMux))
+    }()
+
+    // ── Mobile BFF — Port 8082 ───────────────────────────────────────────
+    mobileHandler := mobilebff.NewMobileBFFHandler(productClient)
+    mobileMux := http.NewServeMux()
+    mobileMux.HandleFunc("/api/products",  mobileHandler.GetProductList)
+    mobileMux.HandleFunc("/api/product",   mobileHandler.GetProduct)
+
+    log.Println("Mobile BFF running on :8082")
+    log.Fatal(http.ListenAndServe(":8082", mobileMux))
+}</code></pre>
+  </div>
+</div>
+
+<!-- ── RESPONSE COMPARISON ── -->
+<div class="section">
+  <div class="section-title">📊 เปรียบเทียบ Response Size</div>
+
+  <table class="compare">
+    <tr>
+      <th>ด้าน</th>
+      <th>Web BFF Response</th>
+      <th>Mobile BFF Response</th>
+    </tr>
+    <tr>
+      <td>ขนาด Response</td>
+      <td>~15KB (full data + recommendations + cart)</td>
+      <td>~1.5KB (minimal, gzip)</td>
+    </tr>
+    <tr>
+      <td>Number of Calls</td>
+      <td>1 call → BFF fan-out 3 upstream calls</td>
+      <td>1 call → BFF ทำ 1-2 upstream calls</td>
+    </tr>
+    <tr>
+      <td>Images</td>
+      <td>ทุกรูป (อาจ 10+ URLs)</td>
+      <td>max 3 รูป</td>
+    </tr>
+    <tr>
+      <td>Description</td>
+      <td>เต็ม (2000+ chars)</td>
+      <td>150 chars (truncated)</td>
+    </tr>
+    <tr>
+      <td>Pagination</td>
+      <td>Offset-based (แสดงเลขหน้า)</td>
+      <td>Cursor-based (infinite scroll)</td>
+    </tr>
+    <tr>
+      <td>Cart Info</td>
+      <td>มี (แสดง mini cart)</td>
+      <td>ไม่มี (separate cart page)</td>
+    </tr>
+    <tr>
+      <td>Cache</td>
+      <td>5 minutes</td>
+      <td>30 minutes (mobile tolerates stale)</td>
+    </tr>
+  </table>
+</div>
+
+<!-- ── WHEN TO USE ── -->
+<div class="section">
+  <div class="section-title">✅ สรุปและ Best Practices</div>
+
+  <div class="concept-grid">
+    <div class="concept-card" style="--c:#10b981">
+      <div class="label">ข้อดี</div>
+      <h3>ควรใช้เมื่อ</h3>
+      <p>• มี clients หลายประเภท (Web, Mobile, TV, IoT)<br>• Client ต้องการ aggregate หลาย APIs<br>• ต้องการ optimize bandwidth สำหรับ mobile<br>• Teams แยกกัน (Frontend team owned BFF)</p>
+    </div>
+    <div class="concept-card" style="--c:#f59e0b">
+      <div class="label">ระวัง</div>
+      <h3>Trade-offs</h3>
+      <p>• เพิ่ม services ที่ต้อง maintain<br>• Duplication logic ระหว่าง BFFs<br>• ถ้า clients ต้องการข้อมูลเหมือนกัน ใช้ single API Gateway แทน</p>
+    </div>
+  </div>
+
+  <div class="callout tip">
+    <strong>Tip:</strong> ถ้ามีหลาย clients แต่ต้องการข้อมูลเหมือนกัน — ใช้ <strong>GraphQL</strong> แทน
+    GraphQL ให้ client เลือกเอง fields ที่ต้องการ โดยไม่ต้องสร้าง BFF แยก
+  </div>
+</div>
+
+<div style="text-align:center;margin:3rem 0;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+  <a href="3-event-driven.html" style="display:inline-flex;align-items:center;gap:.5rem;background:#0d1117;border:1px solid #1e293b;color:#64748b;padding:.7rem 1.5rem;border-radius:10px;font-size:.88rem">← Event Driven</a>
+  <a href="5-atomic.html" style="display:inline-flex;align-items:center;gap:.5rem;background:#0d1117;border:1px solid #1e293b;color:#fbbf24;padding:.7rem 1.5rem;border-radius:10px;font-weight:600;font-size:.88rem">หัวข้อถัดไป: Atomic Design →</a>
+</div>
+
+</div>
+<script>hljs.highlightAll()</script>
+</body>
+</html>

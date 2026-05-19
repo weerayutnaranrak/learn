@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MVC Pattern — สื่อการสอน</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#07090f;color:#e2e8f0;line-height:1.7}
+a{color:#4ade80;text-decoration:none}
+.topnav{display:flex;align-items:center;gap:1rem;padding:1rem 2rem;background:#0d1117;border-bottom:1px solid #1e293b;position:sticky;top:0;z-index:100}
+.back-btn{color:#64748b;font-size:.85rem}.back-btn:hover{color:#e2e8f0;text-decoration:none}
+.nav-title{color:#475569;font-size:.85rem}.nav-title span{color:#86efac;font-weight:600}
+.hero{padding:4rem 2rem 3rem;text-align:center;background:linear-gradient(160deg,#07090f,#031208)}
+.hero-badge{display:inline-block;background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.3);color:#86efac;padding:.35rem 1rem;border-radius:999px;font-size:.8rem;font-weight:600;margin-bottom:1.5rem}
+.hero h1{font-size:clamp(1.8rem,4vw,3rem);font-weight:800;background:linear-gradient(135deg,#4ade80,#22c55e);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:1rem}
+.hero p{color:#64748b;max-width:640px;margin:0 auto;font-size:1rem}
+.content{max-width:960px;margin:0 auto;padding:2rem 1.5rem 5rem}
+.section{margin-bottom:4rem}
+.section-title{font-size:1.5rem;font-weight:700;color:#4ade80;margin-bottom:.3rem;display:flex;align-items:center;gap:.6rem}
+.section-sub{color:#475569;font-size:.88rem;margin-bottom:2rem;padding-left:2rem}
+.callout{background:#0f172a;border-left:3px solid #4ade80;border-radius:0 8px 8px 0;padding:1rem 1.2rem;margin:1.5rem 0;font-size:.87rem;color:#94a3b8}
+.callout strong{color:#86efac}
+.callout.tip{border-color:#38bdf8}.callout.tip strong{color:#7dd3fc}
+.code-block{margin:1.5rem 0;border-radius:12px;overflow:hidden;border:1px solid #1e293b}
+.code-header{background:#111827;padding:.7rem 1rem;display:flex;justify-content:space-between;align-items:center}
+.code-header span{font-size:.78rem;color:#64748b;font-weight:600}
+.code-header .lang{background:rgba(74,222,128,.12);color:#4ade80;padding:.15rem .6rem;border-radius:4px;font-size:.72rem;font-weight:700}
+.code-block pre{margin:0!important;border-radius:0!important;border:none!important;font-size:.83rem!important;line-height:1.6!important}
+/* VB */
+.vb-wrap{margin:2rem 0}
+.vb-label{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#475569;margin-bottom:.9rem;display:flex;align-items:center;gap:.6rem}
+.vb-label::after{content:'';flex:1;height:1px;background:#1e293b}
+.vb-grid{display:grid;gap:.85rem}
+.vb-2{grid-template-columns:repeat(2,1fr)}.vb-3{grid-template-columns:repeat(3,1fr)}
+.vb-4{grid-template-columns:repeat(auto-fit,minmax(145px,1fr))}
+@media(max-width:580px){.vb-2,.vb-3{grid-template-columns:1fr}}
+.vbox{background:#0d1117;border:1.5px solid #1e293b;border-radius:12px;padding:1.1rem 1.2rem;position:relative;overflow:hidden;transition:border-color .2s,transform .2s}
+.vbox:hover{border-color:#334155;transform:translateY(-2px)}
+.vbox::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--ac,#4ade80)}
+.vb-icon{font-size:1.7rem;display:block;margin-bottom:.5rem}
+.vb-title{font-size:.87rem;font-weight:700;color:#f1f5f9;margin-bottom:.35rem}
+.vb-body{font-size:.77rem;color:#64748b;line-height:1.55}
+.vb-list{margin-top:.5rem;display:flex;flex-direction:column;gap:.2rem;list-style:none}
+.vb-list li{font-size:.73rem;color:#475569;padding-left:1rem;position:relative}
+.vb-list li::before{content:'▸';position:absolute;left:0;color:var(--ac,#4ade80);font-size:.6rem;top:.08rem}
+.vb-chip{display:inline-block;margin-top:.5rem;font-size:.64rem;font-weight:700;padding:.12rem .5rem;border-radius:999px;background:rgba(74,222,128,.1);color:var(--ac,#86efac)}
+.diagram{background:#0d1117;border:1px solid #1e293b;border-radius:16px;padding:2rem;margin:2rem 0;text-align:center;overflow:hidden}
+.diagram-title{font-size:.75rem;color:#475569;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:1.5rem}
+/* MVC big boxes */
+.mvc-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;margin:2rem 0}
+@media(max-width:580px){.mvc-row{grid-template-columns:1fr}}
+.mvc-box{border:2px solid var(--bc);border-radius:16px;padding:1.5rem;text-align:center;background:color-mix(in srgb,var(--bc) 5%,#07090f);position:relative}
+.mvc-box-title{font-size:1.1rem;font-weight:800;color:var(--bc);margin-bottom:.8rem}
+.mvc-box-sub{font-size:.78rem;color:#64748b;margin-bottom:.8rem;line-height:1.5}
+.mvc-box-items{display:flex;flex-direction:column;gap:.3rem;text-align:left}
+.mvc-box-item{background:color-mix(in srgb,var(--bc) 10%,#0d1117);border-radius:6px;padding:.4rem .7rem;font-size:.73rem;color:var(--bc);font-weight:600}
+</style>
+</head>
+<body>
+<nav class="topnav">
+  <a href="index.html" class="back-btn">← กลับหน้าหลัก</a>
+  <span class="nav-title">07 / <span>Model-View-Controller (MVC)</span></span>
+</nav>
+<div class="hero">
+  <div class="hero-badge">🎯 UI Architecture Pattern</div>
+  <h1>Model-View-Controller</h1>
+  <p>แยก Application ออกเป็น 3 ส่วน: Data (Model), Presentation (View), Logic (Controller) — pattern ยอดนิยมสำหรับ Web Applications มาตั้งแต่ปี 1970s</p>
+</div>
+<div class="content">
+
+<!-- ── 3 COMPONENTS ── -->
+<div class="section">
+  <div class="section-title">🧩 3 ส่วนหลักของ MVC</div>
+
+  <div class="mvc-row">
+    <div class="mvc-box" style="--bc:#6366f1">
+      <div style="font-size:2.5rem;margin-bottom:.5rem">🗃️</div>
+      <div class="mvc-box-title">Model</div>
+      <div class="mvc-box-sub">รับผิดชอบ <strong>Data</strong> และ <strong>Business Logic</strong> ไม่รู้จัก View หรือ Controller</div>
+      <div class="mvc-box-items">
+        <div class="mvc-box-item">📊 Data structures</div>
+        <div class="mvc-box-item">✅ Validation rules</div>
+        <div class="mvc-box-item">🔄 Business operations</div>
+        <div class="mvc-box-item">💾 Database queries</div>
+        <div class="mvc-box-item">📡 API calls</div>
+      </div>
+    </div>
+    <div class="mvc-box" style="--bc:#4ade80">
+      <div style="font-size:2.5rem;margin-bottom:.5rem">🖼️</div>
+      <div class="mvc-box-title">View</div>
+      <div class="mvc-box-sub">รับผิดชอบ <strong>Presentation</strong> เท่านั้น — แสดงข้อมูลที่ Controller ส่งมา</div>
+      <div class="mvc-box-items">
+        <div class="mvc-box-item">🌐 HTML Templates</div>
+        <div class="mvc-box-item">🎨 CSS Styling</div>
+        <div class="mvc-box-item">📱 UI Components</div>
+        <div class="mvc-box-item">📋 JSON responses (API)</div>
+        <div class="mvc-box-item">🖨️ Render output</div>
+      </div>
+    </div>
+    <div class="mvc-box" style="--bc:#f59e0b">
+      <div style="font-size:2.5rem;margin-bottom:.5rem">🎮</div>
+      <div class="mvc-box-title">Controller</div>
+      <div class="mvc-box-sub">รับ <strong>Input</strong> จาก User, เรียก Model, เลือก View ที่ตอบ</div>
+      <div class="mvc-box-items">
+        <div class="mvc-box-item">📥 Handle HTTP request</div>
+        <div class="mvc-box-item">🔀 Route to logic</div>
+        <div class="mvc-box-item">📤 Call Model methods</div>
+        <div class="mvc-box-item">🎯 Select View/Response</div>
+        <div class="mvc-box-item">⚡ Coordinate M ↔ V</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VISUAL: Data Flow -->
+  <div class="vb-wrap">
+    <div class="vb-label">🔄 Data Flow ใน MVC</div>
+    <div style="background:#0d1117;border:1px solid #1e293b;border-radius:12px;padding:1.5rem;margin:1rem 0">
+      <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;justify-content:center">
+        <div style="background:#001820;border:1.5px solid #22d3ee;border-radius:8px;padding:.6rem 1rem;text-align:center;min-width:80px">
+          <div style="font-size:1.2rem">👤</div>
+          <div style="font-size:.75rem;font-weight:700;color:#67e8f9">User</div>
+          <div style="font-size:.65rem;color:#475569">คลิก/ส่งฟอร์ม</div>
+        </div>
+        <div style="color:#334155;font-size:1.5rem">→</div>
+        <div style="background:color-mix(in srgb,#f59e0b 8%,#07090f);border:1.5px solid #f59e0b;border-radius:8px;padding:.6rem 1rem;text-align:center;min-width:80px">
+          <div style="font-size:1.2rem">🎮</div>
+          <div style="font-size:.75rem;font-weight:700;color:#fcd34d">Controller</div>
+          <div style="font-size:.65rem;color:#475569">รับ Request</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:.3rem">
+          <div style="color:#6366f1;font-size:.8rem;font-weight:600">→ call</div>
+          <div style="color:#334155;font-size:.6rem">← return data</div>
+        </div>
+        <div style="background:color-mix(in srgb,#6366f1 8%,#07090f);border:1.5px solid #6366f1;border-radius:8px;padding:.6rem 1rem;text-align:center;min-width:80px">
+          <div style="font-size:1.2rem">🗃️</div>
+          <div style="font-size:.75rem;font-weight:700;color:#a5b4fc">Model</div>
+          <div style="font-size:.65rem;color:#475569">ดึง/บันทึก Data</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:.3rem">
+          <div style="color:#4ade80;font-size:.8rem;font-weight:600">→ pass data</div>
+          <div style="color:#334155;font-size:.6rem">&nbsp;</div>
+        </div>
+        <div style="background:color-mix(in srgb,#4ade80 8%,#07090f);border:1.5px solid #4ade80;border-radius:8px;padding:.6rem 1rem;text-align:center;min-width:80px">
+          <div style="font-size:1.2rem">🖼️</div>
+          <div style="font-size:.75rem;font-weight:700;color:#86efac">View</div>
+          <div style="font-size:.65rem;color:#475569">Render HTML/JSON</div>
+        </div>
+        <div style="color:#334155;font-size:1.5rem">→</div>
+        <div style="background:#001820;border:1.5px solid #22d3ee;border-radius:8px;padding:.6rem 1rem;text-align:center;min-width:80px">
+          <div style="font-size:1.2rem">📺</div>
+          <div style="font-size:.75rem;font-weight:700;color:#67e8f9">Browser</div>
+          <div style="font-size:.65rem;color:#475569">แสดงผล</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VISUAL: MVC Variants -->
+  <div class="vb-wrap">
+    <div class="vb-label">🔀 MVC Variants ที่นิยมใช้</div>
+    <div class="vb-grid vb-4">
+      <div class="vbox" style="--ac:#4ade80">
+        <span class="vb-icon">🌐</span>
+        <div class="vb-title">MVC (Classic)</div>
+        <div class="vb-body">Server-side rendering — Controller ส่ง HTML กลับ</div>
+        <span class="vb-chip">Rails · Laravel · Go</span>
+      </div>
+      <div class="vbox" style="--ac:#22d3ee">
+        <span class="vb-icon">📊</span>
+        <div class="vb-title">MVP</div>
+        <div class="vb-body">Model-View-Presenter — View passive, Presenter ควบคุม</div>
+        <span class="vb-chip">Android · WinForms</span>
+      </div>
+      <div class="vbox" style="--ac:#6366f1">
+        <span class="vb-icon">📱</span>
+        <div class="vb-title">MVVM</div>
+        <div class="vb-body">Model-View-ViewModel — Two-way data binding</div>
+        <span class="vb-chip">Vue · Angular · SwiftUI</span>
+      </div>
+      <div class="vbox" style="--ac:#f59e0b">
+        <span class="vb-icon">⚡</span>
+        <div class="vb-title">MVC (API)</div>
+        <div class="vb-body">View คือ JSON response — สำหรับ REST APIs</div>
+        <span class="vb-chip">REST · Go · Express</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>ความแตกต่างสำคัญ:</strong>
+    <strong>Model ไม่รู้จัก View ไม่รู้จัก Controller</strong> — ทำให้ business logic reuse ได้หลาย UI
+    เช่น ใช้ Model เดียวกันกับ Web View, Mobile JSON response, และ CLI output
+  </div>
+</div>
+
+<!-- ── DIAGRAM ── -->
+<div class="section">
+  <div class="section-title">📊 MVC Flow Diagram</div>
+  <div class="diagram">
+    <div class="diagram-title">MVC Request Lifecycle</div>
+    <svg viewBox="0 0 680 220" fill="none" xmlns="http://www.w3.org/2000/svg" style="max-width:680px;width:100%">
+      <!-- User -->
+      <rect x="10" y="80" width="80" height="60" rx="10" fill="#001820" stroke="#22d3ee" stroke-width="1.5"/>
+      <text x="50" y="106" text-anchor="middle" fill="#67e8f9" font-size="10" font-weight="700">👤</text>
+      <text x="50" y="120" text-anchor="middle" fill="#67e8f9" font-size="9" font-weight="700">User</text>
+      <text x="50" y="133" text-anchor="middle" fill="#475569" font-size="7">GET /products</text>
+
+      <!-- Router -->
+      <rect x="130" y="80" width="80" height="60" rx="10" fill="#111827" stroke="#334155" stroke-width="1.5"/>
+      <text x="170" y="106" text-anchor="middle" fill="#94a3b8" font-size="10">🔀</text>
+      <text x="170" y="120" text-anchor="middle" fill="#94a3b8" font-size="9" font-weight="700">Router</text>
+      <text x="170" y="133" text-anchor="middle" fill="#475569" font-size="7">Match URL</text>
+
+      <!-- Controller -->
+      <rect x="250" y="60" width="100" height="100" rx="10" fill="#120a00" stroke="#f59e0b" stroke-width="2"/>
+      <text x="300" y="90" text-anchor="middle" fill="#fcd34d" font-size="11">🎮</text>
+      <text x="300" y="107" text-anchor="middle" fill="#fcd34d" font-size="10" font-weight="700">Controller</text>
+      <text x="300" y="122" text-anchor="middle" fill="#fbbf24" font-size="8">ProductController</text>
+      <text x="300" y="137" text-anchor="middle" fill="#475569" font-size="7">.Index()</text>
+      <text x="300" y="149" text-anchor="middle" fill="#475569" font-size="7">Handle request</text>
+
+      <!-- Model -->
+      <rect x="390" y="20" width="100" height="80" rx="10" fill="#0a0820" stroke="#6366f1" stroke-width="2"/>
+      <text x="440" y="50" text-anchor="middle" fill="#a5b4fc" font-size="11">🗃️</text>
+      <text x="440" y="67" text-anchor="middle" fill="#a5b4fc" font-size="10" font-weight="700">Model</text>
+      <text x="440" y="82" text-anchor="middle" fill="#818cf8" font-size="8">Product</text>
+      <text x="440" y="94" text-anchor="middle" fill="#475569" font-size="7">+ DB Query</text>
+
+      <!-- View -->
+      <rect x="390" y="120" width="100" height="80" rx="10" fill="#031208" stroke="#4ade80" stroke-width="2"/>
+      <text x="440" y="150" text-anchor="middle" fill="#86efac" font-size="11">🖼️</text>
+      <text x="440" y="167" text-anchor="middle" fill="#86efac" font-size="10" font-weight="700">View</text>
+      <text x="440" y="182" text-anchor="middle" fill="#4ade80" font-size="8">products.html</text>
+      <text x="440" y="194" text-anchor="middle" fill="#475569" font-size="7">Render template</text>
+
+      <!-- Response -->
+      <rect x="540" y="80" width="100" height="60" rx="10" fill="#001820" stroke="#22d3ee" stroke-width="1.5"/>
+      <text x="590" y="106" text-anchor="middle" fill="#67e8f9" font-size="10">📺</text>
+      <text x="590" y="120" text-anchor="middle" fill="#67e8f9" font-size="9" font-weight="700">Browser</text>
+      <text x="590" y="133" text-anchor="middle" fill="#475569" font-size="7">Show HTML</text>
+
+      <!-- Arrows -->
+      <line x1="90" y1="110" x2="128" y2="110" stroke="#22d3ee" stroke-width="1.5" marker-end="url(#a1)">
+        <animate attributeName="stroke-dasharray" values="0,40;40,0" dur="1.2s" repeatCount="indefinite"/>
+      </line>
+      <line x1="210" y1="110" x2="248" y2="110" stroke="#334155" stroke-width="1.5" marker-end="url(#a2)">
+        <animate attributeName="stroke-dasharray" values="0,40;40,0" dur="1.2s" begin=".2s" repeatCount="indefinite"/>
+      </line>
+      <!-- Controller ↔ Model -->
+      <path d="M 350 90 L 388 60" stroke="#f59e0b" stroke-width="1.5" fill="none" marker-end="url(#a3)">
+        <animate attributeName="stroke-dasharray" values="0,60;60,0" dur="1.2s" repeatCount="indefinite"/>
+      </path>
+      <path d="M 390 75 L 352 100" stroke="#6366f1" stroke-width="1.5" fill="none" stroke-dasharray="5,3">
+        <animate attributeName="stroke-dashoffset" from="0" to="-12" dur=".8s" repeatCount="indefinite"/>
+      </path>
+      <!-- Controller → View -->
+      <path d="M 350 130 L 388 155" stroke="#f59e0b" stroke-width="1.5" fill="none" marker-end="url(#a4)">
+        <animate attributeName="stroke-dasharray" values="0,60;60,0" dur="1.2s" begin=".4s" repeatCount="indefinite"/>
+      </path>
+      <!-- View → Browser -->
+      <line x1="490" y1="160" x2="538" y2="125" stroke="#4ade80" stroke-width="1.5" marker-end="url(#a5)">
+        <animate attributeName="stroke-dasharray" values="0,60;60,0" dur="1.2s" begin=".6s" repeatCount="indefinite"/>
+      </line>
+
+      <!-- Labels on arrows -->
+      <text x="139" y="104" fill="#475569" font-size="7">HTTP Request</text>
+      <text x="355" y="73" fill="#f59e0b" font-size="7">FindAll()</text>
+      <text x="355" y="122" fill="#f59e0b" font-size="7">Render(data)</text>
+      <text x="500" y="130" fill="#4ade80" font-size="7">HTML Response</text>
+      <defs>
+        <marker id="a1" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#22d3ee"/></marker>
+        <marker id="a2" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#475569"/></marker>
+        <marker id="a3" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#f59e0b"/></marker>
+        <marker id="a4" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#f59e0b"/></marker>
+        <marker id="a5" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#4ade80"/></marker>
+      </defs>
+    </svg>
+  </div>
+</div>
+
+<!-- ── CODE ── -->
+<div class="section">
+  <div class="section-title">💻 ตัวอย่าง Go — MVC Web Application</div>
+
+  <div class="code-block">
+    <div class="code-header"><span>model/product.go — Model (Data + Business Logic)</span><span class="lang">Go</span></div>
+    <pre><code class="language-go">package model
+
+import (
+    "database/sql"
+    "errors"
+    "time"
+)
+
+// ── Model: ข้อมูลและ Business Rules ──────────────────────────────────────
+// ไม่รู้จัก HTTP, ไม่รู้จัก HTML template
+
+type Product struct {
+    ID          int       `json:"id"`
+    Name        string    `json:"name"`
+    Description string    `json:"description"`
+    Price       float64   `json:"price"`
+    Stock       int       `json:"stock"`
+    CreatedAt   time.Time `json:"created_at"`
+}
+
+// Business rule
+func (p *Product) Validate() error {
+    if p.Name == "" {
+        return errors.New("name is required")
+    }
+    if p.Price < 0 {
+        return errors.New("price cannot be negative")
+    }
+    if p.Stock < 0 {
+        return errors.New("stock cannot be negative")
+    }
+    return nil
+}
+
+func (p *Product) IsAvailable() bool { return p.Stock > 0 }
+
+// ProductModel — Data Access (อาจแยกเป็น Repository ก็ได้)
+type ProductModel struct{ DB *sql.DB }
+
+func (m *ProductModel) All() ([]*Product, error) {
+    rows, err := m.DB.Query(
+        `SELECT id,name,description,price,stock,created_at FROM products ORDER BY created_at DESC`,
+    )
+    if err != nil { return nil, err }
+    defer rows.Close()
+    var products []*Product
+    for rows.Next() {
+        var p Product
+        rows.Scan(&p.ID, &p.Name, &p.Description, &p.Price, &p.Stock, &p.CreatedAt)
+        products = append(products, &p)
+    }
+    return products, nil
+}
+
+func (m *ProductModel) ByID(id int) (*Product, error) {
+    var p Product
+    err := m.DB.QueryRow(
+        `SELECT id,name,description,price,stock,created_at FROM products WHERE id=$1`, id,
+    ).Scan(&p.ID, &p.Name, &p.Description, &p.Price, &p.Stock, &p.CreatedAt)
+    if err == sql.ErrNoRows { return nil, errors.New("product not found") }
+    return &p, err
+}
+
+func (m *ProductModel) Create(p *Product) error {
+    if err := p.Validate(); err != nil { return err }
+    p.CreatedAt = time.Now()
+    return m.DB.QueryRow(
+        `INSERT INTO products(name,description,price,stock,created_at) VALUES($1,$2,$3,$4,$5) RETURNING id`,
+        p.Name, p.Description, p.Price, p.Stock, p.CreatedAt,
+    ).Scan(&p.ID)
+}</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><span>controller/product_controller.go — Controller (Logic + Routing)</span><span class="lang">Go</span></div>
+    <pre><code class="language-go">package controller
+
+import (
+    "encoding/json"
+    "html/template"
+    "net/http"
+    "strconv"
+    "myapp/model"
+)
+
+// ── Controller: รับ HTTP request, เรียก Model, เลือก View ────────────────
+// รู้จัก HTTP และ Model — แต่ไม่รู้จัก Database detail
+
+type ProductController struct {
+    model     *model.ProductModel
+    templates *template.Template
+}
+
+func NewProductController(m *model.ProductModel, tmpl *template.Template) *ProductController {
+    return &ProductController{model: m, templates: tmpl}
+}
+
+// Index — แสดงรายการสินค้าทั้งหมด
+// GET /products
+func (c *ProductController) Index(w http.ResponseWriter, r *http.Request) {
+    products, err := c.model.All() // เรียก Model
+    if err != nil {
+        http.Error(w, "Failed to load products", http.StatusInternalServerError)
+        return
+    }
+
+    // เลือก View ตาม Accept header
+    if r.Header.Get("Accept") == "application/json" {
+        // View: JSON
+        w.Header().Set("Content-Type", "application/json")
+        json.NewEncoder(w).Encode(products)
+        return
+    }
+
+    // View: HTML template
+    c.templates.ExecuteTemplate(w, "products/index.html", map[string]interface{}{
+        "Title":    "สินค้าทั้งหมด",
+        "Products": products,
+    })
+}
+
+// Show — แสดงรายละเอียดสินค้า
+// GET /products/{id}
+func (c *ProductController) Show(w http.ResponseWriter, r *http.Request) {
+    idStr := r.PathValue("id")
+    id, err := strconv.Atoi(idStr)
+    if err != nil {
+        http.Error(w, "Invalid product ID", http.StatusBadRequest)
+        return
+    }
+
+    product, err := c.model.ByID(id)
+    if err != nil {
+        http.Error(w, "Product not found", http.StatusNotFound)
+        return
+    }
+
+    c.templates.ExecuteTemplate(w, "products/show.html", map[string]interface{}{
+        "Product": product,
+    })
+}
+
+// Create — สร้างสินค้าใหม่ (API)
+// POST /products
+func (c *ProductController) Create(w http.ResponseWriter, r *http.Request) {
+    var input struct {
+        Name        string  `json:"name"`
+        Description string  `json:"description"`
+        Price       float64 `json:"price"`
+        Stock       int     `json:"stock"`
+    }
+
+    if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+        http.Error(w, "Invalid request", http.StatusBadRequest)
+        return
+    }
+
+    product := &model.Product{
+        Name: input.Name, Description: input.Description,
+        Price: input.Price, Stock: input.Stock,
+    }
+
+    if err := c.model.Create(product); err != nil { // Business rule ใน Model
+        http.Error(w, err.Error(), http.StatusBadRequest)
+        return
+    }
+
+    w.Header().Set("Content-Type", "application/json")
+    w.WriteHeader(http.StatusCreated)
+    json.NewEncoder(w).Encode(product)
+}</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><span>view/templates/products/index.html — View (Presentation only)</span><span class="lang">Go</span></div>
+    <pre><code class="language-go">{{/* View: แสดงข้อมูลที่ Controller ส่งมา — ไม่มี logic อื่น */}}
+{{define "products/index.html"}}
+&lt;!DOCTYPE html&gt;
+&lt;html lang="th"&gt;
+&lt;head&gt;
+  &lt;title&gt;{{.Title}}&lt;/title&gt;
+  &lt;link rel="stylesheet" href="/static/style.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  {{template "partials/navbar.html" .}}
+
+  &lt;main class="container"&gt;
+    &lt;h1&gt;{{.Title}}&lt;/h1&gt;
+
+    {{if .Products}}
+      &lt;div class="product-grid"&gt;
+        {{range .Products}}
+          &lt;article class="product-card"&gt;
+            &lt;h2&gt;{{.Name}}&lt;/h2&gt;
+            &lt;p&gt;{{.Description}}&lt;/p&gt;
+            &lt;p class="price"&gt;฿{{printf "%.2f" .Price}}&lt;/p&gt;
+            {{if .IsAvailable}}
+              &lt;span class="badge badge-green"&gt;มีสินค้า&lt;/span&gt;
+            {{else}}
+              &lt;span class="badge badge-red"&gt;หมดสต็อก&lt;/span&gt;
+            {{end}}
+            &lt;a href="/products/{{.ID}}" class="btn"&gt;ดูรายละเอียด&lt;/a&gt;
+          &lt;/article&gt;
+        {{end}}
+      &lt;/div&gt;
+    {{else}}
+      &lt;p class="empty"&gt;ยังไม่มีสินค้า&lt;/p&gt;
+    {{end}}
+  &lt;/main&gt;
+
+  {{template "partials/footer.html" .}}
+&lt;/body&gt;
+&lt;/html&gt;
+{{end}}</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><span>cmd/main.go — Wire Router + Controller + Model</span><span class="lang">Go</span></div>
+    <pre><code class="language-go">package main
+
+import (
+    "database/sql"
+    "html/template"
+    "log"
+    "net/http"
+    "myapp/controller"
+    "myapp/model"
+    _ "github.com/lib/pq"
+)
+
+func main() {
+    // Setup
+    db, _ := sql.Open("postgres", "postgres://localhost/shop")
+
+    // Model (ชั้นข้อมูล)
+    productModel := &model.ProductModel{DB: db}
+
+    // View (templates)
+    tmpl := template.Must(template.ParseGlob("view/templates/**/*.html"))
+
+    // Controller (ตัวกลาง)
+    productCtrl := controller.NewProductController(productModel, tmpl)
+
+    // Router — bind URLs กับ Controller methods
+    mux := http.NewServeMux()
+    mux.HandleFunc("GET  /products",     productCtrl.Index)
+    mux.HandleFunc("GET  /products/{id}", productCtrl.Show)
+    mux.HandleFunc("POST /products",     productCtrl.Create)
+
+    // Static files
+    mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("view/static"))))
+
+    log.Println("MVC App running on :8080")
+    log.Fatal(http.ListenAndServe(":8080", mux))
+}</code></pre>
+  </div>
+</div>
+
+<!-- ── SUMMARY ── -->
+<div class="section">
+  <div class="section-title">✅ สรุป MVC</div>
+  <div class="vb-grid vb-3">
+    <div class="vbox" style="--ac:#6366f1">
+      <span class="vb-icon">🗃️</span>
+      <div class="vb-title">Model — Rules</div>
+      <ul class="vb-list">
+        <li>Business logic &amp; validation</li>
+        <li>Database queries</li>
+        <li>ไม่รู้จัก HTTP หรือ HTML</li>
+        <li>Testable อิสระ</li>
+      </ul>
+    </div>
+    <div class="vbox" style="--ac:#4ade80">
+      <span class="vb-icon">🖼️</span>
+      <div class="vb-title">View — Display</div>
+      <ul class="vb-list">
+        <li>แสดงข้อมูลที่รับมาเท่านั้น</li>
+        <li>ไม่มี business logic</li>
+        <li>HTML Template / JSON</li>
+        <li>เปลี่ยน UI ไม่ต้องแก้ Model</li>
+      </ul>
+    </div>
+    <div class="vbox" style="--ac:#f59e0b">
+      <span class="vb-icon">🎮</span>
+      <div class="vb-title">Controller — Bridge</div>
+      <ul class="vb-list">
+        <li>รับ Input → เรียก Model</li>
+        <li>ส่งข้อมูล → View</li>
+        <li>Thin Controller (ไม่อ้วน!)</li>
+        <li>ไม่ใส่ logic ซับซ้อนที่นี่</li>
+      </ul>
+    </div>
+  </div>
+  <div class="callout tip">
+    <strong>Anti-pattern: Fat Controller</strong> — Controller ที่มี business logic เยอะ
+    ควรย้าย logic ไปอยู่ใน Model หรือ Service ทำให้ Controller "Thin" — แค่ coordinate เท่านั้น
+  </div>
+</div>
+
+<div style="text-align:center;margin:3rem 0;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+  <a href="9-microservice.html" style="background:#0d1117;border:1px solid #1e293b;color:#64748b;padding:.7rem 1.5rem;border-radius:10px;font-size:.88rem">← Microservices</a>
+  <a href="11-soa.html" style="background:#0d1117;border:1px solid #1e293b;color:#4ade80;padding:.7rem 1.5rem;border-radius:10px;font-weight:600;font-size:.88rem">SOA →</a>
+</div>
+</div>
+<script>hljs.highlightAll()</script>
+</body>
+</html>

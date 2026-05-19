@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Peer-to-Peer (P2P) Architecture</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',sans-serif;background:#0f0f1a;color:#e2e8f0;line-height:1.7}
+.hero{background:linear-gradient(135deg,#1a1200 0%,#2d2200 50%,#1a1200 100%);padding:60px 40px;text-align:center;border-bottom:1px solid #fbbf2433;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,#fbbf2422 0%,transparent 70%)}
+.hero-badge{display:inline-block;background:#fbbf2420;border:1px solid #fbbf2460;color:#fbbf24;padding:6px 18px;border-radius:20px;font-size:.8rem;letter-spacing:2px;text-transform:uppercase;margin-bottom:20px}
+.hero h1{font-size:3rem;font-weight:800;background:linear-gradient(135deg,#fbbf24,#f59e0b,#fbbf24);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:16px}
+.hero p{font-size:1.15rem;color:#94a3b8;max-width:700px;margin:0 auto}
+nav{background:#1e1e2e;padding:16px 40px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #ffffff10;position:sticky;top:0;z-index:100}
+.nav-home{color:#fbbf24;text-decoration:none;font-weight:600;font-size:.9rem}
+.nav-links{display:flex;gap:16px}
+.nav-links a{color:#94a3b8;text-decoration:none;font-size:.85rem;padding:6px 14px;border-radius:8px;border:1px solid #ffffff15;transition:all .2s}
+.nav-links a:hover{color:#e2e8f0;border-color:#fbbf2440}
+.container{max-width:1100px;margin:0 auto;padding:40px 20px}
+section{margin-bottom:56px}
+h2{font-size:1.7rem;font-weight:700;color:#fbbf24;margin-bottom:8px;padding-bottom:8px;border-bottom:2px solid #fbbf2430}
+h3{font-size:1.2rem;font-weight:600;color:#f59e0b;margin:28px 0 14px}
+p{color:#94a3b8;margin-bottom:14px}
+
+/* VB System */
+.vb-wrap{margin:24px 0}
+.vb-label{font-size:.75rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#fbbf24;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.vb-label::after{content:'';flex:1;height:1px;background:#fbbf2420}
+.vb-grid{display:grid;gap:14px}
+.vb-2{grid-template-columns:repeat(2,1fr)}
+.vb-3{grid-template-columns:repeat(3,1fr)}
+.vb-4{grid-template-columns:repeat(4,1fr)}
+.vbox{background:#1e1e2e;border:1px solid #fbbf2430;border-radius:14px;padding:20px;transition:transform .2s,border-color .2s}
+.vbox:hover{transform:translateY(-3px);border-color:#fbbf2460}
+.vb-icon{font-size:1.8rem;margin-bottom:10px}
+.vb-title{font-size:.95rem;font-weight:700;color:#e2e8f0;margin-bottom:8px}
+.vb-body{font-size:.84rem;color:#94a3b8;line-height:1.6}
+.vb-list{list-style:none;margin-top:8px}
+.vb-list li{font-size:.82rem;color:#94a3b8;padding:3px 0;padding-left:14px;position:relative}
+.vb-list li::before{content:'›';position:absolute;left:0;color:#fbbf24}
+.vb-chip{display:inline-block;background:#fbbf2415;border:1px solid #fbbf2440;color:#fbbf24;padding:3px 10px;border-radius:12px;font-size:.75rem;margin:3px 2px}
+
+/* CS vs P2P comparison */
+.arch-compare{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin:28px 0}
+.arch-box{border-radius:16px;padding:24px;border:2px solid transparent}
+.arch-box.cs{background:linear-gradient(135deg,#0a1628,#1a2d4e);border-color:#60a5fa40}
+.arch-box.p2p{background:linear-gradient(135deg,#1a1200,#2d2200);border-color:#fbbf2440}
+.arch-box-header{font-size:1.1rem;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.arch-box-header.blue{color:#60a5fa}
+.arch-box-header.amber{color:#fbbf24}
+.arch-point{font-size:.85rem;color:#94a3b8;padding:5px 0;border-bottom:1px solid #ffffff08;display:flex;align-items:flex-start;gap:8px}
+.arch-point:last-child{border-bottom:none}
+.dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:6px}
+.dot.blue{background:#60a5fa}
+.dot.amber{background:#fbbf24}
+
+/* P2P types */
+.p2p-types{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin:24px 0}
+.p2p-type{border-radius:14px;padding:22px;text-align:center}
+.p2p-type.pure{background:linear-gradient(135deg,#1a1200,#2a2000);border:1px solid #fbbf2440}
+.p2p-type.hybrid{background:linear-gradient(135deg,#0a1a0a,#1a2a1a);border:1px solid #4ade8040}
+.p2p-type.structured{background:linear-gradient(135deg,#0a0a1a,#1a1a2a);border:1px solid #818cf840}
+.p2p-type-icon{font-size:2rem;margin-bottom:10px}
+.p2p-type-name{font-size:1rem;font-weight:700;margin-bottom:6px}
+.p2p-type-name.amber{color:#fbbf24}
+.p2p-type-name.green{color:#4ade80}
+.p2p-type-name.indigo{color:#818cf8}
+.p2p-type-desc{font-size:.82rem;color:#94a3b8;margin-bottom:10px}
+.p2p-type-example{font-size:.78rem;font-style:italic;color:#64748b}
+
+/* Animated P2P Network diagram */
+.diagram-wrap{background:#141425;border:1px solid #fbbf2430;border-radius:16px;padding:20px;margin:28px 0;overflow:hidden}
+.diagram-wrap svg{width:100%;height:auto}
+
+/* DHT / chord ring */
+.ring-diagram{display:flex;justify-content:center;margin:28px 0}
+
+/* Code */
+.code-section{margin:24px 0}
+.code-file{background:#1a1a2e;border:1px solid #fbbf2430;border-radius:12px;margin-bottom:20px;overflow:hidden}
+.code-file-header{background:#fbbf2415;padding:10px 16px;font-size:.82rem;color:#fbbf24;font-family:monospace;border-bottom:1px solid #fbbf2430;display:flex;align-items:center;gap:8px}
+.code-file-header::before{content:'📄'}
+.code-file pre{margin:0}
+.code-file code{font-size:.82rem!important;padding:20px!important}
+
+/* Real-world examples */
+.examples-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin:24px 0}
+.example-card{background:#1e1e2e;border:1px solid #fbbf2430;border-radius:12px;padding:18px;text-align:center}
+.example-card-icon{font-size:2rem;margin-bottom:8px}
+.example-card-name{font-size:.9rem;font-weight:700;color:#e2e8f0;margin-bottom:4px}
+.example-card-type{font-size:.78rem;color:#fbbf24}
+.example-card-desc{font-size:.78rem;color:#94a3b8;margin-top:6px}
+
+@media(max-width:768px){
+  .hero h1{font-size:2rem}
+  .vb-3,.vb-4{grid-template-columns:repeat(2,1fr)}
+  .p2p-types,.examples-grid{grid-template-columns:1fr 1fr}
+  .arch-compare{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-home">← กลับหน้าหลัก</a>
+  <div class="nav-links">
+    <a href="13-cqrs.html">← CQRS</a>
+    <a href="index.html">Home</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">Architecture Pattern #14</div>
+  <h1>Peer-to-Peer Architecture</h1>
+  <p>ทุก Node ทำหน้าที่เป็นทั้ง Client และ Server — ไม่มี Central Authority ระบบกระจาย Resilient และ Scalable</p>
+</div>
+
+<div class="container">
+
+  <!-- Core Concept -->
+  <section>
+    <h2>P2P คืออะไร?</h2>
+    <p>Peer-to-Peer (P2P) คือ architectural pattern ที่แต่ละ node ในระบบ (<strong>peer</strong>) มีความสามารถเท่ากัน — สามารถทำหน้าที่เป็น client (ขอ resource) และ server (ให้ resource) ได้พร้อมกัน โดยไม่พึ่ง central server</p>
+
+    <div class="arch-compare">
+      <div class="arch-box cs">
+        <div class="arch-box-header blue">🏢 Client-Server</div>
+        <div class="arch-point"><span class="dot blue"></span>Central server ควบคุมทุกอย่าง</div>
+        <div class="arch-point"><span class="dot blue"></span>Clients รับบริการจาก server</div>
+        <div class="arch-point"><span class="dot blue"></span>Server เป็น single point of failure</div>
+        <div class="arch-point"><span class="dot blue"></span>Scale โดยเพิ่ม server capacity</div>
+        <div class="arch-point"><span class="dot blue"></span>ผู้ดูแลควบคุม data ได้</div>
+        <div class="arch-point"><span class="dot blue"></span>เหมาะกับ web apps, APIs</div>
+      </div>
+      <div class="arch-box p2p">
+        <div class="arch-box-header amber">🕸️ Peer-to-Peer</div>
+        <div class="arch-point"><span class="dot amber"></span>ไม่มี central authority</div>
+        <div class="arch-point"><span class="dot amber"></span>Peers ให้และรับบริการซึ่งกัน</div>
+        <div class="arch-point"><span class="dot amber"></span>Resilient — ไม่มี single failure point</div>
+        <div class="arch-point"><span class="dot amber"></span>Scale อัตโนมัติ — peer ใหม่เพิ่ม capacity</div>
+        <div class="arch-point"><span class="dot amber"></span>ข้อมูลกระจาย ไม่มีผู้ควบคุม</div>
+        <div class="arch-point"><span class="dot amber"></span>เหมาะกับ file sharing, blockchain, messaging</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- P2P Types -->
+  <section>
+    <h2>ประเภทของ P2P Networks</h2>
+    <div class="p2p-types">
+      <div class="p2p-type pure">
+        <div class="p2p-type-icon">🕸️</div>
+        <div class="p2p-type-name amber">Pure P2P</div>
+        <div class="p2p-type-desc">ทุก node เท่ากันสมบูรณ์ ไม่มี node พิเศษใดๆ เลย ค้นหา resource โดย flood ถาม neighbors</div>
+        <div class="p2p-type-example">Gnutella (เวอร์ชันแรก)</div>
+      </div>
+      <div class="p2p-type hybrid">
+        <div class="p2p-type-icon">🌐</div>
+        <div class="p2p-type-name green">Hybrid P2P</div>
+        <div class="p2p-type-desc">มี central index server สำหรับ discovery แต่ data transfer เกิดระหว่าง peers โดยตรง</div>
+        <div class="p2p-type-example">Napster, BitTorrent tracker</div>
+      </div>
+      <div class="p2p-type structured">
+        <div class="p2p-type-icon">🔷</div>
+        <div class="p2p-type-name indigo">Structured P2P (DHT)</div>
+        <div class="p2p-type-desc">ใช้ Distributed Hash Table จัดระเบียบ nodes ตาม key space — ค้นหา O(log N) โดยไม่ต้องมี index server</div>
+        <div class="p2p-type-example">Kademlia, Chord, IPFS</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Core concepts boxes -->
+  <section>
+    <h2>Concepts หลัก</h2>
+    <div class="vb-wrap">
+      <div class="vb-grid vb-4">
+        <div class="vbox">
+          <div class="vb-icon">🔑</div>
+          <div class="vb-title">DHT (Distributed Hash Table)</div>
+          <div class="vb-body">แผนที่กระจาย key→value ทั่วทุก node — แต่ละ node รับผิดชอบ key range ของตัวเอง</div>
+          <ul class="vb-list">
+            <li>Lookup: O(log N) hops</li>
+            <li>No central index</li>
+            <li>Self-organizing</li>
+          </ul>
+        </div>
+        <div class="vbox">
+          <div class="vb-icon">🏠</div>
+          <div class="vb-title">Node ID & Routing</div>
+          <div class="vb-body">แต่ละ peer มี unique ID (hash) ใช้กำหนดว่า data ชิ้นไหนควรเก็บที่ peer ไหน</div>
+          <ul class="vb-list">
+            <li>SHA1/SHA256 hash</li>
+            <li>Consistent hashing</li>
+            <li>Finger table (Chord)</li>
+          </ul>
+        </div>
+        <div class="vbox">
+          <div class="vb-icon">🤝</div>
+          <div class="vb-title">Peer Discovery</div>
+          <div class="vb-body">วิธีค้นหา peers ในเครือข่าย — bootstrap nodes, mDNS, DHT crawl, tracker</div>
+          <ul class="vb-list">
+            <li>Bootstrap nodes</li>
+            <li>mDNS (local network)</li>
+            <li>Peer exchange (PEX)</li>
+          </ul>
+        </div>
+        <div class="vbox">
+          <div class="vb-icon">📦</div>
+          <div class="vb-title">Data Replication</div>
+          <div class="vb-body">เก็บ copy ของ data ไว้หลาย nodes เพื่อ availability เมื่อ node ออกจากเครือข่าย</div>
+          <ul class="vb-list">
+            <li>Replication factor k</li>
+            <li>Auto-repair on churn</li>
+            <li>Merkle tree verification</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="vb-wrap">
+      <div class="vb-label">Network Challenges</div>
+      <div class="vb-grid vb-4">
+        <div class="vbox">
+          <div class="vb-icon">🔄</div>
+          <div class="vb-title">Churn</div>
+          <div class="vb-body">Nodes เข้าและออกตลอดเวลา — ระบบต้องปรับตัวและ re-route data อัตโนมัติ</div>
+        </div>
+        <div class="vbox">
+          <div class="vb-icon">🔓</div>
+          <div class="vb-title">NAT Traversal</div>
+          <div class="vb-body">Peers อยู่หลัง NAT router — ต้องใช้ STUN/TURN/hole-punching เพื่อ connect กัน</div>
+        </div>
+        <div class="vbox">
+          <div class="vb-icon">👺</div>
+          <div class="vb-title">Sybil Attack</div>
+          <div class="vb-body">ผู้โจมตีสร้าง fake nodes จำนวนมาก — ต้องการ Proof of Work หรือ reputation system</div>
+        </div>
+        <div class="vbox">
+          <div class="vb-icon">⚡</div>
+          <div class="vb-title">Eventual Consistency</div>
+          <div class="vb-body">Data update กระจายไม่พร้อมกัน — nodes อาจเห็น data version ต่างกันชั่วคราว</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- P2P Network Animated Diagram -->
+  <section>
+    <h2>P2P Network Diagram</h2>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 860 500" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <style>
+            .pl{font-family:sans-serif;font-size:10px;fill:#94a3b8}
+            .pt{font-family:sans-serif;font-size:11px;font-weight:bold;fill:#e2e8f0}
+            .ps{font-family:sans-serif;font-size:9px;fill:#64748b}
+          </style>
+          <filter id="glow2">
+            <feGaussianBlur stdDeviation="3" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <rect width="860" height="500" fill="#0d0d1a" rx="12"/>
+
+        <!-- Title: Pure P2P Network -->
+        <text x="220" y="30" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="bold" fill="#fbbf24">Pure P2P Network</text>
+        <text x="220" y="46" text-anchor="middle" class="pl">All peers equal — no central server</text>
+
+        <!-- Nodes (circle layout) -->
+        <!-- Node A (top) -->
+        <circle cx="220" cy="100" r="28" fill="#2a2000" stroke="#fbbf24" stroke-width="2"/>
+        <text x="220" y="96" text-anchor="middle" class="pt">🖥️</text>
+        <text x="220" y="110" text-anchor="middle" class="pl">Peer A</text>
+        <text x="220" y="122" text-anchor="middle" class="ps">192.168.1.2</text>
+
+        <!-- Node B (top-right) -->
+        <circle cx="360" cy="150" r="28" fill="#2a2000" stroke="#fbbf24" stroke-width="2"/>
+        <text x="360" y="146" text-anchor="middle" class="pt">🖥️</text>
+        <text x="360" y="160" text-anchor="middle" class="pl">Peer B</text>
+        <text x="360" y="172" text-anchor="middle" class="ps">192.168.1.5</text>
+
+        <!-- Node C (right) -->
+        <circle cx="370" cy="290" r="28" fill="#2a2000" stroke="#fbbf24" stroke-width="2"/>
+        <text x="370" y="286" text-anchor="middle" class="pt">📱</text>
+        <text x="370" y="300" text-anchor="middle" class="pl">Peer C</text>
+        <text x="370" y="312" text-anchor="middle" class="ps">mobile</text>
+
+        <!-- Node D (bottom) -->
+        <circle cx="220" cy="380" r="28" fill="#2a2000" stroke="#fbbf24" stroke-width="2"/>
+        <text x="220" y="376" text-anchor="middle" class="pt">💻</text>
+        <text x="220" y="390" text-anchor="middle" class="pl">Peer D</text>
+        <text x="220" y="402" text-anchor="middle" class="ps">laptop</text>
+
+        <!-- Node E (left) -->
+        <circle cx="80" cy="290" r="28" fill="#2a2000" stroke="#fbbf24" stroke-width="2"/>
+        <text x="80" y="286" text-anchor="middle" class="pt">🖥️</text>
+        <text x="80" y="300" text-anchor="middle" class="pl">Peer E</text>
+        <text x="80" y="312" text-anchor="middle" class="ps">server</text>
+
+        <!-- Node F (left-up) -->
+        <circle cx="80" cy="150" r="28" fill="#2a2000" stroke="#fbbf24" stroke-width="2"/>
+        <text x="80" y="146" text-anchor="middle" class="pt">🖥️</text>
+        <text x="80" y="160" text-anchor="middle" class="pl">Peer F</text>
+        <text x="80" y="172" text-anchor="middle" class="ps">192.168.1.8</text>
+
+        <!-- Connections (mesh) -->
+        <line x1="220" y1="128" x2="360" y2="122" stroke="#fbbf2440" stroke-width="1.5"/>
+        <line x1="220" y1="128" x2="80" y2="122" stroke="#fbbf2440" stroke-width="1.5"/>
+        <line x1="360" y1="178" x2="370" y2="262" stroke="#fbbf2440" stroke-width="1.5"/>
+        <line x1="80" y1="178" x2="80" y2="262" stroke="#fbbf2440" stroke-width="1.5"/>
+        <line x1="80" y1="318" x2="220" y2="352" stroke="#fbbf2440" stroke-width="1.5"/>
+        <line x1="370" y1="318" x2="220" y2="352" stroke="#fbbf2440" stroke-width="1.5"/>
+        <line x1="108" y1="150" x2="192" y2="150" stroke="#fbbf2440" stroke-width="1" stroke-dasharray="3,3"/>
+        <!-- cross connects -->
+        <line x1="108" y1="170" x2="192" y2="262" stroke="#fbbf2425" stroke-width="1" stroke-dasharray="3,3"/>
+        <line x1="352" y1="170" x2="252" y2="262" stroke="#fbbf2425" stroke-width="1" stroke-dasharray="3,3"/>
+
+        <!-- Animated data packet -->
+        <circle r="5" fill="#fbbf24" filter="url(#glow2)" opacity="0.9">
+          <animateMotion dur="3s" repeatCount="indefinite">
+            <mpath href="#p2ppath1"/>
+          </animateMotion>
+        </circle>
+        <path id="p2ppath1" d="M 220 100 L 360 150 L 370 290 L 220 380 L 80 290 L 220 100" fill="none"/>
+
+        <circle r="4" fill="#fb923c" filter="url(#glow2)" opacity="0.9">
+          <animateMotion dur="2s" repeatCount="indefinite" begin="1s">
+            <mpath href="#p2ppath2"/>
+          </animateMotion>
+        </circle>
+        <path id="p2ppath2" d="M 80 150 L 220 100 L 370 290 L 80 290 L 80 150" fill="none"/>
+
+        <!-- Label: "All nodes are Client+Server" -->
+        <text x="220" y="460" text-anchor="middle" class="pl" fill="#fbbf24">Each peer acts as BOTH client and server simultaneously</text>
+
+        <!-- ============ DHT / Structured (right side) ============ -->
+        <text x="640" y="30" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="bold" fill="#818cf8">Structured P2P — DHT Ring</text>
+        <text x="640" y="46" text-anchor="middle" class="pl">Kademlia / Chord — O(log N) routing</text>
+
+        <!-- DHT ring circle -->
+        <circle cx="640" cy="250" r="160" fill="none" stroke="#818cf825" stroke-width="1" stroke-dasharray="4,4"/>
+        <circle cx="640" cy="250" r="160" fill="none" stroke="#818cf810" stroke-width="80"/>
+
+        <!-- Ring nodes (8 nodes on ring) -->
+        <!-- 0deg=top, going clockwise -->
+        <!-- N0 at 315deg -->
+        <circle cx="753" cy="137" r="24" fill="#1a1a2e" stroke="#818cf8" stroke-width="1.5"/>
+        <text x="753" y="133" text-anchor="middle" class="pt" style="font-size:10px">🔷</text>
+        <text x="753" y="147" text-anchor="middle" class="ps" fill="#818cf8">ID:0</text>
+
+        <!-- N1 at 0deg (right) -->
+        <circle cx="800" cy="250" r="24" fill="#1a1a2e" stroke="#818cf8" stroke-width="1.5"/>
+        <text x="800" y="246" text-anchor="middle" class="pt" style="font-size:10px">🔷</text>
+        <text x="800" y="260" text-anchor="middle" class="ps" fill="#818cf8">ID:1</text>
+
+        <!-- N2 at 45deg -->
+        <circle cx="753" cy="363" r="24" fill="#1a1a2e" stroke="#818cf8" stroke-width="1.5"/>
+        <text x="753" y="359" text-anchor="middle" class="pt" style="font-size:10px">🔷</text>
+        <text x="753" y="373" text-anchor="middle" class="ps" fill="#818cf8">ID:2</text>
+
+        <!-- N3 at 90deg (bottom) -->
+        <circle cx="640" cy="410" r="24" fill="#1a1a2e" stroke="#818cf8" stroke-width="1.5"/>
+        <text x="640" y="406" text-anchor="middle" class="pt" style="font-size:10px">🔷</text>
+        <text x="640" y="420" text-anchor="middle" class="ps" fill="#818cf8">ID:3</text>
+
+        <!-- N4 at 135deg -->
+        <circle cx="527" cy="363" r="24" fill="#2a2000" stroke="#fbbf24" stroke-width="2"/>
+        <text x="527" y="359" text-anchor="middle" class="pt" style="font-size:10px">⭐</text>
+        <text x="527" y="373" text-anchor="middle" class="ps" fill="#fbbf24">ID:4 (you)</text>
+
+        <!-- N5 at 180deg (left) -->
+        <circle cx="480" cy="250" r="24" fill="#1a1a2e" stroke="#818cf8" stroke-width="1.5"/>
+        <text x="480" y="246" text-anchor="middle" class="pt" style="font-size:10px">🔷</text>
+        <text x="480" y="260" text-anchor="middle" class="ps" fill="#818cf8">ID:5</text>
+
+        <!-- N6 at 225deg -->
+        <circle cx="527" cy="137" r="24" fill="#1a1a2e" stroke="#818cf8" stroke-width="1.5"/>
+        <text x="527" y="133" text-anchor="middle" class="pt" style="font-size:10px">🔷</text>
+        <text x="527" y="147" text-anchor="middle" class="ps" fill="#818cf8">ID:6</text>
+
+        <!-- N7 at 270deg (top) -->
+        <circle cx="640" cy="90" r="24" fill="#1a1a2e" stroke="#818cf8" stroke-width="1.5"/>
+        <text x="640" y="86" text-anchor="middle" class="pt" style="font-size:10px">🔷</text>
+        <text x="640" y="100" text-anchor="middle" class="ps" fill="#818cf8">ID:7</text>
+
+        <!-- Chord ring arcs (connecting neighbors) -->
+        <path d="M 777 137 A 160 160 0 0 1 800 250" fill="none" stroke="#818cf840" stroke-width="1.5"/>
+        <path d="M 800 274 A 160 160 0 0 1 753 363" fill="none" stroke="#818cf840" stroke-width="1.5"/>
+        <path d="M 729 363 A 160 160 0 0 1 640 410" fill="none" stroke="#818cf840" stroke-width="1.5"/>
+        <path d="M 616 410 A 160 160 0 0 1 527 363" fill="none" stroke="#818cf840" stroke-width="1.5"/>
+        <path d="M 503 363 A 160 160 0 0 1 480 250" fill="none" stroke="#fbbf2460" stroke-width="2"/>
+        <path d="M 480 226 A 160 160 0 0 1 527 137" fill="none" stroke="#818cf840" stroke-width="1.5"/>
+        <path d="M 551 137 A 160 160 0 0 1 640 90" fill="none" stroke="#818cf840" stroke-width="1.5"/>
+        <path d="M 664 90 A 160 160 0 0 1 753 137" fill="none" stroke="#818cf840" stroke-width="1.5"/>
+
+        <!-- Finger table shortcuts from node 4 -->
+        <line x1="527" y1="340" x2="640" y2="274" stroke="#fbbf2460" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <line x1="527" y1="340" x2="640" y2="114" stroke="#fbbf2450" stroke-width="1" stroke-dasharray="3,4"/>
+        <text x="620" y="195" class="ps" fill="#fbbf24">finger table</text>
+        <text x="620" y="207" class="ps" fill="#fbbf24">shortcuts</text>
+
+        <!-- Animated routing -->
+        <circle r="4" fill="#fbbf24" filter="url(#glow2)">
+          <animateMotion dur="4s" repeatCount="indefinite">
+            <mpath href="#dhtpath"/>
+          </animateMotion>
+        </circle>
+        <path id="dhtpath" d="M 527 363 L 480 250 L 640 90 L 800 250 L 640 410 L 527 363" fill="none"/>
+
+        <!-- DHT label -->
+        <text x="640" y="460" text-anchor="middle" class="pl" fill="#818cf8">Lookup key → route to responsible node in O(log N) hops</text>
+      </svg>
+    </div>
+  </section>
+
+  <!-- Real-world examples -->
+  <section>
+    <h2>ตัวอย่างในชีวิตจริง</h2>
+    <div class="examples-grid">
+      <div class="example-card">
+        <div class="example-card-icon">🧲</div>
+        <div class="example-card-name">BitTorrent</div>
+        <div class="example-card-type">File Sharing</div>
+        <div class="example-card-desc">แบ่ง file เป็น pieces กระจายระหว่าง peers ใช้ DHT ค้นหา</div>
+      </div>
+      <div class="example-card">
+        <div class="example-card-icon">₿</div>
+        <div class="example-card-name">Bitcoin</div>
+        <div class="example-card-type">Blockchain</div>
+        <div class="example-card-desc">Distributed ledger — ทุก node เก็บ transaction history</div>
+      </div>
+      <div class="example-card">
+        <div class="example-card-icon">🌐</div>
+        <div class="example-card-name">IPFS</div>
+        <div class="example-card-type">Distributed Storage</div>
+        <div class="example-card-desc">Content-addressed storage ใช้ Kademlia DHT</div>
+      </div>
+      <div class="example-card">
+        <div class="example-card-icon">📞</div>
+        <div class="example-card-name">WebRTC</div>
+        <div class="example-card-type">Real-time Comm</div>
+        <div class="example-card-desc">Video call โดยตรงระหว่าง browsers ใช้ STUN/TURN</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Go Code -->
+  <section>
+    <h2>ตัวอย่าง Code (Go)</h2>
+
+    <div class="code-section">
+      <div class="code-file">
+        <div class="code-file-header">peer/peer.go — Basic Peer Node</div>
+        <pre><code class="language-go">package peer
+
+import (
+	"crypto/sha1"
+	"encoding/hex"
+	"fmt"
+	"net"
+	"sync"
+)
+
+// PeerID — unique identifier for a node (hash-based)
+type PeerID string
+
+func NewPeerID(addr string) PeerID {
+	h := sha1.Sum([]byte(addr))
+	return PeerID(hex.EncodeToString(h[:]))
+}
+
+// PeerInfo — information about a peer in the network
+type PeerInfo struct {
+	ID   PeerID
+	Addr string // "host:port"
+}
+
+// Node — a peer that is both client and server
+type Node struct {
+	mu       sync.RWMutex
+	self     PeerInfo
+	peers    map[PeerID]*PeerInfo
+	data     map[string][]byte // local data store
+	listener net.Listener
+}
+
+func NewNode(addr string) *Node {
+	return &Node{
+		self:  PeerInfo{ID: NewPeerID(addr), Addr: addr},
+		peers: make(map[PeerID]*PeerInfo),
+		data:  make(map[string][]byte),
+	}
+}
+
+// Start — begins listening for incoming connections (acting as server)
+func (n *Node) Start() error {
+	ln, err := net.Listen("tcp", n.self.Addr)
+	if err != nil {
+		return fmt.Errorf("listen on %s: %w", n.self.Addr, err)
+	}
+	n.listener = ln
+	go n.acceptLoop()
+	fmt.Printf("[%s] Node started at %s\n", n.self.ID[:8], n.self.Addr)
+	return nil
+}
+
+func (n *Node) acceptLoop() {
+	for {
+		conn, err := n.listener.Accept()
+		if err != nil {
+			return
+		}
+		go n.handleConnection(conn)
+	}
+}
+
+func (n *Node) handleConnection(conn net.Conn) {
+	defer conn.Close()
+	// Protocol handling: read message type, dispatch
+	buf := make([]byte, 4096)
+	nRead, err := conn.Read(buf)
+	if err != nil {
+		return
+	}
+	msg := ParseMessage(buf[:nRead])
+	n.handleMessage(conn, msg)
+}</code></pre>
+      </div>
+
+      <div class="code-file">
+        <div class="code-file-header">peer/message.go — P2P Protocol Messages</div>
+        <pre><code class="language-go">package peer
+
+import (
+	"encoding/json"
+	"fmt"
+)
+
+type MessageType string
+
+const (
+	MsgPing      MessageType = "PING"
+	MsgPong      MessageType = "PONG"
+	MsgStore     MessageType = "STORE"     // store key-value on this peer
+	MsgFindValue MessageType = "FIND_VALUE" // find value by key
+	MsgFindNode  MessageType = "FIND_NODE"  // find peers close to a key
+	MsgPeerList  MessageType = "PEER_LIST"  // response with peer list
+)
+
+type Message struct {
+	Type    MessageType     `json:"type"`
+	From    PeerID          `json:"from"`
+	Payload json.RawMessage `json:"payload"`
+}
+
+type StorePayload struct {
+	Key   string `json:"key"`
+	Value []byte `json:"value"`
+}
+
+type FindValuePayload struct {
+	Key string `json:"key"`
+}
+
+type FindValueResponse struct {
+	Found bool     `json:"found"`
+	Value []byte   `json:"value,omitempty"`
+	Peers []PeerInfo `json:"peers,omitempty"` // closer peers if not found
+}
+
+func ParseMessage(data []byte) Message {
+	var msg Message
+	json.Unmarshal(data, &msg)
+	return msg
+}
+
+func (n *Node) handleMessage(conn interface{ Write([]byte) (int, error) }, msg Message) {
+	switch msg.Type {
+	case MsgPing:
+		resp, _ := json.Marshal(Message{Type: MsgPong, From: n.self.ID})
+		conn.Write(resp)
+
+	case MsgStore:
+		var p StorePayload
+		json.Unmarshal(msg.Payload, &p)
+		n.mu.Lock()
+		n.data[p.Key] = p.Value
+		n.mu.Unlock()
+		fmt.Printf("[%s] Stored key=%s\n", n.self.ID[:8], p.Key)
+
+	case MsgFindValue:
+		var p FindValuePayload
+		json.Unmarshal(msg.Payload, &p)
+		n.mu.RLock()
+		val, found := n.data[p.Key]
+		n.mu.RUnlock()
+
+		resp := FindValueResponse{Found: found, Value: val}
+		if !found {
+			// Return k-closest peers we know about
+			resp.Peers = n.closestPeers(p.Key, 3)
+		}
+		payload, _ := json.Marshal(resp)
+		out, _ := json.Marshal(Message{Type: MsgFindValue, From: n.self.ID, Payload: payload})
+		conn.Write(out)
+	}
+}</code></pre>
+      </div>
+
+      <div class="code-file">
+        <div class="code-file-header">peer/routing.go — Simple DHT-like Routing</div>
+        <pre><code class="language-go">package peer
+
+import (
+	"crypto/sha1"
+	"encoding/binary"
+	"net"
+	"sort"
+)
+
+// distance XOR metric — lower = closer (Kademlia style)
+func distance(a, b PeerID) uint32 {
+	ha := sha1.Sum([]byte(a))
+	hb := sha1.Sum([]byte(b))
+	var d uint32
+	for i := 0; i < 4; i++ {
+		d ^= binary.BigEndian.Uint32(ha[i*4 : (i+1)*4])
+		d ^= binary.BigEndian.Uint32(hb[i*4 : (i+1)*4])
+	}
+	return d
+}
+
+// closestPeers returns k peers with shortest XOR distance to key
+func (n *Node) closestPeers(key string, k int) []PeerInfo {
+	target := PeerID(key)
+	n.mu.RLock()
+	defer n.mu.RUnlock()
+
+	type scored struct {
+		peer PeerInfo
+		dist uint32
+	}
+	var candidates []scored
+	for _, p := range n.peers {
+		candidates = append(candidates, scored{*p, distance(target, p.ID)})
+	}
+	sort.Slice(candidates, func(i, j int) bool {
+		return candidates[i].dist < candidates[j].dist
+	})
+
+	result := make([]PeerInfo, 0, k)
+	for i := 0; i < k && i < len(candidates); i++ {
+		result = append(result, candidates[i].peer)
+	}
+	return result
+}
+
+// Connect — acting as client, connecting to a known peer
+func (n *Node) Connect(addr string) error {
+	conn, err := net.Dial("tcp", addr)
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
+
+	// Send ping
+	msg, _ := json.Marshal(Message{Type: MsgPing, From: n.self.ID})
+	conn.Write(msg)
+
+	// Read pong, add peer to table
+	buf := make([]byte, 1024)
+	nRead, _ := conn.Read(buf)
+	var resp Message
+	json.Unmarshal(buf[:nRead], &resp)
+
+	n.mu.Lock()
+	n.peers[resp.From] = &PeerInfo{ID: resp.From, Addr: addr}
+	n.mu.Unlock()
+	return nil
+}</code></pre>
+      </div>
+
+      <div class="code-file">
+        <div class="code-file-header">peer/gossip.go — Gossip Protocol for peer discovery</div>
+        <pre><code class="language-go">package peer
+
+import (
+	"encoding/json"
+	"fmt"
+	"math/rand"
+	"net"
+	"time"
+)
+
+// Gossip periodically shares peer list with random neighbors
+// — แพร่กระจายข้อมูลแบบ epidemic ทุก peer จะรู้จัก peer อื่นๆ เร็วขึ้น
+func (n *Node) StartGossip(interval time.Duration) {
+	ticker := time.NewTicker(interval)
+	go func() {
+		for range ticker.C {
+			n.gossipOnce()
+		}
+	}()
+}
+
+func (n *Node) gossipOnce() {
+	n.mu.RLock()
+	peerList := make([]PeerInfo, 0, len(n.peers))
+	for _, p := range n.peers {
+		peerList = append(peerList, *p)
+	}
+	n.mu.RUnlock()
+
+	if len(peerList) == 0 {
+		return
+	}
+
+	// Pick a random peer to gossip with
+	target := peerList[rand.Intn(len(peerList))]
+
+	// Share our peer list with them
+	payload, _ := json.Marshal(peerList)
+	msg, _ := json.Marshal(Message{
+		Type:    MsgPeerList,
+		From:    n.self.ID,
+		Payload: payload,
+	})
+
+	conn, err := net.DialTimeout("tcp", target.Addr, 2*time.Second)
+	if err != nil {
+		fmt.Printf("[gossip] cannot reach %s: %v\n", target.Addr, err)
+		return
+	}
+	defer conn.Close()
+	conn.Write(msg)
+}</code></pre>
+      </div>
+
+      <div class="code-file">
+        <div class="code-file-header">cmd/main.go — Start two peers and connect them</div>
+        <pre><code class="language-go">package main
+
+import (
+	"fmt"
+	"time"
+
+	"myapp/peer"
+)
+
+func main() {
+	// Create Peer A
+	nodeA := peer.NewNode(":4001")
+	if err := nodeA.Start(); err != nil {
+		panic(err)
+	}
+
+	// Create Peer B
+	nodeB := peer.NewNode(":4002")
+	if err := nodeB.Start(); err != nil {
+		panic(err)
+	}
+
+	// B connects to A (bootstrap)
+	time.Sleep(100 * time.Millisecond)
+	if err := nodeB.Connect(":4001"); err != nil {
+		fmt.Println("connect failed:", err)
+		return
+	}
+	fmt.Println("Peer B connected to Peer A")
+
+	// B stores data (will be routed to correct node)
+	nodeB.StoreValue("user:123", []byte(`{"name":"Alice"}`))
+
+	// A retrieves data (via DHT routing)
+	val, found := nodeA.FindValue("user:123")
+	if found {
+		fmt.Printf("Found: %s\n", val)
+	}
+
+	// Start gossip so peers discover each other automatically
+	nodeA.StartGossip(5 * time.Second)
+	nodeB.StartGossip(5 * time.Second)
+
+	// Keep running
+	select {}
+}</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- WebRTC P2P -->
+  <section>
+    <h2>P2P ใน Browser — WebRTC Pattern</h2>
+    <div class="vb-wrap">
+      <div class="vb-label">WebRTC Connection Flow</div>
+      <div class="vb-grid vb-4">
+        <div class="vbox">
+          <div class="vb-icon">📡</div>
+          <div class="vb-title">STUN Server</div>
+          <div class="vb-body">ช่วย peer รู้ public IP ของตัวเอง สำหรับ NAT traversal — ไม่ relay data</div>
+          <span class="vb-chip">ICE Candidate</span>
+        </div>
+        <div class="vbox">
+          <div class="vb-icon">🔀</div>
+          <div class="vb-title">TURN Server</div>
+          <div class="vb-body">Relay data เมื่อ direct P2P ทำไม่ได้ (strict NAT) — fallback เท่านั้น</div>
+          <span class="vb-chip">Fallback relay</span>
+        </div>
+        <div class="vbox">
+          <div class="vb-icon">🤝</div>
+          <div class="vb-title">Signaling Server</div>
+          <div class="vb-body">แลกเปลี่ยน SDP offer/answer และ ICE candidates ระหว่าง peers — หลังจากนั้นใช้งานไม่ถึง</div>
+          <span class="vb-chip">WebSocket</span>
+        </div>
+        <div class="vbox">
+          <div class="vb-icon">⚡</div>
+          <div class="vb-title">Data Channel</div>
+          <div class="vb-body">Direct P2P data transfer — ต่ำกว่า 50ms latency สำหรับ video, gaming, file transfer</div>
+          <span class="vb-chip">DTLS/SRTP</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- When to use -->
+  <section>
+    <h2>เมื่อไหร่ควรใช้ P2P?</h2>
+    <div class="vb-wrap">
+      <div class="vb-grid vb-2">
+        <div class="vbox">
+          <div class="vb-icon">✅</div>
+          <div class="vb-title">เหมาะกับ</div>
+          <ul class="vb-list">
+            <li>ต้องการ censorship-resistant / decentralized system</li>
+            <li>File sharing ขนาดใหญ่ที่ bandwidth cost สูงถ้าใช้ central server</li>
+            <li>Real-time communication ที่ต้องการ latency ต่ำ (WebRTC)</li>
+            <li>Blockchain / distributed ledger systems</li>
+            <li>Distributed storage (IPFS, backup systems)</li>
+            <li>Gaming ที่ต้องการ low-latency multiplayer</li>
+          </ul>
+        </div>
+        <div class="vbox">
+          <div class="vb-icon">⚠️</div>
+          <div class="vb-title">ระวัง</div>
+          <ul class="vb-list">
+            <li>ยากต่อการ debug และ monitor</li>
+            <li>Security ซับซ้อน — Sybil attack, data poisoning</li>
+            <li>NAT traversal เป็น pain point บน mobile</li>
+            <li>Eventual consistency — ไม่เหมาะกับ strong consistency</li>
+            <li>Peer churn ทำให้ availability ไม่สม่ำเสมอ</li>
+            <li>ไม่เหมาะกับ transaction-heavy business applications</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>hljs.highlightAll();</script>
+</body>
+</html>

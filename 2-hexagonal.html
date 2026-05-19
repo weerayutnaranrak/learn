@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hexagonal Architecture — สื่อการสอน</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#07090f;color:#e2e8f0;line-height:1.7}
+a{color:#38bdf8;text-decoration:none}
+
+.topnav{display:flex;align-items:center;gap:1rem;padding:1rem 2rem;background:#0d1117;border-bottom:1px solid #1e293b;position:sticky;top:0;z-index:100}
+.back-btn{display:flex;align-items:center;gap:.4rem;color:#64748b;font-size:.85rem;transition:color .2s}
+.back-btn:hover{color:#e2e8f0;text-decoration:none}
+.nav-title{color:#475569;font-size:.85rem}
+.nav-title span{color:#67e8f9;font-weight:600}
+
+.hero{padding:4rem 2rem 3rem;text-align:center;background:linear-gradient(160deg,#07090f,#040f1a)}
+.hero-badge{display:inline-block;background:rgba(6,182,212,.1);border:1px solid rgba(6,182,212,.3);color:#67e8f9;padding:.35rem 1rem;border-radius:999px;font-size:.8rem;font-weight:600;margin-bottom:1.5rem}
+.hero h1{font-size:clamp(1.8rem,4vw,3rem);font-weight:800;background:linear-gradient(135deg,#06b6d4,#0284c7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:1rem}
+.hero p{color:#64748b;max-width:620px;margin:0 auto;font-size:1rem}
+
+.content{max-width:900px;margin:0 auto;padding:2rem 1.5rem 5rem}
+.section{margin-bottom:4rem}
+.section-title{font-size:1.6rem;font-weight:700;color:#06b6d4;margin-bottom:.4rem;display:flex;align-items:center;gap:.6rem}
+.section-sub{color:#475569;font-size:.9rem;margin-bottom:2rem;padding-left:2rem}
+
+.callout{background:#0f172a;border-left:3px solid #06b6d4;border-radius:0 8px 8px 0;padding:1rem 1.2rem;margin:1.5rem 0;font-size:.88rem;color:#94a3b8}
+.callout strong{color:#67e8f9}
+.callout.tip{border-color:#10b981}.callout.tip strong{color:#6ee7b7}
+.callout.warn{border-color:#f59e0b}.callout.warn strong{color:#fcd34d}
+
+.code-block{margin:1.5rem 0;border-radius:12px;overflow:hidden;border:1px solid #1e293b}
+.code-header{background:#111827;padding:.7rem 1rem;display:flex;justify-content:space-between;align-items:center}
+.code-header span{font-size:.78rem;color:#64748b;font-weight:600}
+.code-header .lang{background:rgba(6,182,212,.15);color:#22d3ee;padding:.15rem .6rem;border-radius:4px;font-size:.72rem;font-weight:700}
+.code-block pre{margin:0!important;border-radius:0!important;border:none!important;font-size:.83rem!important;line-height:1.6!important}
+
+.diagram{background:#0d1117;border:1px solid #1e293b;border-radius:16px;padding:2rem;margin:2rem 0;text-align:center}
+.diagram-title{font-size:.8rem;color:#475569;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:1.5rem}
+
+.concept-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;margin:1.5rem 0}
+.concept-card{background:#0d1117;border:1px solid #1e293b;border-radius:12px;padding:1.4rem;border-left:3px solid var(--c,#06b6d4)}
+.concept-card h3{font-size:.95rem;font-weight:700;color:#f1f5f9;margin-bottom:.4rem}
+.concept-card p{font-size:.83rem;color:#64748b;line-height:1.6}
+.concept-card .label{font-size:.7rem;color:var(--c,#06b6d4);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.4rem}
+
+.compare{width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:.88rem}
+.compare th{background:#111827;color:#94a3b8;padding:.8rem 1rem;text-align:left;border-bottom:2px solid #1e293b}
+.compare td{padding:.7rem 1rem;border-bottom:1px solid #111827;color:#cbd5e1;vertical-align:top}
+
+/* Hexagon animation */
+@keyframes rotate{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:.4}50%{opacity:.9}}
+@keyframes flowIn{0%{stroke-dashoffset:60}100%{stroke-dashoffset:0}}
+@keyframes flowOut{0%{stroke-dashoffset:-60}100%{stroke-dashoffset:0}}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="index.html" class="back-btn">← กลับหน้าหลัก</a>
+  <span class="nav-title">02 / <span>Hexagonal Architecture</span></span>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">⬡ หัวข้อที่ 2</div>
+  <h1>Hexagonal Architecture</h1>
+  <p>หรือที่รู้จักในชื่อ "Ports &amp; Adapters" — แยก Business Logic ออกจาก Infrastructure ให้ Core ของระบบทดสอบได้โดยไม่ต้องง้อ Database</p>
+</div>
+
+<div class="content">
+
+<!-- ── PROBLEM ── -->
+<div class="section">
+  <div class="section-title">😣 ปัญหาที่ Hexagonal แก้</div>
+  <div class="section-sub">ทำไมถึงต้องการ architecture แบบนี้?</div>
+
+  <p style="color:#94a3b8;margin-bottom:1.5rem">
+    ใน Traditional Layered Architecture ปัญหาที่พบบ่อยคือ:
+  </p>
+
+  <div class="concept-grid">
+    <div class="concept-card" style="--c:#ef4444">
+      <div class="label">ปัญหา 1</div>
+      <h3>Business Logic ผูกกับ Database</h3>
+      <p>เปลี่ยน database ไม่ได้ เพราะ SQL queries อยู่กระจัดกระจายทั่ว codebase ต้อง mock DB ทุกครั้งที่ test</p>
+    </div>
+    <div class="concept-card" style="--c:#f59e0b">
+      <div class="label">ปัญหา 2</div>
+      <h3>Test ยาก</h3>
+      <p>ต้องมี DB connection จริงๆ ถึงจะ test ได้ unit test ช้า brittle ทำให้ developer ไม่ test</p>
+    </div>
+    <div class="concept-card" style="--c:#ef4444">
+      <div class="label">ปัญหา 3</div>
+      <h3>เปลี่ยน Technology ยาก</h3>
+      <p>อยากเปลี่ยนจาก HTTP เป็น gRPC หรือจาก PostgreSQL เป็น MongoDB ต้องแก้ทั้งระบบ</p>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>Hexagonal Architecture แก้ปัญหานี้ด้วย:</strong> กำหนดให้ Core (Business Logic) อยู่ตรงกลาง
+    และสื่อสารกับโลกภายนอกผ่าน <strong>Ports (interfaces)</strong> เท่านั้น
+    — Technology สามารถเปลี่ยนได้โดยไม่กระทบ Core เลย
+  </div>
+</div>
+
+<!-- ── CONCEPT ── -->
+<div class="section">
+  <div class="section-title">⬡ แนวคิดหลัก</div>
+  <div class="section-sub">Ports and Adapters Pattern — Alistair Cockburn, 2005</div>
+
+  <!-- Hexagonal Diagram -->
+  <div class="diagram">
+    <div class="diagram-title">Hexagonal Architecture — Flow of Control</div>
+    <svg viewBox="0 0 700 380" fill="none" xmlns="http://www.w3.org/2000/svg" style="max-width:700px;width:100%">
+      <!-- Outer ring: Adapters -->
+      <!-- Left side: Primary (Driving) Adapters -->
+      <rect x="10" y="60" width="110" height="34" rx="6" fill="#0f2010" stroke="#10b981" stroke-width="1"/>
+      <text x="65" y="81" text-anchor="middle" fill="#6ee7b7" font-size="9" font-weight="600">HTTP Handler</text>
+
+      <rect x="10" y="110" width="110" height="34" rx="6" fill="#0f2010" stroke="#10b981" stroke-width="1"/>
+      <text x="65" y="131" text-anchor="middle" fill="#6ee7b7" font-size="9" font-weight="600">gRPC Handler</text>
+
+      <rect x="10" y="160" width="110" height="34" rx="6" fill="#0f2010" stroke="#10b981" stroke-width="1"/>
+      <text x="65" y="181" text-anchor="middle" fill="#6ee7b7" font-size="9" font-weight="600">CLI</text>
+
+      <rect x="10" y="210" width="110" height="34" rx="6" fill="#0f2010" stroke="#10b981" stroke-width="1"/>
+      <text x="65" y="231" text-anchor="middle" fill="#6ee7b7" font-size="9" font-weight="600">Test (Go test)</text>
+
+      <!-- Label Primary -->
+      <text x="65" y="30" text-anchor="middle" fill="#10b981" font-size="10" font-weight="700">PRIMARY ADAPTERS</text>
+      <text x="65" y="42" text-anchor="middle" fill="#475569" font-size="8">(Driving / Left side)</text>
+
+      <!-- Middle: Ports ring -->
+      <rect x="140" y="45" width="90" height="220" rx="10" fill="#071520" stroke="#0284c7" stroke-width="1.5" stroke-dasharray="5,3"/>
+      <text x="185" y="115" text-anchor="middle" fill="#38bdf8" font-size="9" font-weight="700">Primary</text>
+      <text x="185" y="128" text-anchor="middle" fill="#38bdf8" font-size="9" font-weight="700">Ports</text>
+      <text x="185" y="148" text-anchor="middle" fill="#475569" font-size="8">interface</text>
+      <text x="185" y="160" text-anchor="middle" fill="#475569" font-size="8">UserService</text>
+      <text x="185" y="172" text-anchor="middle" fill="#475569" font-size="8">OrderService</text>
+
+      <!-- Core Hexagon -->
+      <polygon points="350,60 430,100 430,200 350,240 270,200 270,100" fill="#0a0f20" stroke="#6366f1" stroke-width="2"/>
+      <text x="350" y="140" text-anchor="middle" fill="#a5b4fc" font-size="11" font-weight="700">CORE</text>
+      <text x="350" y="158" text-anchor="middle" fill="#818cf8" font-size="9">Business Logic</text>
+      <text x="350" y="173" text-anchor="middle" fill="#6366f1" font-size="8">Domain Objects</text>
+      <text x="350" y="186" text-anchor="middle" fill="#6366f1" font-size="8">Use Cases</text>
+
+      <!-- Right Ports ring -->
+      <rect x="470" y="45" width="90" height="220" rx="10" fill="#07150a" stroke="#10b981" stroke-width="1.5" stroke-dasharray="5,3"/>
+      <text x="515" y="115" text-anchor="middle" fill="#6ee7b7" font-size="9" font-weight="700">Secondary</text>
+      <text x="515" y="128" text-anchor="middle" fill="#6ee7b7" font-size="9" font-weight="700">Ports</text>
+      <text x="515" y="148" text-anchor="middle" fill="#475569" font-size="8">interface</text>
+      <text x="515" y="160" text-anchor="middle" fill="#475569" font-size="8">UserRepo</text>
+      <text x="515" y="172" text-anchor="middle" fill="#475569" font-size="8">EmailSender</text>
+
+      <!-- Right: Secondary (Driven) Adapters -->
+      <rect x="580" y="60" width="110" height="34" rx="6" fill="#0a1510" stroke="#10b981" stroke-width="1"/>
+      <text x="635" y="81" text-anchor="middle" fill="#6ee7b7" font-size="9" font-weight="600">PostgreSQL</text>
+
+      <rect x="580" y="110" width="110" height="34" rx="6" fill="#0a1510" stroke="#10b981" stroke-width="1"/>
+      <text x="635" y="131" text-anchor="middle" fill="#6ee7b7" font-size="9" font-weight="600">MongoDB</text>
+
+      <rect x="580" y="160" width="110" height="34" rx="6" fill="#0a1510" stroke="#10b981" stroke-width="1"/>
+      <text x="635" y="181" text-anchor="middle" fill="#6ee7b7" font-size="9" font-weight="600">SMTP Email</text>
+
+      <rect x="580" y="210" width="110" height="34" rx="6" fill="#0a1510" stroke="#10b981" stroke-width="1"/>
+      <text x="635" y="231" text-anchor="middle" fill="#6ee7b7" font-size="9" font-weight="600">Kafka</text>
+
+      <!-- Label Secondary -->
+      <text x="635" y="30" text-anchor="middle" fill="#10b981" font-size="10" font-weight="700">SECONDARY ADAPTERS</text>
+      <text x="635" y="42" text-anchor="middle" fill="#475569" font-size="8">(Driven / Right side)</text>
+
+      <!-- Arrows: Primary → Port → Core -->
+      <line x1="120" y1="77" x2="140" y2="120" stroke="#10b981" stroke-width="1.5" marker-end="url(#g)">
+        <animate attributeName="stroke-dasharray" values="0,50;50,0" dur="1.5s" repeatCount="indefinite"/>
+      </line>
+      <line x1="120" y1="127" x2="140" y2="145" stroke="#10b981" stroke-width="1.5" marker-end="url(#g)">
+        <animate attributeName="stroke-dasharray" values="0,50;50,0" dur="1.5s" begin=".2s" repeatCount="indefinite"/>
+      </line>
+      <line x1="120" y1="177" x2="140" y2="165" stroke="#10b981" stroke-width="1.5" marker-end="url(#g)">
+        <animate attributeName="stroke-dasharray" values="0,50;50,0" dur="1.5s" begin=".4s" repeatCount="indefinite"/>
+      </line>
+      <line x1="120" y1="227" x2="140" y2="185" stroke="#10b981" stroke-width="1.5" marker-end="url(#g)">
+        <animate attributeName="stroke-dasharray" values="0,50;50,0" dur="1.5s" begin=".6s" repeatCount="indefinite"/>
+      </line>
+
+      <!-- Port → Core -->
+      <line x1="230" y1="150" x2="270" y2="150" stroke="#38bdf8" stroke-width="2" marker-end="url(#b)">
+        <animate attributeName="stroke-dasharray" values="0,60;60,0" dur="1.2s" repeatCount="indefinite"/>
+      </line>
+
+      <!-- Core → Port (right) -->
+      <line x1="430" y1="150" x2="470" y2="150" stroke="#6366f1" stroke-width="2" marker-end="url(#p)">
+        <animate attributeName="stroke-dasharray" values="0,60;60,0" dur="1.2s" begin=".3s" repeatCount="indefinite"/>
+      </line>
+
+      <!-- Port → Adapters (right) -->
+      <line x1="560" y1="120" x2="580" y2="90" stroke="#6366f1" stroke-width="1.5" marker-end="url(#p)">
+        <animate attributeName="stroke-dasharray" values="0,50;50,0" dur="1.5s" repeatCount="indefinite"/>
+      </line>
+      <line x1="560" y1="140" x2="580" y2="127" stroke="#6366f1" stroke-width="1.5" marker-end="url(#p)">
+        <animate attributeName="stroke-dasharray" values="0,50;50,0" dur="1.5s" begin=".3s" repeatCount="indefinite"/>
+      </line>
+      <line x1="560" y1="155" x2="580" y2="177" stroke="#6366f1" stroke-width="1.5" marker-end="url(#p)">
+        <animate attributeName="stroke-dasharray" values="0,50;50,0" dur="1.5s" begin=".6s" repeatCount="indefinite"/>
+      </line>
+      <line x1="560" y1="175" x2="580" y2="227" stroke="#6366f1" stroke-width="1.5" marker-end="url(#p)">
+        <animate attributeName="stroke-dasharray" values="0,50;50,0" dur="1.5s" begin=".9s" repeatCount="indefinite"/>
+      </line>
+
+      <!-- Flow labels -->
+      <text x="350" y="290" text-anchor="middle" fill="#334155" font-size="9">← Request (Call) →</text>
+      <text x="185" y="290" text-anchor="middle" fill="#0284c7" font-size="9">Interface (Port)</text>
+      <text x="515" y="290" text-anchor="middle" fill="#6366f1" font-size="9">Interface (Port)</text>
+
+      <defs>
+        <marker id="g" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+          <path d="M0,0 L6,3 L0,6 Z" fill="#10b981"/>
+        </marker>
+        <marker id="b" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+          <path d="M0,0 L6,3 L0,6 Z" fill="#38bdf8"/>
+        </marker>
+        <marker id="p" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+          <path d="M0,0 L6,3 L0,6 Z" fill="#6366f1"/>
+        </marker>
+      </defs>
+    </svg>
+  </div>
+
+  <div class="concept-grid">
+    <div class="concept-card" style="--c:#10b981">
+      <div class="label">Primary Port</div>
+      <h3>Driving / Input Side</h3>
+      <p>Interface ที่ Core <strong>expose</strong> ออกไปให้ outside world เรียกใช้ เช่น <code>UserService interface</code> — HTTP Handler จะ call interface นี้</p>
+    </div>
+    <div class="concept-card" style="--c:#6366f1">
+      <div class="label">Secondary Port</div>
+      <h3>Driven / Output Side</h3>
+      <p>Interface ที่ Core <strong>กำหนด</strong> และต้องการจาก outside world เช่น <code>UserRepository interface</code> — PostgreSQL จะ implement interface นี้</p>
+    </div>
+    <div class="concept-card" style="--c:#10b981">
+      <div class="label">Primary Adapter</div>
+      <h3>Driving Adapter</h3>
+      <p>ตัวที่ <strong>drive</strong> Core — HTTP Handler, gRPC Server, CLI Command, Test — ฝั่งซ้ายของ hexagon</p>
+    </div>
+    <div class="concept-card" style="--c:#6366f1">
+      <div class="label">Secondary Adapter</div>
+      <h3>Driven Adapter</h3>
+      <p>ตัวที่ Core <strong>drive</strong> — PostgreSQL, MongoDB, SMTP, Kafka — ฝั่งขวา ต้อง implement Secondary Port</p>
+    </div>
+  </div>
+</div>
+
+<!-- ── CODE EXAMPLE ── -->
+<div class="section">
+  <div class="section-title">💻 ตัวอย่าง Go — User Registration Service</div>
+  <div class="section-sub">แสดง Core → Ports → Adapters อย่างชัดเจน</div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>core/domain.go — Domain Objects (ไม่ depend อะไรเลย)</span>
+      <span class="lang">Go</span>
+    </div>
+    <pre><code class="language-go">package core
+
+import (
+    "errors"
+    "regexp"
+    "strings"
+    "time"
+)
+
+// User — Domain Object ของเรา
+type User struct {
+    ID        string
+    Name      string
+    Email     Email // Value Object
+    CreatedAt time.Time
+}
+
+// Email — Value Object (มี validation)
+type Email string
+
+var emailRegex = regexp.MustCompile(`^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$`)
+
+func NewEmail(s string) (Email, error) {
+    s = strings.ToLower(strings.TrimSpace(s))
+    if !emailRegex.MatchString(s) {
+        return "", errors.New("invalid email format")
+    }
+    return Email(s), nil
+}
+
+func (e Email) String() string { return string(e) }</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>core/ports.go — Ports (Interfaces ที่ Core กำหนด)</span>
+      <span class="lang">Go</span>
+    </div>
+    <pre><code class="language-go">package core
+
+import "context"
+
+// ─── PRIMARY PORTS (Core expose ออกไป) ───────────────────────────────────────
+// UserService — interface ที่ HTTP Handler / gRPC / CLI จะ call
+type UserService interface {
+    Register(ctx context.Context, name, email string) (*User, error)
+    GetByID(ctx context.Context, id string) (*User, error)
+    ListAll(ctx context.Context) ([]*User, error)
+}
+
+// ─── SECONDARY PORTS (Core ต้องการจาก outside) ──────────────────────────────
+// UserRepository — Core กำหนด interface นี้, Infrastructure implement
+type UserRepository interface {
+    Save(ctx context.Context, user *User) error
+    FindByID(ctx context.Context, id string) (*User, error)
+    FindByEmail(ctx context.Context, email Email) (*User, error)
+    FindAll(ctx context.Context) ([]*User, error)
+}
+
+// EmailSender — Core กำหนด interface, SMTP adapter implement
+type EmailSender interface {
+    SendWelcome(ctx context.Context, to Email, name string) error
+}
+
+// IDGenerator — Core กำหนด, Infrastructure implement (UUID, etc.)
+type IDGenerator interface {
+    Generate() string
+}</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>core/service.go — Core Business Logic (Use Case)</span>
+      <span class="lang">Go</span>
+    </div>
+    <pre><code class="language-go">package core
+
+import (
+    "context"
+    "fmt"
+    "log"
+    "time"
+)
+
+// userService — implement UserService interface
+// ไม่รู้จัก HTTP, PostgreSQL, SMTP — รู้แค่ interfaces
+type userService struct {
+    repo   UserRepository  // Secondary Port
+    mailer EmailSender     // Secondary Port
+    ids    IDGenerator     // Secondary Port
+}
+
+func NewUserService(repo UserRepository, mailer EmailSender, ids IDGenerator) UserService {
+    return &userService{repo: repo, mailer: mailer, ids: ids}
+}
+
+func (s *userService) Register(ctx context.Context, name, email string) (*User, error) {
+    // 1. Validate input
+    emailVO, err := NewEmail(email)
+    if err != nil {
+        return nil, fmt.Errorf("invalid email: %w", err)
+    }
+    if name == "" {
+        return nil, fmt.Errorf("name is required")
+    }
+
+    // 2. Business rule: email ต้องไม่ซ้ำ
+    existing, _ := s.repo.FindByEmail(ctx, emailVO)
+    if existing != nil {
+        return nil, fmt.Errorf("email already registered")
+    }
+
+    // 3. สร้าง User ใหม่
+    user := &User{
+        ID:        s.ids.Generate(),
+        Name:      name,
+        Email:     emailVO,
+        CreatedAt: time.Now(),
+    }
+
+    // 4. Save ผ่าน Secondary Port (ไม่รู้ว่าเป็น DB อะไร)
+    if err := s.repo.Save(ctx, user); err != nil {
+        return nil, fmt.Errorf("save user: %w", err)
+    }
+
+    // 5. Send email ผ่าน Secondary Port (ไม่รู้ว่าเป็น SMTP อะไร)
+    if err := s.mailer.SendWelcome(ctx, emailVO, name); err != nil {
+        log.Printf("warn: welcome email failed for %s: %v", email, err)
+        // ไม่ fail — email ไม่ใช่ critical path
+    }
+
+    return user, nil
+}
+
+func (s *userService) GetByID(ctx context.Context, id string) (*User, error) {
+    user, err := s.repo.FindByID(ctx, id)
+    if err != nil {
+        return nil, fmt.Errorf("find user: %w", err)
+    }
+    return user, nil
+}
+
+func (s *userService) ListAll(ctx context.Context) ([]*User, error) {
+    return s.repo.FindAll(ctx)
+}</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>adapters/primary/http_handler.go — Primary Adapter (HTTP)</span>
+      <span class="lang">Go</span>
+    </div>
+    <pre><code class="language-go">package httphandler
+
+import (
+    "encoding/json"
+    "net/http"
+    "myapp/core"
+)
+
+// UserHandler — Primary Adapter: HTTP → Core
+// รู้จักแค่ core.UserService interface เท่านั้น
+type UserHandler struct {
+    svc core.UserService // Primary Port
+}
+
+func NewUserHandler(svc core.UserService) *UserHandler {
+    return &UserHandler{svc: svc}
+}
+
+func (h *UserHandler) Register(w http.ResponseWriter, r *http.Request) {
+    if r.Method != http.MethodPost {
+        http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+        return
+    }
+    var req struct {
+        Name  string `json:"name"`
+        Email string `json:"email"`
+    }
+    if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+        http.Error(w, "bad request", http.StatusBadRequest)
+        return
+    }
+
+    // เรียก Core ผ่าน Primary Port
+    user, err := h.svc.Register(r.Context(), req.Name, req.Email)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusBadRequest)
+        return
+    }
+
+    w.Header().Set("Content-Type", "application/json")
+    w.WriteHeader(http.StatusCreated)
+    json.NewEncoder(w).Encode(map[string]interface{}{
+        "id":    user.ID,
+        "name":  user.Name,
+        "email": user.Email.String(),
+    })
+}
+
+func (h *UserHandler) GetUser(w http.ResponseWriter, r *http.Request) {
+    id := r.URL.Path[len("/users/"):]
+    user, err := h.svc.GetByID(r.Context(), id)
+    if err != nil {
+        http.Error(w, "not found", http.StatusNotFound)
+        return
+    }
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(user)
+}</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>adapters/secondary/postgres_repo.go — Secondary Adapter (PostgreSQL)</span>
+      <span class="lang">Go</span>
+    </div>
+    <pre><code class="language-go">package postgres
+
+import (
+    "context"
+    "database/sql"
+    "fmt"
+    "myapp/core"
+)
+
+// PostgresUserRepository — Secondary Adapter: implements core.UserRepository
+type PostgresUserRepository struct {
+    db *sql.DB
+}
+
+func NewUserRepository(db *sql.DB) core.UserRepository {
+    return &PostgresUserRepository{db: db}
+}
+
+func (r *PostgresUserRepository) Save(ctx context.Context, user *core.User) error {
+    _, err := r.db.ExecContext(ctx,
+        `INSERT INTO users (id, name, email, created_at)
+         VALUES ($1, $2, $3, $4)
+         ON CONFLICT (id) DO UPDATE SET name=$2, email=$3`,
+        user.ID, user.Name, user.Email.String(), user.CreatedAt,
+    )
+    return err
+}
+
+func (r *PostgresUserRepository) FindByID(ctx context.Context, id string) (*core.User, error) {
+    var u core.User
+    var email string
+    err := r.db.QueryRowContext(ctx,
+        `SELECT id, name, email, created_at FROM users WHERE id = $1`, id,
+    ).Scan(&u.ID, &u.Name, &email, &u.CreatedAt)
+    if err == sql.ErrNoRows {
+        return nil, fmt.Errorf("user not found")
+    }
+    if err != nil {
+        return nil, err
+    }
+    u.Email, _ = core.NewEmail(email)
+    return &u, nil
+}
+
+func (r *PostgresUserRepository) FindByEmail(ctx context.Context, email core.Email) (*core.User, error) {
+    var u core.User
+    var em string
+    err := r.db.QueryRowContext(ctx,
+        `SELECT id, name, email, created_at FROM users WHERE email = $1`, email.String(),
+    ).Scan(&u.ID, &u.Name, &em, &u.CreatedAt)
+    if err == sql.ErrNoRows {
+        return nil, nil
+    }
+    if err != nil {
+        return nil, err
+    }
+    u.Email, _ = core.NewEmail(em)
+    return &u, nil
+}
+
+func (r *PostgresUserRepository) FindAll(ctx context.Context) ([]*core.User, error) {
+    rows, err := r.db.QueryContext(ctx, `SELECT id, name, email, created_at FROM users`)
+    if err != nil {
+        return nil, err
+    }
+    defer rows.Close()
+    var users []*core.User
+    for rows.Next() {
+        var u core.User
+        var email string
+        rows.Scan(&u.ID, &u.Name, &email, &u.CreatedAt)
+        u.Email, _ = core.NewEmail(email)
+        users = append(users, &u)
+    }
+    return users, nil
+}</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>adapters/secondary/memory_repo.go — In-Memory Adapter (สำหรับ Test!)</span>
+      <span class="lang">Go</span>
+    </div>
+    <pre><code class="language-go">package memory
+
+import (
+    "context"
+    "fmt"
+    "sync"
+    "myapp/core"
+)
+
+// InMemoryUserRepository — Secondary Adapter สำหรับ Testing
+// ไม่ต้องมี Database — เหมาะสำหรับ Unit Tests
+type InMemoryUserRepository struct {
+    mu    sync.RWMutex
+    users map[string]*core.User
+}
+
+func NewUserRepository() core.UserRepository {
+    return &InMemoryUserRepository{users: make(map[string]*core.User)}
+}
+
+func (r *InMemoryUserRepository) Save(ctx context.Context, user *core.User) error {
+    r.mu.Lock()
+    defer r.mu.Unlock()
+    r.users[user.ID] = user
+    return nil
+}
+
+func (r *InMemoryUserRepository) FindByID(ctx context.Context, id string) (*core.User, error) {
+    r.mu.RLock()
+    defer r.mu.RUnlock()
+    u, ok := r.users[id]
+    if !ok {
+        return nil, fmt.Errorf("not found")
+    }
+    return u, nil
+}
+
+func (r *InMemoryUserRepository) FindByEmail(ctx context.Context, email core.Email) (*core.User, error) {
+    r.mu.RLock()
+    defer r.mu.RUnlock()
+    for _, u := range r.users {
+        if u.Email == email {
+            return u, nil
+        }
+    }
+    return nil, nil
+}
+
+func (r *InMemoryUserRepository) FindAll(ctx context.Context) ([]*core.User, error) {
+    r.mu.RLock()
+    defer r.mu.RUnlock()
+    var result []*core.User
+    for _, u := range r.users {
+        result = append(result, u)
+    }
+    return result, nil
+}</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>core/service_test.go — Unit Test ไม่ต้องมี DB จริง!</span>
+      <span class="lang">Go</span>
+    </div>
+    <pre><code class="language-go">package core_test
+
+import (
+    "context"
+    "testing"
+    "myapp/adapters/secondary/memory"
+    "myapp/core"
+)
+
+// fakeMailer — implements core.EmailSender สำหรับ test
+type fakeMailer struct{ sent []string }
+func (f *fakeMailer) SendWelcome(_ context.Context, to core.Email, _ string) error {
+    f.sent = append(f.sent, to.String())
+    return nil
+}
+
+// fakeIDGen — implements core.IDGenerator
+type fakeIDGen struct{ id string }
+func (f *fakeIDGen) Generate() string { return f.id }
+
+func TestRegisterUser_Success(t *testing.T) {
+    repo   := memory.NewUserRepository()     // In-memory — ไม่ต้องมี DB!
+    mailer := &fakeMailer{}
+    ids    := &fakeIDGen{id: "user-001"}
+
+    svc := core.NewUserService(repo, mailer, ids)
+
+    user, err := svc.Register(context.Background(), "สมชาย", "somchai@example.com")
+    if err != nil {
+        t.Fatalf("expected no error, got: %v", err)
+    }
+    if user.ID != "user-001" {
+        t.Errorf("expected id user-001, got %s", user.ID)
+    }
+    if len(mailer.sent) != 1 || mailer.sent[0] != "somchai@example.com" {
+        t.Errorf("welcome email not sent")
+    }
+}
+
+func TestRegisterUser_DuplicateEmail(t *testing.T) {
+    repo   := memory.NewUserRepository()
+    mailer := &fakeMailer{}
+    ids    := &fakeIDGen{id: "user-002"}
+    svc    := core.NewUserService(repo, mailer, ids)
+
+    ctx := context.Background()
+    svc.Register(ctx, "คนแรก", "dup@example.com")
+
+    _, err := svc.Register(ctx, "คนสอง", "dup@example.com")
+    if err == nil {
+        t.Fatal("expected error for duplicate email")
+    }
+}
+
+func TestRegisterUser_InvalidEmail(t *testing.T) {
+    repo   := memory.NewUserRepository()
+    mailer := &fakeMailer{}
+    ids    := &fakeIDGen{id: "user-003"}
+    svc    := core.NewUserService(repo, mailer, ids)
+
+    _, err := svc.Register(context.Background(), "ทดสอบ", "not-an-email")
+    if err == nil {
+        t.Fatal("expected validation error")
+    }
+}</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>cmd/main.go — Wiring (ประกอบทุกอย่างเข้าด้วยกัน)</span>
+      <span class="lang">Go</span>
+    </div>
+    <pre><code class="language-go">package main
+
+import (
+    "database/sql"
+    "log"
+    "net/http"
+    "os"
+
+    _ "github.com/lib/pq"
+
+    "myapp/adapters/primary/httphandler"
+    "myapp/adapters/secondary/postgres"
+    "myapp/adapters/secondary/smtp"
+    "myapp/adapters/secondary/uuidgen"
+    "myapp/core"
+)
+
+func main() {
+    // ── Infrastructure ──────────────────────────────────────────────────────
+    db, err := sql.Open("postgres", os.Getenv("DATABASE_URL"))
+    if err != nil {
+        log.Fatal(err)
+    }
+    defer db.Close()
+
+    // ── Secondary Adapters (implement Secondary Ports) ─────────────────────
+    userRepo := postgres.NewUserRepository(db)
+    mailer   := smtp.NewEmailSender(os.Getenv("SMTP_HOST"), os.Getenv("SMTP_FROM"))
+    idGen    := uuidgen.New()
+
+    // ── Core (ใช้แค่ interfaces — ไม่รู้จัก postgres/smtp เลย) ────────────
+    userSvc := core.NewUserService(userRepo, mailer, idGen)
+
+    // ── Primary Adapters (ใช้ Primary Ports) ──────────────────────────────
+    handler := httphandler.NewUserHandler(userSvc)
+
+    // ── Server ────────────────────────────────────────────────────────────
+    mux := http.NewServeMux()
+    mux.HandleFunc("/users", handler.Register)
+    mux.HandleFunc("/users/", handler.GetUser)
+
+    log.Println("Server running on :8080")
+    log.Fatal(http.ListenAndServe(":8080", mux))
+}</code></pre>
+  </div>
+
+  <div class="callout tip">
+    <strong>ข้อดีหลักของ Hexagonal Architecture:</strong><br>
+    • <strong>Testability</strong> — test Core ได้โดยไม่ต้องมี DB จริง (ใช้ in-memory แทน)<br>
+    • <strong>Flexibility</strong> — เปลี่ยน PostgreSQL → MongoDB ได้ โดยแก้แค่ Adapter<br>
+    • <strong>Maintainability</strong> — Business logic อยู่ที่ Core — ไม่กระจัดกระจาย<br>
+    • <strong>Dependency Rule</strong> — ทุกอย่าง depend inward → Core ไม่ depend อะไรเลย
+  </div>
+</div>
+
+<!-- ── VS LAYERED ── -->
+<div class="section">
+  <div class="section-title">⚖️ เปรียบเทียบกับ Traditional Layered Architecture</div>
+
+  <table class="compare">
+    <tr>
+      <th>ด้าน</th>
+      <th>Traditional Layered</th>
+      <th>Hexagonal Architecture</th>
+    </tr>
+    <tr>
+      <td>Dependency</td>
+      <td>Controller → Service → Repository → DB<br><small style="color:#475569">ทุกชั้น depend กัน chain</small></td>
+      <td>Adapters → Ports ← Core<br><small style="color:#475569">Core ไม่ depend ใคร</small></td>
+    </tr>
+    <tr>
+      <td>Testing</td>
+      <td>ต้องมี DB จริง / mock ซับซ้อน</td>
+      <td>ใช้ in-memory adapter แทนได้ง่าย</td>
+    </tr>
+    <tr>
+      <td>เปลี่ยน DB</td>
+      <td>แก้หลาย files</td>
+      <td>แก้แค่ Secondary Adapter</td>
+    </tr>
+    <tr>
+      <td>เปลี่ยน Protocol</td>
+      <td>ซับซ้อน ถ้า code ผสมกัน</td>
+      <td>สร้าง Primary Adapter ใหม่</td>
+    </tr>
+    <tr>
+      <td>Complexity</td>
+      <td>ง่ายกว่าสำหรับ CRUD เล็กๆ</td>
+      <td>เหมาะกับระบบซับซ้อนที่ต้องการ testability</td>
+    </tr>
+  </table>
+</div>
+
+<!-- ── FILE STRUCTURE ── -->
+<div class="section">
+  <div class="section-title">📁 โครงสร้างไฟล์</div>
+  <div class="code-block">
+    <div class="code-header">
+      <span>Project Structure</span>
+      <span class="lang">Shell</span>
+    </div>
+    <pre><code class="language-bash">myapp/
+├── core/                    # ← Core (ไม่ depend อะไร)
+│   ├── domain.go            #   Domain objects
+│   ├── ports.go             #   Interfaces (Ports)
+│   └── service.go           #   Business logic (Use cases)
+│
+├── adapters/
+│   ├── primary/             # ← Primary Adapters (Driving)
+│   │   ├── http/            #   HTTP Handler
+│   │   └── grpc/            #   gRPC Server
+│   │
+│   └── secondary/           # ← Secondary Adapters (Driven)
+│       ├── postgres/        #   PostgreSQL repository
+│       ├── memory/          #   In-memory (สำหรับ test)
+│       ├── smtp/            #   Email sender
+│       └── uuidgen/         #   ID generator
+│
+└── cmd/
+    └── main.go              # Wiring — ประกอบทุกอย่าง</code></pre>
+  </div>
+</div>
+
+<div style="text-align:center;margin:3rem 0;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+  <a href="1-ddd.html" style="display:inline-flex;align-items:center;gap:.5rem;background:#0d1117;border:1px solid #1e293b;color:#64748b;padding:.7rem 1.5rem;border-radius:10px;font-size:.88rem">← DDD</a>
+  <a href="3-event-driven.html" style="display:inline-flex;align-items:center;gap:.5rem;background:#0d1117;border:1px solid #1e293b;color:#38bdf8;padding:.7rem 1.5rem;border-radius:10px;font-weight:600;font-size:.88rem">หัวข้อถัดไป: Event Driven Design →</a>
+</div>
+
+</div>
+<script>hljs.highlightAll()</script>
+</body>
+</html>
