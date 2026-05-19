@@ -109,27 +109,27 @@ a:hover{text-decoration:underline}
     <div style="display:grid;grid-template-columns:40px 1fr 1.8fr;padding:10px 20px;font-size:.82rem;border-bottom:1px solid #0f172a;gap:12px;align-items:center">
       <div style="font-size:1.2rem;font-weight:900;color:#f97316">S</div>
       <div style="color:#e2e8f0;font-weight:600">Single Responsibility</div>
-      <div style="color:#64748b">1 class/func มีเหตุผลเดียวในการเปลี่ยน</div>
+      <div style="color:#64748b">แต่ละ class ทำหน้าที่เดียว — ต้องแก้เพราะสาเหตุเดียวเท่านั้น</div>
     </div>
     <div style="display:grid;grid-template-columns:40px 1fr 1.8fr;padding:10px 20px;font-size:.82rem;border-bottom:1px solid #0f172a;gap:12px;align-items:center">
       <div style="font-size:1.2rem;font-weight:900;color:#22d3ee">O</div>
       <div style="color:#e2e8f0;font-weight:600">Open / Closed</div>
-      <div style="color:#64748b">เปิดต่อการขยาย ปิดต่อการแก้ไข</div>
+      <div style="color:#64748b">เพิ่ม feature ใหม่ = เพิ่ม code ใหม่ ไม่แก้ code เดิม</div>
     </div>
     <div style="display:grid;grid-template-columns:40px 1fr 1.8fr;padding:10px 20px;font-size:.82rem;border-bottom:1px solid #0f172a;gap:12px;align-items:center">
       <div style="font-size:1.2rem;font-weight:900;color:#4ade80">L</div>
       <div style="color:#e2e8f0;font-weight:600">Liskov Substitution</div>
-      <div style="color:#64748b">Subtype ต้องแทน parent ได้โดยไม่เสีย behavior</div>
+      <div style="color:#64748b">เปลี่ยน subclass แทน parent class ได้เลย โดย program ยังทำงานถูกต้อง</div>
     </div>
     <div style="display:grid;grid-template-columns:40px 1fr 1.8fr;padding:10px 20px;font-size:.82rem;border-bottom:1px solid #0f172a;gap:12px;align-items:center">
       <div style="font-size:1.2rem;font-weight:900;color:#a78bfa">I</div>
       <div style="color:#e2e8f0;font-weight:600">Interface Segregation</div>
-      <div style="color:#64748b">ไม่บังคับ implement method ที่ไม่ได้ใช้</div>
+      <div style="color:#64748b">แยก interface ให้เล็กตรงประเด็น — ไม่บังคับ implement method ที่ตัวเองไม่ต้องการ</div>
     </div>
     <div style="display:grid;grid-template-columns:40px 1fr 1.8fr;padding:10px 20px;font-size:.82rem;gap:12px;align-items:center">
       <div style="font-size:1.2rem;font-weight:900;color:#f472b6">D</div>
       <div style="color:#e2e8f0;font-weight:600">Dependency Inversion</div>
-      <div style="color:#64748b">Depend on abstraction ไม่ใช่ concrete</div>
+      <div style="color:#64748b">ทุก module ขึ้นต่อกันผ่าน interface ไม่ใช่เชื่อมตรงกับ implementation จริงๆ</div>
     </div>
   </div>
 
