@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design Patterns (GoF) — สื่อการสอน</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#07090f;color:#e2e8f0;line-height:1.7}
+a{color:#fb923c;text-decoration:none}
+a:hover{text-decoration:underline}
+
+.topnav{display:flex;align-items:center;gap:1rem;padding:1rem 2rem;background:#0d1117;border-bottom:1px solid #1e293b;position:sticky;top:0;z-index:100}
+.back-btn{display:flex;align-items:center;gap:.4rem;color:#64748b;font-size:.85rem;transition:color .2s}
+.back-btn:hover{color:#e2e8f0;text-decoration:none}
+.nav-title{color:#475569;font-size:.85rem}
+.nav-title span{color:#fdba74;font-weight:600}
+
+.hero{padding:4rem 2rem 3rem;text-align:center;background:linear-gradient(160deg,#07090f,#0c0a1a)}
+.hero-badge{display:inline-block;background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.3);color:#c4b5fd;padding:.35rem 1rem;border-radius:999px;font-size:.8rem;font-weight:600;margin-bottom:1.5rem}
+.hero h1{font-size:clamp(1.8rem,4vw,3rem);font-weight:800;background:linear-gradient(135deg,#8b5cf6 0%,#a78bfa 40%,#60a5fa 70%,#34d399 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:1rem}
+.hero p{color:#64748b;max-width:640px;margin:0 auto;font-size:1rem}
+
+.content{max-width:960px;margin:0 auto;padding:2rem 1.5rem 5rem}
+.section{margin-bottom:4rem}
+.section-title{font-size:1.5rem;font-weight:700;margin-bottom:.4rem;display:flex;align-items:center;gap:.6rem}
+.section-sub{color:#475569;font-size:.9rem;margin-bottom:2rem;padding-left:2rem}
+
+.callout{background:#0f172a;border-left:3px solid #8b5cf6;border-radius:0 8px 8px 0;padding:1rem 1.2rem;margin:1.5rem 0;font-size:.88rem;color:#94a3b8}
+.callout strong{color:#c4b5fd}
+.callout.tip{border-left-color:#10b981}.callout.tip strong{color:#6ee7b7}
+.callout.warn{border-left-color:#f59e0b}.callout.warn strong{color:#fcd34d}
+
+.code-block{margin:1rem 0;border-radius:12px;overflow:hidden;border:1px solid #1e293b}
+.code-header{background:#111827;padding:.7rem 1rem;display:flex;justify-content:space-between;align-items:center}
+.code-header span{font-size:.78rem;color:#64748b;font-weight:600}
+.code-block pre{margin:0!important;border-radius:0!important;border:none!important;font-size:.82rem!important;line-height:1.6!important}
+
+.lang-bad {background:rgba(239,68,68,.12);color:#fca5a5;padding:.15rem .6rem;border-radius:4px;font-size:.72rem;font-weight:700}
+.lang-good{background:rgba(74,222,128,.12);color:#86efac;padding:.15rem .6rem;border-radius:4px;font-size:.72rem;font-weight:700}
+
+.pattern-header{display:flex;align-items:center;gap:1.2rem;margin-bottom:1.5rem}
+.pattern-badge{width:64px;height:64px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:1.8rem;flex-shrink:0;border:2px solid var(--lc)}
+
+.pattern-nav{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:2rem 0}
+@media(min-width:600px){.pattern-nav{grid-template-columns:repeat(6,1fr)}}
+.pattern-nav a{background:#0d1117;border:1px solid #1e293b;border-radius:12px;padding:12px 8px;text-align:center;text-decoration:none;transition:transform .2s,border-color .2s}
+.pattern-nav a:hover{transform:translateY(-3px);border-color:var(--sc)}
+.pattern-nav .p-icon{font-size:1.5rem;line-height:1}
+.pattern-nav .p-name{font-size:.65rem;color:#64748b;margin-top:4px;line-height:1.3}
+.pattern-nav .p-cat{font-size:.6rem;color:var(--sc);margin-top:2px}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="index.html" class="back-btn">← กลับหน้าหลัก</a>
+  <span class="nav-title">18 / <span>Design Patterns (GoF)</span></span>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">🎨 หัวข้อที่ 18</div>
+  <h1>Design Patterns (GoF)</h1>
+  <p>23 patterns จาก Gang of Four — วิธีแก้ปัญหา OOP ที่พบบ่อย แบ่งเป็น Creational, Structural, Behavioral พร้อมตัวอย่าง Go ทุก pattern</p>
+</div>
+
+<div class="content">
+
+<!-- OVERVIEW -->
+<div class="section">
+  <div class="section-title" style="color:#8b5cf6">📋 ภาพรวม</div>
+  <div class="section-sub">6 patterns ที่ใช้บ่อยที่สุดในงานจริง</div>
+
+  <div class="pattern-nav">
+    <a href="#factory" style="--sc:#f97316">
+      <div class="p-icon">🏭</div>
+      <div class="p-name">Factory Method</div>
+      <div class="p-cat">Creational</div>
+    </a>
+    <a href="#builder" style="--sc:#fbbf24">
+      <div class="p-icon">🔧</div>
+      <div class="p-name">Builder</div>
+      <div class="p-cat">Creational</div>
+    </a>
+    <a href="#decorator" style="--sc:#22d3ee">
+      <div class="p-icon">🎀</div>
+      <div class="p-name">Decorator</div>
+      <div class="p-cat">Structural</div>
+    </a>
+    <a href="#strategy" style="--sc:#4ade80">
+      <div class="p-icon">♟️</div>
+      <div class="p-name">Strategy</div>
+      <div class="p-cat">Behavioral</div>
+    </a>
+    <a href="#observer" style="--sc:#a78bfa">
+      <div class="p-icon">👁️</div>
+      <div class="p-name">Observer</div>
+      <div class="p-cat">Behavioral</div>
+    </a>
+    <a href="#middleware" style="--sc:#f472b6">
+      <div class="p-icon">🔗</div>
+      <div class="p-name">Chain of Resp.</div>
+      <div class="p-cat">Behavioral</div>
+    </a>
+  </div>
+
+  <div style="background:#0d1117;border:1px solid #1e293b;border-radius:14px;overflow:hidden;margin:1.5rem 0">
+    <div style="background:#111827;padding:10px 20px;display:grid;grid-template-columns:110px 1fr 1.8fr;font-size:.77rem;font-weight:700;color:#64748b;gap:12px">
+      <div>กลุ่ม</div><div>Pattern</div><div>แก้ปัญหาอะไร</div>
+    </div>
+    <div style="display:grid;grid-template-columns:110px 1fr 1.8fr;padding:10px 20px;font-size:.82rem;border-bottom:1px solid #0f172a;gap:12px;align-items:center">
+      <div style="color:#f97316;font-weight:700;font-size:.75rem">Creational</div>
+      <div style="color:#e2e8f0;font-weight:600">Factory Method</div>
+      <div style="color:#64748b">สร้าง object โดยไม่ระบุ concrete type ที่ caller</div>
+    </div>
+    <div style="display:grid;grid-template-columns:110px 1fr 1.8fr;padding:10px 20px;font-size:.82rem;border-bottom:1px solid #0f172a;gap:12px;align-items:center">
+      <div style="color:#f97316;font-weight:700;font-size:.75rem">Creational</div>
+      <div style="color:#e2e8f0;font-weight:600">Builder</div>
+      <div style="color:#64748b">สร้าง object ที่มี field เยอะ ทีละขั้นตอนอย่างชัดเจน</div>
+    </div>
+    <div style="display:grid;grid-template-columns:110px 1fr 1.8fr;padding:10px 20px;font-size:.82rem;border-bottom:1px solid #0f172a;gap:12px;align-items:center">
+      <div style="color:#22d3ee;font-weight:700;font-size:.75rem">Structural</div>
+      <div style="color:#e2e8f0;font-weight:600">Decorator</div>
+      <div style="color:#64748b">เพิ่ม behavior ให้ object โดยไม่แก้ต้นฉบับ — wrap ซ้อนได้</div>
+    </div>
+    <div style="display:grid;grid-template-columns:110px 1fr 1.8fr;padding:10px 20px;font-size:.82rem;border-bottom:1px solid #0f172a;gap:12px;align-items:center">
+      <div style="color:#4ade80;font-weight:700;font-size:.75rem">Behavioral</div>
+      <div style="color:#e2e8f0;font-weight:600">Strategy</div>
+      <div style="color:#64748b">เปลี่ยน algorithm ที่ใช้ได้ตอน runtime โดยไม่แก้ caller</div>
+    </div>
+    <div style="display:grid;grid-template-columns:110px 1fr 1.8fr;padding:10px 20px;font-size:.82rem;border-bottom:1px solid #0f172a;gap:12px;align-items:center">
+      <div style="color:#4ade80;font-weight:700;font-size:.75rem">Behavioral</div>
+      <div style="color:#e2e8f0;font-weight:600">Observer</div>
+      <div style="color:#64748b">แจ้ง object หลายตัวเมื่อ state เปลี่ยน โดยไม่ coupling กัน</div>
+    </div>
+    <div style="display:grid;grid-template-columns:110px 1fr 1.8fr;padding:10px 20px;font-size:.82rem;gap:12px;align-items:center">
+      <div style="color:#4ade80;font-weight:700;font-size:.75rem">Behavioral</div>
+      <div style="color:#e2e8f0;font-weight:600">Chain of Responsibility</div>
+      <div style="color:#64748b">ส่ง request ผ่าน handler chain — แต่ละตัวเลือกว่าจะจัดการหรือส่งต่อ</div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>GoF กับ SOLID:</strong> Design Patterns ส่วนใหญ่ <strong>คือ SOLID ในทางปฏิบัติ</strong> — Strategy = OCP, Observer = OCP+SRP, Decorator = OCP, Factory = DIP
+  </div>
+</div>
+
+<!-- FACTORY METHOD -->
+<div class="section" id="factory">
+  <div class="pattern-header" style="--lc:#f97316">
+    <div class="pattern-badge" style="background:rgba(249,115,22,.1)">🏭</div>
+    <div>
+      <div style="font-size:1.35rem;font-weight:800;color:#f1f5f9">Factory Method</div>
+      <div style="font-size:.85rem;color:#f97316;font-weight:600">Creational — Define an interface for creating an object, let subclasses decide which class to instantiate</div>
+    </div>
+  </div>
+
+  <div style="background:linear-gradient(135deg,#1a0c04,#2a1206);border:1px solid #f9731630;border-radius:12px;padding:1.2rem 1.4rem;margin-bottom:1.5rem">
+    <div style="font-size:.83rem;color:#94a3b8;line-height:1.8">
+      <span style="color:#fdba74;font-weight:700">ปัญหา:</span> code ต้องสร้าง object แต่ไม่อยากผูกกับ concrete type — อยากเปลี่ยน implementation ได้ทีหลัง<br>
+      <span style="color:#fdba74;font-weight:700">วิธีแก้:</span> ซ่อนการสร้าง object ไว้ใน factory function/method — caller รู้แค่ interface ไม่รู้ concrete type
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+    <div class="code-block" style="border-color:#ef444430">
+      <div class="code-header">
+        <span>❌ สร้าง concrete type โดยตรง</span>
+        <span class="lang-bad">ผิดหลักการ</span>
+      </div>
+      <pre><code class="language-go">// caller รู้ว่าเป็น SMTPMailer
+// ถ้าอยากเปลี่ยนเป็น SendGrid ต้องแก้ทุกจุด
+func sendWelcome(user User) {
+    mailer := &SMTPMailer{
+        host: "smtp.co.th",
+        port: 587,
+    }
+    mailer.Send(user.Email, "Welcome!")
+}
+
+func sendAlert(admin User) {
+    mailer := &SMTPMailer{ // duplicate
+        host: "smtp.co.th",
+        port: 587,
+    }
+    mailer.Send(admin.Email, "Alert!")
+}</code></pre>
+    </div>
+    <div class="code-block" style="border-color:#4ade8030">
+      <div class="code-header">
+        <span>✅ Factory ซ่อน concrete type</span>
+        <span class="lang-good">ถูกหลักการ</span>
+      </div>
+      <pre><code class="language-go">type Mailer interface {
+    Send(to, body string) error
+}
+
+// Factory function — สร้างผ่านนี้เสมอ
+func NewMailer(cfg Config) Mailer {
+    switch cfg.Provider {
+    case "sendgrid":
+        return &SendGridMailer{apiKey: cfg.Key}
+    case "ses":
+        return &SESMailer{region: cfg.Region}
+    default:
+        return &SMTPMailer{host: cfg.Host}
+    }
+}
+
+// caller ไม่รู้ concrete type
+func sendWelcome(m Mailer, user User) {
+    m.Send(user.Email, "Welcome!")
+}
+
+// main.go — เปลี่ยน provider ที่จุดเดียว
+mailer := NewMailer(cfg)
+sendWelcome(mailer, user)</code></pre>
+    </div>
+  </div>
+
+  <div class="callout" style="border-left-color:#f97316">
+    <strong>ใน Go:</strong> Factory มักเป็น <code>NewXxx()</code> function ที่คืน interface ไม่ใช่ concrete type — เป็น convention ที่ใช้ทั่ว standard library
+  </div>
+</div>
+
+<!-- BUILDER -->
+<div class="section" id="builder">
+  <div class="pattern-header" style="--lc:#fbbf24">
+    <div class="pattern-badge" style="background:rgba(251,191,36,.1)">🔧</div>
+    <div>
+      <div style="font-size:1.35rem;font-weight:800;color:#f1f5f9">Builder</div>
+      <div style="font-size:.85rem;color:#fbbf24;font-weight:600">Creational — Construct complex objects step by step</div>
+    </div>
+  </div>
+
+  <div style="background:linear-gradient(135deg,#141004,#201808);border:1px solid #fbbf2430;border-radius:12px;padding:1.2rem 1.4rem;margin-bottom:1.5rem">
+    <div style="font-size:.83rem;color:#94a3b8;line-height:1.8">
+      <span style="color:#fde68a;font-weight:700">ปัญหา:</span> struct ที่มี field เยอะและบาง field เป็น optional — constructor argument ยาวมากจนอ่านไม่ออกว่า argument ไหนคืออะไร<br>
+      <span style="color:#fde68a;font-weight:700">วิธีแก้:</span> สร้าง Builder type ที่มี method ชื่อชัดเจน chain กันได้ แล้วเรียก <code>.Build()</code> ตอนท้าย
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+    <div class="code-block" style="border-color:#ef444430">
+      <div class="code-header">
+        <span>❌ Constructor ที่อ่านไม่ออก</span>
+        <span class="lang-bad">ผิดหลักการ</span>
+      </div>
+      <pre><code class="language-go">// อ่านไม่ออกว่า true, false, 30, 5 คืออะไร
+server := NewServer(
+    "localhost", 8080,
+    true, false, 30, 5,
+    "/api", "v1",
+)
+
+// หรือ struct literal ที่ต้อง set ทุก field
+server := &Server{
+    Host:        "localhost",
+    Port:        8080,
+    TLS:         true,
+    Debug:       false,
+    Timeout:     30,
+    MaxRetry:    5,
+    BasePath:    "/api",
+    APIVersion:  "v1",
+    // ลืม field ไหนไปก็ไม่รู้
+}</code></pre>
+    </div>
+    <div class="code-block" style="border-color:#4ade8030">
+      <div class="code-header">
+        <span>✅ Builder — chain method อ่านออกทันที</span>
+        <span class="lang-good">ถูกหลักการ</span>
+      </div>
+      <pre><code class="language-go">type ServerBuilder struct{ s Server }
+
+func NewServerBuilder(host string, port int) *ServerBuilder {
+    return &ServerBuilder{s: Server{Host: host, Port: port}}
+}
+
+func (b *ServerBuilder) WithTLS() *ServerBuilder {
+    b.s.TLS = true; return b
+}
+func (b *ServerBuilder) WithDebug() *ServerBuilder {
+    b.s.Debug = true; return b
+}
+func (b *ServerBuilder) WithTimeout(t int) *ServerBuilder {
+    b.s.Timeout = t; return b
+}
+func (b *ServerBuilder) WithBasePath(p string) *ServerBuilder {
+    b.s.BasePath = p; return b
+}
+func (b *ServerBuilder) Build() (*Server, error) {
+    if b.s.Host == "" {
+        return nil, errors.New("host required")
+    }
+    return &b.s, nil
+}
+
+// อ่านออกทันทีว่าทำอะไร
+srv, _ := NewServerBuilder("localhost", 8080).
+    WithTLS().
+    WithTimeout(30).
+    WithBasePath("/api").
+    Build()</code></pre>
+    </div>
+  </div>
+
+  <div class="callout" style="border-left-color:#fbbf24">
+    <strong>Functional Options (Go idiom):</strong> อีกแบบที่นิยมใน Go คือ <code>func(o *Options)</code> option pattern — <code>NewServer(host, port, WithTLS(), WithTimeout(30))</code> — ให้ผลเหมือนกันแต่ไม่ต้องมี Builder type
+  </div>
+</div>
+
+<!-- DECORATOR -->
+<div class="section" id="decorator">
+  <div class="pattern-header" style="--lc:#22d3ee">
+    <div class="pattern-badge" style="background:rgba(34,211,238,.1)">🎀</div>
+    <div>
+      <div style="font-size:1.35rem;font-weight:800;color:#f1f5f9">Decorator</div>
+      <div style="font-size:.85rem;color:#22d3ee;font-weight:600">Structural — Attach additional behavior to objects by wrapping them</div>
+    </div>
+  </div>
+
+  <div style="background:linear-gradient(135deg,#041418,#061e24);border:1px solid #22d3ee30;border-radius:12px;padding:1.2rem 1.4rem;margin-bottom:1.5rem">
+    <div style="font-size:.83rem;color:#94a3b8;line-height:1.8">
+      <span style="color:#67e8f9;font-weight:700">ปัญหา:</span> อยากเพิ่ม behavior เช่น logging, caching, retry โดยไม่แก้ original struct — และอยาก wrap ซ้อนกันได้หลายชั้น<br>
+      <span style="color:#67e8f9;font-weight:700">วิธีแก้:</span> สร้าง wrapper type ที่ implement interface เดิม แต่ใส่ logic เพิ่มก่อน/หลังแล้ว delegate ไปยัง inner
+    </div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>✅ Decorator — เพิ่ม logging + caching โดยไม่แก้ original</span>
+      <span class="lang-good">ถูกหลักการ</span>
+    </div>
+    <pre><code class="language-go">type OrderRepository interface {
+    FindByID(id string) (*Order, error)
+    Save(o *Order) error
+}
+
+// Original implementation
+type PostgresOrderRepo struct{ db *sql.DB }
+func (r *PostgresOrderRepo) FindByID(id string) (*Order, error) { /* DB query */ }
+func (r *PostgresOrderRepo) Save(o *Order) error { /* DB write */ }
+
+// Decorator 1: Logging — wrap ซ้อนบน original
+type LoggingOrderRepo struct {
+    inner  OrderRepository
+    logger *slog.Logger
+}
+
+func (r *LoggingOrderRepo) FindByID(id string) (*Order, error) {
+    start := time.Now()
+    order, err := r.inner.FindByID(id) // delegate
+    r.logger.Info("FindByID", "id", id, "ms", time.Since(start).Milliseconds(), "err", err)
+    return order, err
+}
+func (r *LoggingOrderRepo) Save(o *Order) error { return r.inner.Save(o) }
+
+// Decorator 2: Caching — wrap ซ้อนบน logging
+type CachingOrderRepo struct {
+    inner OrderRepository
+    cache map[string]*Order
+}
+
+func (r *CachingOrderRepo) FindByID(id string) (*Order, error) {
+    if o, ok := r.cache[id]; ok {
+        return o, nil // cache hit
+    }
+    o, err := r.inner.FindByID(id) // miss → delegate
+    if err == nil { r.cache[id] = o }
+    return o, err
+}
+func (r *CachingOrderRepo) Save(o *Order) error {
+    delete(r.cache, o.ID) // invalidate
+    return r.inner.Save(o)
+}
+
+// Wire-up: ซ้อน decorator หลายชั้น
+repo := &PostgresOrderRepo{db: db}
+repo = &LoggingOrderRepo{inner: repo, logger: logger}
+repo = &CachingOrderRepo{inner: repo, cache: map[string]*Order{}}
+
+// caller ไม่รู้เลยว่ามีกี่ชั้น — ใช้แค่ interface
+svc := NewOrderService(repo)</code></pre>
+  </div>
+
+  <div class="callout" style="border-left-color:#22d3ee">
+    <strong>Middleware = Decorator:</strong> HTTP middleware ทุกตัวที่เขียนใน Go (<code>func(http.Handler) http.Handler</code>) คือ Decorator pattern — logging, auth, rate-limit ล้วนซ้อนกันบน handler จริง
+  </div>
+</div>
+
+<!-- STRATEGY -->
+<div class="section" id="strategy">
+  <div class="pattern-header" style="--lc:#4ade80">
+    <div class="pattern-badge" style="background:rgba(74,222,128,.1)">♟️</div>
+    <div>
+      <div style="font-size:1.35rem;font-weight:800;color:#f1f5f9">Strategy</div>
+      <div style="font-size:.85rem;color:#4ade80;font-weight:600">Behavioral — Define a family of algorithms, encapsulate each one, make them interchangeable</div>
+    </div>
+  </div>
+
+  <div style="background:linear-gradient(135deg,#041408,#081e0e);border:1px solid #4ade8030;border-radius:12px;padding:1.2rem 1.4rem;margin-bottom:1.5rem">
+    <div style="font-size:.83rem;color:#94a3b8;line-height:1.8">
+      <span style="color:#86efac;font-weight:700">ปัญหา:</span> behavior หลายแบบที่เลือกได้ตอน runtime — ถ้าใช้ <code>if/switch</code> ทุกครั้งที่เพิ่มแบบใหม่ต้องแก้ code เดิม<br>
+      <span style="color:#86efac;font-weight:700">วิธีแก้:</span> ห่อแต่ละ algorithm ใน struct ของตัวเอง inject เข้ามาทาง interface — เปลี่ยนได้ตอน runtime
+    </div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>✅ Strategy — เปลี่ยน sorting algorithm โดยไม่แก้ caller</span>
+      <span class="lang-good">ถูกหลักการ</span>
+    </div>
+    <pre><code class="language-go">// Strategy interface
+type SortStrategy interface {
+    Sort(data []int) []int
+}
+
+// Concrete strategies
+type BubbleSort  struct{}
+type QuickSort   struct{}
+type MergeSort   struct{}
+
+func (BubbleSort) Sort(d []int) []int  { /* bubble sort */; return d }
+func (QuickSort)  Sort(d []int) []int  { /* quick sort  */; return d }
+func (MergeSort)  Sort(d []int) []int  { /* merge sort  */; return d }
+
+// Context — ใช้ strategy ที่ inject มา
+type DataProcessor struct {
+    strategy SortStrategy
+}
+
+func (p *DataProcessor) SetStrategy(s SortStrategy) {
+    p.strategy = s
+}
+
+func (p *DataProcessor) Process(data []int) []int {
+    return p.strategy.Sort(data)
+}
+
+// เปลี่ยน strategy ตอน runtime
+proc := &DataProcessor{strategy: QuickSort{}}
+result := proc.Process(bigData) // quick sort
+
+proc.SetStrategy(MergeSort{}) // swap strategy
+result = proc.Process(bigData) // merge sort
+
+// Real-world: payment strategy
+type PaymentStrategy interface {
+    Pay(amount float64) error
+}
+
+type CreditCard struct{ no string }
+type PromptPay  struct{ id string }
+type Crypto     struct{ wallet string }
+
+func (c CreditCard) Pay(a float64) error { /* charge */ return nil }
+func (p PromptPay)  Pay(a float64) error { /* qr */    return nil }
+func (c Crypto)     Pay(a float64) error { /* chain */  return nil }
+
+type Checkout struct{ payment PaymentStrategy }
+
+func (c *Checkout) Complete(amount float64) error {
+    return c.payment.Pay(amount) // ไม่รู้ว่า payment แบบไหน
+}</code></pre>
+  </div>
+</div>
+
+<!-- OBSERVER -->
+<div class="section" id="observer">
+  <div class="pattern-header" style="--lc:#a78bfa">
+    <div class="pattern-badge" style="background:rgba(167,139,250,.1)">👁️</div>
+    <div>
+      <div style="font-size:1.35rem;font-weight:800;color:#f1f5f9">Observer</div>
+      <div style="font-size:.85rem;color:#a78bfa;font-weight:600">Behavioral — Define a one-to-many dependency so when one object changes state, all dependents are notified</div>
+    </div>
+  </div>
+
+  <div style="background:linear-gradient(135deg,#100820,#180d30);border:1px solid #a78bfa30;border-radius:12px;padding:1.2rem 1.4rem;margin-bottom:1.5rem">
+    <div style="font-size:.83rem;color:#94a3b8;line-height:1.8">
+      <span style="color:#c4b5fd;font-weight:700">ปัญหา:</span> เมื่อ object หนึ่งเปลี่ยน state อยากให้ object อื่นๆ รู้โดยอัตโนมัติ แต่ไม่อยาก coupling กันโดยตรง<br>
+      <span style="color:#c4b5fd;font-weight:700">วิธีแก้:</span> ให้ Subject เก็บ list ของ Observer — เมื่อ state เปลี่ยนเรียก <code>Notify()</code> ให้ทุกตัวโดยที่ Subject ไม่รู้จักรายละเอียดของ Observer
+    </div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>✅ Observer — Order state เปลี่ยน → แจ้งหลายระบบอัตโนมัติ</span>
+      <span class="lang-good">ถูกหลักการ</span>
+    </div>
+    <pre><code class="language-go">// Observer interface
+type OrderObserver interface {
+    OnOrderPlaced(o Order)
+}
+
+// Subject: เก็บ list of observers
+type OrderService struct {
+    observers []OrderObserver
+    repo      OrderRepository
+}
+
+func (s *OrderService) Subscribe(obs OrderObserver) {
+    s.observers = append(s.observers, obs)
+}
+
+func (s *OrderService) notify(o Order) {
+    for _, obs := range s.observers {
+        go obs.OnOrderPlaced(o) // async notify
+    }
+}
+
+func (s *OrderService) PlaceOrder(o Order) error {
+    if err := s.repo.Save(o); err != nil {
+        return err
+    }
+    s.notify(o) // broadcast — ไม่รู้ว่ามีใคร subscribe
+    return nil
+}
+
+// Observers: ต่างคนต่างรับแล้วทำของตัวเอง
+type EmailNotifier struct{ mailer Mailer }
+func (e *EmailNotifier) OnOrderPlaced(o Order) {
+    e.mailer.Send(o.Email, "Order "+o.ID+" placed!")
+}
+
+type InventoryService struct{ repo InventoryRepo }
+func (i *InventoryService) OnOrderPlaced(o Order) {
+    i.repo.Reserve(o.Items)
+}
+
+type AuditLogger struct{ log *slog.Logger }
+func (a *AuditLogger) OnOrderPlaced(o Order) {
+    a.log.Info("order_placed", "id", o.ID, "total", o.Total)
+}
+
+// Wire-up: เพิ่ม observer ใหม่ไม่ต้องแก้ OrderService
+svc := &OrderService{repo: repo}
+svc.Subscribe(&EmailNotifier{mailer})
+svc.Subscribe(&InventoryService{invRepo})
+svc.Subscribe(&AuditLogger{logger})
+// เพิ่ม Analytics observer วันหลัง — แค่ Subscribe เพิ่ม</code></pre>
+  </div>
+
+  <div class="callout" style="border-left-color:#a78bfa">
+    <strong>Observer vs Event-Driven:</strong> Observer เป็น in-process (function call), Event-Driven ข้าม process ผ่าน message broker — ใช้ Observer ก่อนเมื่อยังอยู่ใน service เดียวกัน
+  </div>
+</div>
+
+<!-- CHAIN OF RESPONSIBILITY -->
+<div class="section" id="middleware">
+  <div class="pattern-header" style="--lc:#f472b6">
+    <div class="pattern-badge" style="background:rgba(244,114,182,.1)">🔗</div>
+    <div>
+      <div style="font-size:1.35rem;font-weight:800;color:#f1f5f9">Chain of Responsibility</div>
+      <div style="font-size:.85rem;color:#f472b6;font-weight:600">Behavioral — Pass requests along a chain of handlers</div>
+    </div>
+  </div>
+
+  <div style="background:linear-gradient(135deg,#1a0410,#280618);border:1px solid #f472b630;border-radius:12px;padding:1.2rem 1.4rem;margin-bottom:1.5rem">
+    <div style="font-size:.83rem;color:#94a3b8;line-height:1.8">
+      <span style="color:#f9a8d4;font-weight:700">ปัญหา:</span> request ต้องผ่านขั้นตอนหลายอย่าง (auth → rate-limit → validate → handle) แต่ไม่อยากให้ handler รู้จักกันโดยตรง<br>
+      <span style="color:#f9a8d4;font-weight:700">วิธีแก้:</span> เชื่อม handler เป็น chain — แต่ละตัวจัดการส่วนของตัวแล้วเรียก next หรือหยุดถ้า error
+    </div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>✅ HTTP Middleware chain — Go idiom</span>
+      <span class="lang-good">ถูกหลักการ</span>
+    </div>
+    <pre><code class="language-go">// Middleware type ใน Go คือ func(http.Handler) http.Handler
+type Middleware func(http.Handler) http.Handler
+
+// Middleware 1: logging
+func Logging(next http.Handler) http.Handler {
+    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+        start := time.Now()
+        next.ServeHTTP(w, r) // ส่งต่อไป
+        log.Printf("%s %s %v", r.Method, r.URL.Path, time.Since(start))
+    })
+}
+
+// Middleware 2: auth
+func Auth(next http.Handler) http.Handler {
+    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+        token := r.Header.Get("Authorization")
+        if !isValid(token) {
+            http.Error(w, "Unauthorized", 401)
+            return // หยุด chain ที่นี่
+        }
+        next.ServeHTTP(w, r)
+    })
+}
+
+// Middleware 3: rate limit
+func RateLimit(rps int) Middleware {
+    limiter := rate.NewLimiter(rate.Limit(rps), rps)
+    return func(next http.Handler) http.Handler {
+        return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+            if !limiter.Allow() {
+                http.Error(w, "Too Many Requests", 429)
+                return
+            }
+            next.ServeHTTP(w, r)
+        })
+    }
+}
+
+// Chain helper
+func Chain(h http.Handler, mw ...Middleware) http.Handler {
+    for i := len(mw) - 1; i >= 0; i-- {
+        h = mw[i](h) // wrap จากในออกนอก
+    }
+    return h
+}
+
+// Wire-up: อ่านออกว่า request ผ่านอะไรบ้าง
+handler := Chain(
+    orderHandler,
+    Logging,
+    Auth,
+    RateLimit(100),
+)</code></pre>
+  </div>
+</div>
+
+<!-- SUMMARY -->
+<div class="section">
+  <div class="section-title" style="color:#8b5cf6">🔗 Pattern กับ SOLID</div>
+  <div class="section-sub">แต่ละ pattern คือ SOLID principle ในทางปฏิบัติ</div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin:1.5rem 0">
+    <div style="background:#0d1117;border:1px solid #1e293b;border-left:3px solid #f97316;border-radius:12px;padding:16px">
+      <div style="font-size:.8rem;font-weight:700;color:#f97316;margin-bottom:8px">🏭 Factory Method</div>
+      <div style="font-size:.8rem;color:#64748b;line-height:1.8"><span style="color:#f472b6">D</span> — caller depend on interface ไม่ใช่ concrete<br><span style="color:#22d3ee">O</span> — เพิ่ม implementation ใหม่ไม่แก้ caller</div>
+    </div>
+    <div style="background:#0d1117;border:1px solid #1e293b;border-left:3px solid #fbbf24;border-radius:12px;padding:16px">
+      <div style="font-size:.8rem;font-weight:700;color:#fbbf24;margin-bottom:8px">🔧 Builder</div>
+      <div style="font-size:.8rem;color:#64748b;line-height:1.8"><span style="color:#f97316">S</span> — แยก construction logic ออกจาก struct<br>อ่าน code ง่ายขึ้น ลด error จาก positional args</div>
+    </div>
+    <div style="background:#0d1117;border:1px solid #1e293b;border-left:3px solid #22d3ee;border-radius:12px;padding:16px">
+      <div style="font-size:.8rem;font-weight:700;color:#22d3ee;margin-bottom:8px">🎀 Decorator</div>
+      <div style="font-size:.8rem;color:#64748b;line-height:1.8"><span style="color:#22d3ee">O</span> — เพิ่ม behavior โดยไม่แก้ original<br><span style="color:#f97316">S</span> — แต่ละ decorator มี 1 responsibility</div>
+    </div>
+    <div style="background:#0d1117;border:1px solid #1e293b;border-left:3px solid #4ade80;border-radius:12px;padding:16px">
+      <div style="font-size:.8rem;font-weight:700;color:#4ade80;margin-bottom:8px">♟️ Strategy</div>
+      <div style="font-size:.8rem;color:#64748b;line-height:1.8"><span style="color:#22d3ee">O</span> — เพิ่ม algorithm ใหม่ไม่แก้ context<br><span style="color:#f472b6">D</span> — context depend on strategy interface</div>
+    </div>
+    <div style="background:#0d1117;border:1px solid #1e293b;border-left:3px solid #a78bfa;border-radius:12px;padding:16px">
+      <div style="font-size:.8rem;font-weight:700;color:#a78bfa;margin-bottom:8px">👁️ Observer</div>
+      <div style="font-size:.8rem;color:#64748b;line-height:1.8"><span style="color:#22d3ee">O</span> — เพิ่ม observer ใหม่ไม่แก้ subject<br><span style="color:#f97316">S</span> — subject ไม่รับผิดชอบ logic ของ observer</div>
+    </div>
+    <div style="background:#0d1117;border:1px solid #1e293b;border-left:3px solid #f472b6;border-radius:12px;padding:16px">
+      <div style="font-size:.8rem;font-weight:700;color:#f472b6;margin-bottom:8px">🔗 Chain of Resp.</div>
+      <div style="font-size:.8rem;color:#64748b;line-height:1.8"><span style="color:#f97316">S</span> — แต่ละ handler ทำงานเดียว<br><span style="color:#22d3ee">O</span> — เพิ่ม middleware ใหม่ไม่แก้ handler เดิม</div>
+    </div>
+  </div>
+</div>
+
+<div style="text-align:center;margin:3rem 0;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+  <a href="17-solid.html" style="display:inline-flex;align-items:center;gap:.5rem;background:#0d1117;border:1px solid #1e293b;color:#64748b;padding:.7rem 1.5rem;border-radius:10px;font-size:.88rem">← SOLID Principles</a>
+  <a href="19-testing.html" style="display:inline-flex;align-items:center;gap:.5rem;background:#0d1117;border:1px solid #8b5cf640;color:#a78bfa;padding:.7rem 1.5rem;border-radius:10px;font-weight:600;font-size:.88rem">Testing Patterns →</a>
+</div>
+
+</div>
+<script>hljs.highlightAll()</script>
+<script>
+document.querySelectorAll('.code-block').forEach(block => {
+  const header = block.querySelector('.code-header')
+  const code   = block.querySelector('code')
+  if (!header || !code) return
+  const btn = document.createElement('button')
+  btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span>Copy</span>`
+  btn.style.cssText = 'display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#94a3b8;font-size:.7rem;font-weight:600;padding:3px 10px;border-radius:6px;cursor:pointer;transition:all .15s;flex-shrink:0'
+  btn.addEventListener('mouseenter', () => { btn.style.background='rgba(255,255,255,.1)'; btn.style.color='#e2e8f0' })
+  btn.addEventListener('mouseleave', () => { if (!btn.dataset.copied) { btn.style.background='rgba(255,255,255,.06)'; btn.style.color='#94a3b8' } })
+  btn.addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(code.innerText) }
+    catch { const ta=document.createElement('textarea'); ta.value=code.innerText; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove() }
+    btn.dataset.copied='1'
+    btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span style="color:#8b5cf6">Copied!</span>`
+    btn.style.background='rgba(139,92,246,.1)'; btn.style.borderColor='rgba(139,92,246,.3)'
+    setTimeout(() => {
+      delete btn.dataset.copied
+      btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span>Copy</span>`
+      btn.style.background='rgba(255,255,255,.06)'; btn.style.borderColor='rgba(255,255,255,.1)'; btn.style.color='#94a3b8'
+    }, 2000)
+  })
+  header.appendChild(btn)
+})
+</script>
+</body>
+</html>

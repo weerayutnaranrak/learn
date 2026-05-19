@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Testing Patterns — สื่อการสอน</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#07090f;color:#e2e8f0;line-height:1.7}
+a{color:#fb923c;text-decoration:none}
+a:hover{text-decoration:underline}
+
+.topnav{display:flex;align-items:center;gap:1rem;padding:1rem 2rem;background:#0d1117;border-bottom:1px solid #1e293b;position:sticky;top:0;z-index:100}
+.back-btn{display:flex;align-items:center;gap:.4rem;color:#64748b;font-size:.85rem;transition:color .2s}
+.back-btn:hover{color:#e2e8f0;text-decoration:none}
+.nav-title{color:#475569;font-size:.85rem}
+.nav-title span{color:#fdba74;font-weight:600}
+
+.hero{padding:4rem 2rem 3rem;text-align:center;background:linear-gradient(160deg,#07090f,#041810)}
+.hero-badge{display:inline-block;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);color:#6ee7b7;padding:.35rem 1rem;border-radius:999px;font-size:.8rem;font-weight:600;margin-bottom:1.5rem}
+.hero h1{font-size:clamp(1.8rem,4vw,3rem);font-weight:800;background:linear-gradient(135deg,#10b981 0%,#34d399 40%,#6ee7b7 70%,#a7f3d0 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:1rem}
+.hero p{color:#64748b;max-width:640px;margin:0 auto;font-size:1rem}
+
+.content{max-width:960px;margin:0 auto;padding:2rem 1.5rem 5rem}
+.section{margin-bottom:4rem}
+.section-title{font-size:1.5rem;font-weight:700;margin-bottom:.4rem;display:flex;align-items:center;gap:.6rem}
+.section-sub{color:#475569;font-size:.9rem;margin-bottom:2rem;padding-left:2rem}
+
+.callout{background:#0f172a;border-left:3px solid #10b981;border-radius:0 8px 8px 0;padding:1rem 1.2rem;margin:1.5rem 0;font-size:.88rem;color:#94a3b8}
+.callout strong{color:#6ee7b7}
+.callout.warn{border-left-color:#f59e0b}.callout.warn strong{color:#fcd34d}
+.callout.info{border-left-color:#38bdf8}.callout.info strong{color:#7dd3fc}
+
+.code-block{margin:1rem 0;border-radius:12px;overflow:hidden;border:1px solid #1e293b}
+.code-header{background:#111827;padding:.7rem 1rem;display:flex;justify-content:space-between;align-items:center}
+.code-header span{font-size:.78rem;color:#64748b;font-weight:600}
+.code-block pre{margin:0!important;border-radius:0!important;border:none!important;font-size:.82rem!important;line-height:1.6!important}
+
+.lang-bad {background:rgba(239,68,68,.12);color:#fca5a5;padding:.15rem .6rem;border-radius:4px;font-size:.72rem;font-weight:700}
+.lang-good{background:rgba(74,222,128,.12);color:#86efac;padding:.15rem .6rem;border-radius:4px;font-size:.72rem;font-weight:700}
+.lang-tag{background:rgba(16,185,129,.12);color:#6ee7b7;padding:.15rem .6rem;border-radius:4px;font-size:.72rem;font-weight:700}
+
+/* pyramid */
+.pyramid{display:flex;flex-direction:column;align-items:center;gap:4px;margin:2rem auto;max-width:480px}
+.pyramid-layer{display:flex;align-items:center;justify-content:center;border-radius:8px;font-size:.82rem;font-weight:700;color:#fff;padding:.5rem 1rem}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="index.html" class="back-btn">← กลับหน้าหลัก</a>
+  <span class="nav-title">19 / <span>Testing Patterns</span></span>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">🧪 หัวข้อที่ 19</div>
+  <h1>Testing Patterns</h1>
+  <p>Test Pyramid, TDD, Test Doubles (Mock/Stub/Fake/Spy), Table-driven Tests, Integration Tests — วิธีเขียน test ใน Go อย่างถูกต้อง</p>
+</div>
+
+<div class="content">
+
+<!-- TEST PYRAMID -->
+<div class="section">
+  <div class="section-title" style="color:#10b981">🔺 Test Pyramid</div>
+  <div class="section-sub">สัดส่วนที่เหมาะสมของ test แต่ละชนิด</div>
+
+  <div class="pyramid">
+    <div class="pyramid-layer" style="width:40%;background:rgba(239,68,68,.7)">E2E Tests</div>
+    <div class="pyramid-layer" style="width:65%;background:rgba(251,191,36,.7)">Integration Tests</div>
+    <div class="pyramid-layer" style="width:100%;background:rgba(16,185,129,.7)">Unit Tests (มากที่สุด)</div>
+  </div>
+
+  <div style="background:#0d1117;border:1px solid #1e293b;border-radius:14px;overflow:hidden;margin:1.5rem 0">
+    <div style="background:#111827;padding:10px 20px;display:grid;grid-template-columns:130px 1fr 1fr 80px;font-size:.77rem;font-weight:700;color:#64748b;gap:12px">
+      <div>ชนิด</div><div>ทดสอบอะไร</div><div>ลักษณะ</div><div>สัดส่วน</div>
+    </div>
+    <div style="display:grid;grid-template-columns:130px 1fr 1fr 80px;padding:10px 20px;font-size:.82rem;border-bottom:1px solid #0f172a;gap:12px;align-items:center">
+      <div style="color:#34d399;font-weight:700">Unit Test</div>
+      <div style="color:#94a3b8">function/method เดียว — isolate</div>
+      <div style="color:#64748b">เร็ว, ไม่ต้อง infra, เยอะได้</div>
+      <div style="color:#34d399">~70%</div>
+    </div>
+    <div style="display:grid;grid-template-columns:130px 1fr 1fr 80px;padding:10px 20px;font-size:.82rem;border-bottom:1px solid #0f172a;gap:12px;align-items:center">
+      <div style="color:#fbbf24;font-weight:700">Integration Test</div>
+      <div style="color:#94a3b8">หลาย component ทำงานร่วมกัน</div>
+      <div style="color:#64748b">ต้องการ DB/queue จริง, ช้ากว่า</div>
+      <div style="color:#fbbf24">~20%</div>
+    </div>
+    <div style="display:grid;grid-template-columns:130px 1fr 1fr 80px;padding:10px 20px;font-size:.82rem;gap:12px;align-items:center">
+      <div style="color:#f87171;font-weight:700">E2E Test</div>
+      <div style="color:#94a3b8">ทั้งระบบตั้งแต่ UI ถึง DB</div>
+      <div style="color:#64748b">ช้ามาก, flaky ได้, น้อยพอ</div>
+      <div style="color:#f87171">~10%</div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>ทำไม Unit Test ต้องมากที่สุด?</strong> รันเร็ว (milliseconds), ไม่ต้องการ infra, ชี้จุด bug ได้ทันที — ถ้า unit test ผ่านแล้ว integration test จะหา "glue bug" ที่เหลือ
+  </div>
+</div>
+
+<!-- TEST DOUBLES -->
+<div class="section">
+  <div class="section-title" style="color:#10b981">🎭 Test Doubles</div>
+  <div class="section-sub">วิธีแทนที่ dependency จริงใน unit test</div>
+
+  <div style="background:#0d1117;border:1px solid #1e293b;border-radius:14px;overflow:hidden;margin:1.5rem 0">
+    <div style="background:#111827;padding:10px 20px;display:grid;grid-template-columns:80px 1fr 1.5fr;font-size:.77rem;font-weight:700;color:#64748b;gap:12px">
+      <div>ชนิด</div><div>ทำอะไร</div><div>ใช้เมื่อไหร่</div>
+    </div>
+    <div style="display:grid;grid-template-columns:80px 1fr 1.5fr;padding:10px 20px;font-size:.82rem;border-bottom:1px solid #0f172a;gap:12px;align-items:center">
+      <div style="color:#34d399;font-weight:700">Stub</div>
+      <div style="color:#94a3b8">คืนค่าที่กำหนดไว้ล่วงหน้า</div>
+      <div style="color:#64748b">ต้องการ input ที่ controllable ให้ code ที่ test</div>
+    </div>
+    <div style="display:grid;grid-template-columns:80px 1fr 1.5fr;padding:10px 20px;font-size:.82rem;border-bottom:1px solid #0f172a;gap:12px;align-items:center">
+      <div style="color:#60a5fa;font-weight:700">Mock</div>
+      <div style="color:#94a3b8">บันทึกว่าถูกเรียกอย่างไร แล้ว assert ทีหลัง</div>
+      <div style="color:#64748b">ต้องการ verify ว่า dependency ถูกเรียกถูกต้อง</div>
+    </div>
+    <div style="display:grid;grid-template-columns:80px 1fr 1.5fr;padding:10px 20px;font-size:.82rem;border-bottom:1px solid #0f172a;gap:12px;align-items:center">
+      <div style="color:#a78bfa;font-weight:700">Fake</div>
+      <div style="color:#94a3b8">implementation จริงๆ แต่ใช้แทน production</div>
+      <div style="color:#64748b">in-memory DB แทน Postgres, local queue แทน Kafka</div>
+    </div>
+    <div style="display:grid;grid-template-columns:80px 1fr 1.5fr;padding:10px 20px;font-size:.82rem;gap:12px;align-items:center">
+      <div style="color:#f97316;font-weight:700">Spy</div>
+      <div style="color:#94a3b8">เรียก real implementation แต่บันทึกด้วย</div>
+      <div style="color:#64748b">ต้องการ behavior จริงแต่อยากรู้ว่ามีการเรียก method</div>
+    </div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>Stub, Mock, Fake ใน Go — ไม่ต้องใช้ library</span>
+      <span class="lang-tag">Go · Test Doubles</span>
+    </div>
+    <pre><code class="language-go">// ── Interface ที่จะ test ───────────────────────────────────
+type UserRepository interface {
+    FindByID(id string) (*User, error)
+    Save(u *User) error
+    CountByEmail(email string) (int, error)
+}
+
+// ── STUB: คืนค่าที่กำหนดล่วงหน้า ─────────────────────────
+type StubUserRepo struct {
+    user *User
+    err  error
+}
+
+func (s *StubUserRepo) FindByID(id string) (*User, error) {
+    return s.user, s.err // คืนสิ่งที่กำหนดไว้เสมอ
+}
+func (s *StubUserRepo) Save(u *User) error           { return nil }
+func (s *StubUserRepo) CountByEmail(e string) (int, error) { return 0, nil }
+
+// ── MOCK: บันทึก calls แล้ว assert ─────────────────────────
+type MockUserRepo struct {
+    SaveCalls []User    // บันทึก arguments ที่ถูกส่งมา
+    FindCalls []string
+}
+
+func (m *MockUserRepo) FindByID(id string) (*User, error) {
+    m.FindCalls = append(m.FindCalls, id)
+    return &User{ID: id}, nil
+}
+func (m *MockUserRepo) Save(u *User) error {
+    m.SaveCalls = append(m.SaveCalls, *u)
+    return nil
+}
+func (m *MockUserRepo) CountByEmail(e string) (int, error) { return 0, nil }
+
+// ── FAKE: in-memory implementation จริงๆ ───────────────────
+type InMemoryUserRepo struct {
+    data map[string]*User
+}
+
+func NewInMemoryUserRepo() *InMemoryUserRepo {
+    return &InMemoryUserRepo{data: make(map[string]*User)}
+}
+func (r *InMemoryUserRepo) FindByID(id string) (*User, error) {
+    u, ok := r.data[id]
+    if !ok { return nil, errors.New("not found") }
+    return u, nil
+}
+func (r *InMemoryUserRepo) Save(u *User) error {
+    r.data[u.ID] = u
+    return nil
+}
+func (r *InMemoryUserRepo) CountByEmail(e string) (int, error) {
+    count := 0
+    for _, u := range r.data {
+        if u.Email == e { count++ }
+    }
+    return count, nil
+}
+
+// ── Tests ──────────────────────────────────────────────────
+func TestRegisterUser_EmailAlreadyExists(t *testing.T) {
+    // Stub: ทำให้ CountByEmail คืน 1 (มี email แล้ว)
+    repo := &StubUserRepo{}
+    // ใช้ Fake แทน เพราะ logic ซับซ้อน
+    fakeRepo := NewInMemoryUserRepo()
+    fakeRepo.Save(&User{ID: "1", Email: "a@test.com"})
+
+    svc := NewUserService(fakeRepo)
+    err := svc.Register("a@test.com", "pass")
+
+    if err == nil {
+        t.Error("expected duplicate email error")
+    }
+    _ = repo // unused here
+}
+
+func TestRegisterUser_CallsSave(t *testing.T) {
+    // Mock: ตรวจว่า Save ถูกเรียก
+    mock := &MockUserRepo{}
+    svc := NewUserService(mock)
+
+    svc.Register("new@test.com", "pass")
+
+    if len(mock.SaveCalls) != 1 {
+        t.Errorf("expected Save called once, got %d", len(mock.SaveCalls))
+    }
+    if mock.SaveCalls[0].Email != "new@test.com" {
+        t.Error("saved wrong email")
+    }
+}</code></pre>
+  </div>
+</div>
+
+<!-- TABLE DRIVEN TESTS -->
+<div class="section">
+  <div class="section-title" style="color:#10b981">📋 Table-driven Tests</div>
+  <div class="section-sub">Go idiom ที่ทำให้ test เยอะ case ได้โดยไม่ซ้ำ code</div>
+
+  <div style="background:linear-gradient(135deg,#041810,#062010);border:1px solid #10b98130;border-radius:12px;padding:1.2rem 1.4rem;margin-bottom:1.5rem">
+    <div style="font-size:.83rem;color:#94a3b8;line-height:1.8">
+      <span style="color:#6ee7b7;font-weight:700">แนวคิด:</span> เขียน test logic ครั้งเดียว แต่รันกับ input หลายชุดโดยใช้ <code>[]struct</code> เป็น test table — Go testing รองรับด้วย <code>t.Run()</code><br>
+      <span style="color:#6ee7b7;font-weight:700">ข้อดี:</span> เพิ่ม case ใหม่แค่เพิ่มแถวใน table, ชื่อ test ชัดเจน, ง่ายต่อการ debug เมื่อ fail
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+    <div class="code-block" style="border-color:#ef444430">
+      <div class="code-header">
+        <span>❌ เขียน test แยกทุก case — ซ้ำซ้อน</span>
+        <span class="lang-bad">ผิดหลักการ</span>
+      </div>
+      <pre><code class="language-go">func TestDiscount_VIP(t *testing.T) {
+    got := CalcDiscount(1000, "vip")
+    if got != 200 {
+        t.Errorf("got %v want 200", got)
+    }
+}
+
+func TestDiscount_Member(t *testing.T) {
+    got := CalcDiscount(1000, "member")
+    if got != 100 {
+        t.Errorf("got %v want 100", got)
+    }
+}
+
+func TestDiscount_NewUser(t *testing.T) {
+    got := CalcDiscount(1000, "new_user")
+    if got != 50 {
+        t.Errorf("got %v want 50", got)
+    }
+}
+// test logic ซ้ำกัน 3 ครั้ง...</code></pre>
+    </div>
+    <div class="code-block" style="border-color:#4ade8030">
+      <div class="code-header">
+        <span>✅ Table-driven — เพิ่ม case แค่เพิ่มแถว</span>
+        <span class="lang-good">ถูกหลักการ</span>
+      </div>
+      <pre><code class="language-go">func TestCalcDiscount(t *testing.T) {
+    tests := []struct {
+        name     string
+        total    float64
+        userType string
+        want     float64
+    }{
+        {"vip gets 20%",     1000, "vip",      200},
+        {"member gets 10%",  1000, "member",   100},
+        {"new user gets 5%", 1000, "new_user",  50},
+        {"unknown gets 0",   1000, "guest",      0},
+        {"zero total",          0, "vip",         0},
+    }
+
+    for _, tt := range tests {
+        t.Run(tt.name, func(t *testing.T) {
+            got := CalcDiscount(tt.total, tt.userType)
+            if got != tt.want {
+                t.Errorf("got %v, want %v", got, tt.want)
+            }
+        })
+    }
+}
+// เพิ่ม case ใหม่ = เพิ่มแถวใน tests slice</code></pre>
+    </div>
+  </div>
+</div>
+
+<!-- TDD -->
+<div class="section">
+  <div class="section-title" style="color:#10b981">🔄 TDD — Test Driven Development</div>
+  <div class="section-sub">เขียน test ก่อน แล้วค่อยเขียน code ให้ผ่าน</div>
+
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:1.5rem 0">
+    <div style="background:#1a0404;border:2px solid #ef4444;border-radius:12px;padding:16px;text-align:center">
+      <div style="font-size:1.5rem;font-weight:900;color:#ef4444;margin-bottom:8px">🔴 Red</div>
+      <div style="font-size:.82rem;color:#94a3b8">เขียน test ที่ <strong style="color:#fca5a5">fail</strong> ก่อน<br>test ต้อง compile ได้แต่ fail</div>
+    </div>
+    <div style="background:#041a04;border:2px solid #4ade80;border-radius:12px;padding:16px;text-align:center">
+      <div style="font-size:1.5rem;font-weight:900;color:#4ade80;margin-bottom:8px">🟢 Green</div>
+      <div style="font-size:.82rem;color:#94a3b8">เขียน code <strong style="color:#86efac">น้อยที่สุด</strong><br>ที่ทำให้ test ผ่าน</div>
+    </div>
+    <div style="background:#040a1a;border:2px solid #60a5fa;border-radius:12px;padding:16px;text-align:center">
+      <div style="font-size:1.5rem;font-weight:900;color:#60a5fa;margin-bottom:8px">🔵 Refactor</div>
+      <div style="font-size:.82rem;color:#94a3b8">ทำความสะอาด code<br>โดย test ยังต้องผ่าน</div>
+    </div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>TDD cycle — สร้าง PasswordValidator ทีละขั้น</span>
+      <span class="lang-tag">Go · TDD</span>
+    </div>
+    <pre><code class="language-go">// ── 1. RED: เขียน test ก่อน — ยังไม่มี ValidatePassword ─────
+func TestValidatePassword(t *testing.T) {
+    tests := []struct {
+        name    string
+        pwd     string
+        wantErr bool
+    }{
+        {"too short",          "abc",       true},
+        {"no number",          "abcdefgh",  true},
+        {"no uppercase",       "abcdef1",   true},
+        {"valid password",     "Abcdef1!",  false},
+    }
+    for _, tt := range tests {
+        t.Run(tt.name, func(t *testing.T) {
+            err := ValidatePassword(tt.pwd)
+            if (err != nil) != tt.wantErr {
+                t.Errorf("ValidatePassword(%q) err=%v, wantErr=%v",
+                    tt.pwd, err, tt.wantErr)
+            }
+        })
+    }
+}
+
+// ── 2. GREEN: เขียน code น้อยที่สุดให้ผ่าน ─────────────────
+func ValidatePassword(pwd string) error {
+    if len(pwd) < 8 {
+        return errors.New("password too short")
+    }
+    hasUpper, hasNum := false, false
+    for _, c := range pwd {
+        if unicode.IsUpper(c) { hasUpper = true }
+        if unicode.IsDigit(c) { hasNum = true }
+    }
+    if !hasUpper { return errors.New("must contain uppercase") }
+    if !hasNum   { return errors.New("must contain number") }
+    return nil
+}
+
+// ── 3. REFACTOR: ทำให้ดีขึ้นโดย test ยังผ่าน ────────────────
+type PasswordRule func(string) error
+
+func MinLength(n int) PasswordRule {
+    return func(pwd string) error {
+        if len(pwd) < n {
+            return fmt.Errorf("password must be at least %d characters", n)
+        }
+        return nil
+    }
+}
+
+func HasUppercase() PasswordRule {
+    return func(pwd string) error {
+        for _, c := range pwd {
+            if unicode.IsUpper(c) { return nil }
+        }
+        return errors.New("password must contain uppercase")
+    }
+}
+
+func ValidatePassword(pwd string, rules ...PasswordRule) error {
+    for _, rule := range rules {
+        if err := rule(pwd); err != nil { return err }
+    }
+    return nil
+}</code></pre>
+  </div>
+
+  <div class="callout" style="border-left-color:#10b981">
+    <strong>TDD ช่วยออกแบบ API:</strong> การเขียน test ก่อนบังคับให้คิดจาก "ผู้ใช้" ก่อน — ถ้า test อ่านยากหมายความว่า API ออกแบบมาไม่ดี แก้ API ก่อนแก้ implementation
+  </div>
+</div>
+
+<!-- INTEGRATION TEST -->
+<div class="section">
+  <div class="section-title" style="color:#10b981">🔌 Integration Tests</div>
+  <div class="section-sub">ทดสอบ component หลายตัวทำงานร่วมกันกับ infra จริง</div>
+
+  <div style="background:linear-gradient(135deg,#041810,#062010);border:1px solid #10b98130;border-radius:12px;padding:1.2rem 1.4rem;margin-bottom:1.5rem">
+    <div style="font-size:.83rem;color:#94a3b8;line-height:1.8">
+      <span style="color:#6ee7b7;font-weight:700">เมื่อไหร่ใช้:</span> เมื่อต้องการมั่นใจว่า SQL query ถูกต้อง, migration ไม่พัง, หรือ HTTP handler คืน response ถูก format<br>
+      <span style="color:#6ee7b7;font-weight:700">ใน Go:</span> ใช้ <code>testcontainers-go</code> สร้าง Docker container จริงใน test, หรือ <code>httptest.NewServer()</code> สำหรับ HTTP integration test
+    </div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>Integration Test — HTTP handler + real service logic</span>
+      <span class="lang-tag">Go · Integration</span>
+    </div>
+    <pre><code class="language-go">// httptest.NewRecorder() — ไม่ต้อง start server จริง
+func TestOrderHandler_PlaceOrder(t *testing.T) {
+    // Fake repo แทน Postgres
+    repo := NewInMemoryOrderRepo()
+    svc  := NewOrderService(repo, &NoopNotifier{})
+    h    := NewOrderHandler(svc)
+
+    // สร้าง HTTP request จริง
+    body := `{"user_id":"u1","items":[{"sku":"A","qty":2}]}`
+    req  := httptest.NewRequest("POST", "/orders", strings.NewReader(body))
+    req.Header.Set("Content-Type", "application/json")
+    w := httptest.NewRecorder()
+
+    h.PlaceOrder(w, req)
+
+    res := w.Result()
+    if res.StatusCode != http.StatusCreated {
+        t.Errorf("status=%d want 201", res.StatusCode)
+    }
+
+    var resp OrderResponse
+    json.NewDecoder(res.Body).Decode(&resp)
+    if resp.OrderID == "" {
+        t.Error("expected order ID in response")
+    }
+
+    // verify side effect: order actually saved
+    saved, err := repo.FindByID(resp.OrderID)
+    if err != nil || saved == nil {
+        t.Error("order was not saved")
+    }
+}
+
+// ── testcontainers-go: Postgres จริงใน Docker ──────────────
+func TestOrderRepo_Integration(t *testing.T) {
+    if testing.Short() { t.Skip("skipping integration test") }
+
+    ctx := context.Background()
+    pgContainer, err := postgres.RunContainer(ctx,
+        testcontainers.WithImage("postgres:16"),
+        postgres.WithDatabase("testdb"),
+        postgres.WithUsername("test"),
+        postgres.WithPassword("test"),
+    )
+    require.NoError(t, err)
+    defer pgContainer.Terminate(ctx)
+
+    connStr, _ := pgContainer.ConnectionString(ctx, "sslmode=disable")
+    db, _ := sql.Open("postgres", connStr)
+    runMigrations(db)
+
+    repo := &PostgresOrderRepo{db: db}
+    order := &Order{ID: "o1", Total: 500}
+
+    err = repo.Save(order)
+    assert.NoError(t, err)
+
+    got, err := repo.FindByID("o1")
+    assert.NoError(t, err)
+    assert.Equal(t, float64(500), got.Total)
+}</code></pre>
+  </div>
+
+  <div class="callout warn">
+    <strong>Build tags:</strong> ใช้ <code>//go:build integration</code> แยก integration test ออกจาก unit test — รัน <code>go test ./...</code> สำหรับ unit, <code>go test -tags integration ./...</code> สำหรับทั้งหมด
+  </div>
+</div>
+
+<!-- GOLDEN PATH -->
+<div class="section">
+  <div class="section-title" style="color:#10b981">📌 Quick Reference</div>
+  <div class="section-sub">เมื่อไหร่ใช้อะไร</div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin:1.5rem 0">
+    <div style="background:#0d1117;border:1px solid #1e293b;border-left:3px solid #34d399;border-radius:12px;padding:16px">
+      <div style="font-size:.8rem;font-weight:700;color:#34d399;margin-bottom:8px">✅ Unit Test เหมาะกับ</div>
+      <div style="font-size:.8rem;color:#64748b;line-height:1.8">Business logic, validation, calculation<br>Pure functions, domain rules<br>Fast feedback loop ระหว่าง coding</div>
+    </div>
+    <div style="background:#0d1117;border:1px solid #1e293b;border-left:3px solid #fbbf24;border-radius:12px;padding:16px">
+      <div style="font-size:.8rem;font-weight:700;color:#fbbf24;margin-bottom:8px">🔌 Integration Test เหมาะกับ</div>
+      <div style="font-size:.8rem;color:#64748b;line-height:1.8">SQL queries และ DB migrations<br>HTTP handlers กับ real service<br>Message queue producer/consumer</div>
+    </div>
+    <div style="background:#0d1117;border:1px solid #1e293b;border-left:3px solid #60a5fa;border-radius:12px;padding:16px">
+      <div style="font-size:.8rem;font-weight:700;color:#60a5fa;margin-bottom:8px">🎭 Test Double เลือกอย่างไร</div>
+      <div style="font-size:.8rem;color:#64748b;line-height:1.8">Stub: ต้องการ input ที่ควบคุมได้<br>Mock: ต้อง verify ว่า method ถูกเรียก<br>Fake: logic ซับซ้อน, mock จะยุ่งยาก</div>
+    </div>
+  </div>
+
+  <div class="callout info">
+    <strong>หลีกเลี่ยง Over-mocking:</strong> ถ้า mock เยอะกว่า code จริง — test นั้นอาจไม่ได้ test behavior จริง แต่ test ว่า "code เรียก method ในลำดับที่ต้องการ" ซึ่งเปราะบางมาก ใช้ Fake แทนถ้าเป็นไปได้
+  </div>
+</div>
+
+<div style="text-align:center;margin:3rem 0;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+  <a href="18-design-patterns.html" style="display:inline-flex;align-items:center;gap:.5rem;background:#0d1117;border:1px solid #1e293b;color:#64748b;padding:.7rem 1.5rem;border-radius:10px;font-size:.88rem">← Design Patterns</a>
+  <a href="20-concurrency.html" style="display:inline-flex;align-items:center;gap:.5rem;background:#0d1117;border:1px solid #10b98140;color:#34d399;padding:.7rem 1.5rem;border-radius:10px;font-weight:600;font-size:.88rem">Concurrency Patterns →</a>
+</div>
+
+</div>
+<script>hljs.highlightAll()</script>
+<script>
+document.querySelectorAll('.code-block').forEach(block => {
+  const header = block.querySelector('.code-header')
+  const code   = block.querySelector('code')
+  if (!header || !code) return
+  const btn = document.createElement('button')
+  btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span>Copy</span>`
+  btn.style.cssText = 'display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#94a3b8;font-size:.7rem;font-weight:600;padding:3px 10px;border-radius:6px;cursor:pointer;transition:all .15s;flex-shrink:0'
+  btn.addEventListener('mouseenter', () => { btn.style.background='rgba(255,255,255,.1)'; btn.style.color='#e2e8f0' })
+  btn.addEventListener('mouseleave', () => { if (!btn.dataset.copied) { btn.style.background='rgba(255,255,255,.06)'; btn.style.color='#94a3b8' } })
+  btn.addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(code.innerText) }
+    catch { const ta=document.createElement('textarea'); ta.value=code.innerText; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove() }
+    btn.dataset.copied='1'
+    btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span style="color:#10b981">Copied!</span>`
+    btn.style.background='rgba(16,185,129,.1)'; btn.style.borderColor='rgba(16,185,129,.3)'
+    setTimeout(() => {
+      delete btn.dataset.copied
+      btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span>Copy</span>`
+      btn.style.background='rgba(255,255,255,.06)'; btn.style.borderColor='rgba(255,255,255,.1)'; btn.style.color='#94a3b8'
+    }, 2000)
+  })
+  header.appendChild(btn)
+})
+</script>
+</body>
+</html>

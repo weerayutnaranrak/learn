@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Saga Pattern — สื่อการสอน</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#07090f;color:#e2e8f0;line-height:1.7}
+a{color:#fb923c;text-decoration:none}
+a:hover{text-decoration:underline}
+
+.topnav{display:flex;align-items:center;gap:1rem;padding:1rem 2rem;background:#0d1117;border-bottom:1px solid #1e293b;position:sticky;top:0;z-index:100}
+.back-btn{display:flex;align-items:center;gap:.4rem;color:#64748b;font-size:.85rem;transition:color .2s}
+.back-btn:hover{color:#e2e8f0;text-decoration:none}
+.nav-title{color:#475569;font-size:.85rem}
+.nav-title span{color:#fdba74;font-weight:600}
+
+.hero{padding:4rem 2rem 3rem;text-align:center;background:linear-gradient(160deg,#07090f,#0e0a04)}
+.hero-badge{display:inline-block;background:rgba(251,146,60,.1);border:1px solid rgba(251,146,60,.3);color:#fdba74;padding:.35rem 1rem;border-radius:999px;font-size:.8rem;font-weight:600;margin-bottom:1.5rem}
+.hero h1{font-size:clamp(1.8rem,4vw,3rem);font-weight:800;background:linear-gradient(135deg,#fb923c 0%,#f97316 30%,#ef4444 60%,#f43f5e 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:1rem}
+.hero p{color:#64748b;max-width:640px;margin:0 auto;font-size:1rem}
+
+.content{max-width:960px;margin:0 auto;padding:2rem 1.5rem 5rem}
+.section{margin-bottom:4rem}
+.section-title{font-size:1.5rem;font-weight:700;margin-bottom:.4rem;display:flex;align-items:center;gap:.6rem}
+.section-sub{color:#475569;font-size:.9rem;margin-bottom:2rem;padding-left:2rem}
+
+.callout{background:#0f172a;border-left:3px solid #fb923c;border-radius:0 8px 8px 0;padding:1rem 1.2rem;margin:1.5rem 0;font-size:.88rem;color:#94a3b8}
+.callout strong{color:#fdba74}
+.callout.tip{border-left-color:#10b981}.callout.tip strong{color:#6ee7b7}
+.callout.warn{border-left-color:#f59e0b}.callout.warn strong{color:#fcd34d}
+.callout.danger{border-left-color:#ef4444}.callout.danger strong{color:#fca5a5}
+
+.code-block{margin:1rem 0;border-radius:12px;overflow:hidden;border:1px solid #1e293b}
+.code-header{background:#111827;padding:.7rem 1rem;display:flex;justify-content:space-between;align-items:center}
+.code-header span{font-size:.78rem;color:#64748b;font-weight:600}
+.code-block pre{margin:0!important;border-radius:0!important;border:none!important;font-size:.82rem!important;line-height:1.6!important}
+
+.lang-bad {background:rgba(239,68,68,.12);color:#fca5a5;padding:.15rem .6rem;border-radius:4px;font-size:.72rem;font-weight:700}
+.lang-good{background:rgba(74,222,128,.12);color:#86efac;padding:.15rem .6rem;border-radius:4px;font-size:.72rem;font-weight:700}
+.lang-tag{background:rgba(251,146,60,.12);color:#fdba74;padding:.15rem .6rem;border-radius:4px;font-size:.72rem;font-weight:700}
+
+/* Flow diagram */
+.flow{display:flex;align-items:center;flex-wrap:wrap;gap:4px;margin:1rem 0}
+.flow-step{background:#0d1117;border:1px solid #1e293b;border-radius:8px;padding:8px 14px;font-size:.78rem;font-weight:600;white-space:nowrap}
+.flow-arrow{color:#475569;font-size:1.2rem}
+.flow-step.ok{border-color:#4ade8040;color:#86efac}
+.flow-step.err{border-color:#ef444440;color:#fca5a5}
+.flow-step.comp{border-color:#fbbf2440;color:#fde68a}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="index.html" class="back-btn">← กลับหน้าหลัก</a>
+  <span class="nav-title">21 / <span>Saga Pattern</span></span>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">📜 หัวข้อที่ 21</div>
+  <h1>Saga Pattern</h1>
+  <p>Distributed Transaction ใน Microservices — เมื่อ 2PC ไม่เหมาะอีกต่อไป Saga ใช้ compensating transactions แทนเพื่อรักษา consistency</p>
+</div>
+
+<div class="content">
+
+<!-- PROBLEM -->
+<div class="section">
+  <div class="section-title" style="color:#fb923c">❓ ปัญหา: Distributed Transaction</div>
+  <div class="section-sub">เมื่อ transaction ต้องข้ามหลาย service พร้อมกัน</div>
+
+  <div style="background:linear-gradient(135deg,#0e0a04,#1a1004);border:1px solid #fb923c30;border-radius:12px;padding:1.2rem 1.4rem;margin-bottom:1.5rem">
+    <div style="font-size:.83rem;color:#94a3b8;line-height:1.8">
+      <span style="color:#fdba74;font-weight:700">สถานการณ์:</span> ลูกค้าสั่งซื้อ → ต้อง 1) ตัดสต็อก 2) ตัดเงิน 3) สร้าง shipment — ถ้า service ใดล้มเหลวระหว่างทาง ข้อมูลจะ inconsistent<br>
+      <span style="color:#fdba74;font-weight:700">2-Phase Commit (2PC) แก้ได้ไหม?</span> ได้ใน monolith แต่ใน microservices — 2PC ต้องการ distributed lock ข้ามหลาย DB ซึ่งทำให้ latency สูงและ availability ต่ำมาก
+    </div>
+  </div>
+
+  <div style="margin:1.5rem 0">
+    <div style="font-size:.82rem;color:#475569;margin-bottom:.5rem">Happy path: ทุก step สำเร็จ</div>
+    <div class="flow">
+      <div class="flow-step ok">1. Create Order</div><div class="flow-arrow">→</div>
+      <div class="flow-step ok">2. Reserve Stock</div><div class="flow-arrow">→</div>
+      <div class="flow-step ok">3. Charge Payment</div><div class="flow-arrow">→</div>
+      <div class="flow-step ok">4. Create Shipment</div><div class="flow-arrow">→</div>
+      <div class="flow-step ok">✅ Done</div>
+    </div>
+
+    <div style="font-size:.82rem;color:#475569;margin-bottom:.5rem;margin-top:1rem">Failure path: Payment ล้มเหลว — ต้อง compensate</div>
+    <div class="flow">
+      <div class="flow-step ok">1. Create Order ✓</div><div class="flow-arrow">→</div>
+      <div class="flow-step ok">2. Reserve Stock ✓</div><div class="flow-arrow">→</div>
+      <div class="flow-step err">3. Payment ✗</div><div class="flow-arrow">→</div>
+      <div class="flow-step comp">↩ Release Stock</div><div class="flow-arrow">→</div>
+      <div class="flow-step comp">↩ Cancel Order</div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>Saga = Eventual Consistency:</strong> ไม่ได้รับประกัน ACID atomicity ทั้งหมดในทันที แต่รับประกันว่าระบบจะ <strong>สุดท้ายกลับสู่ consistent state</strong> ไม่ว่า step ไหนจะล้มเหลว
+  </div>
+</div>
+
+<!-- CHOREOGRAPHY -->
+<div class="section">
+  <div class="section-title" style="color:#fb923c">🎭 Choreography-based Saga</div>
+  <div class="section-sub">แต่ละ service ฟัง event และตัดสินใจเอง — ไม่มี central coordinator</div>
+
+  <div style="background:linear-gradient(135deg,#0e0a04,#1a1004);border:1px solid #fb923c30;border-radius:12px;padding:1.2rem 1.4rem;margin-bottom:1.5rem">
+    <div style="font-size:.83rem;color:#94a3b8;line-height:1.8">
+      <span style="color:#fdba74;font-weight:700">วิธีทำงาน:</span> แต่ละ service publish event หลังทำงานสำเร็จ → service ถัดไปฟัง event นั้นแล้วทำงานต่อ → ถ้า error ก็ publish compensating event<br>
+      <span style="color:#fdba74;font-weight:700">เหมาะกับ:</span> saga ที่ไม่ซับซ้อน, step น้อย, team อยากให้แต่ละ service เป็นอิสระ
+    </div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>Choreography Saga — Order flow ผ่าน events</span>
+      <span class="lang-tag">Go · Choreography</span>
+    </div>
+    <pre><code class="language-go">// ── Events ────────────────────────────────────────────────
+type OrderPlaced    struct{ OrderID, UserID string; Items []Item }
+type StockReserved  struct{ OrderID string }
+type StockFailed    struct{ OrderID, Reason string }
+type PaymentCharged struct{ OrderID string; Amount float64 }
+type PaymentFailed  struct{ OrderID, Reason string }
+type OrderConfirmed struct{ OrderID string }
+type OrderCancelled struct{ OrderID, Reason string }
+
+// ── Order Service ─────────────────────────────────────────
+type OrderService struct {
+    repo OrderRepo
+    bus  EventBus
+}
+
+func (s *OrderService) PlaceOrder(cmd PlaceOrderCmd) error {
+    order := NewOrder(cmd.UserID, cmd.Items)
+    order.Status = "pending"
+    s.repo.Save(order)
+
+    // publish แล้วรอ event ตอบกลับ
+    s.bus.Publish("order.placed", OrderPlaced{
+        OrderID: order.ID, UserID: order.UserID, Items: order.Items,
+    })
+    return nil
+}
+
+// ฟัง compensating event จาก downstream
+func (s *OrderService) OnPaymentFailed(e PaymentFailed) {
+    order, _ := s.repo.FindByID(e.OrderID)
+    order.Status = "cancelled"
+    s.repo.Save(order)
+    s.bus.Publish("order.cancelled", OrderCancelled{
+        OrderID: e.OrderID, Reason: e.Reason,
+    })
+}
+
+// ── Inventory Service ─────────────────────────────────────
+type InventoryService struct {
+    repo InventoryRepo
+    bus  EventBus
+}
+
+// ฟัง order.placed → จอง stock
+func (s *InventoryService) OnOrderPlaced(e OrderPlaced) {
+    ok, err := s.repo.Reserve(e.Items)
+    if err != nil || !ok {
+        s.bus.Publish("stock.failed", StockFailed{
+            OrderID: e.OrderID, Reason: "out of stock",
+        })
+        return
+    }
+    s.bus.Publish("stock.reserved", StockReserved{OrderID: e.OrderID})
+}
+
+// ฟัง compensating event — คืน stock
+func (s *InventoryService) OnOrderCancelled(e OrderCancelled) {
+    s.repo.Release(e.OrderID) // compensating transaction
+}
+
+// ── Payment Service ───────────────────────────────────────
+type PaymentService struct {
+    gateway PaymentGateway
+    bus     EventBus
+}
+
+// ฟัง stock.reserved → เก็บเงิน
+func (s *PaymentService) OnStockReserved(e StockReserved) {
+    order, _ := getOrderAmount(e.OrderID)
+    if err := s.gateway.Charge(order.UserID, order.Total); err != nil {
+        s.bus.Publish("payment.failed", PaymentFailed{
+            OrderID: e.OrderID, Reason: err.Error(),
+        })
+        return
+    }
+    s.bus.Publish("payment.charged", PaymentCharged{
+        OrderID: e.OrderID, Amount: order.Total,
+    })
+}
+
+// ── Wire-up subscriptions ─────────────────────────────────
+func wireChoreography(bus EventBus, inv *InventoryService,
+    pay *PaymentService, ord *OrderService) {
+
+    bus.Subscribe("order.placed",     inv.OnOrderPlaced)
+    bus.Subscribe("stock.reserved",   pay.OnStockReserved)
+    bus.Subscribe("payment.failed",   inv.OnOrderCancelled)
+    bus.Subscribe("payment.failed",   ord.OnPaymentFailed)
+    bus.Subscribe("order.cancelled",  inv.OnOrderCancelled)
+}</code></pre>
+  </div>
+</div>
+
+<!-- ORCHESTRATION -->
+<div class="section">
+  <div class="section-title" style="color:#fb923c">🎬 Orchestration-based Saga</div>
+  <div class="section-sub">มี central orchestrator ที่รู้ทุก step และสั่งแต่ละ service</div>
+
+  <div style="background:linear-gradient(135deg,#0e0a04,#1a1004);border:1px solid #fb923c30;border-radius:12px;padding:1.2rem 1.4rem;margin-bottom:1.5rem">
+    <div style="font-size:.83rem;color:#94a3b8;line-height:1.8">
+      <span style="color:#fdba74;font-weight:700">วิธีทำงาน:</span> Orchestrator (state machine) สั่ง service แต่ละตัวตามลำดับ ถ้า step ใด fail orchestrator สั่ง compensate ตาม step ย้อนหลัง<br>
+      <span style="color:#fdba74;font-weight:700">เหมาะกับ:</span> saga ที่ซับซ้อน มีหลาย branch, ต้องการเห็น flow ชัดเจนจากจุดเดียว, ง่ายต่อการ debug
+    </div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>Orchestration Saga — state machine coordinator</span>
+      <span class="lang-tag">Go · Orchestration</span>
+    </div>
+    <pre><code class="language-go">type SagaState string
+
+const (
+    StateStarted          SagaState = "started"
+    StateStockReserved    SagaState = "stock_reserved"
+    StatePaymentCharged   SagaState = "payment_charged"
+    StateCompleted        SagaState = "completed"
+    StateCompensating     SagaState = "compensating"
+    StateFailed           SagaState = "failed"
+)
+
+type OrderSaga struct {
+    ID        string
+    OrderID   string
+    State     SagaState
+    inventory InventoryService
+    payment   PaymentService
+    order     OrderService
+    repo      SagaRepo // persist saga state
+}
+
+// Execute: ประมวลผล step ถัดไปตาม state ปัจจุบัน
+func (s *OrderSaga) Execute(ctx context.Context) error {
+    for {
+        switch s.State {
+        case StateStarted:
+            if err := s.reserveStock(ctx); err != nil {
+                return s.startCompensation(ctx, err)
+            }
+            s.setState(StateStockReserved)
+
+        case StateStockReserved:
+            if err := s.chargePayment(ctx); err != nil {
+                return s.startCompensation(ctx, err)
+            }
+            s.setState(StatePaymentCharged)
+
+        case StatePaymentCharged:
+            s.order.Confirm(ctx, s.OrderID)
+            s.setState(StateCompleted)
+            return nil
+
+        case StateCompensating:
+            s.compensate(ctx)
+            s.setState(StateFailed)
+            return fmt.Errorf("saga failed, compensation done")
+
+        case StateCompleted, StateFailed:
+            return nil
+        }
+    }
+}
+
+func (s *OrderSaga) reserveStock(ctx context.Context) error {
+    return s.inventory.Reserve(ctx, s.OrderID)
+}
+
+func (s *OrderSaga) chargePayment(ctx context.Context) error {
+    return s.payment.Charge(ctx, s.OrderID)
+}
+
+// Compensate ย้อนกลับตาม state ที่ถึงแล้ว
+func (s *OrderSaga) compensate(ctx context.Context) {
+    switch s.State {
+    case StateStockReserved, StatePaymentCharged:
+        // stock ถูก reserve แล้ว → ต้อง release
+        s.inventory.Release(ctx, s.OrderID)
+        fallthrough
+    case StateStarted:
+        s.order.Cancel(ctx, s.OrderID)
+    }
+}
+
+func (s *OrderSaga) startCompensation(ctx context.Context, err error) error {
+    s.setState(StateCompensating)
+    return s.Execute(ctx) // re-enter loop → เข้า case Compensating
+}
+
+func (s *OrderSaga) setState(state SagaState) {
+    s.State = state
+    s.repo.Save(s) // persist state ทุกครั้ง → resume ได้หาก crash
+}
+
+// ── Saga Manager: สร้างและรัน saga ──────────────────────────
+type SagaManager struct {
+    repo      SagaRepo
+    inventory InventoryService
+    payment   PaymentService
+    order     OrderService
+}
+
+func (m *SagaManager) StartOrderSaga(ctx context.Context, orderID string) error {
+    saga := &OrderSaga{
+        ID: uuid.New().String(), OrderID: orderID,
+        State:     StateStarted,
+        inventory: m.inventory,
+        payment:   m.payment,
+        order:     m.order,
+        repo:      m.repo,
+    }
+    m.repo.Save(saga)
+    return saga.Execute(ctx)
+}
+
+// Resume saga ที่ค้างจาก crash — idempotent
+func (m *SagaManager) Resume(ctx context.Context, sagaID string) error {
+    saga, _ := m.repo.FindByID(sagaID)
+    saga.inventory = m.inventory // re-inject deps
+    saga.payment   = m.payment
+    saga.order     = m.order
+    saga.repo      = m.repo
+    return saga.Execute(ctx)
+}</code></pre>
+  </div>
+</div>
+
+<!-- COMPARISON -->
+<div class="section">
+  <div class="section-title" style="color:#fb923c">⚖️ Choreography vs Orchestration</div>
+  <div class="section-sub">เลือกใช้ให้ถูกกับ use case</div>
+
+  <div style="background:#0d1117;border:1px solid #1e293b;border-radius:14px;overflow:hidden;margin:1.5rem 0">
+    <div style="background:#111827;padding:10px 20px;display:grid;grid-template-columns:1fr 1fr 1fr;font-size:.77rem;font-weight:700;color:#64748b;gap:12px">
+      <div>มิติ</div><div style="color:#f97316">🎭 Choreography</div><div style="color:#60a5fa">🎬 Orchestration</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:10px 20px;font-size:.82rem;border-bottom:1px solid #0f172a;gap:12px;align-items:start">
+      <div style="color:#94a3b8;font-weight:600">Coupling</div>
+      <div style="color:#64748b">Loose — services ไม่รู้จักกัน</div>
+      <div style="color:#64748b">Orchestrator รู้จักทุก service</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:10px 20px;font-size:.82rem;border-bottom:1px solid #0f172a;gap:12px;align-items:start">
+      <div style="color:#94a3b8;font-weight:600">Visibility</div>
+      <div style="color:#64748b">ยาก — ต้อง trace events</div>
+      <div style="color:#64748b">ง่าย — orchestrator เก็บ state</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:10px 20px;font-size:.82rem;border-bottom:1px solid #0f172a;gap:12px;align-items:start">
+      <div style="color:#94a3b8;font-weight:600">Complexity</div>
+      <div style="color:#64748b">ง่ายเริ่มต้น ซับซ้อนเมื่อ flow เพิ่ม</div>
+      <div style="color:#64748b">ซับซ้อนกว่าตอนเริ่ม แต่ scale ได้</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:10px 20px;font-size:.82rem;border-bottom:1px solid #0f172a;gap:12px;align-items:start">
+      <div style="color:#94a3b8;font-weight:600">Testing</div>
+      <div style="color:#64748b">ยาก — ต้องจำลอง event chain</div>
+      <div style="color:#64748b">ง่าย — test orchestrator โดยตรง</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:10px 20px;font-size:.82rem;gap:12px;align-items:start">
+      <div style="color:#94a3b8;font-weight:600">เหมาะกับ</div>
+      <div style="color:#64748b">Simple flow, Event-driven first system</div>
+      <div style="color:#64748b">Complex flow, Long-running process</div>
+    </div>
+  </div>
+
+  <div class="callout warn">
+    <strong>Idempotency สำคัญมาก:</strong> ทุก step ใน saga ต้องเป็น idempotent — รัน 2 ครั้งให้ผลเหมือนรัน 1 ครั้ง เพราะ message อาจถูกส่งซ้ำ ใช้ idempotency key ทุกครั้ง
+  </div>
+</div>
+
+<!-- OUTBOX PATTERN -->
+<div class="section">
+  <div class="section-title" style="color:#fb923c">📤 Outbox Pattern — ส่ง event ได้แน่นอน</div>
+  <div class="section-sub">แก้ปัญหา "save to DB แล้ว publish event ล้มเหลว"</div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>Transactional Outbox — atomic save + publish</span>
+      <span class="lang-tag">Go · Outbox</span>
+    </div>
+    <pre><code class="language-go">// ปัญหา: save order สำเร็จ แต่ publish event ล้มเหลว
+// → order ถูก create แต่ inventory ไม่รู้ → inconsistent
+func (s *OrderService) PlaceOrderBroken(o Order) error {
+    s.repo.Save(o)                    // ✓ saved
+    s.bus.Publish("order.placed", o)  // ✗ network error → event lost!
+    return nil
+}
+
+// ── Outbox: บันทึก event ใน DB transaction เดียวกับ data ──
+type OutboxEvent struct {
+    ID        string
+    Topic     string
+    Payload   []byte
+    CreatedAt time.Time
+    Published bool
+}
+
+func (s *OrderService) PlaceOrder(ctx context.Context, o Order) error {
+    return s.db.WithTransaction(ctx, func(tx *sql.Tx) error {
+        // 1. save order
+        if err := s.repo.SaveTx(tx, o); err != nil {
+            return err
+        }
+
+        // 2. save event ใน outbox table — transaction เดียวกัน
+        payload, _ := json.Marshal(OrderPlaced{OrderID: o.ID})
+        event := OutboxEvent{
+            ID: uuid.New().String(), Topic: "order.placed",
+            Payload: payload, CreatedAt: time.Now(),
+        }
+        return s.outboxRepo.SaveTx(tx, event)
+        // ถ้า step ใดล้มเหลว → rollback ทั้ง 2 → consistent
+    })
+}
+
+// Outbox Relay: process แยก poll outbox แล้วส่งจริง
+type OutboxRelay struct {
+    repo   OutboxRepo
+    bus    EventBus
+    ticker *time.Ticker
+}
+
+func (r *OutboxRelay) Run(ctx context.Context) {
+    for {
+        select {
+        case <-r.ticker.C:
+            events, _ := r.repo.FindUnpublished(ctx, 100)
+            for _, e := range events {
+                if err := r.bus.Publish(e.Topic, e.Payload); err != nil {
+                    continue // retry next tick
+                }
+                r.repo.MarkPublished(ctx, e.ID) // mark สำเร็จ
+            }
+        case <-ctx.Done():
+            return
+        }
+    }
+}</code></pre>
+  </div>
+
+  <div class="callout tip">
+    <strong>Outbox + Saga = Reliable Saga:</strong> Outbox รับประกันว่า event ถึง message broker แน่นอน, Saga รับประกันว่าระบบกลับสู่ consistent state — ใช้ร่วมกันสำหรับ distributed transaction ที่เชื่อถือได้
+  </div>
+</div>
+
+<div style="text-align:center;margin:3rem 0;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+  <a href="20-concurrency.html" style="display:inline-flex;align-items:center;gap:.5rem;background:#0d1117;border:1px solid #1e293b;color:#64748b;padding:.7rem 1.5rem;border-radius:10px;font-size:.88rem">← Concurrency Patterns</a>
+  <a href="22-observability.html" style="display:inline-flex;align-items:center;gap:.5rem;background:#0d1117;border:1px solid #fb923c40;color:#fdba74;padding:.7rem 1.5rem;border-radius:10px;font-weight:600;font-size:.88rem">Observability →</a>
+</div>
+
+</div>
+<script>hljs.highlightAll()</script>
+<script>
+document.querySelectorAll('.code-block').forEach(block => {
+  const header = block.querySelector('.code-header')
+  const code   = block.querySelector('code')
+  if (!header || !code) return
+  const btn = document.createElement('button')
+  btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span>Copy</span>`
+  btn.style.cssText = 'display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#94a3b8;font-size:.7rem;font-weight:600;padding:3px 10px;border-radius:6px;cursor:pointer;transition:all .15s;flex-shrink:0'
+  btn.addEventListener('mouseenter', () => { btn.style.background='rgba(255,255,255,.1)'; btn.style.color='#e2e8f0' })
+  btn.addEventListener('mouseleave', () => { if (!btn.dataset.copied) { btn.style.background='rgba(255,255,255,.06)'; btn.style.color='#94a3b8' } })
+  btn.addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(code.innerText) }
+    catch { const ta=document.createElement('textarea'); ta.value=code.innerText; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove() }
+    btn.dataset.copied='1'
+    btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fb923c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span style="color:#fb923c">Copied!</span>`
+    btn.style.background='rgba(249,115,22,.1)'; btn.style.borderColor='rgba(249,115,22,.3)'
+    setTimeout(() => {
+      delete btn.dataset.copied
+      btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span>Copy</span>`
+      btn.style.background='rgba(255,255,255,.06)'; btn.style.borderColor='rgba(255,255,255,.1)'; btn.style.color='#94a3b8'
+    }, 2000)
+  })
+  header.appendChild(btn)
+})
+</script>
+</body>
+</html>

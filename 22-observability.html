@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Observability — สื่อการสอน</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#07090f;color:#e2e8f0;line-height:1.7}
+a{color:#fb923c;text-decoration:none}
+a:hover{text-decoration:underline}
+
+.topnav{display:flex;align-items:center;gap:1rem;padding:1rem 2rem;background:#0d1117;border-bottom:1px solid #1e293b;position:sticky;top:0;z-index:100}
+.back-btn{display:flex;align-items:center;gap:.4rem;color:#64748b;font-size:.85rem;transition:color .2s}
+.back-btn:hover{color:#e2e8f0;text-decoration:none}
+.nav-title{color:#475569;font-size:.85rem}
+.nav-title span{color:#fdba74;font-weight:600}
+
+.hero{padding:4rem 2rem 3rem;text-align:center;background:linear-gradient(160deg,#07090f,#020e14)}
+.hero-badge{display:inline-block;background:rgba(6,182,212,.1);border:1px solid rgba(6,182,212,.3);color:#67e8f9;padding:.35rem 1rem;border-radius:999px;font-size:.8rem;font-weight:600;margin-bottom:1.5rem}
+.hero h1{font-size:clamp(1.8rem,4vw,3rem);font-weight:800;background:linear-gradient(135deg,#06b6d4 0%,#38bdf8 30%,#818cf8 60%,#a78bfa 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:1rem}
+.hero p{color:#64748b;max-width:640px;margin:0 auto;font-size:1rem}
+
+.content{max-width:960px;margin:0 auto;padding:2rem 1.5rem 5rem}
+.section{margin-bottom:4rem}
+.section-title{font-size:1.5rem;font-weight:700;margin-bottom:.4rem;display:flex;align-items:center;gap:.6rem}
+.section-sub{color:#475569;font-size:.9rem;margin-bottom:2rem;padding-left:2rem}
+
+.callout{background:#0f172a;border-left:3px solid #06b6d4;border-radius:0 8px 8px 0;padding:1rem 1.2rem;margin:1.5rem 0;font-size:.88rem;color:#94a3b8}
+.callout strong{color:#67e8f9}
+.callout.tip{border-left-color:#10b981}.callout.tip strong{color:#6ee7b7}
+.callout.warn{border-left-color:#f59e0b}.callout.warn strong{color:#fcd34d}
+
+.code-block{margin:1rem 0;border-radius:12px;overflow:hidden;border:1px solid #1e293b}
+.code-header{background:#111827;padding:.7rem 1rem;display:flex;justify-content:space-between;align-items:center}
+.code-header span{font-size:.78rem;color:#64748b;font-weight:600}
+.code-block pre{margin:0!important;border-radius:0!important;border:none!important;font-size:.82rem!important;line-height:1.6!important}
+
+.lang-bad {background:rgba(239,68,68,.12);color:#fca5a5;padding:.15rem .6rem;border-radius:4px;font-size:.72rem;font-weight:700}
+.lang-good{background:rgba(74,222,128,.12);color:#86efac;padding:.15rem .6rem;border-radius:4px;font-size:.72rem;font-weight:700}
+.lang-tag{background:rgba(6,182,212,.12);color:#67e8f9;padding:.15rem .6rem;border-radius:4px;font-size:.72rem;font-weight:700}
+
+.pillar-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:2rem 0}
+@media(max-width:600px){.pillar-grid{grid-template-columns:1fr}}
+.pillar{border-radius:14px;padding:1.4rem;border:1px solid var(--lc);background:var(--bg)}
+.pillar-icon{font-size:2rem;margin-bottom:.6rem}
+.pillar-name{font-size:1.1rem;font-weight:800;color:var(--lc);margin-bottom:.4rem}
+.pillar-desc{font-size:.82rem;color:#64748b;line-height:1.7}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="index.html" class="back-btn">← กลับหน้าหลัก</a>
+  <span class="nav-title">22 / <span>Observability</span></span>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">🔭 หัวข้อที่ 22</div>
+  <h1>Observability</h1>
+  <p>3 pillars — Logs, Metrics, Traces — รู้ว่าระบบทำอะไรอยู่ โดยไม่ต้องเดา ด้วย structured logging, Prometheus, และ OpenTelemetry</p>
+</div>
+
+<div class="content">
+
+<!-- 3 PILLARS -->
+<div class="section">
+  <div class="section-title" style="color:#06b6d4">🔭 3 Pillars of Observability</div>
+  <div class="section-sub">แต่ละ pillar ตอบคำถามต่างกัน — ใช้ร่วมกันถึงจะเข้าใจระบบได้สมบูรณ์</div>
+
+  <div class="pillar-grid">
+    <div class="pillar" style="--lc:#10b981;--bg:rgba(16,185,129,.05)">
+      <div class="pillar-icon">📄</div>
+      <div class="pillar-name">Logs</div>
+      <div class="pillar-desc">บันทึกเหตุการณ์ที่เกิดขึ้น — "WHAT happened"<br>ดี: debug รายละเอียด<br>ข้อจำกัด: มาก → แพง, ต้องค้นหา</div>
+    </div>
+    <div class="pillar" style="--lc:#f97316;--bg:rgba(249,115,22,.05)">
+      <div class="pillar-icon">📊</div>
+      <div class="pillar-name">Metrics</div>
+      <div class="pillar-desc">ตัวเลขสรุปที่วัดต่อเนื่อง — "HOW MUCH"<br>ดี: alert, dashboard, trend<br>ข้อจำกัด: รู้ว่าผิดแต่ไม่รู้ทำไม</div>
+    </div>
+    <div class="pillar" style="--lc:#a78bfa;--bg:rgba(167,139,250,.05)">
+      <div class="pillar-icon">🔗</div>
+      <div class="pillar-name">Traces</div>
+      <div class="pillar-desc">ติดตาม request ข้าม service — "WHERE slow"<br>ดี: หา bottleneck ใน distributed system<br>ข้อจำกัด: overhead, ต้อง instrument</div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>คำถามที่แต่ละ pillar ตอบ:</strong>
+    <strong>Logs</strong> → "ทำไม order #123 ถึงล้มเหลว?" &nbsp;|&nbsp;
+    <strong>Metrics</strong> → "error rate ชั่วโมงนี้เป็นเท่าไหร่?" &nbsp;|&nbsp;
+    <strong>Traces</strong> → "request ช้า — ช้าที่ service ไหน?"
+  </div>
+</div>
+
+<!-- STRUCTURED LOGGING -->
+<div class="section">
+  <div class="section-title" style="color:#10b981">📄 Structured Logging</div>
+  <div class="section-sub">log เป็น JSON แทน plain text — ค้นหา filter ได้ทันที</div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+    <div class="code-block" style="border-color:#ef444430">
+      <div class="code-header">
+        <span>❌ Unstructured log — ค้นหายาก</span>
+        <span class="lang-bad">ผิดหลักการ</span>
+      </div>
+      <pre><code class="language-go">// อ่านได้ แต่ machine parse ไม่ได้
+// ไม่มีโครงสร้าง → กรองข้าม service ไม่ได้
+fmt.Printf("Error: failed to process order %s for user %s: %v\n",
+    orderID, userID, err)
+
+log.Printf("[2024-01-15 10:30:00] INFO: Order %s placed, total=%.2f",
+    order.ID, order.Total)
+// ค้นหาทุก order ของ user "u123" → grep ยากมาก</code></pre>
+    </div>
+    <div class="code-block" style="border-color:#4ade8030">
+      <div class="code-header">
+        <span>✅ Structured logging ด้วย slog (Go 1.21+)</span>
+        <span class="lang-good">ถูกหลักการ</span>
+      </div>
+      <pre><code class="language-go">// slog — standard library ตั้งแต่ Go 1.21
+logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+    Level: slog.LevelInfo,
+}))
+
+// log พร้อม structured fields
+logger.Info("order_placed",
+    slog.String("order_id", order.ID),
+    slog.String("user_id",  order.UserID),
+    slog.Float64("total",   order.Total),
+    slog.String("trace_id", traceID),
+)
+// output: {"time":"...","level":"INFO","msg":"order_placed",
+//          "order_id":"o1","user_id":"u1","total":250.00,"trace_id":"abc"}
+
+// ค้นหาทุก event ของ user ด้วย:
+// grep '"user_id":"u1"' app.log | jq .</code></pre>
+    </div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>Logger ที่ดี — context propagation และ default fields</span>
+      <span class="lang-tag">Go · slog</span>
+    </div>
+    <pre><code class="language-go">// ── Logger Middleware: ใส่ request fields ให้ทุก log ────────
+func LoggingMiddleware(logger *slog.Logger) func(http.Handler) http.Handler {
+    return func(next http.Handler) http.Handler {
+        return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+            start := time.Now()
+
+            // สร้าง request-scoped logger พร้อม default fields
+            reqLogger := logger.With(
+                slog.String("trace_id",   r.Header.Get("X-Trace-ID")),
+                slog.String("method",     r.Method),
+                slog.String("path",       r.URL.Path),
+                slog.String("user_agent", r.UserAgent()),
+            )
+
+            // ใส่ logger ใน context
+            ctx := context.WithValue(r.Context(), logKey, reqLogger)
+            rw  := &responseWriter{ResponseWriter: w}
+
+            next.ServeHTTP(rw, r.WithContext(ctx))
+
+            reqLogger.Info("request_completed",
+                slog.Int("status",  rw.status),
+                slog.Int64("ms",    time.Since(start).Milliseconds()),
+                slog.Int("bytes",   rw.bytes),
+            )
+        })
+    }
+}
+
+// ดึง logger จาก context ใน handler/service
+func logFromCtx(ctx context.Context) *slog.Logger {
+    if l, ok := ctx.Value(logKey).(*slog.Logger); ok {
+        return l
+    }
+    return slog.Default()
+}
+
+// ── Log Levels ที่ถูกต้อง ─────────────────────────────────
+// DEBUG: developer detail — ปิดใน production
+logger.Debug("cache_miss", slog.String("key", key))
+
+// INFO: normal business event — order placed, user login
+logger.Info("payment_processed", slog.String("order_id", id))
+
+// WARN: unexpected แต่ recover ได้ — retry, fallback
+logger.Warn("upstream_slow", slog.Int64("ms", latency), slog.String("host", host))
+
+// ERROR: ต้องดูแล — db error, external API fail
+logger.Error("db_query_failed",
+    slog.String("query", query),
+    slog.String("error", err.Error()),
+)</code></pre>
+  </div>
+</div>
+
+<!-- METRICS -->
+<div class="section">
+  <div class="section-title" style="color:#f97316">📊 Metrics — Prometheus</div>
+  <div class="section-sub">ตัวเลขที่วัดต่อเนื่อง สำหรับ alert และ dashboard</div>
+
+  <div style="background:#0d1117;border:1px solid #1e293b;border-radius:14px;overflow:hidden;margin:1.5rem 0">
+    <div style="background:#111827;padding:10px 20px;display:grid;grid-template-columns:100px 1fr 1.5fr;font-size:.77rem;font-weight:700;color:#64748b;gap:12px">
+      <div>ชนิด</div><div>คือ</div><div>ใช้กับ</div>
+    </div>
+    <div style="display:grid;grid-template-columns:100px 1fr 1.5fr;padding:10px 20px;font-size:.82rem;border-bottom:1px solid #0f172a;gap:12px;align-items:center">
+      <div style="color:#34d399;font-weight:700">Counter</div>
+      <div style="color:#94a3b8">นับขึ้นอย่างเดียว (0, 1, 2, ...)</div>
+      <div style="color:#64748b">requests_total, errors_total, orders_created</div>
+    </div>
+    <div style="display:grid;grid-template-columns:100px 1fr 1.5fr;padding:10px 20px;font-size:.82rem;border-bottom:1px solid #0f172a;gap:12px;align-items:center">
+      <div style="color:#60a5fa;font-weight:700">Gauge</div>
+      <div style="color:#94a3b8">ขึ้นลงได้</div>
+      <div style="color:#64748b">goroutines_active, memory_used, queue_size</div>
+    </div>
+    <div style="display:grid;grid-template-columns:100px 1fr 1.5fr;padding:10px 20px;font-size:.82rem;gap:12px;align-items:center">
+      <div style="color:#a78bfa;font-weight:700">Histogram</div>
+      <div style="color:#94a3b8">กระจาย value ใน buckets</div>
+      <div style="color:#64748b">request_duration_seconds, response_size_bytes</div>
+    </div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>Prometheus metrics ใน Go — RED Method</span>
+      <span class="lang-tag">Go · Prometheus</span>
+    </div>
+    <pre><code class="language-go">// ── RED Method: Rate, Errors, Duration ───────────────────────
+// 3 metrics ที่สำคัญที่สุดสำหรับ service
+
+var (
+    // Rate: จำนวน request ต่อวินาที
+    httpRequestsTotal = prometheus.NewCounterVec(
+        prometheus.CounterOpts{
+            Name: "http_requests_total",
+            Help: "Total HTTP requests",
+        },
+        []string{"method", "path", "status"},
+    )
+
+    // Duration: latency distribution
+    httpDuration = prometheus.NewHistogramVec(
+        prometheus.HistogramOpts{
+            Name:    "http_request_duration_seconds",
+            Help:    "HTTP request duration",
+            Buckets: []float64{.005, .01, .025, .05, .1, .25, .5, 1, 2.5, 5},
+        },
+        []string{"method", "path"},
+    )
+
+    // Business metric: order revenue
+    orderRevenue = prometheus.NewCounterVec(
+        prometheus.CounterOpts{
+            Name: "order_revenue_baht_total",
+            Help: "Total revenue from placed orders in Baht",
+        },
+        []string{"payment_method"},
+    )
+
+    // Gauge: active goroutines
+    activeWorkers = prometheus.NewGauge(prometheus.GaugeOpts{
+        Name: "worker_pool_active_workers",
+        Help: "Number of currently active workers",
+    })
+)
+
+func init() {
+    prometheus.MustRegister(httpRequestsTotal, httpDuration,
+        orderRevenue, activeWorkers)
+}
+
+// ── Middleware: record ทุก HTTP request ───────────────────────
+func MetricsMiddleware(next http.Handler) http.Handler {
+    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+        start := time.Now()
+        rw    := &responseWriter{ResponseWriter: w, status: 200}
+
+        next.ServeHTTP(rw, r)
+
+        duration := time.Since(start).Seconds()
+        status   := strconv.Itoa(rw.status)
+
+        httpRequestsTotal.WithLabelValues(r.Method, r.URL.Path, status).Inc()
+        httpDuration.WithLabelValues(r.Method, r.URL.Path).Observe(duration)
+    })
+}
+
+// ── Business metric ────────────────────────────────────────
+func (s *OrderService) PlaceOrder(o Order) error {
+    if err := s.repo.Save(o); err != nil {
+        return err
+    }
+    // record revenue metric
+    orderRevenue.WithLabelValues(o.PaymentMethod).Add(o.Total)
+    return nil
+}
+
+// ── Expose /metrics endpoint ──────────────────────────────
+http.Handle("/metrics", promhttp.Handler())
+
+// ── PromQL alerts ─────────────────────────────────────────
+// error rate สูงกว่า 5%:
+// rate(http_requests_total{status=~"5.."}[5m])
+//   / rate(http_requests_total[5m]) > 0.05
+
+// p99 latency สูงกว่า 1 วินาที:
+// histogram_quantile(0.99,
+//   rate(http_request_duration_seconds_bucket[5m])) > 1</code></pre>
+  </div>
+</div>
+
+<!-- DISTRIBUTED TRACING -->
+<div class="section">
+  <div class="section-title" style="color:#a78bfa">🔗 Distributed Tracing — OpenTelemetry</div>
+  <div class="section-sub">ติดตาม request ข้ามหลาย service ด้วย trace_id เดียวกัน</div>
+
+  <div style="background:linear-gradient(135deg,#100820,#180d30);border:1px solid #a78bfa30;border-radius:12px;padding:1.2rem 1.4rem;margin-bottom:1.5rem">
+    <div style="font-size:.83rem;color:#94a3b8;line-height:1.8">
+      <span style="color:#c4b5fd;font-weight:700">ปัญหา:</span> user report ว่า checkout ช้า — มี 5 service ในเส้นทาง ไม่รู้ว่าช้าที่ไหน logs แต่ละ service ดูแยกกัน<br>
+      <span style="color:#c4b5fd;font-weight:700">Trace:</span> ทุก request ได้ <strong>trace_id</strong> เดียวกันตลอด — แต่ละ service สร้าง <strong>span</strong> บอก ว่าทำอะไร เริ่ม-จบตอนไหน ทำให้เห็น waterfall diagram
+    </div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>OpenTelemetry — instrument Go service</span>
+      <span class="lang-tag">Go · OpenTelemetry</span>
+    </div>
+    <pre><code class="language-go">// ── Setup: init tracer ──────────────────────────────────────
+func initTracer(serviceName string) (*sdktrace.TracerProvider, error) {
+    exporter, err := otlptracehttp.New(context.Background(),
+        otlptracehttp.WithEndpoint("otel-collector:4318"),
+        otlptracehttp.WithInsecure(),
+    )
+    if err != nil { return nil, err }
+
+    tp := sdktrace.NewTracerProvider(
+        sdktrace.WithBatcher(exporter),
+        sdktrace.WithResource(resource.NewWithAttributes(
+            semconv.SchemaURL,
+            semconv.ServiceName(serviceName),
+            semconv.ServiceVersion("1.0.0"),
+        )),
+        sdktrace.WithSampler(sdktrace.ParentBased(
+            sdktrace.TraceIDRatioBased(0.1), // sample 10%
+        )),
+    )
+    otel.SetTracerProvider(tp)
+    otel.SetTextMapPropagator(propagation.TraceContext{})
+    return tp, nil
+}
+
+// ── HTTP Middleware: ส่งและรับ trace context ─────────────────
+func TracingMiddleware(next http.Handler) http.Handler {
+    return otelhttp.NewHandler(next, "http_server",
+        otelhttp.WithTracerProvider(otel.GetTracerProvider()),
+    )
+}
+
+// ── Instrument business logic ─────────────────────────────
+var tracer = otel.Tracer("order-service")
+
+func (s *OrderService) PlaceOrder(ctx context.Context, o Order) error {
+    // สร้าง span ครอบ operation
+    ctx, span := tracer.Start(ctx, "OrderService.PlaceOrder",
+        trace.WithAttributes(
+            attribute.String("order.id",   o.ID),
+            attribute.Float64("order.total", o.Total),
+        ),
+    )
+    defer span.End()
+
+    // nested span สำหรับ DB operation
+    ctx, dbSpan := tracer.Start(ctx, "OrderRepository.Save")
+    if err := s.repo.Save(ctx, o); err != nil {
+        dbSpan.RecordError(err)
+        dbSpan.SetStatus(codes.Error, err.Error())
+        dbSpan.End()
+        span.RecordError(err)
+        return err
+    }
+    dbSpan.End()
+
+    // span สำหรับ outgoing HTTP call
+    ctx, notifySpan := tracer.Start(ctx, "NotificationService.Notify")
+    s.notifier.Notify(ctx, o) // trace context propagated via HTTP header
+    notifySpan.End()
+
+    span.SetAttributes(attribute.Bool("order.completed", true))
+    return nil
+}
+
+// ── HTTP Client: propagate trace context ─────────────────────
+func (n *HTTPNotifier) Notify(ctx context.Context, o Order) error {
+    req, _ := http.NewRequestWithContext(ctx, "POST",
+        "http://notification-svc/notify", encodeOrder(o))
+
+    // inject trace context ใน header: traceparent: 00-{traceID}-{spanID}-01
+    otel.GetTextMapPropagator().Inject(ctx, propagation.HeaderCarrier(req.Header))
+
+    _, err := http.DefaultClient.Do(req)
+    return err
+}</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>Correlate ทั้ง 3 pillars — trace_id เชื่อม logs + traces + metrics</span>
+      <span class="lang-tag">Go · Correlation</span>
+    </div>
+    <pre><code class="language-go">// ── Middleware ที่รวม Logs + Traces + Metrics ─────────────────
+func ObservabilityMiddleware(
+    logger  *slog.Logger,
+    metrics *Metrics,
+) func(http.Handler) http.Handler {
+    return func(next http.Handler) http.Handler {
+        return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+            start := time.Now()
+
+            // ดึง trace context จาก request
+            ctx    := r.Context()
+            span   := trace.SpanFromContext(ctx)
+            traceID := span.SpanContext().TraceID().String()
+            spanID  := span.SpanContext().SpanID().String()
+
+            // สร้าง logger ที่มี trace_id ติดไปด้วย → correlate กับ trace
+            reqLogger := logger.With(
+                slog.String("trace_id", traceID),
+                slog.String("span_id",  spanID),
+                slog.String("path",     r.URL.Path),
+            )
+            ctx = context.WithValue(ctx, logKey, reqLogger)
+
+            rw := &responseWriter{ResponseWriter: w, status: 200}
+            next.ServeHTTP(rw, r.WithContext(ctx))
+
+            duration := time.Since(start)
+
+            // Log — มี trace_id
+            reqLogger.Info("request",
+                slog.Int("status", rw.status),
+                slog.Int64("ms",   duration.Milliseconds()),
+            )
+
+            // Metric — label ด้วย status
+            metrics.Duration.WithLabelValues(
+                r.Method,
+                strconv.Itoa(rw.status),
+            ).Observe(duration.Seconds())
+
+            // Span attribute — เชื่อม trace กับ log
+            span.SetAttributes(
+                attribute.Int("http.status_code", rw.status),
+                attribute.Int64("http.duration_ms", duration.Milliseconds()),
+            )
+        })
+    }
+}</code></pre>
+  </div>
+</div>
+
+<!-- GOLDEN SIGNALS + ALERT -->
+<div class="section">
+  <div class="section-title" style="color:#06b6d4">📌 Golden Signals & Alerting</div>
+  <div class="section-sub">4 metrics ที่ต้อง monitor ทุก service</div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin:1.5rem 0">
+    <div style="background:#0d1117;border:1px solid #1e293b;border-left:3px solid #34d399;border-radius:12px;padding:16px">
+      <div style="font-size:.8rem;font-weight:700;color:#34d399;margin-bottom:8px">📈 Latency</div>
+      <div style="font-size:.8rem;color:#64748b;line-height:1.8">เวลาตอบสนอง — แยก success vs error<br><code style="color:#86efac;font-size:.75rem">p50, p95, p99</code></div>
+    </div>
+    <div style="background:#0d1117;border:1px solid #1e293b;border-left:3px solid #60a5fa;border-radius:12px;padding:16px">
+      <div style="font-size:.8rem;font-weight:700;color:#60a5fa;margin-bottom:8px">🔢 Traffic</div>
+      <div style="font-size:.8rem;color:#64748b;line-height:1.8">จำนวน request ต่อวินาที<br><code style="color:#93c5fd;font-size:.75rem">rate(requests_total[1m])</code></div>
+    </div>
+    <div style="background:#0d1117;border:1px solid #1e293b;border-left:3px solid #ef4444;border-radius:12px;padding:16px">
+      <div style="font-size:.8rem;font-weight:700;color:#ef4444;margin-bottom:8px">❌ Errors</div>
+      <div style="font-size:.8rem;color:#64748b;line-height:1.8">สัดส่วน error ต่อ request ทั้งหมด<br><code style="color:#fca5a5;font-size:.75rem">errors/total &gt; 1%</code></div>
+    </div>
+    <div style="background:#0d1117;border:1px solid #1e293b;border-left:3px solid #fbbf24;border-radius:12px;padding:16px">
+      <div style="font-size:.8rem;font-weight:700;color:#fbbf24;margin-bottom:8px">🗜️ Saturation</div>
+      <div style="font-size:.8rem;color:#64748b;line-height:1.8">ระบบใกล้เต็ม capacity ไหม<br><code style="color:#fde68a;font-size:.75rem">CPU, memory, goroutines</code></div>
+    </div>
+  </div>
+
+  <div class="callout tip">
+    <strong>Stack แนะนำ:</strong>
+    Logs → <strong>slog</strong> + <strong>Loki</strong> (หรือ CloudWatch) &nbsp;|&nbsp;
+    Metrics → <strong>Prometheus</strong> + <strong>Grafana</strong> &nbsp;|&nbsp;
+    Traces → <strong>OpenTelemetry</strong> + <strong>Jaeger / Tempo</strong><br>
+    ทั้งหมด correlate กันด้วย <strong>trace_id</strong> ที่ใส่ใน log และ span attribute
+  </div>
+
+  <div class="callout warn">
+    <strong>Observability ≠ Monitoring:</strong> Monitoring คือ "รู้ว่าผิดพลาด" — Observability คือ "รู้ว่าทำไม ผิดพลาดโดยไม่ต้องแก้ code เพิ่ม" ต่างกันที่ <strong>cardinality ของ data และการ correlate</strong> ข้ามระบบ
+  </div>
+</div>
+
+<div style="text-align:center;margin:3rem 0;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+  <a href="21-saga.html" style="display:inline-flex;align-items:center;gap:.5rem;background:#0d1117;border:1px solid #1e293b;color:#64748b;padding:.7rem 1.5rem;border-radius:10px;font-size:.88rem">← Saga Pattern</a>
+  <a href="index.html" style="display:inline-flex;align-items:center;gap:.5rem;background:#0d1117;border:1px solid #06b6d440;color:#67e8f9;padding:.7rem 1.5rem;border-radius:10px;font-weight:600;font-size:.88rem">กลับหน้าหลัก →</a>
+</div>
+
+</div>
+<script>hljs.highlightAll()</script>
+<script>
+document.querySelectorAll('.code-block').forEach(block => {
+  const header = block.querySelector('.code-header')
+  const code   = block.querySelector('code')
+  if (!header || !code) return
+  const btn = document.createElement('button')
+  btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span>Copy</span>`
+  btn.style.cssText = 'display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#94a3b8;font-size:.7rem;font-weight:600;padding:3px 10px;border-radius:6px;cursor:pointer;transition:all .15s;flex-shrink:0'
+  btn.addEventListener('mouseenter', () => { btn.style.background='rgba(255,255,255,.1)'; btn.style.color='#e2e8f0' })
+  btn.addEventListener('mouseleave', () => { if (!btn.dataset.copied) { btn.style.background='rgba(255,255,255,.06)'; btn.style.color='#94a3b8' } })
+  btn.addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(code.innerText) }
+    catch { const ta=document.createElement('textarea'); ta.value=code.innerText; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove() }
+    btn.dataset.copied='1'
+    btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span style="color:#06b6d4">Copied!</span>`
+    btn.style.background='rgba(6,182,212,.1)'; btn.style.borderColor='rgba(6,182,212,.3)'
+    setTimeout(() => {
+      delete btn.dataset.copied
+      btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span>Copy</span>`
+      btn.style.background='rgba(255,255,255,.06)'; btn.style.borderColor='rgba(255,255,255,.1)'; btn.style.color='#94a3b8'
+    }, 2000)
+  })
+  header.appendChild(btn)
+})
+</script>
+</body>
+</html>

@@ -51,7 +51,7 @@ footer{text-align:center;padding:2rem;color:#334155;font-size:.82rem;border-top:
 <body>
 
 <div class="hero">
-  <div class="badge">📚 สื่อการสอน Software Architecture · 17 หัวข้อ</div>
+  <div class="badge">📚 สื่อการสอน Software Architecture · 22 หัวข้อ</div>
   <h1>Software Design &amp; Architecture Patterns</h1>
   <p class="hero-sub">เรียนรู้หลักการออกแบบซอฟต์แวร์ที่สำคัญ พร้อมภาพ diagram, ตัวอย่าง code ภาษา Go อย่างละเอียด</p>
   <div class="stack-chips">
@@ -59,12 +59,22 @@ footer{text-align:center;padding:2rem;color:#334155;font-size:.82rem;border-top:
     <span class="chip">⚡ Events</span><span class="chip">⬡ Hexagonal</span>
     <span class="chip">⚛️ Atomic</span><span class="chip">🔀 BFF</span>
     <span class="chip">🏗️ Microservices</span><span class="chip">🔄 CQRS</span>
+    <span class="chip">🎨 GoF Patterns</span><span class="chip">🧪 Testing</span>
+    <span class="chip">⚡ Concurrency</span><span class="chip">🔭 Observability</span>
   </div>
 </div>
 
 <!-- ── CATEGORY 1: Design Principles ── -->
 <div class="cat-label">🏛️ Design Principles &amp; Patterns</div>
 <div class="grid">
+
+  <a href="18-design-patterns.html" class="card" style="--c:linear-gradient(90deg,#8b5cf6,#a78bfa)">
+    <div class="card-num">18</div><span class="card-icon">🎨</span>
+    <h2>Design Patterns (GoF)</h2>
+    <p>Factory, Builder, Decorator, Strategy, Observer, Chain of Responsibility — 6 patterns จาก Gang of Four ที่ใช้บ่อยที่สุด พร้อมตัวอย่าง Go</p>
+    <div class="tags"><span class="tag">Creational</span><span class="tag">Structural</span><span class="tag">Behavioral</span><span class="tag">GoF</span></div>
+    <span class="arrow">→</span>
+  </a>
 
   <a href="17-solid.html" class="card" style="--c:linear-gradient(90deg,#f97316,#fbbf24)">
     <div class="card-num">17</div><span class="card-icon">🔷</span>
@@ -114,6 +124,14 @@ footer{text-align:center;padding:2rem;color:#334155;font-size:.82rem;border-top:
     <span class="arrow">→</span>
   </a>
 
+  <a href="19-testing.html" class="card" style="--c:linear-gradient(90deg,#10b981,#34d399)">
+    <div class="card-num">19</div><span class="card-icon">🧪</span>
+    <h2>Testing Patterns</h2>
+    <p>Test Pyramid, TDD (Red-Green-Refactor), Test Doubles (Stub/Mock/Fake/Spy), Table-driven Tests และ Integration Tests ใน Go</p>
+    <div class="tags"><span class="tag">TDD</span><span class="tag">Mock</span><span class="tag">Table Tests</span><span class="tag">Integration</span></div>
+    <span class="arrow">→</span>
+  </a>
+
 </div>
 
 <!-- ── CATEGORY 2: Architecture Styles ── -->
@@ -149,6 +167,20 @@ footer{text-align:center;padding:2rem;color:#334155;font-size:.82rem;border-top:
     <h2>Service-Oriented Architecture</h2>
     <p>SOA — แบ่งระบบเป็น Services ที่สื่อสารผ่าน Standard Protocol เช่น SOAP/REST ผ่าน Enterprise Service Bus</p>
     <div class="tags"><span class="tag">Services</span><span class="tag">ESB</span><span class="tag">Registry</span><span class="tag">Contract</span></div>
+    <span class="arrow">→</span>
+  </a>
+
+</div>
+
+<!-- ── CATEGORY 2.5: Go Concurrency ── -->
+<div class="cat-label">⚡ Go Concurrency Patterns</div>
+<div class="grid">
+
+  <a href="20-concurrency.html" class="card" style="--c:linear-gradient(90deg,#38bdf8,#818cf8)">
+    <div class="card-num">20</div><span class="card-icon">⚡</span>
+    <h2>Go Concurrency Patterns</h2>
+    <p>Worker Pool, Pipeline, Fan-out/Fan-in, Semaphore และ Context cancellation — ใช้ Goroutine + Channel อย่างปลอดภัยและไม่ leak</p>
+    <div class="tags"><span class="tag">Worker Pool</span><span class="tag">Pipeline</span><span class="tag">Fan-out</span><span class="tag">Context</span></div>
     <span class="arrow">→</span>
   </a>
 
@@ -190,6 +222,14 @@ footer{text-align:center;padding:2rem;color:#334155;font-size:.82rem;border-top:
     <span class="arrow">→</span>
   </a>
 
+  <a href="21-saga.html" class="card" style="--c:linear-gradient(90deg,#fb923c,#ef4444)">
+    <div class="card-num">21</div><span class="card-icon">📜</span>
+    <h2>Saga Pattern</h2>
+    <p>Distributed Transaction ใน Microservices — Choreography vs Orchestration, Compensating Transactions และ Outbox Pattern</p>
+    <div class="tags"><span class="tag">Choreography</span><span class="tag">Orchestration</span><span class="tag">Outbox</span><span class="tag">Compensation</span></div>
+    <span class="arrow">→</span>
+  </a>
+
 </div>
 
 <!-- ── CATEGORY 3.5: Infrastructure ── -->
@@ -201,6 +241,14 @@ footer{text-align:center;padding:2rem;color:#334155;font-size:.82rem;border-top:
     <h2>Kubernetes (K8s)</h2>
     <p>Container Orchestration — จัดการ, scale, และ deploy containers อัตโนมัติ พร้อม Learning Path ทีละ step, YAML examples, kubectl cheatsheet, และ Go client-go</p>
     <div class="tags"><span class="tag">Pod</span><span class="tag">Deployment</span><span class="tag">Service</span><span class="tag">HPA</span><span class="tag">Ingress</span></div>
+    <span class="arrow">→</span>
+  </a>
+
+  <a href="22-observability.html" class="card" style="--c:linear-gradient(90deg,#06b6d4,#818cf8)">
+    <div class="card-num">22</div><span class="card-icon">🔭</span>
+    <h2>Observability</h2>
+    <p>3 Pillars — Logs (slog), Metrics (Prometheus), Traces (OpenTelemetry) — รู้ว่าระบบเป็นอย่างไรโดยไม่ต้องเดา พร้อม Golden Signals</p>
+    <div class="tags"><span class="tag">Logs</span><span class="tag">Metrics</span><span class="tag">Tracing</span><span class="tag">OpenTelemetry</span></div>
     <span class="arrow">→</span>
   </a>
 
@@ -228,6 +276,6 @@ footer{text-align:center;padding:2rem;color:#334155;font-size:.82rem;border-top:
 
 </div>
 
-<footer>สื่อการสอน Software Architecture Patterns &nbsp;·&nbsp; Code ตัวอย่างใช้ภาษา Go &nbsp;·&nbsp; 17 หัวข้อ</footer>
+<footer>สื่อการสอน Software Architecture Patterns &nbsp;·&nbsp; Code ตัวอย่างใช้ภาษา Go &nbsp;·&nbsp; 22 หัวข้อ</footer>
 </body>
 </html>

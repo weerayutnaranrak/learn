@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Go Concurrency Patterns — สื่อการสอน</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#07090f;color:#e2e8f0;line-height:1.7}
+a{color:#fb923c;text-decoration:none}
+a:hover{text-decoration:underline}
+
+.topnav{display:flex;align-items:center;gap:1rem;padding:1rem 2rem;background:#0d1117;border-bottom:1px solid #1e293b;position:sticky;top:0;z-index:100}
+.back-btn{display:flex;align-items:center;gap:.4rem;color:#64748b;font-size:.85rem;transition:color .2s}
+.back-btn:hover{color:#e2e8f0;text-decoration:none}
+.nav-title{color:#475569;font-size:.85rem}
+.nav-title span{color:#fdba74;font-weight:600}
+
+.hero{padding:4rem 2rem 3rem;text-align:center;background:linear-gradient(160deg,#07090f,#040e18)}
+.hero-badge{display:inline-block;background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.3);color:#7dd3fc;padding:.35rem 1rem;border-radius:999px;font-size:.8rem;font-weight:600;margin-bottom:1.5rem}
+.hero h1{font-size:clamp(1.8rem,4vw,3rem);font-weight:800;background:linear-gradient(135deg,#38bdf8 0%,#60a5fa 40%,#818cf8 70%,#a78bfa 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:1rem}
+.hero p{color:#64748b;max-width:640px;margin:0 auto;font-size:1rem}
+
+.content{max-width:960px;margin:0 auto;padding:2rem 1.5rem 5rem}
+.section{margin-bottom:4rem}
+.section-title{font-size:1.5rem;font-weight:700;margin-bottom:.4rem;display:flex;align-items:center;gap:.6rem}
+.section-sub{color:#475569;font-size:.9rem;margin-bottom:2rem;padding-left:2rem}
+
+.callout{background:#0f172a;border-left:3px solid #38bdf8;border-radius:0 8px 8px 0;padding:1rem 1.2rem;margin:1.5rem 0;font-size:.88rem;color:#94a3b8}
+.callout strong{color:#7dd3fc}
+.callout.warn{border-left-color:#f59e0b}.callout.warn strong{color:#fcd34d}
+.callout.danger{border-left-color:#ef4444}.callout.danger strong{color:#fca5a5}
+
+.code-block{margin:1rem 0;border-radius:12px;overflow:hidden;border:1px solid #1e293b}
+.code-header{background:#111827;padding:.7rem 1rem;display:flex;justify-content:space-between;align-items:center}
+.code-header span{font-size:.78rem;color:#64748b;font-weight:600}
+.code-block pre{margin:0!important;border-radius:0!important;border:none!important;font-size:.82rem!important;line-height:1.6!important}
+
+.lang-bad {background:rgba(239,68,68,.12);color:#fca5a5;padding:.15rem .6rem;border-radius:4px;font-size:.72rem;font-weight:700}
+.lang-good{background:rgba(74,222,128,.12);color:#86efac;padding:.15rem .6rem;border-radius:4px;font-size:.72rem;font-weight:700}
+.lang-tag{background:rgba(56,189,248,.12);color:#7dd3fc;padding:.15rem .6rem;border-radius:4px;font-size:.72rem;font-weight:700}
+
+.pattern-nav{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:2rem 0}
+@media(min-width:600px){.pattern-nav{grid-template-columns:repeat(5,1fr)}}
+.pattern-nav a{background:#0d1117;border:1px solid #1e293b;border-radius:12px;padding:14px 8px;text-align:center;text-decoration:none;transition:transform .2s,border-color .2s}
+.pattern-nav a:hover{transform:translateY(-3px);border-color:var(--sc)}
+.pattern-nav .p-icon{font-size:1.5rem;line-height:1}
+.pattern-nav .p-name{font-size:.65rem;color:#64748b;margin-top:4px;line-height:1.3}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="index.html" class="back-btn">← กลับหน้าหลัก</a>
+  <span class="nav-title">20 / <span>Go Concurrency Patterns</span></span>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">⚡ หัวข้อที่ 20</div>
+  <h1>Go Concurrency Patterns</h1>
+  <p>"Do not communicate by sharing memory; instead, share memory by communicating." — Pike. Worker Pool, Pipeline, Fan-out/Fan-in, Semaphore และ Context cancellation</p>
+</div>
+
+<div class="content">
+
+<!-- OVERVIEW -->
+<div class="section">
+  <div class="section-title" style="color:#38bdf8">📋 ภาพรวม</div>
+  <div class="section-sub">Goroutine + Channel คือเครื่องมือหลัก — patterns ช่วยจัดระเบียบการใช้</div>
+
+  <div class="pattern-nav">
+    <a href="#worker-pool" style="--sc:#38bdf8">
+      <div class="p-icon">👷</div>
+      <div class="p-name">Worker Pool</div>
+    </a>
+    <a href="#pipeline" style="--sc:#4ade80">
+      <div class="p-icon">🔀</div>
+      <div class="p-name">Pipeline</div>
+    </a>
+    <a href="#fanout" style="--sc:#a78bfa">
+      <div class="p-icon">📡</div>
+      <div class="p-name">Fan-out/Fan-in</div>
+    </a>
+    <a href="#semaphore" style="--sc:#fbbf24">
+      <div class="p-icon">🚦</div>
+      <div class="p-name">Semaphore</div>
+    </a>
+    <a href="#context" style="--sc:#f472b6">
+      <div class="p-icon">🛑</div>
+      <div class="p-name">Context Cancel</div>
+    </a>
+  </div>
+
+  <div class="callout">
+    <strong>Goroutine vs Thread:</strong> Goroutine เริ่มต้นที่ ~2KB stack (thread ~1MB), Go runtime schedule เอง — spawn หลายแสนตัวได้โดยไม่ OOM แต่ต้องระวัง goroutine leak
+  </div>
+</div>
+
+<!-- WORKER POOL -->
+<div class="section" id="worker-pool">
+  <div class="section-title" style="color:#38bdf8">👷 Worker Pool</div>
+  <div class="section-sub">จำกัดจำนวน goroutine ที่ทำงานพร้อมกัน — ป้องกัน resource exhaustion</div>
+
+  <div style="background:linear-gradient(135deg,#040e18,#071620);border:1px solid #38bdf830;border-radius:12px;padding:1.2rem 1.4rem;margin-bottom:1.5rem">
+    <div style="font-size:.83rem;color:#94a3b8;line-height:1.8">
+      <span style="color:#7dd3fc;font-weight:700">ปัญหา:</span> ถ้า spawn goroutine 1 ตัวต่อ job โดยไม่จำกัด — เมื่อ job เยอะมาก goroutine จะมากจนกิน memory หรือทำให้ DB connection pool หมด<br>
+      <span style="color:#7dd3fc;font-weight:700">วิธีแก้:</span> สร้าง worker N ตัวที่รับงานจาก channel — queue ยาวแค่ไหนก็ประมวลผลทีละ N งาน
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+    <div class="code-block" style="border-color:#ef444430">
+      <div class="code-header">
+        <span>❌ Goroutine ไม่จำกัด — อันตราย</span>
+        <span class="lang-bad">ผิดหลักการ</span>
+      </div>
+      <pre><code class="language-go">// ถ้า orders มี 100,000 รายการ
+// → spawn 100,000 goroutines พร้อมกัน
+// → OOM หรือ DB connection หมด
+for _, order := range orders {
+    go processOrder(order) // ☠️ ไม่มีขีดจำกัด
+}</code></pre>
+    </div>
+    <div class="code-block" style="border-color:#4ade8030">
+      <div class="code-header">
+        <span>✅ Worker Pool — จำกัด 10 goroutine</span>
+        <span class="lang-good">ถูกหลักการ</span>
+      </div>
+      <pre><code class="language-go">func ProcessOrders(orders []Order, workers int) {
+    jobs := make(chan Order, len(orders))
+
+    // สร้าง worker pool
+    var wg sync.WaitGroup
+    for i := 0; i < workers; i++ {
+        wg.Add(1)
+        go func() {
+            defer wg.Done()
+            for order := range jobs { // รับงานจาก channel
+                processOrder(order)
+            }
+        }()
+    }
+
+    // ส่งงานเข้า channel
+    for _, o := range orders {
+        jobs <- o
+    }
+    close(jobs) // บอก workers ว่าไม่มีงานแล้ว
+    wg.Wait()   // รอทุก worker เสร็จ
+}
+
+// ใช้: จำกัดแค่ 10 goroutine ไม่ว่า orders จะมีแค่ไหน
+ProcessOrders(orders, 10)</code></pre>
+    </div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>Worker Pool พร้อม result collection และ error handling</span>
+      <span class="lang-tag">Go · Production-ready</span>
+    </div>
+    <pre><code class="language-go">type Result struct {
+    OrderID string
+    Err     error
+}
+
+func ProcessOrdersConcurrent(
+    ctx context.Context,
+    orders []Order,
+    workers int,
+) []Result {
+    jobs    := make(chan Order, len(orders))
+    results := make(chan Result, len(orders))
+
+    // Worker pool
+    var wg sync.WaitGroup
+    for i := 0; i < workers; i++ {
+        wg.Add(1)
+        go func() {
+            defer wg.Done()
+            for order := range jobs {
+                select {
+                case <-ctx.Done(): // หยุดถ้า context cancel
+                    results <- Result{OrderID: order.ID, Err: ctx.Err()}
+                default:
+                    err := processOrder(order)
+                    results <- Result{OrderID: order.ID, Err: err}
+                }
+            }
+        }()
+    }
+
+    // ส่งงาน
+    for _, o := range orders { jobs <- o }
+    close(jobs)
+
+    // รอ workers แล้วปิด results
+    go func() { wg.Wait(); close(results) }()
+
+    // รวบรวม results
+    var out []Result
+    for r := range results { out = append(out, r) }
+    return out
+}</code></pre>
+  </div>
+</div>
+
+<!-- PIPELINE -->
+<div class="section" id="pipeline">
+  <div class="section-title" style="color:#4ade80">🔀 Pipeline</div>
+  <div class="section-sub">เชื่อม goroutine เป็นสายพาน — แต่ละ stage รับจาก channel ก่อนหน้า ส่งออก channel ถัดไป</div>
+
+  <div style="background:linear-gradient(135deg,#041408,#081e0e);border:1px solid #4ade8030;border-radius:12px;padding:1.2rem 1.4rem;margin-bottom:1.5rem">
+    <div style="font-size:.83rem;color:#94a3b8;line-height:1.8">
+      <span style="color:#86efac;font-weight:700">ปัญหา:</span> data ต้องผ่านการประมวลผลหลายขั้นตอน (fetch → parse → validate → store) ถ้าทำ sequential ต้องรอแต่ละ batch เสร็จก่อน<br>
+      <span style="color:#86efac;font-weight:700">วิธีแก้:</span> Pipeline ทำให้แต่ละ stage ทำงานพร้อมกัน — stage 2 เริ่มได้ทันทีที่ stage 1 มี output แรก ไม่ต้องรอ batch เสร็จ
+    </div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>Pipeline 3 stage: Generate → Transform → Sink</span>
+      <span class="lang-tag">Go · Pipeline</span>
+    </div>
+    <pre><code class="language-go">// Stage 1: Generate — อ่านข้อมูลจากที่ไหนสักที่
+func generate(ctx context.Context, nums ...int) <-chan int {
+    out := make(chan int)
+    go func() {
+        defer close(out)
+        for _, n := range nums {
+            select {
+            case out <- n:
+            case <-ctx.Done(): return
+            }
+        }
+    }()
+    return out
+}
+
+// Stage 2: Transform — แปลงข้อมูล
+func square(ctx context.Context, in <-chan int) <-chan int {
+    out := make(chan int)
+    go func() {
+        defer close(out)
+        for n := range in {
+            select {
+            case out <- n * n:
+            case <-ctx.Done(): return
+            }
+        }
+    }()
+    return out
+}
+
+// Stage 3: Filter
+func onlyEven(ctx context.Context, in <-chan int) <-chan int {
+    out := make(chan int)
+    go func() {
+        defer close(out)
+        for n := range in {
+            if n%2 == 0 {
+                select {
+                case out <- n:
+                case <-ctx.Done(): return
+                }
+            }
+        }
+    }()
+    return out
+}
+
+// Wire-up pipeline — แต่ละ stage ทำงาน concurrently
+func main() {
+    ctx, cancel := context.WithCancel(context.Background())
+    defer cancel()
+
+    // chain: generate → square → filter
+    c := generate(ctx, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+    c  = square(ctx, c)
+    c  = onlyEven(ctx, c)
+
+    for v := range c {
+        fmt.Println(v) // 4, 16, 36, 64, 100
+    }
+}
+
+// Real-world: CSV import pipeline
+// readLines → parseCSV → validateRow → saveToDb</code></pre>
+  </div>
+</div>
+
+<!-- FAN-OUT FAN-IN -->
+<div class="section" id="fanout">
+  <div class="section-title" style="color:#a78bfa">📡 Fan-out / Fan-in</div>
+  <div class="section-sub">กระจายงานให้หลาย goroutine (fan-out) แล้วรวม result กลับมา (fan-in)</div>
+
+  <div style="background:linear-gradient(135deg,#100820,#180d30);border:1px solid #a78bfa30;border-radius:12px;padding:1.2rem 1.4rem;margin-bottom:1.5rem">
+    <div style="font-size:.83rem;color:#94a3b8;line-height:1.8">
+      <span style="color:#c4b5fd;font-weight:700">Fan-out:</span> แบ่งงานจาก 1 channel ให้ worker หลายตัวทำงานพร้อมกัน — ใช้เมื่อ stage ใดช้าเป็นพิเศษ<br>
+      <span style="color:#c4b5fd;font-weight:700">Fan-in (Merge):</span> รวม output จากหลาย channel กลับมาเป็น 1 channel — ใช้หลัง fan-out เพื่อรับ result ทั้งหมด
+    </div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>Fan-out / Fan-in — call 3 external APIs พร้อมกัน</span>
+      <span class="lang-tag">Go · Fan-out/Fan-in</span>
+    </div>
+    <pre><code class="language-go">// merge รวม channel หลายอันเป็น 1
+func merge(ctx context.Context, cs ...<-chan Result) <-chan Result {
+    var wg sync.WaitGroup
+    merged := make(chan Result, len(cs))
+
+    output := func(c <-chan Result) {
+        defer wg.Done()
+        for r := range c {
+            select {
+            case merged <- r:
+            case <-ctx.Done(): return
+            }
+        }
+    }
+
+    wg.Add(len(cs))
+    for _, c := range cs { go output(c) }
+
+    go func() { wg.Wait(); close(merged) }()
+    return merged
+}
+
+// ── Real-world: pricing engine ────────────────────────────
+// ราคาต้องมาจาก 3 provider — เอาราคาต่ำสุด
+type PriceResult struct {
+    Provider string
+    Price    float64
+    Err      error
+}
+
+func fetchPrice(ctx context.Context, provider, sku string) <-chan PriceResult {
+    out := make(chan PriceResult, 1)
+    go func() {
+        defer close(out)
+        // ไปดึงราคาจาก external API
+        price, err := callPricingAPI(ctx, provider, sku)
+        out <- PriceResult{Provider: provider, Price: price, Err: err}
+    }()
+    return out
+}
+
+func GetBestPrice(ctx context.Context, sku string) (float64, error) {
+    // Fan-out: call 3 providers พร้อมกัน
+    ch1 := fetchPrice(ctx, "provider_a", sku)
+    ch2 := fetchPrice(ctx, "provider_b", sku)
+    ch3 := fetchPrice(ctx, "provider_c", sku)
+
+    // Fan-in: รับ result ทั้งหมด
+    results := merge(ctx, ch1, ch2, ch3)
+
+    best := math.MaxFloat64
+    for r := range results {
+        if r.Err == nil && r.Price < best {
+            best = r.Price
+        }
+    }
+    if best == math.MaxFloat64 {
+        return 0, errors.New("no price available")
+    }
+    return best, nil
+}</code></pre>
+  </div>
+</div>
+
+<!-- SEMAPHORE -->
+<div class="section" id="semaphore">
+  <div class="section-title" style="color:#fbbf24">🚦 Semaphore</div>
+  <div class="section-sub">จำกัดจำนวน concurrent operations โดยใช้ buffered channel</div>
+
+  <div style="background:linear-gradient(135deg,#141004,#201808);border:1px solid #fbbf2430;border-radius:12px;padding:1.2rem 1.4rem;margin-bottom:1.5rem">
+    <div style="font-size:.83rem;color:#94a3b8;line-height:1.8">
+      <span style="color:#fde68a;font-weight:700">ปัญหา:</span> บาง resource มีจำกัด เช่น DB connection pool มี 20 connection — ถ้า goroutine มากกว่า 20 ทำงานพร้อมกันจะรอ timeout<br>
+      <span style="color:#fde68a;font-weight:700">วิธีแก้:</span> buffered channel ขนาด N ทำหน้าที่เป็น semaphore — ส่ง token เข้าก่อนทำงาน, รับออกเมื่อเสร็จ
+    </div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>Semaphore ด้วย buffered channel</span>
+      <span class="lang-tag">Go · Semaphore</span>
+    </div>
+    <pre><code class="language-go">// Semaphore type
+type Semaphore chan struct{}
+
+func NewSemaphore(n int) Semaphore {
+    return make(chan struct{}, n)
+}
+
+func (s Semaphore) Acquire() { s <- struct{}{} }
+func (s Semaphore) Release() { <-s }
+
+// ── ตัวอย่าง: จำกัด concurrent DB queries ────────────────
+func processBatch(ctx context.Context, items []Item, db *sql.DB) error {
+    sem := NewSemaphore(10) // ไม่เกิน 10 query พร้อมกัน
+    var (
+        wg   sync.WaitGroup
+        mu   sync.Mutex
+        errs []error
+    )
+
+    for _, item := range items {
+        wg.Add(1)
+        go func(item Item) {
+            defer wg.Done()
+
+            sem.Acquire()        // รอถ้ามี 10 งานแล้ว
+            defer sem.Release()  // คืน slot เมื่อเสร็จ
+
+            if _, err := db.ExecContext(ctx,
+                "INSERT INTO items VALUES(?)", item.ID); err != nil {
+                mu.Lock()
+                errs = append(errs, err)
+                mu.Unlock()
+            }
+        }(item)
+    }
+
+    wg.Wait()
+    return errors.Join(errs...)
+}
+
+// ── golang.org/x/sync/semaphore: production version ──────
+func processBatchWeighted(ctx context.Context, items []Item) error {
+    sem := semaphore.NewWeighted(10) // จาก x/sync
+
+    var wg sync.WaitGroup
+    for _, item := range items {
+        if err := sem.Acquire(ctx, 1); err != nil {
+            break // context cancelled
+        }
+        wg.Add(1)
+        go func(item Item) {
+            defer sem.Release(1)
+            defer wg.Done()
+            processItem(item)
+        }(item)
+    }
+    wg.Wait()
+    return ctx.Err()
+}</code></pre>
+  </div>
+</div>
+
+<!-- CONTEXT CANCELLATION -->
+<div class="section" id="context">
+  <div class="section-title" style="color:#f472b6">🛑 Context Cancellation</div>
+  <div class="section-sub">หยุด goroutine chain ทั้งหมดอย่างสะอาด</div>
+
+  <div style="background:linear-gradient(135deg,#1a0410,#280618);border:1px solid #f472b630;border-radius:12px;padding:1.2rem 1.4rem;margin-bottom:1.5rem">
+    <div style="font-size:.83rem;color:#94a3b8;line-height:1.8">
+      <span style="color:#f9a8d4;font-weight:700">กฎสำคัญ:</span> goroutine ที่ spawn ออกไปต้องมีทางหยุดเสมอ — ถ้าไม่มี เรียกว่า "goroutine leak" ซึ่งทำให้ memory ค่อยๆ เพิ่มจนระบบพัง<br>
+      <span style="color:#f9a8d4;font-weight:700">วิธี:</span> ส่ง <code>context.Context</code> เข้าทุก goroutine — ตรวจ <code>ctx.Done()</code> เพื่อรู้ว่าต้องหยุด
+    </div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>Context — timeout, cancel, และ goroutine leak prevention</span>
+      <span class="lang-tag">Go · Context</span>
+    </div>
+    <pre><code class="language-go">// ── 1. WithTimeout: หยุดอัตโนมัติหลัง N วินาที ─────────────
+func fetchUserData(userID string) (*User, error) {
+    ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+    defer cancel() // ALWAYS defer cancel เพื่อ free resource
+
+    return db.QueryUserContext(ctx, userID)
+    // ถ้า query ช้าเกิน 5 วิ → ctx.Done() triggered → query cancel
+}
+
+// ── 2. WithCancel: หยุดเองตอนที่ต้องการ ──────────────────
+func streamPrices(ctx context.Context, symbol string) <-chan Price {
+    out := make(chan Price)
+    go func() {
+        defer close(out)
+        ticker := time.NewTicker(time.Second)
+        defer ticker.Stop()
+        for {
+            select {
+            case <-ticker.C:
+                price := fetchPrice(symbol)
+                out <- price
+            case <-ctx.Done(): // รับ signal หยุด
+                return // goroutine จบสะอาด ไม่ leak
+            }
+        }
+    }()
+    return out
+}
+
+func main() {
+    ctx, cancel := context.WithCancel(context.Background())
+
+    prices := streamPrices(ctx, "BTC")
+
+    go func() {
+        for p := range prices {
+            fmt.Println(p)
+        }
+    }()
+
+    time.Sleep(10 * time.Second)
+    cancel() // ส่ง signal หยุด → goroutine จบ
+}
+
+// ── 3. Context value: ส่ง request-scoped data ─────────────
+type ctxKey string
+
+const userKey ctxKey = "user"
+
+func withUser(ctx context.Context, u *User) context.Context {
+    return context.WithValue(ctx, userKey, u)
+}
+
+func userFromCtx(ctx context.Context) (*User, bool) {
+    u, ok := ctx.Value(userKey).(*User)
+    return u, ok
+}
+
+// HTTP middleware ใส่ user ใน context
+func AuthMiddleware(next http.Handler) http.Handler {
+    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+        user := authenticateToken(r.Header.Get("Authorization"))
+        ctx := withUser(r.Context(), user)
+        next.ServeHTTP(w, r.WithContext(ctx))
+    })
+}</code></pre>
+  </div>
+
+  <div class="callout danger">
+    <strong>Goroutine Leak:</strong> goroutine ที่ block บน channel และไม่มีใครปิด channel นั้น จะค้างอยู่ตลอดไป ใช้ <code>goleak</code> library ใน test เพื่อตรวจหา leak อัตโนมัติ
+  </div>
+</div>
+
+<!-- SUMMARY -->
+<div class="section">
+  <div class="section-title" style="color:#38bdf8">📌 Quick Reference</div>
+  <div class="section-sub">เมื่อไหร่ใช้ pattern ไหน</div>
+
+  <div style="background:#0d1117;border:1px solid #1e293b;border-radius:14px;overflow:hidden;margin:1.5rem 0">
+    <div style="background:#111827;padding:10px 20px;display:grid;grid-template-columns:130px 1fr 1.5fr;font-size:.77rem;font-weight:700;color:#64748b;gap:12px">
+      <div>Pattern</div><div>ใช้เมื่อ</div><div>ตัวอย่างในงานจริง</div>
+    </div>
+    <div style="display:grid;grid-template-columns:130px 1fr 1.5fr;padding:10px 20px;font-size:.82rem;border-bottom:1px solid #0f172a;gap:12px;align-items:center">
+      <div style="color:#38bdf8;font-weight:700">Worker Pool</div>
+      <div style="color:#94a3b8">งานเยอะแต่ต้องจำกัด resource</div>
+      <div style="color:#64748b">process batch orders, resize images</div>
+    </div>
+    <div style="display:grid;grid-template-columns:130px 1fr 1.5fr;padding:10px 20px;font-size:.82rem;border-bottom:1px solid #0f172a;gap:12px;align-items:center">
+      <div style="color:#4ade80;font-weight:700">Pipeline</div>
+      <div style="color:#94a3b8">data ต้องผ่านหลายขั้นตอน</div>
+      <div style="color:#64748b">ETL pipeline, stream processing</div>
+    </div>
+    <div style="display:grid;grid-template-columns:130px 1fr 1.5fr;padding:10px 20px;font-size:.82rem;border-bottom:1px solid #0f172a;gap:12px;align-items:center">
+      <div style="color:#a78bfa;font-weight:700">Fan-out/Fan-in</div>
+      <div style="color:#94a3b8">งานแบ่งได้และรวมกลับได้</div>
+      <div style="color:#64748b">call หลาย API พร้อมกัน, parallel search</div>
+    </div>
+    <div style="display:grid;grid-template-columns:130px 1fr 1.5fr;padding:10px 20px;font-size:.82rem;border-bottom:1px solid #0f172a;gap:12px;align-items:center">
+      <div style="color:#fbbf24;font-weight:700">Semaphore</div>
+      <div style="color:#94a3b8">จำกัด concurrency ของ resource จำกัด</div>
+      <div style="color:#64748b">DB pool, file handle limit, rate limit</div>
+    </div>
+    <div style="display:grid;grid-template-columns:130px 1fr 1.5fr;padding:10px 20px;font-size:.82rem;gap:12px;align-items:center">
+      <div style="color:#f472b6;font-weight:700">Context</div>
+      <div style="color:#94a3b8">ต้องการหยุด goroutine chain</div>
+      <div style="color:#64748b">HTTP timeout, graceful shutdown</div>
+    </div>
+  </div>
+</div>
+
+<div style="text-align:center;margin:3rem 0;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+  <a href="19-testing.html" style="display:inline-flex;align-items:center;gap:.5rem;background:#0d1117;border:1px solid #1e293b;color:#64748b;padding:.7rem 1.5rem;border-radius:10px;font-size:.88rem">← Testing Patterns</a>
+  <a href="21-saga.html" style="display:inline-flex;align-items:center;gap:.5rem;background:#0d1117;border:1px solid #38bdf840;color:#7dd3fc;padding:.7rem 1.5rem;border-radius:10px;font-weight:600;font-size:.88rem">Saga Pattern →</a>
+</div>
+
+</div>
+<script>hljs.highlightAll()</script>
+<script>
+document.querySelectorAll('.code-block').forEach(block => {
+  const header = block.querySelector('.code-header')
+  const code   = block.querySelector('code')
+  if (!header || !code) return
+  const btn = document.createElement('button')
+  btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span>Copy</span>`
+  btn.style.cssText = 'display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#94a3b8;font-size:.7rem;font-weight:600;padding:3px 10px;border-radius:6px;cursor:pointer;transition:all .15s;flex-shrink:0'
+  btn.addEventListener('mouseenter', () => { btn.style.background='rgba(255,255,255,.1)'; btn.style.color='#e2e8f0' })
+  btn.addEventListener('mouseleave', () => { if (!btn.dataset.copied) { btn.style.background='rgba(255,255,255,.06)'; btn.style.color='#94a3b8' } })
+  btn.addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(code.innerText) }
+    catch { const ta=document.createElement('textarea'); ta.value=code.innerText; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove() }
+    btn.dataset.copied='1'
+    btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span style="color:#38bdf8">Copied!</span>`
+    btn.style.background='rgba(56,189,248,.1)'; btn.style.borderColor='rgba(56,189,248,.3)'
+    setTimeout(() => {
+      delete btn.dataset.copied
+      btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span>Copy</span>`
+      btn.style.background='rgba(255,255,255,.06)'; btn.style.borderColor='rgba(255,255,255,.1)'; btn.style.color='#94a3b8'
+    }, 2000)
+  })
+  header.appendChild(btn)
+})
+</script>
+</body>
+</html>
