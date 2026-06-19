@@ -1,0 +1,1421 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kong Gateway — สื่อการสอน</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/yaml.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+<link rel="stylesheet" href="common.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',sans-serif;background:#07090f;color:#e2e8f0;line-height:1.7}
+
+/* ── Hero ── */
+.hero{background:linear-gradient(135deg,#07090f 0%,#0a1520 50%,#07090f 100%);padding:60px 40px;text-align:center;border-bottom:1px solid #00b4d820;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,#00b4d825 0%,transparent 65%)}
+.hero-badge{display:inline-block;background:#00b4d815;border:1px solid #00b4d850;color:#67e8f9;padding:6px 18px;border-radius:20px;font-size:.8rem;letter-spacing:2px;text-transform:uppercase;margin-bottom:20px}
+.hero h1{font-size:3rem;font-weight:800;background:linear-gradient(135deg,#00b4d8,#0ea5e9,#38bdf8,#67e8f9);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:12px}
+.hero-sub{font-size:1.1rem;color:#94a3b8;max-width:680px;margin:0 auto 20px}
+.hero-chips{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.hero-chip{background:#00b4d810;border:1px solid #00b4d830;color:#7dd3fc;padding:4px 14px;border-radius:12px;font-size:.78rem}
+
+/* ── Nav ── */
+nav{background:#0d1117;padding:14px 40px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #ffffff10;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px)}
+.nav-home{color:#0ea5e9;text-decoration:none;font-weight:600;font-size:.9rem}
+.nav-toc{display:flex;gap:6px;flex-wrap:wrap}
+.toc-link{color:#64748b;text-decoration:none;font-size:.78rem;padding:3px 10px;border-radius:6px;background:#ffffff08;transition:all .2s}
+.toc-link:hover{color:#7dd3fc;background:#00b4d815}
+
+/* ── Layout ── */
+.container{max-width:1150px;margin:0 auto;padding:40px 20px}
+section{margin-bottom:64px;scroll-margin-top:80px}
+h2{font-size:1.65rem;font-weight:700;color:#0ea5e9;margin-bottom:8px;padding-bottom:10px;border-bottom:2px solid #00b4d825;display:flex;align-items:center;gap:10px}
+h3{font-size:1.1rem;font-weight:600;color:#7dd3fc;margin:28px 0 14px}
+p{color:#94a3b8;margin-bottom:14px}
+strong{color:#e2e8f0}
+
+/* ── Learning Path ── */
+.path-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:0;position:relative;margin:24px 0}
+.path-grid::before{content:'';position:absolute;top:36px;left:36px;right:36px;height:2px;background:linear-gradient(90deg,#0ea5e9,#38bdf8,#0ea5e9);z-index:0}
+.path-step{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;padding:0 8px;cursor:default}
+.step-circle{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:800;border:2px solid #0ea5e9;background:#07090f;margin-bottom:10px;transition:transform .2s;position:relative}
+.step-circle:hover{transform:scale(1.1)}
+.step-circle.done{background:#0ea5e9;color:white}
+.step-circle.current{background:linear-gradient(135deg,#0ea5e9,#38bdf8);color:white;box-shadow:0 0 20px #0ea5e940}
+.step-num{position:absolute;top:-8px;right:-8px;width:20px;height:20px;background:#38bdf8;border-radius:50%;font-size:.65rem;display:flex;align-items:center;justify-content:center;color:#07090f;font-weight:700}
+.step-name{font-size:.78rem;text-align:center;color:#94a3b8;line-height:1.3;max-width:90px}
+.step-name strong{color:#7dd3fc;display:block;font-size:.8rem}
+
+/* ── VBox ── */
+.vb-wrap{margin:24px 0}
+.vb-label{font-size:.72rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#0ea5e9;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.vb-label::after{content:'';flex:1;height:1px;background:#00b4d815}
+.vb-grid{display:grid;gap:14px}
+.vb-2{grid-template-columns:repeat(2,1fr)}
+.vb-3{grid-template-columns:repeat(3,1fr)}
+.vb-4{grid-template-columns:repeat(4,1fr)}
+.vbox{background:#0d1117;border:1px solid #00b4d825;border-radius:14px;padding:18px;transition:transform .2s,border-color .2s,box-shadow .2s}
+.vbox:hover{transform:translateY(-3px);border-color:#0ea5e960;box-shadow:0 8px 24px #0ea5e915}
+.vb-icon{font-size:1.7rem;margin-bottom:8px}
+.vb-title{font-size:.92rem;font-weight:700;color:#e2e8f0;margin-bottom:6px}
+.vb-body{font-size:.82rem;color:#94a3b8;line-height:1.6}
+.vb-list{list-style:none;margin-top:8px}
+.vb-list li{font-size:.8rem;color:#94a3b8;padding:3px 0 3px 14px;position:relative}
+.vb-list li::before{content:'›';position:absolute;left:0;color:#0ea5e9}
+.vb-chip{display:inline-block;background:#0ea5e910;border:1px solid #0ea5e930;color:#7dd3fc;padding:3px 10px;border-radius:10px;font-size:.72rem;margin:3px 2px}
+
+/* ── Architecture Diagram ── */
+.diagram-wrap{background:#050810;border:1px solid #00b4d825;border-radius:16px;padding:20px;margin:28px 0;overflow:hidden}
+.diagram-wrap svg{width:100%;height:auto}
+
+/* ── Plugin Cards ── */
+.plugin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:24px 0}
+.plugin-card{background:#0d1117;border:1px solid #1e293b;border-radius:14px;padding:18px;border-top:3px solid var(--pc)}
+.plugin-card:hover{border-color:var(--pc);box-shadow:0 4px 20px #00000040}
+.plugin-icon{font-size:1.5rem;margin-bottom:6px}
+.plugin-name{font-size:.92rem;font-weight:700;color:#e2e8f0;margin-bottom:4px}
+.plugin-cat{font-size:.7rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--pc);margin-bottom:8px}
+.plugin-desc{font-size:.8rem;color:#64748b;line-height:1.55}
+
+/* ── Callout ── */
+.callout{border-radius:12px;padding:16px 20px;margin:16px 0;display:flex;gap:12px;align-items:flex-start}
+.callout.info{background:#0ea5e910;border-left:3px solid #0ea5e9}
+.callout.warn{background:#f59e0b10;border-left:3px solid #f59e0b}
+.callout.tip{background:#4ade8010;border-left:3px solid #4ade80}
+.callout.danger{background:#ef444410;border-left:3px solid #ef4444}
+.callout-icon{font-size:1.1rem;flex-shrink:0;margin-top:2px}
+.callout-text{font-size:.85rem;color:#94a3b8}
+.callout-text strong{color:#e2e8f0}
+
+/* ── Code ── */
+.code-block{margin:20px 0;border-radius:12px;overflow:hidden;border:1px solid #1e293b}
+.code-header{background:#111827;padding:.7rem 1rem;display:flex;justify-content:space-between;align-items:center}
+.code-header span{font-size:.78rem;color:#64748b;font-weight:600}
+.code-block pre{margin:0}
+.code-block code{font-size:.8rem!important;padding:20px!important}
+.lang-tag{background:rgba(14,165,233,.12);color:#7dd3fc;padding:.15rem .6rem;border-radius:4px;font-size:.72rem;font-weight:700}
+.lang-good{background:rgba(74,222,128,.12);color:#86efac;padding:.15rem .6rem;border-radius:4px;font-size:.72rem;font-weight:700}
+
+/* ── Cheatsheet table ── */
+.cmd-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin:24px 0}
+.cmd-box{background:#0d1117;border:1px solid #00b4d825;border-radius:12px;overflow:hidden}
+.cmd-box-header{background:#00b4d815;padding:10px 16px;font-size:.82rem;font-weight:700;color:#0ea5e9;border-bottom:1px solid #00b4d820}
+.cmd-row{display:block;padding:8px 16px;font-family:'Courier New',monospace;font-size:.8rem;color:#e2e8f0;border-bottom:1px solid #ffffff06}
+.cmd-row:last-child{border-bottom:none}
+.cmd-row span{color:#64748b;font-size:.75rem;display:block;margin-top:2px;font-family:'Segoe UI',sans-serif}
+.cmd-k{color:#38bdf8}
+.cmd-v{color:#a3e635}
+.cmd-flag{color:#fbbf24}
+
+/* ── Comparison table ── */
+.compare-wrap{overflow-x:auto;margin:24px 0}
+.compare-table{width:100%;border-collapse:collapse;font-size:.82rem}
+.compare-table th{background:#0d1b2e;color:#7dd3fc;padding:10px 14px;text-align:left;border-bottom:2px solid #00b4d830;white-space:nowrap}
+.compare-table td{padding:10px 14px;border-bottom:1px solid #1e293b;color:#94a3b8;vertical-align:top}
+.compare-table tr:hover td{background:#0d1117}
+.compare-table td:first-child{color:#e2e8f0;font-weight:600}
+.badge-yes{display:inline-block;background:#4ade8015;color:#4ade80;border:1px solid #4ade8040;padding:2px 8px;border-radius:6px;font-size:.72rem;font-weight:700}
+.badge-no{display:inline-block;background:#ef444415;color:#f87171;border:1px solid #ef444440;padding:2px 8px;border-radius:6px;font-size:.72rem;font-weight:700}
+.badge-partial{display:inline-block;background:#f59e0b15;color:#fbbf24;border:1px solid #f59e0b40;padding:2px 8px;border-radius:6px;font-size:.72rem;font-weight:700}
+
+/* ── Deployment mode ── */
+.deploy-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:24px 0}
+.deploy-card{border-radius:16px;padding:22px;border:2px solid transparent;transition:border-color .2s}
+.deploy-card:hover{border-color:var(--dc)}
+.deploy-icon{font-size:2rem;margin-bottom:10px}
+.deploy-name{font-size:1rem;font-weight:700;color:#e2e8f0;margin-bottom:4px}
+.deploy-subtitle{font-size:.75rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--dc);margin-bottom:10px}
+.deploy-desc{font-size:.82rem;color:#64748b;line-height:1.6;margin-bottom:12px}
+.deploy-pros{list-style:none;font-size:.8rem}
+.deploy-pros li{padding:2px 0 2px 14px;position:relative;color:#94a3b8}
+.deploy-pros li::before{content:'✓';position:absolute;left:0;color:#4ade80;font-weight:700}
+
+/* ── Flow boxes ── */
+.flow-wrap{margin:24px 0}
+.flow-row{display:flex;align-items:stretch;gap:0;margin-bottom:8px;position:relative}
+.flow-box{background:#0d1117;border:1px solid #00b4d825;border-radius:10px;padding:12px 16px;flex:1;text-align:center}
+.flow-box-title{font-size:.85rem;font-weight:700;color:#e2e8f0;margin-bottom:3px}
+.flow-box-sub{font-size:.75rem;color:#64748b}
+.flow-arrow{display:flex;align-items:center;padding:0 8px;color:#0ea5e9;font-size:1.2rem;flex-shrink:0}
+.flow-label{font-size:.7rem;color:#0ea5e9;font-weight:600;position:absolute;top:-18px;left:50%;transform:translateX(-50%);white-space:nowrap;background:#07090f;padding:0 6px}
+
+/* ── Phase steps ── */
+.phase-list{list-style:none;margin:16px 0;counter-reset:phase}
+.phase-list li{counter-increment:phase;padding:10px 10px 10px 50px;position:relative;border-left:2px solid #00b4d820;margin-left:16px;margin-bottom:8px}
+.phase-list li::before{content:counter(phase);position:absolute;left:-14px;top:8px;width:26px;height:26px;background:#0ea5e9;color:#07090f;border-radius:50%;font-size:.78rem;font-weight:800;display:flex;align-items:center;justify-content:center}
+.phase-list li strong{color:#7dd3fc;display:block;font-size:.88rem;margin-bottom:3px}
+.phase-list li span{font-size:.82rem;color:#64748b}
+
+footer{text-align:center;padding:2rem;color:#334155;font-size:.82rem;border-top:1px solid #0f172a;margin-top:2rem}
+
+@media(max-width:900px){
+  .hero h1{font-size:2.2rem}
+  .path-grid{grid-template-columns:repeat(3,1fr)}
+  .path-grid::before{display:none}
+  .vb-4,.plugin-grid,.deploy-grid{grid-template-columns:repeat(2,1fr)}
+  .cmd-grid{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  .vb-3,.vb-2,.plugin-grid,.deploy-grid{grid-template-columns:1fr}
+  .path-grid{grid-template-columns:repeat(2,1fr)}
+  nav{flex-direction:column;gap:8px;padding:12px 16px}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-home">← กลับหน้าหลัก</a>
+  <div class="nav-toc">
+    <a href="#overview" class="toc-link">🌐 Overview</a>
+    <a href="#architecture" class="toc-link">🏗️ Architecture</a>
+    <a href="#concepts" class="toc-link">📦 Concepts</a>
+    <a href="#plugins" class="toc-link">🧩 Plugins</a>
+    <a href="#deployment" class="toc-link">🚀 Deployment</a>
+    <a href="#config" class="toc-link">📄 Config</a>
+    <a href="#k8s" class="toc-link">☸️ K8s</a>
+    <a href="#code" class="toc-link">🐹 Go Code</a>
+    <a href="#cheatsheet" class="toc-link">⌨️ Cheatsheet</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">Infrastructure #23</div>
+  <h1>🦍 Kong Gateway</h1>
+  <p class="hero-sub">API Gateway ระดับ Production — จัดการ traffic, auth, rate limiting, logging และ plugin ecosystem ที่ขยายได้ไม่จำกัด บน Nginx/OpenResty</p>
+  <div class="hero-chips">
+    <span class="hero-chip">🚦 Traffic Management</span>
+    <span class="hero-chip">🔐 Authentication</span>
+    <span class="hero-chip">⚡ Rate Limiting</span>
+    <span class="hero-chip">🧩 Plugin Ecosystem</span>
+    <span class="hero-chip">☸️ K8s Native</span>
+    <span class="hero-chip">📄 Declarative Config</span>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- ══════════════════════════════════════════ -->
+<section id="overview">
+  <h2>🌐 Kong Gateway คืออะไร?</h2>
+  <p>Kong Gateway คือ <strong>API Gateway</strong> open-source ที่สร้างบน <strong>Nginx + OpenResty (Lua)</strong> ทำหน้าที่เป็น "ประตู" กลางระหว่าง client กับ upstream services — จัดการ cross-cutting concerns ทั้งหมดในที่เดียว ไม่ต้องเขียนซ้ำใน service แต่ละตัว</p>
+
+  <div class="callout info">
+    <span class="callout-icon">💡</span>
+    <div class="callout-text">
+      <strong>ทำไมต้องมี API Gateway?</strong><br>
+      ใน Microservices แต่ละ service ต้องการ auth, rate limiting, logging เหมือนกัน — ถ้าเขียนเองทุก service จะซ้ำซ้อนมาก Kong รวม logic เหล่านี้ไว้ที่ gateway ชั้นเดียว
+    </div>
+  </div>
+
+  <div class="vb-wrap">
+    <div class="vb-label">Learning Path</div>
+    <div class="path-grid">
+      <div class="path-step">
+        <div class="step-circle done">🌐<span class="step-num">1</span></div>
+        <div class="step-name"><strong>Concepts</strong>Service, Route, Plugin, Consumer</div>
+      </div>
+      <div class="path-step">
+        <div class="step-circle current">🚀<span class="step-num">2</span></div>
+        <div class="step-name"><strong>Run & Config</strong>Docker, Admin API, decK</div>
+      </div>
+      <div class="path-step">
+        <div class="step-circle">🧩<span class="step-num">3</span></div>
+        <div class="step-name"><strong>Plugins</strong>Auth, Rate Limit, Logging</div>
+      </div>
+      <div class="path-step">
+        <div class="step-circle">☸️<span class="step-num">4</span></div>
+        <div class="step-name"><strong>K8s (KIC)</strong>Ingress Controller, CRDs</div>
+      </div>
+      <div class="path-step">
+        <div class="step-circle">🏭<span class="step-num">5</span></div>
+        <div class="step-name"><strong>Production</strong>Hybrid mode, Konnect, Custom Plugin</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="vb-wrap">
+    <div class="vb-label">Kong ทำอะไรให้เราได้บ้าง</div>
+    <div class="vb-grid vb-4">
+      <div class="vbox">
+        <div class="vb-icon">🔐</div>
+        <div class="vb-title">Authentication</div>
+        <div class="vb-body">JWT, API Key, OAuth 2.0, Basic Auth, LDAP, mTLS — ไม่ต้องเขียนเองใน service</div>
+        <span class="vb-chip">JWT</span><span class="vb-chip">OAuth2</span>
+      </div>
+      <div class="vbox">
+        <div class="vb-icon">⚡</div>
+        <div class="vb-title">Rate Limiting</div>
+        <div class="vb-body">จำกัด request ต่อ consumer/IP/service ต่อวินาที/นาที/ชั่วโมง ป้องกัน abuse และ DDoS</div>
+        <span class="vb-chip">Throttling</span><span class="vb-chip">Quota</span>
+      </div>
+      <div class="vbox">
+        <div class="vb-icon">🔄</div>
+        <div class="vb-title">Load Balancing</div>
+        <div class="vb-body">Upstream targets หลายตัว, health check, round-robin, consistent hashing, weighted</div>
+        <span class="vb-chip">Health Check</span><span class="vb-chip">Failover</span>
+      </div>
+      <div class="vbox">
+        <div class="vb-icon">🔭</div>
+        <div class="vb-title">Observability</div>
+        <div class="vb-body">Log ทุก request, Prometheus metrics, Zipkin/Jaeger tracing — เห็น traffic ครบทุกด้าน</div>
+        <span class="vb-chip">Prometheus</span><span class="vb-chip">OpenTelemetry</span>
+      </div>
+      <div class="vbox">
+        <div class="vb-icon">🔀</div>
+        <div class="vb-title">Request Transformation</div>
+        <div class="vb-body">แก้ไข header, query params, body ก่อนส่งต่อ upstream หรือ response กลับ client</div>
+        <span class="vb-chip">Headers</span><span class="vb-chip">Body</span>
+      </div>
+      <div class="vbox">
+        <div class="vb-icon">🛡️</div>
+        <div class="vb-title">Security</div>
+        <div class="vb-body">IP restriction, Bot detection, CORS, mTLS, request validation ป้องกัน service ด้านหลัง</div>
+        <span class="vb-chip">CORS</span><span class="vb-chip">IP Filter</span>
+      </div>
+      <div class="vbox">
+        <div class="vb-icon">🗺️</div>
+        <div class="vb-title">Routing</div>
+        <div class="vb-body">route request ด้วย path, host, method, header — ทำ canary deploy, A/B testing ได้</div>
+        <span class="vb-chip">Path Matching</span><span class="vb-chip">Canary</span>
+      </div>
+      <div class="vbox">
+        <div class="vb-icon">🧩</div>
+        <div class="vb-title">Custom Plugins</div>
+        <div class="vb-body">เขียน plugin เองด้วย Lua หรือ Go (Go Plugin Server) ขยาย functionality ได้ไม่จำกัด</div>
+        <span class="vb-chip">Lua</span><span class="vb-chip">Go PDK</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════ -->
+<section id="architecture">
+  <h2>🏗️ Kong Architecture</h2>
+  <p>Kong แบ่งออกเป็น 2 plane หลัก: <strong>Control Plane</strong> ที่เก็บ config และ <strong>Data Plane</strong> ที่รับ/ส่ง traffic จริง — เข้าใจ separation นี้คือหัวใจของ Kong</p>
+
+  <div class="diagram-wrap">
+    <svg viewBox="0 0 960 500" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="#0ea5e9"/>
+        </marker>
+        <marker id="arr2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="#4ade80"/>
+        </marker>
+        <marker id="arr3" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="#f97316"/>
+        </marker>
+        <filter id="glow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+
+      <!-- Background regions -->
+      <rect x="10" y="10" width="200" height="480" rx="14" fill="#0a1520" stroke="#0ea5e930" stroke-width="1.5"/>
+      <rect x="240" y="10" width="240" height="480" rx="14" fill="#080e18" stroke="#0ea5e940" stroke-width="2"/>
+      <rect x="510" y="60" width="210" height="380" rx="14" fill="#0a1a0a" stroke="#4ade8030" stroke-width="1.5"/>
+      <rect x="750" y="60" width="200" height="380" rx="14" fill="#0a0f1a" stroke="#a78bfa30" stroke-width="1.5"/>
+
+      <!-- Labels -->
+      <text x="110" y="32" text-anchor="middle" fill="#64748b" font-size="11" font-weight="700" letter-spacing="2">CLIENT</text>
+      <text x="360" y="32" text-anchor="middle" fill="#0ea5e9" font-size="11" font-weight="700" letter-spacing="2">KONG GATEWAY</text>
+      <text x="615" y="50" text-anchor="middle" fill="#4ade80" font-size="11" font-weight="700" letter-spacing="2">UPSTREAM SERVICES</text>
+      <text x="850" y="50" text-anchor="middle" fill="#a78bfa" font-size="11" font-weight="700" letter-spacing="2">STORAGE</text>
+
+      <!-- Clients -->
+      <rect x="30" y="60" width="160" height="50" rx="10" fill="#0d1929" stroke="#0ea5e940"/>
+      <text x="110" y="80" text-anchor="middle" fill="#7dd3fc" font-size="12" font-weight="700">🌐 Web / Mobile</text>
+      <text x="110" y="97" text-anchor="middle" fill="#64748b" font-size="10">Browser, App</text>
+
+      <rect x="30" y="130" width="160" height="50" rx="10" fill="#0d1929" stroke="#0ea5e930"/>
+      <text x="110" y="150" text-anchor="middle" fill="#7dd3fc" font-size="12" font-weight="700">⚙️ Internal Service</text>
+      <text x="110" y="167" text-anchor="middle" fill="#64748b" font-size="10">Service-to-Service</text>
+
+      <rect x="30" y="200" width="160" height="50" rx="10" fill="#0d1929" stroke="#0ea5e930"/>
+      <text x="110" y="220" text-anchor="middle" fill="#7dd3fc" font-size="12" font-weight="700">🤖 Third-party API</text>
+      <text x="110" y="237" text-anchor="middle" fill="#64748b" font-size="10">Partner, Webhook</text>
+
+      <!-- Kong Data Plane box (main) -->
+      <rect x="255" y="55" width="210" height="390" rx="12" fill="#0a1525" stroke="#0ea5e960" stroke-width="2" filter="url(#glow)"/>
+      <text x="360" y="78" text-anchor="middle" fill="#38bdf8" font-size="12" font-weight="800">DATA PLANE</text>
+
+      <!-- Plugin pipeline -->
+      <rect x="270" y="90" width="180" height="36" rx="8" fill="#0ea5e915" stroke="#0ea5e940"/>
+      <text x="360" y="113" text-anchor="middle" fill="#7dd3fc" font-size="11" font-weight="700">🔐 Auth Plugins</text>
+
+      <text x="360" y="143" text-anchor="middle" fill="#0ea5e960" font-size="16">↓</text>
+
+      <rect x="270" y="150" width="180" height="36" rx="8" fill="#f59e0b15" stroke="#f59e0b40"/>
+      <text x="360" y="173" text-anchor="middle" fill="#fbbf24" font-size="11" font-weight="700">⚡ Rate Limiting</text>
+
+      <text x="360" y="202" text-anchor="middle" fill="#0ea5e960" font-size="16">↓</text>
+
+      <rect x="270" y="208" width="180" height="36" rx="8" fill="#a78bfa15" stroke="#a78bfa40"/>
+      <text x="360" y="231" text-anchor="middle" fill="#c4b5fd" font-size="11" font-weight="700">🔀 Transformation</text>
+
+      <text x="360" y="261" text-anchor="middle" fill="#0ea5e960" font-size="16">↓</text>
+
+      <rect x="270" y="266" width="180" height="36" rx="8" fill="#4ade8015" stroke="#4ade8040"/>
+      <text x="360" y="289" text-anchor="middle" fill="#86efac" font-size="11" font-weight="700">🗺️ Router / Proxy</text>
+
+      <text x="360" y="319" text-anchor="middle" fill="#0ea5e960" font-size="16">↓</text>
+
+      <rect x="270" y="324" width="180" height="36" rx="8" fill="#06b6d415" stroke="#06b6d440"/>
+      <text x="360" y="347" text-anchor="middle" fill="#67e8f9" font-size="11" font-weight="700">🔭 Logging / Tracing</text>
+
+      <!-- Admin API indicator -->
+      <rect x="265" y="380" width="190" height="50" rx="10" fill="#0d1929" stroke="#fbbf2440" stroke-dasharray="4 3"/>
+      <text x="360" y="400" text-anchor="middle" fill="#fbbf24" font-size="11" font-weight="700">⚙️ Admin API :8001</text>
+      <text x="360" y="418" text-anchor="middle" fill="#64748b" font-size="10">Config, Plugin Management</text>
+
+      <!-- Upstream services -->
+      <rect x="525" y="80" width="180" height="46" rx="10" fill="#0a1a0a" stroke="#4ade8050"/>
+      <text x="615" y="100" text-anchor="middle" fill="#86efac" font-size="12" font-weight="700">🛒 Order Service</text>
+      <text x="615" y="117" text-anchor="middle" fill="#64748b" font-size="10">:8080</text>
+
+      <rect x="525" y="148" width="180" height="46" rx="10" fill="#0a1a0a" stroke="#4ade8040"/>
+      <text x="615" y="168" text-anchor="middle" fill="#86efac" font-size="12" font-weight="700">👤 User Service</text>
+      <text x="615" y="185" text-anchor="middle" fill="#64748b" font-size="10">:8081</text>
+
+      <rect x="525" y="216" width="180" height="46" rx="10" fill="#0a1a0a" stroke="#4ade8040"/>
+      <text x="615" y="236" text-anchor="middle" fill="#86efac" font-size="12" font-weight="700">💳 Payment Service</text>
+      <text x="615" y="253" text-anchor="middle" fill="#64748b" font-size="10">:8082</text>
+
+      <rect x="525" y="284" width="180" height="46" rx="10" fill="#0a1a0a" stroke="#4ade8040"/>
+      <text x="615" y="304" text-anchor="middle" fill="#86efac" font-size="12" font-weight="700">📦 Product Service</text>
+      <text x="615" y="321" text-anchor="middle" fill="#64748b" font-size="10">:8083</text>
+
+      <!-- Storage -->
+      <rect x="765" y="80" width="175" height="60" rx="10" fill="#0f0a1a" stroke="#a78bfa40"/>
+      <text x="852" y="105" text-anchor="middle" fill="#c4b5fd" font-size="12" font-weight="700">🐘 PostgreSQL</text>
+      <text x="852" y="122" text-anchor="middle" fill="#64748b" font-size="10">Config Store (DB mode)</text>
+
+      <rect x="765" y="160" width="175" height="60" rx="10" fill="#0f0a1a" stroke="#a78bfa30"/>
+      <text x="852" y="185" text-anchor="middle" fill="#c4b5fd" font-size="12" font-weight="700">📄 kong.yml</text>
+      <text x="852" y="202" text-anchor="middle" fill="#64748b" font-size="10">DB-less declarative</text>
+
+      <rect x="765" y="240" width="175" height="60" rx="10" fill="#0f0a1a" stroke="#a78bfa30"/>
+      <text x="852" y="265" text-anchor="middle" fill="#c4b5fd" font-size="12" font-weight="700">🔴 Redis</text>
+      <text x="852" y="282" text-anchor="middle" fill="#64748b" font-size="10">Rate Limit counters</text>
+
+      <!-- Arrows: clients → kong -->
+      <line x1="190" y1="85" x2="252" y2="170" stroke="#0ea5e9" stroke-width="1.5" marker-end="url(#arr)" opacity=".7"/>
+      <line x1="190" y1="155" x2="252" y2="200" stroke="#0ea5e9" stroke-width="1.5" marker-end="url(#arr)" opacity=".7"/>
+      <line x1="190" y1="225" x2="252" y2="230" stroke="#0ea5e9" stroke-width="1.5" marker-end="url(#arr)" opacity=".5"/>
+
+      <!-- Arrows: kong → upstream -->
+      <line x1="450" y1="280" x2="522" y2="103" stroke="#4ade80" stroke-width="1.5" marker-end="url(#arr2)" opacity=".7"/>
+      <line x1="450" y1="285" x2="522" y2="171" stroke="#4ade80" stroke-width="1.5" marker-end="url(#arr2)" opacity=".7"/>
+      <line x1="450" y1="290" x2="522" y2="239" stroke="#4ade80" stroke-width="1.5" marker-end="url(#arr2)" opacity=".6"/>
+      <line x1="450" y1="295" x2="522" y2="307" stroke="#4ade80" stroke-width="1.5" marker-end="url(#arr2)" opacity=".5"/>
+
+      <!-- Arrows: kong → storage -->
+      <line x1="455" y1="395" x2="762" y2="110" stroke="#f97316" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arr3)" opacity=".6"/>
+      <line x1="455" y1="400" x2="762" y2="255" stroke="#f97316" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arr3)" opacity=".5"/>
+
+      <!-- Port labels -->
+      <rect x="185" y="170" width="60" height="20" rx="4" fill="#0ea5e920"/>
+      <text x="215" y="184" text-anchor="middle" fill="#38bdf8" font-size="10" font-weight="700">:8000</text>
+    </svg>
+  </div>
+
+  <div class="vb-wrap">
+    <div class="vb-label">Ports สำคัญของ Kong</div>
+    <div class="vb-grid vb-4">
+      <div class="vbox">
+        <div class="vb-icon">🌐</div>
+        <div class="vb-title">Proxy HTTP :8000</div>
+        <div class="vb-body">รับ HTTP traffic จาก client — port หลักที่ expose ออก public</div>
+        <span class="vb-chip">Public</span>
+      </div>
+      <div class="vbox">
+        <div class="vb-icon">🔒</div>
+        <div class="vb-title">Proxy HTTPS :8443</div>
+        <div class="vb-body">รับ HTTPS traffic — ต้องตั้งค่า TLS certificate (หรือใช้ cert-manager ใน K8s)</div>
+        <span class="vb-chip">TLS</span>
+      </div>
+      <div class="vbox">
+        <div class="vb-icon">⚙️</div>
+        <div class="vb-title">Admin API :8001</div>
+        <div class="vb-body">REST API สำหรับ config Kong — <strong>ต้องปิดไม่ให้ public เข้าถึง!</strong> ใช้ manage services/routes/plugins</div>
+        <span class="vb-chip">Internal only</span>
+      </div>
+      <div class="vbox">
+        <div class="vb-icon">📊</div>
+        <div class="vb-title">Admin GUI :8002</div>
+        <div class="vb-body">Kong Manager — Web UI สำหรับดู/แก้ config (Kong Gateway Enterprise หรือ Community ≥3.0)</div>
+        <span class="vb-chip">Dashboard</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════ -->
+<section id="concepts">
+  <h2>📦 Core Concepts — 5 Building Blocks</h2>
+  <p>Kong ใช้ 5 objects หลักในการ config ทุกอย่าง เข้าใจ 5 ตัวนี้ก็เข้าใจ Kong แล้ว 80%</p>
+
+  <div class="vb-grid vb-3" style="margin:24px 0">
+    <div class="vbox" style="border-color:#0ea5e950">
+      <div class="vb-icon">🔌</div>
+      <div class="vb-title" style="color:#38bdf8">Service</div>
+      <div class="vb-body">ตัวแทน upstream service ที่ Kong จะ forward request ไป — เก็บ URL ของ backend<br><br>
+        <strong>ตัวอย่าง:</strong> <code style="color:#7dd3fc;font-size:.78rem">host: order-service, port: 8080, path: /</code>
+      </div>
+      <ul class="vb-list">
+        <li>1 Service = 1 upstream application</li>
+        <li>มี Route หลายตัวชี้มาได้</li>
+        <li>ตั้ง connect/read timeout ได้</li>
+      </ul>
+    </div>
+    <div class="vbox" style="border-color:#a78bfa50">
+      <div class="vb-icon">🗺️</div>
+      <div class="vb-title" style="color:#c4b5fd">Route</div>
+      <div class="vb-body">กำหนดว่า request แบบไหนจะถูก match แล้วส่งไป Service ไหน — match ด้วย path, host, method, header<br><br>
+        <strong>ตัวอย่าง:</strong> <code style="color:#c4b5fd;font-size:.78rem">paths: [/api/orders], methods: [GET, POST]</code>
+      </div>
+      <ul class="vb-list">
+        <li>Route → Service (many-to-one)</li>
+        <li>regex path matching รองรับ</li>
+        <li>strip_path ตัด prefix ออกได้</li>
+      </ul>
+    </div>
+    <div class="vbox" style="border-color:#f59e0b50">
+      <div class="vb-icon">🧩</div>
+      <div class="vb-title" style="color:#fbbf24">Plugin</div>
+      <div class="vb-body">เพิ่ม functionality ให้ Kong — ติด plugin ที่ระดับ Global / Service / Route / Consumer ได้<br><br>
+        <strong>ตัวอย่าง:</strong> rate-limiting, jwt, cors, request-transformer
+      </div>
+      <ul class="vb-list">
+        <li>รันในลำดับ priority</li>
+        <li>enable/disable ได้ทันที</li>
+        <li>เขียนเองด้วย Lua หรือ Go</li>
+      </ul>
+    </div>
+    <div class="vbox" style="border-color:#4ade8050">
+      <div class="vb-icon">👤</div>
+      <div class="vb-title" style="color:#86efac">Consumer</div>
+      <div class="vb-body">ตัวแทน "ผู้เรียกใช้" API — อาจเป็น user, application, หรือ service อื่น เก็บ credentials และ metadata<br><br>
+        <strong>ตัวอย่าง:</strong> consumer <code style="color:#86efac;font-size:.78rem">mobile-app</code> มี API key และ rate limit ของตัวเอง
+      </div>
+      <ul class="vb-list">
+        <li>ผูก credentials (JWT/API Key)</li>
+        <li>ติด plugin เฉพาะ consumer ได้</li>
+        <li>ดู usage ต่อ consumer ได้</li>
+      </ul>
+    </div>
+    <div class="vbox" style="border-color:#f8717150">
+      <div class="vb-icon">⚖️</div>
+      <div class="vb-title" style="color:#fca5a5">Upstream &amp; Target</div>
+      <div class="vb-body">กลุ่ม backend servers สำหรับ load balance — <strong>Upstream</strong> = กลุ่ม, <strong>Target</strong> = server แต่ละตัว<br><br>
+        <strong>ตัวอย่าง:</strong> upstream <code style="color:#fca5a5;font-size:.78rem">order-svc</code> มี 3 targets
+      </div>
+      <ul class="vb-list">
+        <li>health check active/passive</li>
+        <li>weight-based routing</li>
+        <li>round-robin / least-conn / hash</li>
+      </ul>
+    </div>
+    <div class="vbox" style="border-color:#67e8f950">
+      <div class="vb-icon">🏢</div>
+      <div class="vb-title" style="color:#67e8f9">Workspace (Enterprise)</div>
+      <div class="vb-body">แบ่ง Kong ออกเป็น tenants — แต่ละ team มี Services/Routes/Plugins แยกกัน ไม่ปนกัน<br><br>
+        <strong>ใช้ใน:</strong> องค์กรที่มีหลาย team share Kong instance เดียว
+      </div>
+      <ul class="vb-list">
+        <li>RBAC ต่อ workspace</li>
+        <li>แยก Admin API scope</li>
+        <li>Enterprise feature เท่านั้น</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>ความสัมพันธ์ระหว่าง Objects</h3>
+  <div class="flow-wrap">
+    <div style="background:#0d1117;border:1px solid #00b4d825;border-radius:14px;padding:20px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;font-size:.85rem;color:#94a3b8">
+        <div style="background:#0ea5e920;border:1px solid #0ea5e940;padding:6px 12px;border-radius:8px;color:#38bdf8;font-weight:700">Request</div>
+        <span style="color:#0ea5e9">→</span>
+        <div style="background:#a78bfa20;border:1px solid #a78bfa40;padding:6px 12px;border-radius:8px;color:#c4b5fd;font-weight:700">Route match</div>
+        <span style="color:#0ea5e9">→</span>
+        <div style="background:#f59e0b20;border:1px solid #f59e0b40;padding:6px 12px;border-radius:8px;color:#fbbf24;font-weight:700">Plugins run</div>
+        <span style="color:#0ea5e9">→</span>
+        <div style="background:#0ea5e920;border:1px solid #0ea5e940;padding:6px 12px;border-radius:8px;color:#38bdf8;font-weight:700">Service</div>
+        <span style="color:#0ea5e9">→</span>
+        <div style="background:#4ade8020;border:1px solid #4ade8040;padding:6px 12px;border-radius:8px;color:#86efac;font-weight:700">Upstream</div>
+        <span style="color:#0ea5e9">→</span>
+        <div style="background:#4ade8020;border:1px solid #4ade8040;padding:6px 12px;border-radius:8px;color:#86efac;font-weight:700">Target</div>
+      </div>
+      <p style="margin:0;font-size:.82rem;color:#64748b">Plugin scope (กว้าง→แคบ): <strong style="color:#e2e8f0">Global</strong> → <strong style="color:#e2e8f0">Service</strong> → <strong style="color:#e2e8f0">Route</strong> → <strong style="color:#e2e8f0">Consumer</strong> — plugin ที่แคบกว่า override ของกว้างกว่า</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════ -->
+<section id="plugins">
+  <h2>🧩 Plugin Ecosystem</h2>
+  <p>Kong มี built-in plugins กว่า 60+ ตัว แบ่งตาม category — ใช้ร่วมกันได้ทุก plugin ติดได้หลายตัวพร้อมกัน</p>
+
+  <div class="plugin-grid">
+    <div class="plugin-card" style="--pc:#0ea5e9">
+      <div class="plugin-icon">🔐</div>
+      <div class="plugin-name">JWT</div>
+      <div class="plugin-cat">Authentication</div>
+      <div class="plugin-desc">ตรวจสอบ JWT token ใน Authorization header — รองรับ HS256, RS256, ES256 verify signature และ claims</div>
+    </div>
+    <div class="plugin-card" style="--pc:#0ea5e9">
+      <div class="plugin-icon">🗝️</div>
+      <div class="plugin-name">Key Authentication</div>
+      <div class="plugin-cat">Authentication</div>
+      <div class="plugin-desc">API Key ใน header หรือ query param — ง่ายที่สุด เหมาะกับ server-to-server โดยไม่ต้องการ OAuth flow</div>
+    </div>
+    <div class="plugin-card" style="--pc:#0ea5e9">
+      <div class="plugin-icon">🔑</div>
+      <div class="plugin-name">OAuth 2.0</div>
+      <div class="plugin-cat">Authentication</div>
+      <div class="plugin-desc">Authorization Code, Client Credentials, Implicit, Password grant — full OAuth 2.0 server built-in</div>
+    </div>
+    <div class="plugin-card" style="--pc:#f59e0b">
+      <div class="plugin-icon">⚡</div>
+      <div class="plugin-name">Rate Limiting</div>
+      <div class="plugin-cat">Traffic Control</div>
+      <div class="plugin-desc">จำกัด request ต่อวินาที/นาที/ชั่วโมง/วัน ต่อ consumer หรือ IP — ใช้ local memory หรือ Redis cluster</div>
+    </div>
+    <div class="plugin-card" style="--pc:#f59e0b">
+      <div class="plugin-icon">🏋️</div>
+      <div class="plugin-name">Request Size Limiting</div>
+      <div class="plugin-cat">Traffic Control</div>
+      <div class="plugin-desc">ปฏิเสธ request ที่ body ใหญ่เกินกำหนด ป้องกัน large payload attack และ upstream overload</div>
+    </div>
+    <div class="plugin-card" style="--pc:#f59e0b">
+      <div class="plugin-icon">🔁</div>
+      <div class="plugin-name">Proxy Cache</div>
+      <div class="plugin-cat">Traffic Control</div>
+      <div class="plugin-desc">Cache response ใน memory หรือ Redis — ลด load upstream สำหรับ GET request ที่ข้อมูลไม่เปลี่ยนบ่อย</div>
+    </div>
+    <div class="plugin-card" style="--pc:#a78bfa">
+      <div class="plugin-icon">🔀</div>
+      <div class="plugin-name">Request Transformer</div>
+      <div class="plugin-cat">Transformation</div>
+      <div class="plugin-desc">เพิ่ม/แก้/ลบ header, query params, body ก่อนส่งไป upstream — ไม่ต้องแก้ code backend เลย</div>
+    </div>
+    <div class="plugin-card" style="--pc:#a78bfa">
+      <div class="plugin-icon">↩️</div>
+      <div class="plugin-name">Response Transformer</div>
+      <div class="plugin-cat">Transformation</div>
+      <div class="plugin-desc">แก้ไข response จาก upstream ก่อนส่งกลับ client — เพิ่ม CORS headers, ลบ field sensitive ออกได้</div>
+    </div>
+    <div class="plugin-card" style="--pc:#a78bfa">
+      <div class="plugin-icon">🌐</div>
+      <div class="plugin-name">CORS</div>
+      <div class="plugin-cat">Transformation</div>
+      <div class="plugin-desc">จัดการ Cross-Origin Resource Sharing — กำหนด allowed origins, methods, headers แทน upstream ทุกตัว</div>
+    </div>
+    <div class="plugin-card" style="--pc:#4ade80">
+      <div class="plugin-icon">📋</div>
+      <div class="plugin-name">File Log</div>
+      <div class="plugin-cat">Logging</div>
+      <div class="plugin-desc">Log request/response ลง file — ดูง่าย แต่ไม่เหมาะ production scale ใหญ่ ใช้ HTTP Log แทน</div>
+    </div>
+    <div class="plugin-card" style="--pc:#4ade80">
+      <div class="plugin-icon">📡</div>
+      <div class="plugin-name">HTTP Log</div>
+      <div class="plugin-cat">Logging</div>
+      <div class="plugin-desc">ส่ง log เป็น HTTP POST ไปยัง log aggregator เช่น Loki, Elasticsearch, Splunk — production grade</div>
+    </div>
+    <div class="plugin-card" style="--pc:#4ade80">
+      <div class="plugin-icon">📊</div>
+      <div class="plugin-name">Prometheus</div>
+      <div class="plugin-cat">Logging</div>
+      <div class="plugin-desc">expose /metrics endpoint — latency, request count, upstream health metrics ให้ Prometheus scrape</div>
+    </div>
+    <div class="plugin-card" style="--pc:#ef4444">
+      <div class="plugin-icon">🛡️</div>
+      <div class="plugin-name">IP Restriction</div>
+      <div class="plugin-cat">Security</div>
+      <div class="plugin-desc">Allowlist/Denylist ด้วย IP หรือ CIDR range — ง่ายและเร็วมาก เหมาะกับ admin endpoint</div>
+    </div>
+    <div class="plugin-card" style="--pc:#ef4444">
+      <div class="plugin-icon">🤖</div>
+      <div class="plugin-name">Bot Detection</div>
+      <div class="plugin-cat">Security</div>
+      <div class="plugin-desc">ตรวจจับ bot จาก User-Agent — block รายการ bot ที่รู้จัก หรือ allow เฉพาะ legitimate crawlers</div>
+    </div>
+    <div class="plugin-card" style="--pc:#ef4444">
+      <div class="plugin-icon">🔏</div>
+      <div class="plugin-name">mTLS</div>
+      <div class="plugin-cat">Security</div>
+      <div class="plugin-desc">Mutual TLS — ทั้ง client และ server ต้องมี certificate ยืนยันกัน เหมาะกับ zero-trust network</div>
+    </div>
+    <div class="plugin-card" style="--pc:#06b6d4">
+      <div class="plugin-icon">🔗</div>
+      <div class="plugin-name">OpenTelemetry</div>
+      <div class="plugin-cat">Tracing</div>
+      <div class="plugin-desc">ส่ง trace ไป Jaeger, Tempo, Zipkin — propagate trace context ให้ upstream service ต่อ span ได้</div>
+    </div>
+    <div class="plugin-card" style="--pc:#06b6d4">
+      <div class="plugin-icon">📝</div>
+      <div class="plugin-name">Request Validation</div>
+      <div class="plugin-cat">Validation</div>
+      <div class="plugin-desc">ตรวจสอบ request ด้วย JSON Schema — validate body, headers, query params ก่อนถึง upstream</div>
+    </div>
+    <div class="plugin-card" style="--pc:#06b6d4">
+      <div class="plugin-icon">🧩</div>
+      <div class="plugin-name">Custom Plugin (Go/Lua)</div>
+      <div class="plugin-cat">Extensibility</div>
+      <div class="plugin-desc">เขียน plugin เองด้วย Lua (built-in) หรือ Go Plugin Server (external process) — logic ไม่จำกัด</div>
+    </div>
+  </div>
+
+  <div class="callout tip">
+    <span class="callout-icon">💡</span>
+    <div class="callout-text">
+      <strong>Plugin Priority:</strong> Kong รัน plugins ตาม priority number (สูงกว่า = รันก่อน) — Auth plugins (priority ~1000) รันก่อน Rate Limiting (~910) เสมอ ดู priority ได้จาก Kong docs
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════ -->
+<section id="deployment">
+  <h2>🚀 Deployment Modes</h2>
+  <p>Kong มี 3 deployment modes — เลือกตามความต้องการด้าน scalability และ operational complexity</p>
+
+  <div class="deploy-grid">
+    <div class="deploy-card" style="--dc:#4ade80;background:linear-gradient(135deg,#0a1a0a,#0d1f0d);border-color:#4ade8025">
+      <div class="deploy-icon">🗄️</div>
+      <div class="deploy-name">DB Mode</div>
+      <div class="deploy-subtitle">Traditional</div>
+      <div class="deploy-desc">เก็บ config ใน PostgreSQL — Admin API เขียนลง DB ตรง DP อ่าน config จาก DB</div>
+      <ul class="deploy-pros">
+        <li>เปลี่ยน config ได้ทันทีไม่ต้อง restart</li>
+        <li>Admin GUI (Kong Manager) ทำงานได้เต็มที่</li>
+        <li>เหมาะกับ monolith → microservices transition</li>
+      </ul>
+    </div>
+    <div class="deploy-card" style="--dc:#0ea5e9;background:linear-gradient(135deg,#07141f,#0a1929);border-color:#0ea5e925">
+      <div class="deploy-icon">📄</div>
+      <div class="deploy-name">DB-less Mode</div>
+      <div class="deploy-subtitle">Declarative</div>
+      <div class="deploy-desc">Config อยู่ใน YAML/JSON file — load ตอน startup ไม่ต้องการ DB เลย</div>
+      <ul class="deploy-pros">
+        <li>ไม่มี DB = ไม่มี single point of failure</li>
+        <li>Config เป็น code (GitOps friendly)</li>
+        <li>เหมาะกับ K8s และ immutable infra</li>
+      </ul>
+    </div>
+    <div class="deploy-card" style="--dc:#a78bfa;background:linear-gradient(135deg,#0f0a1a,#14102a);border-color:#a78bfa25">
+      <div class="deploy-icon">🔀</div>
+      <div class="deploy-name">Hybrid Mode</div>
+      <div class="deploy-subtitle">Enterprise / Best of Both</div>
+      <div class="deploy-desc">CP เก็บ config ใน DB, DP รัน stateless รับ config ผ่าน mTLS cluster</div>
+      <ul class="deploy-pros">
+        <li>DP ไม่ต่อ DB โดยตรง — ปลอดภัยกว่า</li>
+        <li>DP scale ได้อิสระ scale CP แยกต่างหาก</li>
+        <li>เหมาะกับ multi-region / multi-cloud</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Quick Start ด้วย Docker Compose</h3>
+  <div class="code-block">
+    <div class="code-header">
+      <span>docker-compose.yml — Kong + PostgreSQL</span>
+      <span class="lang-tag">YAML</span>
+    </div>
+    <pre data-lang="go"><code class="language-yaml">version: "3.8"
+services:
+  kong-db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: kong
+      POSTGRES_USER: kong
+      POSTGRES_PASSWORD: kongpass
+    volumes:
+      - kong-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "kong"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  kong-migration:
+    image: kong:3.6
+    command: kong migrations bootstrap
+    environment:
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: kong-db
+      KONG_PG_USER: kong
+      KONG_PG_PASSWORD: kongpass
+      KONG_PG_DATABASE: kong
+    depends_on:
+      kong-db:
+        condition: service_healthy
+    restart: on-failure
+
+  kong:
+    image: kong:3.6
+    environment:
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: kong-db
+      KONG_PG_USER: kong
+      KONG_PG_PASSWORD: kongpass
+      KONG_PG_DATABASE: kong
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_PROXY_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_LISTEN: "0.0.0.0:8001"  # ใน production ห้าม expose :8001 ออก public!
+      KONG_PROXY_LISTEN: "0.0.0.0:8000, 0.0.0.0:8443 ssl"
+    ports:
+      - "8000:8000"   # HTTP proxy
+      - "8443:8443"   # HTTPS proxy
+      - "8001:8001"   # Admin API (internal เท่านั้น!)
+    depends_on:
+      kong-db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "kong", "health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  kong-db-data:</code></pre>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════ -->
+<section id="config">
+  <h2>📄 Config: Admin API &amp; decK</h2>
+  <p>Kong ตั้งค่าได้ 2 วิธีหลัก — Admin API (imperative, runtime) และ decK (declarative, GitOps)</p>
+
+  <h3>Admin API — ตั้งค่าแบบ imperative</h3>
+  <div class="code-block">
+    <div class="code-header">
+      <span>ตั้งค่า Service + Route + Plugin ผ่าน Admin API</span>
+      <span class="lang-tag">bash</span>
+    </div>
+    <pre data-lang="go"><code class="language-bash"># 1. สร้าง Service (upstream backend)
+curl -s -X POST http://localhost:8001/services \
+  -d name=order-service \
+  -d url=http://order-service:8080
+
+# 2. สร้าง Route ผูกกับ Service
+curl -s -X POST http://localhost:8001/services/order-service/routes \
+  -d "paths[]=/api/orders" \
+  -d "methods[]=GET" \
+  -d "methods[]=POST" \
+  -d strip_path=false \
+  -d name=order-route
+
+# 3. ติด Plugin rate-limiting บน Service
+curl -s -X POST http://localhost:8001/services/order-service/plugins \
+  -d name=rate-limiting \
+  -d config.minute=100 \
+  -d config.hour=1000 \
+  -d config.policy=local
+
+# 4. ติด Plugin JWT authentication บน Route
+curl -s -X POST http://localhost:8001/routes/order-route/plugins \
+  -d name=jwt
+
+# 5. สร้าง Consumer และ JWT credential
+curl -s -X POST http://localhost:8001/consumers \
+  -d username=mobile-app
+
+curl -s -X POST http://localhost:8001/consumers/mobile-app/jwt \
+  -d algorithm=HS256 \
+  -d secret=my-super-secret-key
+
+# 6. ทดสอบ — ต้องส่ง JWT token
+curl -H "Authorization: Bearer <JWT_TOKEN>" \
+  http://localhost:8000/api/orders</code></pre>
+  </div>
+
+  <h3>decK — Declarative Config (แนะนำสำหรับ Production)</h3>
+  <div class="callout info">
+    <span class="callout-icon">📌</span>
+    <div class="callout-text">
+      <strong>decK</strong> (Declarative Kong) คือ CLI tool สำหรับ sync config จาก YAML file ไปยัง Kong — เหมือน Terraform แต่สำหรับ Kong โดยเฉพาะ เหมาะกับ GitOps workflow
+    </div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>kong.yaml — full declarative config</span>
+      <span class="lang-tag">YAML</span>
+    </div>
+    <pre data-lang="go"><code class="language-yaml">_format_version: "3.0"
+_transform: true
+
+# ── Services ──────────────────────────────────────
+services:
+  - name: order-service
+    url: http://order-service:8080
+    connect_timeout: 5000
+    read_timeout: 30000
+    write_timeout: 30000
+    routes:
+      - name: order-routes
+        paths:
+          - /api/orders
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+        strip_path: false
+        preserve_host: false
+    plugins:
+      - name: rate-limiting
+        config:
+          minute: 100
+          hour: 1000
+          policy: redis
+          redis_host: redis
+          redis_port: 6379
+      - name: prometheus
+        config:
+          status_code_metrics: true
+          latency_metrics: true
+
+  - name: user-service
+    url: http://user-service:8081
+    routes:
+      - name: user-routes
+        paths:
+          - /api/users
+        methods:
+          - GET
+          - POST
+        strip_path: false
+    plugins:
+      - name: jwt
+        config:
+          secret_is_base64: false
+          claims_to_verify:
+            - exp
+
+# ── Global Plugins ──────────────────────────────
+plugins:
+  - name: cors
+    config:
+      origins:
+        - "https://myapp.com"
+        - "https://admin.myapp.com"
+      methods:
+        - GET
+        - POST
+        - PUT
+        - DELETE
+        - OPTIONS
+      headers:
+        - Authorization
+        - Content-Type
+      exposed_headers:
+        - X-Request-Id
+      max_age: 3600
+      credentials: true
+
+  - name: opentelemetry
+    config:
+      endpoint: http://otel-collector:4318/v1/traces
+      resource_attributes:
+        service.name: kong-gateway
+      propagation:
+        default_format: w3c
+
+# ── Consumers ──────────────────────────────────
+consumers:
+  - username: mobile-app
+    jwt_secrets:
+      - algorithm: HS256
+        secret: "${MOBILE_APP_JWT_SECRET}"  # ใช้ env var ไม่ hardcode!
+    plugins:
+      - name: rate-limiting
+        config:
+          minute: 200   # consumer นี้ได้ limit พิเศษ
+          policy: local
+
+  - username: partner-api
+    keyauth_credentials:
+      - key: "${PARTNER_API_KEY}"</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>คำสั่ง decK</span>
+      <span class="lang-tag">bash</span>
+    </div>
+    <pre data-lang="go"><code class="language-bash"># ติดตั้ง decK
+brew install deck          # macOS
+# หรือ download binary จาก github.com/kong/deck
+
+# Sync config ไปยัง Kong (diff แล้ว apply)
+deck sync --kong-addr http://localhost:8001 --state kong.yaml
+
+# Dry-run ดูว่าจะเปลี่ยนอะไรบ้าง ก่อน sync จริง
+deck diff --kong-addr http://localhost:8001 --state kong.yaml
+
+# Export config ปัจจุบันจาก Kong เป็น YAML
+deck dump --kong-addr http://localhost:8001 --output-file kong-backup.yaml
+
+# Validate YAML ก่อน sync
+deck validate --state kong.yaml
+
+# Reset Kong ทั้งหมด (ระวัง!)
+deck reset --kong-addr http://localhost:8001</code></pre>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════ -->
+<section id="k8s">
+  <h2>☸️ Kong Ingress Controller (KIC)</h2>
+  <p>ใน Kubernetes ใช้ <strong>Kong Ingress Controller</strong> ที่แปลง Kubernetes resources (Ingress, HTTPRoute, CRDs) เป็น Kong config อัตโนมัติ — ไม่ต้องใช้ Admin API โดยตรง</p>
+
+  <div class="vb-wrap">
+    <div class="vb-label">วิธีติดตั้ง KIC ด้วย Helm</div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>ติดตั้ง Kong Ingress Controller</span>
+      <span class="lang-tag">bash</span>
+    </div>
+    <pre data-lang="go"><code class="language-bash"># เพิ่ม Helm repo
+helm repo add kong https://charts.konghq.com
+helm repo update
+
+# ติดตั้ง KIC (DB-less mode — แนะนำสำหรับ K8s)
+helm install kong kong/ingress \
+  --namespace kong \
+  --create-namespace \
+  --set gateway.env.database=off \
+  --set gateway.env.router_flavor=expressions
+
+# ดู pods
+kubectl get pods -n kong
+
+# ดู LoadBalancer IP
+kubectl get svc -n kong kong-gateway-proxy</code></pre>
+  </div>
+
+  <h3>ตัวอย่าง Kubernetes Resources</h3>
+  <div class="code-block">
+    <div class="code-header">
+      <span>Service + Ingress + KongPlugin CRDs</span>
+      <span class="lang-tag">YAML</span>
+    </div>
+    <pre data-lang="go"><code class="language-yaml"># 1. Kubernetes Service สำหรับ order-service
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-service
+  namespace: default
+spec:
+  selector:
+    app: order-service
+  ports:
+    - port: 8080
+      targetPort: 8080
+
+---
+# 2. KongPlugin — rate limiting (Kong CRD)
+apiVersion: configuration.konghq.com/v1
+kind: KongPlugin
+metadata:
+  name: rate-limit-orders
+  namespace: default
+plugin: rate-limiting
+config:
+  minute: 100
+  policy: local
+
+---
+# 3. KongPlugin — JWT auth
+apiVersion: configuration.konghq.com/v1
+kind: KongPlugin
+metadata:
+  name: jwt-auth
+  namespace: default
+plugin: jwt
+
+---
+# 4. Ingress ที่ใช้ Kong plugins ผ่าน annotation
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: order-api-ingress
+  namespace: default
+  annotations:
+    konghq.com/plugins: "jwt-auth,rate-limit-orders"
+    konghq.com/strip-path: "false"
+    konghq.com/preserve-host: "false"
+spec:
+  ingressClassName: kong
+  rules:
+    - host: api.myapp.com
+      http:
+        paths:
+          - path: /api/orders
+            pathType: Prefix
+            backend:
+              service:
+                name: order-service
+                port:
+                  number: 8080
+
+---
+# 5. KongConsumer — ตัวแทน client ที่ใช้ API
+apiVersion: configuration.konghq.com/v1
+kind: KongConsumer
+metadata:
+  name: mobile-app
+  namespace: default
+  annotations:
+    kubernetes.io/ingress.class: kong
+username: mobile-app
+credentials:
+  - mobile-app-jwt-secret   # ชี้ไป Secret
+
+---
+# 6. Kubernetes Secret เก็บ JWT credential
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mobile-app-jwt-secret
+  namespace: default
+  labels:
+    konghq.com/credential: jwt
+stringData:
+  algorithm: HS256
+  secret: "my-super-secret-key"   # ใน production ใช้ External Secrets Operator</code></pre>
+  </div>
+
+  <div class="callout tip">
+    <span class="callout-icon">✅</span>
+    <div class="callout-text">
+      <strong>KIC Best Practice:</strong> ใช้ <code>KongClusterPlugin</code> แทน <code>KongPlugin</code> สำหรับ plugin ที่ใช้ทั้ง cluster เช่น CORS, Prometheus — ไม่ต้องสร้างซ้ำทุก namespace
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════ -->
+<section id="code">
+  <h2>🐹 Go Service + Kong Integration</h2>
+  <p>ตัวอย่าง Go microservice ที่ทำงานร่วมกับ Kong — service ไม่ต้องรู้เรื่อง auth หรือ rate limiting เลย Kong จัดการให้ทั้งหมด</p>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>order-service/main.go — Go service ที่ทำงานหลัง Kong</span>
+      <span class="lang-tag">Go</span>
+    </div>
+    <pre data-lang="go"><code class="language-go">package main
+
+import (
+	"encoding/json"
+	"log/slog"
+	"net/http"
+	"os"
+	"time"
+)
+
+type Order struct {
+	ID        string    `json:"id"`
+	UserID    string    `json:"user_id"`
+	Total     float64   `json:"total"`
+	Status    string    `json:"status"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
+func main() {
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	mux := http.NewServeMux()
+
+	mux.HandleFunc("GET /api/orders", func(w http.ResponseWriter, r *http.Request) {
+		// Kong inject consumer info เป็น header ให้อัตโนมัติ
+		consumerID := r.Header.Get("X-Consumer-Id")
+		consumerUsername := r.Header.Get("X-Consumer-Username")
+
+		logger.Info("list orders",
+			"consumer_id", consumerID,
+			"consumer_username", consumerUsername,
+			"request_id", r.Header.Get("X-Request-Id"), // Kong inject
+		)
+
+		orders := []Order{
+			{ID: "ord-1", UserID: consumerID, Total: 299.99, Status: "pending", CreatedAt: time.Now()},
+			{ID: "ord-2", UserID: consumerID, Total: 149.00, Status: "shipped", CreatedAt: time.Now().Add(-24 * time.Hour)},
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(orders)
+	})
+
+	mux.HandleFunc("POST /api/orders", func(w http.ResponseWriter, r *http.Request) {
+		var req struct {
+			Items []struct {
+				ProductID string  `json:"product_id"`
+				Qty       int     `json:"qty"`
+				Price     float64 `json:"price"`
+			} `json:"items"`
+		}
+
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			http.Error(w, `{"error":"invalid body"}`, http.StatusBadRequest)
+			return
+		}
+
+		consumerUsername := r.Header.Get("X-Consumer-Username")
+		order := Order{
+			ID:        "ord-" + time.Now().Format("20060102150405"),
+			UserID:    consumerUsername,
+			Total:     calculateTotal(req.Items),
+			Status:    "pending",
+			CreatedAt: time.Now(),
+		}
+
+		logger.Info("order created",
+			"order_id", order.ID,
+			"total", order.Total,
+			"consumer", consumerUsername,
+		)
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusCreated)
+		json.NewEncoder(w).Encode(order)
+	})
+
+	// Health check endpoint — Kong ใช้ probe นี้
+	mux.HandleFunc("GET /health", func(w http.ResponseWriter, r *http.Request) {
+		json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
+	})
+
+	addr := ":8080"
+	logger.Info("order service starting", "addr", addr)
+
+	if err := http.ListenAndServe(addr, mux); err != nil {
+		logger.Error("server failed", "err", err)
+		os.Exit(1)
+	}
+}
+
+func calculateTotal(items []struct {
+	ProductID string  `json:"product_id"`
+	Qty       int     `json:"qty"`
+	Price     float64 `json:"price"`
+}) float64 {
+	var total float64
+	for _, item := range items {
+		total += item.Price * float64(item.Qty)
+	}
+	return total
+}</code></pre>
+  </div>
+
+  <h3>Custom Go Plugin</h3>
+  <div class="code-block">
+    <div class="code-header">
+      <span>custom-plugin/main.go — Go Plugin ด้วย Kong PDK</span>
+      <span class="lang-tag">Go</span>
+    </div>
+    <pre data-lang="go"><code class="language-go">// Kong Go Plugin Server — รัน external process ที่ Kong เรียกผ่าน RPC
+// go get github.com/Kong/go-pdk
+
+package main
+
+import (
+	"fmt"
+	"time"
+
+	"github.com/Kong/go-pdk"
+	"github.com/Kong/go-pdk/server"
+)
+
+// Config กำหนด schema ของ plugin config
+type Config struct {
+	HeaderName string `json:"header_name"`
+	TeamName   string `json:"team_name"`
+}
+
+func New() interface{} {
+	return &Config{}
+}
+
+// Access phase — รันก่อน forward ไป upstream
+func (c *Config) Access(kong *pdk.PDK) {
+	// เพิ่ม custom header ที่ upstream จะได้รับ
+	headerName := c.HeaderName
+	if headerName == "" {
+		headerName = "X-Team"
+	}
+
+	kong.Request.SetHeader(headerName, c.TeamName)
+	kong.Request.SetHeader("X-Gateway-Time", fmt.Sprintf("%d", time.Now().UnixMilli()))
+
+	// ดึงข้อมูล consumer จาก Kong
+	consumer, err := kong.Client.GetConsumer()
+	if err == nil {
+		kong.Request.SetHeader("X-Consumer-Team", c.TeamName+":"+consumer.Username)
+	}
+}
+
+// Response phase — รันก่อนส่ง response กลับ client
+func (c *Config) Response(kong *pdk.PDK) {
+	kong.Response.SetHeader("X-Served-By", "kong-"+c.TeamName)
+}
+
+func main() {
+	// Version ของ plugin — เพิ่มทุกครั้งที่ config schema เปลี่ยน
+	server.StartServer(New, "1.0.0", 1000)
+}</code></pre>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════ -->
+<section id="cheatsheet">
+  <h2>⌨️ Admin API Cheatsheet</h2>
+
+  <div class="cmd-grid">
+    <div class="cmd-box">
+      <div class="cmd-box-header">📦 Services</div>
+      <code class="cmd-row"><span class="cmd-k">GET</span>    /services<span>ดู services ทั้งหมด</span></code>
+      <code class="cmd-row"><span class="cmd-k">POST</span>   /services<span>สร้าง service ใหม่</span></code>
+      <code class="cmd-row"><span class="cmd-k">GET</span>    /services/<span class="cmd-v">{name}</span><span>ดู service ตามชื่อ</span></code>
+      <code class="cmd-row"><span class="cmd-k">PATCH</span>  /services/<span class="cmd-v">{name}</span><span>แก้ไข service</span></code>
+      <code class="cmd-row"><span class="cmd-k">DELETE</span> /services/<span class="cmd-v">{name}</span><span>ลบ service</span></code>
+    </div>
+    <div class="cmd-box">
+      <div class="cmd-box-header">🗺️ Routes</div>
+      <code class="cmd-row"><span class="cmd-k">GET</span>    /routes<span>ดู routes ทั้งหมด</span></code>
+      <code class="cmd-row"><span class="cmd-k">POST</span>   /services/<span class="cmd-v">{svc}</span>/routes<span>สร้าง route ใน service</span></code>
+      <code class="cmd-row"><span class="cmd-k">GET</span>    /routes/<span class="cmd-v">{name}</span><span>ดู route ตามชื่อ</span></code>
+      <code class="cmd-row"><span class="cmd-k">PATCH</span>  /routes/<span class="cmd-v">{name}</span><span>แก้ไข route</span></code>
+      <code class="cmd-row"><span class="cmd-k">DELETE</span> /routes/<span class="cmd-v">{name}</span><span>ลบ route</span></code>
+    </div>
+    <div class="cmd-box">
+      <div class="cmd-box-header">🧩 Plugins</div>
+      <code class="cmd-row"><span class="cmd-k">GET</span>    /plugins<span>ดู plugins ทั้งหมด (global)</span></code>
+      <code class="cmd-row"><span class="cmd-k">POST</span>   /services/<span class="cmd-v">{svc}</span>/plugins<span>ติด plugin บน service</span></code>
+      <code class="cmd-row"><span class="cmd-k">POST</span>   /routes/<span class="cmd-v">{rt}</span>/plugins<span>ติด plugin บน route</span></code>
+      <code class="cmd-row"><span class="cmd-k">PATCH</span>  /plugins/<span class="cmd-v">{id}</span><span>แก้ config plugin</span></code>
+      <code class="cmd-row"><span class="cmd-k">DELETE</span> /plugins/<span class="cmd-v">{id}</span><span>ถอด plugin ออก</span></code>
+    </div>
+    <div class="cmd-box">
+      <div class="cmd-box-header">👤 Consumers</div>
+      <code class="cmd-row"><span class="cmd-k">GET</span>    /consumers<span>ดู consumers ทั้งหมด</span></code>
+      <code class="cmd-row"><span class="cmd-k">POST</span>   /consumers<span>สร้าง consumer ใหม่</span></code>
+      <code class="cmd-row"><span class="cmd-k">POST</span>   /consumers/<span class="cmd-v">{c}</span>/jwt<span>สร้าง JWT credential</span></code>
+      <code class="cmd-row"><span class="cmd-k">POST</span>   /consumers/<span class="cmd-v">{c}</span>/key-auth<span>สร้าง API Key</span></code>
+      <code class="cmd-row"><span class="cmd-k">DELETE</span> /consumers/<span class="cmd-v">{c}</span><span>ลบ consumer</span></code>
+    </div>
+    <div class="cmd-box">
+      <div class="cmd-box-header">⚖️ Upstreams &amp; Targets</div>
+      <code class="cmd-row"><span class="cmd-k">GET</span>    /upstreams<span>ดู upstreams ทั้งหมด</span></code>
+      <code class="cmd-row"><span class="cmd-k">POST</span>   /upstreams<span>สร้าง upstream ใหม่</span></code>
+      <code class="cmd-row"><span class="cmd-k">POST</span>   /upstreams/<span class="cmd-v">{name}</span>/targets<span>เพิ่ม target server</span></code>
+      <code class="cmd-row"><span class="cmd-k">GET</span>    /upstreams/<span class="cmd-v">{name}</span>/health<span>ดู health targets</span></code>
+      <code class="cmd-row"><span class="cmd-k">DELETE</span> /upstreams/<span class="cmd-v">{name}</span>/targets/<span class="cmd-v">{id}</span><span>ลบ target</span></code>
+    </div>
+    <div class="cmd-box">
+      <div class="cmd-box-header">🔍 Status &amp; Debug</div>
+      <code class="cmd-row"><span class="cmd-k">GET</span>    /<span>Kong version &amp; node info</span></code>
+      <code class="cmd-row"><span class="cmd-k">GET</span>    /status<span>connection stats, memory usage</span></code>
+      <code class="cmd-row"><span class="cmd-k">GET</span>    /metrics<span>Prometheus metrics (ถ้าเปิด plugin)</span></code>
+      <code class="cmd-row"><span class="cmd-k">GET</span>    /endpoints<span>list endpoints ทั้งหมดของ Admin API</span></code>
+      <code class="cmd-row"><span class="cmd-k">GET</span>    /schemas/plugins/<span class="cmd-v">{name}</span><span>ดู schema plugin</span></code>
+    </div>
+  </div>
+
+  <h3>Kong vs. คู่แข่ง</h3>
+  <div class="compare-wrap">
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>Feature</th>
+          <th>Kong Gateway</th>
+          <th>Nginx (plain)</th>
+          <th>AWS API Gateway</th>
+          <th>Traefik</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Plugin Ecosystem</td>
+          <td>60+ built-in + custom</td>
+          <td>manual Lua/module</td>
+          <td>limited built-in</td>
+          <td>middleware-based</td>
+        </tr>
+        <tr>
+          <td>Declarative Config</td>
+          <td><span class="badge-yes">Yes (decK)</span></td>
+          <td><span class="badge-partial">YAML (limited)</span></td>
+          <td><span class="badge-yes">Yes (CDK/SAM)</span></td>
+          <td><span class="badge-yes">Yes (YAML)</span></td>
+        </tr>
+        <tr>
+          <td>K8s Native (CRDs)</td>
+          <td><span class="badge-yes">KIC + CRDs</span></td>
+          <td><span class="badge-partial">Ingress only</span></td>
+          <td><span class="badge-no">No</span></td>
+          <td><span class="badge-yes">IngressRoute CRDs</span></td>
+        </tr>
+        <tr>
+          <td>Custom Plugin (Go)</td>
+          <td><span class="badge-yes">Go PDK</span></td>
+          <td><span class="badge-no">C module only</span></td>
+          <td><span class="badge-no">No</span></td>
+          <td><span class="badge-partial">Go middleware</span></td>
+        </tr>
+        <tr>
+          <td>Rate Limiting</td>
+          <td><span class="badge-yes">Built-in plugin</span></td>
+          <td><span class="badge-partial">ngx_limit_req</span></td>
+          <td><span class="badge-yes">Built-in</span></td>
+          <td><span class="badge-yes">Middleware</span></td>
+        </tr>
+        <tr>
+          <td>Self-hosted</td>
+          <td><span class="badge-yes">Yes (OSS)</span></td>
+          <td><span class="badge-yes">Yes</span></td>
+          <td><span class="badge-no">AWS only</span></td>
+          <td><span class="badge-yes">Yes (OSS)</span></td>
+        </tr>
+        <tr>
+          <td>Performance</td>
+          <td>สูงมาก (Nginx core)</td>
+          <td>สูงสุด (no overhead)</td>
+          <td>ขึ้นกับ AWS region</td>
+          <td>สูง (Go)</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout warn">
+    <span class="callout-icon">⚠️</span>
+    <div class="callout-text">
+      <strong>Production Checklist:</strong>
+      ปิด Admin API (:8001) ไม่ให้ external เข้าถึง &nbsp;·&nbsp;
+      ใช้ HTTPS (:8443) เสมอ &nbsp;·&nbsp;
+      เก็บ secrets ใน env var หรือ Vault ไม่ hardcode ใน kong.yaml &nbsp;·&nbsp;
+      ตั้ง rate limiting ทุก public route &nbsp;·&nbsp;
+      monitor ด้วย Prometheus + Grafana dashboard
+    </div>
+  </div>
+</section>
+
+</div><!-- /container -->
+
+<footer>สื่อการสอน Software Architecture Patterns &nbsp;·&nbsp; Kong Gateway #23 &nbsp;·&nbsp; Code ตัวอย่างใช้ Go + YAML</footer>
+
+<script>
+  hljs.highlightAll();
+</script>
+<script src="common.js"></script>
+</body>
+</html>

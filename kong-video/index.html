@@ -1,0 +1,502 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1920, height=1080" />
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 1920px; height: 1080px;
+      overflow: hidden;
+      background: #07090f;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      color: #e2e8f0;
+    }
+
+    /* ── Title ── */
+    #title {
+      position: absolute; top: 36px; left: 0; right: 0;
+      text-align: center;
+      font-size: 2.4rem; font-weight: 800;
+      background: linear-gradient(135deg,#00b4d8,#38bdf8,#67e8f9);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    #subtitle {
+      position: absolute; top: 96px; left: 0; right: 0;
+      text-align: center; font-size: 1.05rem; color: #475569; letter-spacing: .04em;
+    }
+
+    /* ── Client ── */
+    #client {
+      position: absolute; left: 52px; top: 400px;
+      width: 170px; height: 170px;
+      background: #0d1929; border: 2px solid #0ea5e970;
+      border-radius: 20px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center;
+    }
+    #client .icon { font-size: 2.6rem; margin-bottom: 8px; }
+    #client .label { font-size: 1rem; font-weight: 700; }
+    #client .sub { font-size: .75rem; color: #64748b; margin-top: 4px; }
+
+    /* ── Kong Box ── */
+    #kong-box {
+      position: absolute; left: 280px; top: 160px;
+      width: 960px; height: 680px;
+      background: #050810; border: 2px solid #00b4d840; border-radius: 24px;
+    }
+    #kong-title {
+      position: absolute; left: 280px; top: 132px;
+      font-size: .95rem; font-weight: 800; letter-spacing: 3px;
+      text-transform: uppercase; color: #00b4d8;
+    }
+    #kong-port {
+      position: absolute; left: 280px; top: 154px;
+      font-size: .75rem; color: #334155;
+    }
+
+    /* ── Pipeline Steps ── */
+    .pipe {
+      position: absolute;
+      border-radius: 14px; padding: 14px 20px;
+      display: flex; align-items: center; gap: 14px;
+    }
+    .pipe .p-icon { font-size: 1.8rem; flex-shrink: 0; }
+    .pipe .p-name { font-size: .95rem; font-weight: 700; color: #e2e8f0; }
+    .pipe .p-desc { font-size: .75rem; color: #64748b; margin-top: 3px; }
+
+    #pipe-route {
+      left: 300px; top: 188px; width: 900px;
+      background: #0a1525; border: 1px solid #0ea5e950;
+    }
+    #pipe-auth {
+      left: 300px; top: 272px; width: 430px;
+      background: #0d1525; border: 1px solid #0ea5e940;
+    }
+    #pipe-rate {
+      left: 300px; top: 342px; width: 430px;
+      background: #110e05; border: 1px solid #f59e0b40;
+    }
+    #pipe-transform {
+      left: 300px; top: 412px; width: 430px;
+      background: #0f0a1a; border: 1px solid #a78bfa40;
+    }
+    #pipe-log {
+      left: 300px; top: 482px; width: 430px;
+      background: #071510; border: 1px solid #4ade8040;
+    }
+
+    #plugin-label {
+      position: absolute; left: 756px; top: 268px;
+      font-size: .78rem; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; color: #334155;
+    }
+
+    /* ── Vertical arrow inside Kong ── */
+    #pipe-arrow {
+      position: absolute; left: 760px; top: 288px;
+      width: 5px; background: linear-gradient(180deg,#0ea5e980,#4ade8080);
+      border-radius: 3px; height: 0; transform-origin: top;
+    }
+
+    /* ── Kong internal right section (proxy note) ── */
+    #proxy-note {
+      position: absolute; left: 756px; top: 310px; width: 460px;
+      background: #0a1520; border: 1px solid #0ea5e920; border-radius: 12px;
+      padding: 14px 18px;
+    }
+    #proxy-note .pn-title { font-size: .85rem; font-weight: 700; color: #38bdf8; margin-bottom: 6px; }
+    #proxy-note .pn-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 5px 0; border-bottom: 1px solid #ffffff08; font-size: .78rem; color: #94a3b8;
+    }
+    #proxy-note .pn-row:last-child { border-bottom: none; }
+    #proxy-note .pn-row .badge {
+      background: #0ea5e915; border: 1px solid #0ea5e940; color: #7dd3fc;
+      padding: 2px 8px; border-radius: 6px; font-size: .68rem; font-weight: 700; flex-shrink: 0;
+    }
+
+    /* ── Admin badge ── */
+    #admin-badge {
+      position: absolute; left: 300px; top: 578px;
+      background: #0d1117; border: 1px dashed #fbbf2450; border-radius: 12px;
+      padding: 10px 18px; font-size: .8rem; color: #fbbf24;
+    }
+
+    /* ── Upstream box ── */
+    #upstream-box {
+      position: absolute; left: 1300px; top: 160px;
+      width: 280px; height: 680px;
+      background: #050d05; border: 2px solid #4ade8040; border-radius: 20px;
+    }
+    #upstream-title {
+      position: absolute; left: 1300px; top: 132px;
+      font-size: .95rem; font-weight: 800; letter-spacing: 3px;
+      text-transform: uppercase; color: #4ade80;
+    }
+
+    /* ── Service boxes ── */
+    .svc {
+      position: absolute; left: 1312px;
+      width: 256px; height: 72px;
+      background: #0a1a0a; border: 1px solid #4ade8050; border-radius: 12px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
+    .svc .sn { font-size: .9rem; font-weight: 700; color: #86efac; }
+    .svc .sp { font-size: .72rem; color: #334155; margin-top: 3px; }
+
+    #svc1 { top: 182px; }
+    #svc2 { top: 270px; }
+    #svc3 { top: 358px; }
+    #svc4 { top: 446px; }
+    #svc5 { top: 534px; }
+
+    /* ── Arrows (SVG layer) ── */
+    #svg-arrows {
+      position: absolute; top: 0; left: 0;
+      width: 1920px; height: 1080px;
+      pointer-events: none;
+    }
+
+    /* ── Packet (request dot) ── */
+    .packet {
+      position: absolute; width: 20px; height: 20px; border-radius: 50%;
+      transform: translateX(0);
+    }
+    #pkt-client  { background: #38bdf8; box-shadow: 0 0 16px #38bdf8; top: 482px; left: 222px; }
+    #pkt-pipeline{ background: #f59e0b; box-shadow: 0 0 16px #f59e0b; top: 482px; left: 730px; }
+    #pkt-out     { background: #4ade80; box-shadow: 0 0 16px #4ade80; top: 482px; left: 1240px; }
+
+    /* ── Legend ── */
+    #legend {
+      position: absolute; bottom: 32px; right: 52px;
+      display: flex; gap: 24px;
+    }
+    .leg { display: flex; align-items: center; gap: 8px; font-size: .78rem; color: #475569; }
+    .leg-dot { width: 12px; height: 12px; border-radius: 50%; }
+
+    /* ── Step counter ── */
+    #step-label {
+      position: absolute; bottom: 32px; left: 52px;
+      font-size: .8rem; color: #334155; font-weight: 600;
+    }
+
+    /* ── Subtitles ── */
+    #subtitle-bar {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      height: 110px;
+      background: linear-gradient(to top, rgba(0,0,0,.82) 0%, rgba(0,0,0,.5) 70%, transparent 100%);
+      display: flex; align-items: flex-end; justify-content: center;
+      padding-bottom: 28px;
+      pointer-events: none;
+    }
+    #sub-text {
+      max-width: 1400px;
+      text-align: center;
+      font-size: 1.35rem;
+      font-weight: 600;
+      color: #f1f5f9;
+      line-height: 1.6;
+      text-shadow: 0 2px 8px rgba(0,0,0,.9), 0 0 24px rgba(0,0,0,.6);
+      letter-spacing: .02em;
+    }
+    #sub-text .hi { color: #38bdf8; }
+    #sub-text .hi-green { color: #86efac; }
+    #sub-text .hi-yellow { color: #fbbf24; }
+  </style>
+</head>
+<body>
+
+<div id="root"
+  data-composition-id="main"
+  data-start="0"
+  data-duration="16"
+  data-width="1920"
+  data-height="1080">
+
+  <!-- Title -->
+  <div id="title">🦍 Kong Gateway — Request Flow</div>
+  <div id="subtitle">Client → Route Matching → Plugin Pipeline → Service → Upstream</div>
+
+  <!-- Client -->
+  <div id="client">
+    <div class="icon">🌐</div>
+    <div class="label">Client</div>
+    <div class="sub">HTTP :8000</div>
+  </div>
+
+  <!-- Kong Container -->
+  <div id="kong-box"></div>
+  <div id="kong-title">KONG GATEWAY</div>
+  <div id="kong-port">Nginx + OpenResty (Lua)  ·  :8000 proxy  ·  :8001 Admin API</div>
+
+  <!-- Pipeline -->
+  <div class="pipe" id="pipe-route">
+    <div class="p-icon">🗺️</div>
+    <div>
+      <div class="p-name">Route Matching</div>
+      <div class="p-desc">Match by path, host, method, headers → ชี้ไป Service</div>
+    </div>
+  </div>
+
+  <div class="pipe" id="pipe-auth">
+    <div class="p-icon">🔐</div>
+    <div>
+      <div class="p-name">Auth Plugin</div>
+      <div class="p-desc">JWT / API Key / OAuth 2.0</div>
+    </div>
+  </div>
+  <div class="pipe" id="pipe-rate">
+    <div class="p-icon">⚡</div>
+    <div>
+      <div class="p-name">Rate Limiting</div>
+      <div class="p-desc">100 req/min per consumer</div>
+    </div>
+  </div>
+  <div class="pipe" id="pipe-transform">
+    <div class="p-icon">🔀</div>
+    <div>
+      <div class="p-name">Request Transform</div>
+      <div class="p-desc">Add/strip headers, rewrite body</div>
+    </div>
+  </div>
+  <div class="pipe" id="pipe-log">
+    <div class="p-icon">🔭</div>
+    <div>
+      <div class="p-name">Log &amp; Trace</div>
+      <div class="p-desc">Prometheus + OpenTelemetry</div>
+    </div>
+  </div>
+
+  <div id="plugin-label">Plugin Pipeline</div>
+
+  <!-- Right info panel -->
+  <div id="proxy-note">
+    <div class="pn-title">⚙️ Plugin Scope (กว้าง → แคบ)</div>
+    <div class="pn-row"><span class="badge">Global</span> ทุก request ทุก service</div>
+    <div class="pn-row"><span class="badge">Service</span> เฉพาะ service นั้น</div>
+    <div class="pn-row"><span class="badge">Route</span> เฉพาะ route นั้น</div>
+    <div class="pn-row"><span class="badge">Consumer</span> เฉพาะ user/app นั้น</div>
+  </div>
+
+  <!-- Admin -->
+  <div id="admin-badge">⚙️ Admin API :8001 — ตั้งค่า Service / Route / Plugin ด้วย decK (YAML)</div>
+
+  <!-- Upstream -->
+  <div id="upstream-box"></div>
+  <div id="upstream-title">UPSTREAM</div>
+
+  <div class="svc" id="svc1"><div class="sn">🛒 Order Service</div><div class="sp">:8080</div></div>
+  <div class="svc" id="svc2"><div class="sn">👤 User Service</div><div class="sp">:8081</div></div>
+  <div class="svc" id="svc3"><div class="sn">💳 Payment Service</div><div class="sp">:8082</div></div>
+  <div class="svc" id="svc4"><div class="sn">📦 Product Service</div><div class="sp">:8083</div></div>
+  <div class="svc" id="svc5"><div class="sn">🔔 Notify Service</div><div class="sp">:8084</div></div>
+
+  <!-- Packets -->
+  <div class="packet" id="pkt-client"></div>
+  <div class="packet" id="pkt-pipeline"></div>
+  <div class="packet" id="pkt-out"></div>
+
+  <!-- SVG arrows -->
+  <svg id="svg-arrows">
+    <defs>
+      <marker id="h-blue" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto">
+        <path d="M0,0 L0,6 L9,3 z" fill="#38bdf8"/>
+      </marker>
+      <marker id="h-green" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto">
+        <path d="M0,0 L0,6 L9,3 z" fill="#4ade80"/>
+      </marker>
+    </defs>
+    <!-- Client → Kong -->
+    <line id="arr-client"
+      x1="222" y1="490" x2="278" y2="490"
+      stroke="#38bdf8" stroke-width="3" stroke-linecap="round"
+      marker-end="url(#h-blue)"
+      stroke-dasharray="60" stroke-dashoffset="60"/>
+    <!-- Kong → Upstream -->
+    <line id="arr-kong"
+      x1="1242" y1="490" x2="1298" y2="490"
+      stroke="#4ade80" stroke-width="3" stroke-linecap="round"
+      marker-end="url(#h-green)"
+      stroke-dasharray="60" stroke-dashoffset="60"/>
+  </svg>
+
+  <!-- Legend -->
+  <div id="legend">
+    <div class="leg"><div class="leg-dot" style="background:#38bdf8"></div> Request in</div>
+    <div class="leg"><div class="leg-dot" style="background:#f59e0b"></div> Plugin processing</div>
+    <div class="leg"><div class="leg-dot" style="background:#4ade80"></div> Upstream response</div>
+  </div>
+  <div id="step-label">Kong Gateway — API Gateway Pattern</div>
+
+  <!-- Subtitle bar -->
+  <div id="subtitle-bar">
+    <div id="sub-text"></div>
+  </div>
+
+</div><!-- #root -->
+
+<script>
+  window.__timelines = window.__timelines || {};
+
+  /* ── Subtitle helper ── */
+  const sub = document.getElementById('sub-text');
+  function setSub(html) {
+    gsap.to(sub, { opacity: 0, duration: .18, onComplete: () => {
+      sub.innerHTML = html;
+      gsap.to(sub, { opacity: 1, duration: .22 });
+    }});
+  }
+  function clearSub() {
+    gsap.to(sub, { opacity: 0, duration: .25 });
+  }
+  gsap.set(sub, { opacity: 0 });
+
+  const tl = gsap.timeline({ paused: true });
+
+  // Set all hidden initially
+  gsap.set(["#title","#subtitle","#client","#kong-box","#kong-title","#kong-port",
+    "#pipe-route","#pipe-auth","#pipe-rate","#pipe-transform","#pipe-log",
+    "#plugin-label","#proxy-note","#admin-badge",
+    "#upstream-box","#upstream-title",
+    "#svc1","#svc2","#svc3","#svc4","#svc5",
+    "#pkt-client","#pkt-pipeline","#pkt-out",
+    "#legend","#step-label"
+  ], { opacity: 0 });
+
+  gsap.set(["#arr-client","#arr-kong"], { strokeDashoffset: 60 });
+
+  // 0s — Title
+  tl.to("#title",    { opacity: 1, y: 0, duration: .6, ease: "power2.out" }, 0.2)
+    .to("#subtitle", { opacity: 1, y: 0, duration: .5, ease: "power2.out" }, 0.5)
+    .to("#step-label",{ opacity: 1, duration: .4 }, 0.6)
+
+  // 1s — Client
+    .to("#client", { opacity: 1, scale: 1, duration: .5, ease: "back.out(1.7)" }, 1.0)
+
+  // 1.6s — Kong box
+    .to("#kong-box",   { opacity: 1, duration: .5 }, 1.6)
+    .to("#kong-title", { opacity: 1, y: 0, duration: .4 }, 1.8)
+    .to("#kong-port",  { opacity: 1, duration: .4 }, 2.0)
+
+  // 2.0s — Arrow client → kong
+    .to("#arr-client", { strokeDashoffset: 0, duration: .4, ease: "power2.inOut" }, 2.0)
+
+  // 2.2s — Route matching
+    .to("#pipe-route", { opacity: 1, x: 0, duration: .5, ease: "back.out(1.4)" }, 2.2)
+
+  // 2.8s — Plugin label + steps
+    .to("#plugin-label", { opacity: 1, duration: .3 }, 2.8)
+    .to("#pipe-auth",      { opacity: 1, x: 0, duration: .4, ease: "back.out(1.4)" }, 3.0)
+    .to("#pipe-rate",      { opacity: 1, x: 0, duration: .4, ease: "back.out(1.4)" }, 3.3)
+    .to("#pipe-transform", { opacity: 1, x: 0, duration: .4, ease: "back.out(1.4)" }, 3.6)
+    .to("#pipe-log",       { opacity: 1, x: 0, duration: .4, ease: "back.out(1.4)" }, 3.9)
+
+  // 4.2s — Right info panel
+    .to("#proxy-note",   { opacity: 1, x: 0, duration: .5, ease: "power2.out" }, 4.2)
+    .to("#admin-badge",  { opacity: 1, duration: .4 }, 4.5)
+
+  // 4.8s — Upstream
+    .to("#upstream-box",   { opacity: 1, duration: .5 }, 4.8)
+    .to("#upstream-title", { opacity: 1, y: 0, duration: .4 }, 5.0)
+    .to("#svc1", { opacity: 1, scale: 1, duration: .35, ease: "back.out(1.7)" }, 5.1)
+    .to("#svc2", { opacity: 1, scale: 1, duration: .35, ease: "back.out(1.7)" }, 5.25)
+    .to("#svc3", { opacity: 1, scale: 1, duration: .35, ease: "back.out(1.7)" }, 5.4)
+    .to("#svc4", { opacity: 1, scale: 1, duration: .35, ease: "back.out(1.7)" }, 5.55)
+    .to("#svc5", { opacity: 1, scale: 1, duration: .35, ease: "back.out(1.7)" }, 5.7)
+
+  // 5.8s — Arrow kong → upstream
+    .to("#arr-kong", { strokeDashoffset: 0, duration: .4, ease: "power2.inOut" }, 5.8)
+
+  // 6.0s — Legend
+    .to("#legend", { opacity: 1, duration: .4 }, 6.0)
+
+  // 6.5s — Packet: Client → Kong
+    .set("#pkt-client", { opacity: 1 }, 6.5)
+    .to("#pkt-client",  { x: 58, duration: .5, ease: "power2.inOut" }, 6.5)
+    .set("#pkt-client", { opacity: 0 }, 7.05)
+
+  // 7.2s — Packet: through plugin pipeline (down)
+    .set("#pkt-pipeline", { opacity: 1 }, 7.2)
+    .to("#pkt-pipeline",  { y: 210, duration: .8, ease: "power1.inOut" }, 7.2)
+    .set("#pkt-pipeline", { opacity: 0 }, 8.05)
+
+  // 8.2s — Packet: Kong → Upstream
+    .set("#pkt-out", { opacity: 1 }, 8.2)
+    .to("#pkt-out",  { x: 65, duration: .5, ease: "power2.inOut" }, 8.2)
+    .set("#pkt-out", { opacity: 0 }, 8.75)
+
+  // 9s — Highlight active svc (order)
+    .to("#svc1", { borderColor: "#4ade80", boxShadow: "0 0 20px #4ade8050", duration: .3 }, 9.0)
+    .to("#svc1", { borderColor: "#4ade8050", boxShadow: "none", duration: .4 }, 9.6)
+
+  // 10s — Repeat packet flow once more
+    .set("#pkt-client", { opacity: 1, x: 0 }, 10.5)
+    .to("#pkt-client",  { x: 58, duration: .5, ease: "power2.inOut" }, 10.5)
+    .set("#pkt-client", { opacity: 0 }, 11.05)
+
+    .set("#pkt-pipeline", { opacity: 1, y: 0 }, 11.2)
+    .to("#pkt-pipeline",  { y: 210, duration: .8, ease: "power1.inOut" }, 11.2)
+    .set("#pkt-pipeline", { opacity: 0 }, 12.05)
+
+    .set("#pkt-out", { opacity: 1, x: 0 }, 12.2)
+    .to("#pkt-out",  { x: 65, duration: .5, ease: "power2.inOut" }, 12.2)
+    .set("#pkt-out", { opacity: 0 }, 12.75)
+
+    .to("#svc3", { borderColor: "#4ade80", boxShadow: "0 0 20px #4ade8050", duration: .3 }, 13.0)
+    .to("#svc3", { borderColor: "#4ade8050", boxShadow: "none", duration: .4 }, 13.6)
+
+  // 14s — Fade title to summary
+    .to("#subtitle", {
+      opacity: .6,
+      duration: .5
+    }, 14.5);
+
+  /* ── Subtitle calls injected into main timeline ── */
+  tl.call(() => setSub(
+    '<span class="hi">Kong Gateway</span> คือ API Gateway ที่ทำหน้าที่เป็น "ประตู" กลางระหว่าง Client กับ Backend Services'
+  ), [], 0.5)
+
+  .call(() => setSub(
+    'เมื่อ Request เข้ามา Kong จะทำการ <span class="hi">Route Matching</span> — จับคู่ path, method, host เพื่อหา Service ที่เหมาะสม'
+  ), [], 2.2)
+
+  .call(() => setSub(
+    'จากนั้น Kong รัน <span class="hi">Plugin Pipeline</span> ตามลำดับ — <span class="hi-yellow">Auth</span> → <span class="hi-yellow">Rate Limiting</span> → <span class="hi-yellow">Transformation</span> → <span class="hi-yellow">Logging</span>'
+  ), [], 3.0)
+
+  .call(() => setSub(
+    'Plugin ติดได้ที่ระดับ <span class="hi">Global</span>, <span class="hi">Service</span>, <span class="hi">Route</span> หรือ <span class="hi">Consumer</span> — ยิ่งแคบยิ่ง override ของกว้างกว่า'
+  ), [], 4.2)
+
+  .call(() => setSub(
+    'หลังผ่าน plugins ครบ Kong จะ <span class="hi-green">forward request</span> ไปยัง Upstream Service ที่ match — Backend ไม่ต้องจัดการ Auth หรือ Rate Limit เอง'
+  ), [], 4.8)
+
+  .call(() => setSub(
+    'ดู Request วิ่งผ่าน Pipeline → ถึง <span class="hi-green">Order Service</span> — ทุกขั้นตอนเกิดใน Kong อัตโนมัติ'
+  ), [], 6.5)
+
+  .call(() => setSub(
+    '<span class="hi">Kong จัดการ Cross-cutting Concerns</span> ทั้งหมด — Developer โฟกัสแค่ Business Logic ของแต่ละ Service'
+  ), [], 9.5)
+
+  .call(() => setSub(
+    'Request อีกชุดเข้า Kong → Plugin Pipeline → ถึง <span class="hi-green">Payment Service</span>'
+  ), [], 10.5)
+
+  .call(() => setSub(
+    'ตั้งค่าด้วย <span class="hi">decK</span> (Declarative YAML) หรือ Admin API :8001 — รองรับ Kubernetes ผ่าน <span class="hi">Kong Ingress Controller</span>'
+  ), [], 13.2)
+
+  .call(() => setSub(
+    'Kong Gateway — <span class="hi">ลด complexity</span> ของ Microservices ด้วย Plugin Ecosystem กว่า 60+ ตัว'
+  ), [], 15.2)
+
+  .call(() => clearSub(), [], 16.0);
+
+  window.__timelines["main"] = tl;
+</script>
+</body>
+</html>

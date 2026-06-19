@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agile &amp; Scrum — สื่อการสอน</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<link rel="stylesheet" href="common.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',sans-serif;background:#07090f;color:#e2e8f0;line-height:1.7}
+
+/* ── Bilingual toggle (CSS-driven, zero framework) ── */
+.th{display:none}
+body.lang-th .th{display:revert}
+body.lang-th .en{display:none}
+.lang-switch{display:flex;gap:0;border:1px solid #14b8a650;border-radius:20px;overflow:hidden}
+.lang-switch button{background:transparent;color:#5eead4;border:none;padding:5px 14px;font-size:.78rem;font-weight:700;cursor:pointer;letter-spacing:1px;transition:background .2s,color .2s}
+.lang-switch button.active{background:linear-gradient(135deg,#14b8a6,#22c55e);color:#06140f}
+
+/* ── Hero ── */
+.hero{background:linear-gradient(135deg,#07090f 0%,#08171a 50%,#07090f 100%);padding:60px 40px;text-align:center;border-bottom:1px solid #14b8a620;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,#14b8a625 0%,transparent 65%)}
+.hero-badge{display:inline-block;background:#14b8a615;border:1px solid #14b8a650;color:#5eead4;padding:6px 18px;border-radius:20px;font-size:.8rem;letter-spacing:2px;text-transform:uppercase;margin-bottom:20px}
+.hero h1{font-size:3rem;font-weight:800;background:linear-gradient(135deg,#14b8a6,#22c55e,#4ade80,#5eead4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:12px}
+.hero-sub{font-size:1.1rem;color:#94a3b8;max-width:700px;margin:0 auto 20px}
+.hero-chips{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.hero-chip{background:#14b8a610;border:1px solid #14b8a630;color:#7dd3fc;padding:4px 14px;border-radius:12px;font-size:.78rem}
+
+/* ── Nav ── */
+nav{background:#0d1117;padding:14px 40px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #ffffff10;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px);gap:12px}
+.nav-home{color:#22c55e;text-decoration:none;font-weight:600;font-size:.9rem;white-space:nowrap}
+.nav-toc{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.toc-link{color:#64748b;text-decoration:none;font-size:.78rem;padding:3px 10px;border-radius:6px;background:#ffffff08;transition:all .2s}
+.toc-link:hover{color:#5eead4;background:#14b8a615}
+
+/* ── Layout ── */
+.container{max-width:1150px;margin:0 auto;padding:40px 20px}
+section{margin-bottom:64px;scroll-margin-top:80px}
+h2{font-size:1.65rem;font-weight:700;color:#22c55e;margin-bottom:8px;padding-bottom:10px;border-bottom:2px solid #14b8a625;display:flex;align-items:center;gap:10px}
+h3{font-size:1.15rem;font-weight:600;color:#5eead4;margin:28px 0 14px}
+p{color:#94a3b8;margin-bottom:14px}
+strong{color:#e2e8f0}
+.lead{font-size:1rem;color:#cbd5e1}
+
+/* ── VBox ── */
+.vb-wrap{margin:24px 0}
+.vb-label{font-size:.72rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#22c55e;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.vb-label::after{content:'';flex:1;height:1px;background:#14b8a615}
+.vb-grid{display:grid;gap:14px}
+.vb-2{grid-template-columns:repeat(2,1fr)}
+.vb-3{grid-template-columns:repeat(3,1fr)}
+.vb-4{grid-template-columns:repeat(4,1fr)}
+.vbox{background:#0d1117;border:1px solid #14b8a625;border-radius:14px;padding:18px;transition:transform .2s,border-color .2s,box-shadow .2s}
+.vbox:hover{transform:translateY(-3px);border-color:#22c55e60;box-shadow:0 8px 24px #14b8a615}
+.vb-icon{font-size:1.7rem;margin-bottom:8px}
+.vb-title{font-size:.95rem;font-weight:700;color:#e2e8f0;margin-bottom:6px}
+.vb-body{font-size:.83rem;color:#94a3b8;line-height:1.6}
+.vb-list{list-style:none;margin-top:8px}
+.vb-list li{font-size:.82rem;color:#94a3b8;padding:3px 0 3px 14px;position:relative}
+.vb-list li::before{content:'›';position:absolute;left:0;color:#22c55e}
+
+/* ── Callout ── */
+.callout{border-radius:12px;padding:16px 20px;margin:16px 0;display:flex;gap:12px;align-items:flex-start}
+.callout.info{background:#14b8a610;border-left:3px solid #14b8a6}
+.callout.warn{background:#f59e0b10;border-left:3px solid #f59e0b}
+.callout.tip{background:#4ade8010;border-left:3px solid #4ade80}
+.callout.danger{background:#ef444410;border-left:3px solid #ef4444}
+.callout-icon{font-size:1.1rem;flex-shrink:0;margin-top:2px}
+.callout-text{font-size:.86rem;color:#94a3b8}
+.callout-text strong{color:#e2e8f0}
+
+/* ── Manifesto values ── */
+.manifesto{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin:24px 0}
+.mf-row{background:#0d1117;border:1px solid #14b8a625;border-radius:14px;padding:18px}
+.mf-over{font-size:.7rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#64748b;margin-top:8px}
+.mf-left{font-size:1.05rem;font-weight:700;color:#5eead4}
+.mf-right{font-size:.95rem;color:#475569}
+.mf-arrow{color:#22c55e;font-weight:700}
+
+/* ── Comparison table ── */
+.compare-wrap{overflow-x:auto;margin:24px 0}
+.compare-table{width:100%;border-collapse:collapse;font-size:.84rem}
+.compare-table th{background:#0d1b16;color:#5eead4;padding:11px 14px;text-align:left;border-bottom:2px solid #14b8a630;white-space:nowrap}
+.compare-table td{padding:11px 14px;border-bottom:1px solid #1e293b;color:#94a3b8;vertical-align:top}
+.compare-table tr:hover td{background:#0d1117}
+.compare-table td:first-child{color:#e2e8f0;font-weight:600}
+
+/* ── Diagram wrap ── */
+.diagram-wrap{background:#050810;border:1px solid #14b8a625;border-radius:16px;padding:24px;margin:28px 0;overflow:hidden}
+.diagram-wrap svg{width:100%;height:auto;display:block}
+.diagram-cap{text-align:center;font-size:.78rem;color:#64748b;margin-top:14px}
+
+/* ════ ANIMATION: Sprint Cycle (rotating orbit) ════ */
+.sprint-stage{position:relative;width:420px;height:420px;max-width:100%;margin:10px auto}
+.sprint-ring{position:absolute;inset:30px;border:2px dashed #14b8a640;border-radius:50%;animation:spin 40s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.sprint-core{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,#14b8a625,transparent 70%);border:1px solid #14b8a650;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.sprint-core b{font-size:1.5rem;color:#22c55e;font-weight:800}
+.sprint-core small{font-size:.72rem;color:#64748b;letter-spacing:1px;text-transform:uppercase}
+.orbit-node{position:absolute;top:50%;left:50%;width:0;height:0}
+.node-card{position:absolute;transform:translate(-50%,-50%);width:118px;background:#0d1117;border:1px solid #14b8a635;border-radius:12px;padding:10px 8px;text-align:center;transition:border-color .2s,transform .2s}
+.node-card:hover{border-color:#22c55e;transform:translate(-50%,-50%) scale(1.07);z-index:5}
+.node-icon{font-size:1.4rem}
+.node-title{font-size:.78rem;font-weight:700;color:#5eead4;margin-top:2px}
+.node-sub{font-size:.66rem;color:#64748b}
+/* token traveling the ring */
+.sprint-token{offset-path:circle(180px at 50% 50%);offset-rotate:0deg;width:18px;height:18px;border-radius:50%;background:#22c55e;box-shadow:0 0 16px #22c55e;position:absolute;top:0;left:0;animation:travel 16s linear infinite}
+@keyframes travel{to{offset-distance:100%}}
+
+/* ════ ANIMATION: Burndown chart ════ */
+.burn-svg .grid-line{stroke:#1e293b;stroke-width:1}
+.burn-svg .ideal{stroke:#475569;stroke-width:2;stroke-dasharray:5 5}
+.burn-svg .actual{stroke:#22c55e;stroke-width:3;fill:none;stroke-linejoin:round;stroke-linecap:round;stroke-dasharray:600;stroke-dashoffset:600;animation:draw 3.5s ease-out forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.burn-svg .dot{fill:#5eead4;opacity:0;animation:pop .3s ease forwards}
+.burn-svg text{fill:#64748b;font-size:11px;font-family:'Segoe UI',sans-serif}
+@keyframes pop{to{opacity:1}}
+
+/* ════ ANIMATION: Scrum board ════ */
+.board{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:24px 0}
+.board-col{background:#0a0e16;border:1px solid #14b8a620;border-radius:14px;padding:12px;min-height:230px}
+.col-head{font-size:.8rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:6px 10px;border-radius:8px;margin-bottom:12px;text-align:center}
+.col-todo .col-head{background:#64748b20;color:#94a3b8}
+.col-doing .col-head{background:#f59e0b20;color:#fbbf24}
+.col-done .col-head{background:#22c55e20;color:#4ade80}
+.tcard{background:#0d1117;border:1px solid #1e293b;border-radius:10px;padding:10px 12px;margin-bottom:10px;font-size:.8rem;color:#cbd5e1}
+.tcard .pts{float:right;background:#14b8a615;color:#5eead4;border:1px solid #14b8a640;border-radius:6px;padding:0 7px;font-size:.7rem;font-weight:700}
+.tcard.flow{animation:flowcard 9s ease-in-out infinite}
+@keyframes flowcard{0%,12%{transform:translateY(0);opacity:1}18%,42%{transform:translateY(0);opacity:.4;border-color:#f59e0b}48%,100%{opacity:1}}
+.tcard.demo{animation:nudge 3s ease-in-out infinite}
+@keyframes nudge{50%{transform:translateX(3px)}}
+
+/* ── Roles cards ── */
+.role-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:24px 0}
+.role-card{background:#0d1117;border:1px solid #1e293b;border-radius:16px;padding:20px;border-top:3px solid var(--rc)}
+.role-card:hover{box-shadow:0 8px 24px #00000040}
+.role-icon{font-size:2rem;margin-bottom:8px}
+.role-name{font-size:1.05rem;font-weight:700;color:#e2e8f0}
+.role-tag{font-size:.7rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--rc);margin-bottom:10px}
+.role-desc{font-size:.83rem;color:#94a3b8;margin-bottom:10px}
+.role-list{list-style:none}
+.role-list li{font-size:.8rem;color:#94a3b8;padding:3px 0 3px 16px;position:relative}
+.role-list li::before{content:'✓';position:absolute;left:0;color:var(--rc);font-weight:700}
+
+/* ── Ceremonies timeline ── */
+.cer-list{list-style:none;margin:16px 0;counter-reset:cer}
+.cer-list li{counter-increment:cer;padding:12px 14px 12px 56px;position:relative;border-left:2px solid #14b8a625;margin-left:18px;margin-bottom:10px;background:#0d111780;border-radius:0 12px 12px 0}
+.cer-list li::before{content:counter(cer);position:absolute;left:-15px;top:12px;width:28px;height:28px;background:linear-gradient(135deg,#14b8a6,#22c55e);color:#06140f;border-radius:50%;font-size:.82rem;font-weight:800;display:flex;align-items:center;justify-content:center}
+.cer-list li strong{color:#5eead4;display:block;font-size:.92rem;margin-bottom:3px}
+.cer-list .when{display:inline-block;background:#14b8a610;color:#5eead4;border:1px solid #14b8a630;border-radius:8px;padding:1px 9px;font-size:.7rem;margin-left:8px;vertical-align:middle}
+.cer-list li span.body{font-size:.84rem;color:#94a3b8}
+
+/* ── Code ── */
+.code-block{margin:20px 0;border-radius:12px;overflow:hidden;border:1px solid #1e293b}
+.code-header{background:#111827;padding:.7rem 1rem;display:flex;justify-content:space-between;align-items:center}
+.code-header span{font-size:.78rem;color:#64748b;font-weight:600}
+.code-block pre{margin:0}
+.code-block code{font-size:.82rem!important;padding:20px!important}
+
+footer{text-align:center;padding:2rem;color:#334155;font-size:.82rem;border-top:1px solid #0f172a;margin-top:2rem}
+
+@media(max-width:900px){
+  .hero h1{font-size:2.2rem}
+  .vb-4,.vb-3,.role-grid,.manifesto{grid-template-columns:repeat(2,1fr)}
+  nav{flex-wrap:wrap}
+}
+@media(max-width:600px){
+  .vb-2,.vb-3,.vb-4,.role-grid,.manifesto,.board{grid-template-columns:1fr}
+  nav{padding:12px 16px}
+  .sprint-stage{width:330px;height:330px}
+}
+</style>
+</head>
+<body class="lang-en">
+
+<nav>
+  <a href="index.html" class="nav-home">← <span class="en">Home</span><span class="th">กลับหน้าหลัก</span></a>
+  <div class="nav-toc">
+    <a href="#agile" class="toc-link">🌱 Agile</a>
+    <a href="#manifesto" class="toc-link">📜 Manifesto</a>
+    <a href="#scrum" class="toc-link">🏉 Scrum</a>
+    <a href="#roles" class="toc-link">👥 Roles</a>
+    <a href="#artifacts" class="toc-link">📦 Artifacts</a>
+    <a href="#events" class="toc-link">🔄 Events</a>
+    <a href="#estimation" class="toc-link">📐 Estimation</a>
+    <a href="#board" class="toc-link">🗂️ Board</a>
+    <a href="#pitfalls" class="toc-link">⚠️ Pitfalls</a>
+    <div class="lang-switch" id="langSwitch">
+      <button data-lang="en" class="active">EN</button>
+      <button data-lang="th">TH</button>
+    </div>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">Agile &amp; Scrum · #24</div>
+  <h1>Agile &amp; Scrum</h1>
+  <p class="hero-sub">
+    <span class="en">A way of working that delivers value in small, fast, inspectable slices — and Scrum, the most popular framework for doing it. Deliver, learn, adapt.</span>
+    <span class="th">วิธีทำงานที่ส่งมอบคุณค่าเป็นชิ้นเล็ก ๆ เร็ว ๆ และตรวจสอบได้ — พร้อม Scrum เฟรมเวิร์กยอดนิยมที่สุดในการลงมือทำ ส่งมอบ เรียนรู้ ปรับตัว</span>
+  </p>
+  <div class="hero-chips">
+    <span class="hero-chip">🌱 Agile Manifesto</span>
+    <span class="hero-chip">🏉 Scrum</span>
+    <span class="hero-chip">🔄 Sprint</span>
+    <span class="hero-chip">📦 Backlog</span>
+    <span class="hero-chip">📉 Burndown</span>
+    <span class="hero-chip">📐 Story Points</span>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- ════════ 1. WHAT IS AGILE ════════ -->
+<section id="agile">
+  <h2>🌱 <span class="en">What is Agile?</span><span class="th">Agile คืออะไร?</span></h2>
+  <p class="lead">
+    <span class="en"><strong>Agile</strong> is a mindset for building products under uncertainty. Instead of planning everything up front and delivering once at the end, you work in short cycles, ship a working slice, get feedback, and adjust. The plan serves the product — not the other way around.</span>
+    <span class="th"><strong>Agile</strong> คือแนวคิดในการสร้างผลิตภัณฑ์ท่ามกลางความไม่แน่นอน แทนที่จะวางแผนทุกอย่างตั้งแต่ต้นแล้วส่งมอบครั้งเดียวตอนจบ เราทำงานเป็นรอบสั้น ๆ ส่งของที่ใช้งานได้ออกไป รับฟีดแบ็ก แล้วปรับ — แผนมีไว้รับใช้ผลิตภัณฑ์ ไม่ใช่ให้ผลิตภัณฑ์รับใช้แผน</span>
+  </p>
+
+  <div class="vb-wrap">
+    <div class="vb-label">🎯 <span class="en">Why teams go Agile</span><span class="th">ทำไมทีมถึงใช้ Agile</span></div>
+    <div class="vb-grid vb-4">
+      <div class="vbox">
+        <div class="vb-icon">⚡</div>
+        <div class="vb-title"><span class="en">Fast feedback</span><span class="th">ฟีดแบ็กเร็ว</span></div>
+        <div class="vb-body"><span class="en">Real users touch real software every few weeks — not after a year.</span><span class="th">ผู้ใช้จริงได้ลองของจริงทุกไม่กี่สัปดาห์ ไม่ใช่รออีกหนึ่งปี</span></div>
+      </div>
+      <div class="vbox">
+        <div class="vb-icon">🔁</div>
+        <div class="vb-title"><span class="en">Embrace change</span><span class="th">ยอมรับการเปลี่ยน</span></div>
+        <div class="vb-body"><span class="en">Requirements change. Agile treats that as normal, not as failure.</span><span class="th">ความต้องการเปลี่ยนเป็นเรื่องปกติ Agile มองว่าธรรมดา ไม่ใช่ความล้มเหลว</span></div>
+      </div>
+      <div class="vbox">
+        <div class="vb-icon">📦</div>
+        <div class="vb-title"><span class="en">Working software</span><span class="th">ซอฟต์แวร์ที่ใช้ได้</span></div>
+        <div class="vb-body"><span class="en">Progress is measured by shipped value, not by pages of docs.</span><span class="th">วัดความก้าวหน้าด้วยคุณค่าที่ส่งมอบ ไม่ใช่จำนวนหน้าเอกสาร</span></div>
+      </div>
+      <div class="vbox">
+        <div class="vb-icon">📉</div>
+        <div class="vb-title"><span class="en">Lower risk</span><span class="th">ความเสี่ยงต่ำลง</span></div>
+        <div class="vb-body"><span class="en">Small batches surface problems early, while they are cheap to fix.</span><span class="th">ทำทีละชิ้นเล็ก ทำให้เจอปัญหาเร็วตอนที่ยังแก้ถูก</span></div>
+      </div>
+    </div>
+  </div>
+
+  <h3>🆚 <span class="en">Agile vs Waterfall</span><span class="th">Agile กับ Waterfall</span></h3>
+  <div class="compare-wrap">
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th><span class="en">Aspect</span><span class="th">หัวข้อ</span></th>
+          <th>💧 Waterfall</th>
+          <th>🌱 Agile</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="en">Planning</span><span class="th">การวางแผน</span></td>
+          <td><span class="en">All up front, fixed scope</span><span class="th">วางทั้งหมดตั้งแต่ต้น ขอบเขตตายตัว</span></td>
+          <td><span class="en">Rolling, adapts every cycle</span><span class="th">ทยอยปรับทุกรอบ</span></td>
+        </tr>
+        <tr>
+          <td><span class="en">Delivery</span><span class="th">การส่งมอบ</span></td>
+          <td><span class="en">Once, at the very end</span><span class="th">ครั้งเดียวตอนจบ</span></td>
+          <td><span class="en">Frequent, incremental</span><span class="th">บ่อย ทีละส่วน</span></td>
+        </tr>
+        <tr>
+          <td><span class="en">Feedback</span><span class="th">ฟีดแบ็ก</span></td>
+          <td><span class="en">Late — after release</span><span class="th">ช้า — หลังปล่อยของ</span></td>
+          <td><span class="en">Continuous, every sprint</span><span class="th">ต่อเนื่องทุกสปรินต์</span></td>
+        </tr>
+        <tr>
+          <td><span class="en">Change</span><span class="th">การเปลี่ยนแปลง</span></td>
+          <td><span class="en">Expensive, resisted</span><span class="th">แพง ต่อต้าน</span></td>
+          <td><span class="en">Expected, welcomed</span><span class="th">คาดไว้แล้ว ยินดีรับ</span></td>
+        </tr>
+        <tr>
+          <td><span class="en">Best for</span><span class="th">เหมาะกับ</span></td>
+          <td><span class="en">Fixed, well-known requirements</span><span class="th">ความต้องการชัดเจน ตายตัว</span></td>
+          <td><span class="en">Uncertain, evolving products</span><span class="th">ผลิตภัณฑ์ที่ไม่แน่นอน เปลี่ยนได้</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout info">
+    <span class="callout-icon">💡</span>
+    <div class="callout-text">
+      <span class="en"><strong>Agile is the mindset; Scrum is one way to live it.</strong> Other Agile frameworks include Kanban, XP (Extreme Programming), and SAFe. Scrum is by far the most widely adopted.</span>
+      <span class="th"><strong>Agile คือแนวคิด ส่วน Scrum คือวิธีหนึ่งในการนำไปใช้จริง</strong> เฟรมเวิร์ก Agile อื่น ๆ เช่น Kanban, XP (Extreme Programming) และ SAFe แต่ Scrum เป็นที่นิยมใช้มากที่สุด</span>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ 2. MANIFESTO ════════ -->
+<section id="manifesto">
+  <h2>📜 <span class="en">The Agile Manifesto</span><span class="th">Agile Manifesto</span></h2>
+  <p>
+    <span class="en">Written in 2001 by 17 developers, the Manifesto has <strong>4 values</strong>. Each says: we value <em>both</em> sides, but when forced to choose, we lean left.</span>
+    <span class="th">เขียนขึ้นปี 2001 โดยนักพัฒนา 17 คน มี <strong>4 ค่านิยม</strong> แต่ละข้อบอกว่า เราเห็นคุณค่าของทั้งสองฝั่ง แต่เมื่อต้องเลือก เราเอนไปทางซ้าย</span>
+  </p>
+
+  <div class="manifesto">
+    <div class="mf-row">
+      <div class="mf-left">👥 <span class="en">Individuals &amp; interactions</span><span class="th">คนและการมีปฏิสัมพันธ์</span></div>
+      <div class="mf-over"><span class="en">over</span><span class="th">เหนือกว่า</span></div>
+      <div class="mf-right"><span class="en">processes &amp; tools</span><span class="th">กระบวนการและเครื่องมือ</span></div>
+    </div>
+    <div class="mf-row">
+      <div class="mf-left">📦 <span class="en">Working software</span><span class="th">ซอฟต์แวร์ที่ใช้งานได้</span></div>
+      <div class="mf-over"><span class="en">over</span><span class="th">เหนือกว่า</span></div>
+      <div class="mf-right"><span class="en">comprehensive documentation</span><span class="th">เอกสารที่ครบถ้วน</span></div>
+    </div>
+    <div class="mf-row">
+      <div class="mf-left">🤝 <span class="en">Customer collaboration</span><span class="th">การร่วมมือกับลูกค้า</span></div>
+      <div class="mf-over"><span class="en">over</span><span class="th">เหนือกว่า</span></div>
+      <div class="mf-right"><span class="en">contract negotiation</span><span class="th">การต่อรองสัญญา</span></div>
+    </div>
+    <div class="mf-row">
+      <div class="mf-left">🔁 <span class="en">Responding to change</span><span class="th">การตอบสนองต่อการเปลี่ยนแปลง</span></div>
+      <div class="mf-over"><span class="en">over</span><span class="th">เหนือกว่า</span></div>
+      <div class="mf-right"><span class="en">following a plan</span><span class="th">การทำตามแผน</span></div>
+    </div>
+  </div>
+
+  <div class="callout tip">
+    <span class="callout-icon">📌</span>
+    <div class="callout-text">
+      <span class="en"><strong>The 12 principles</strong> back the values up — highlights: deliver early &amp; often, welcome changing requirements, build around motivated people, reflect &amp; tune regularly, and keep a <em>sustainable pace</em>.</span>
+      <span class="th"><strong>หลักการ 12 ข้อ</strong> ขยายความค่านิยม — ที่สำคัญ: ส่งมอบเร็วและบ่อย, ต้อนรับความต้องการที่เปลี่ยน, สร้างทีมรอบคนที่มีแรงจูงใจ, ทบทวนและปรับสม่ำเสมอ และรักษา <em>จังหวะงานที่ยั่งยืน</em></span>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ 3. SCRUM + SPRINT CYCLE ANIMATION ════════ -->
+<section id="scrum">
+  <h2>🏉 <span class="en">The Scrum Framework</span><span class="th">เฟรมเวิร์ก Scrum</span></h2>
+  <p class="lead">
+    <span class="en">Scrum delivers value in fixed-length cycles called <strong>Sprints</strong> (usually 1–4 weeks). Each Sprint takes the highest-priority work, turns it into a usable <strong>Increment</strong>, then inspects and adapts. Three roles, three artifacts, five events — that's the whole game.</span>
+    <span class="th">Scrum ส่งมอบคุณค่าเป็นรอบความยาวคงที่เรียกว่า <strong>Sprint</strong> (ปกติ 1–4 สัปดาห์) แต่ละ Sprint หยิบงานที่สำคัญที่สุดมาทำให้กลายเป็น <strong>Increment</strong> ที่ใช้งานได้ แล้วตรวจสอบและปรับ — 3 บทบาท 3 อาร์ทิแฟกต์ 5 อีเวนต์ เท่านี้คือทั้งหมด</span>
+  </p>
+
+  <div class="diagram-wrap">
+    <div class="sprint-stage">
+      <div class="sprint-ring"></div>
+      <div class="sprint-token"></div>
+      <div class="sprint-core">
+        <b><span class="en">SPRINT</span><span class="th">SPRINT</span></b>
+        <small><span class="en">1–4 weeks</span><span class="th">1–4 สัปดาห์</span></small>
+      </div>
+      <!-- 5 nodes positioned around the circle -->
+      <div class="orbit-node" style="transform:translate(0,-180px)">
+        <div class="node-card"><div class="node-icon">📝</div><div class="node-title"><span class="en">Planning</span><span class="th">วางแผน</span></div><div class="node-sub"><span class="en">pick the work</span><span class="th">เลือกงาน</span></div></div>
+      </div>
+      <div class="orbit-node" style="transform:translate(171px,-56px)">
+        <div class="node-card"><div class="node-icon">☀️</div><div class="node-title"><span class="en">Daily Scrum</span><span class="th">เดลี่</span></div><div class="node-sub"><span class="en">sync 15 min</span><span class="th">ซิงก์ 15 น.</span></div></div>
+      </div>
+      <div class="orbit-node" style="transform:translate(106px,146px)">
+        <div class="node-card"><div class="node-icon">🛠️</div><div class="node-title"><span class="en">Development</span><span class="th">ลงมือทำ</span></div><div class="node-sub"><span class="en">build increment</span><span class="th">สร้างของ</span></div></div>
+      </div>
+      <div class="orbit-node" style="transform:translate(-106px,146px)">
+        <div class="node-card"><div class="node-icon">🎬</div><div class="node-title"><span class="en">Review</span><span class="th">รีวิว</span></div><div class="node-sub"><span class="en">demo to users</span><span class="th">โชว์ผู้ใช้</span></div></div>
+      </div>
+      <div class="orbit-node" style="transform:translate(-171px,-56px)">
+        <div class="node-card"><div class="node-icon">🔍</div><div class="node-title"><span class="en">Retro</span><span class="th">เรโทร</span></div><div class="node-sub"><span class="en">improve team</span><span class="th">พัฒนาทีม</span></div></div>
+      </div>
+    </div>
+    <div class="diagram-cap"><span class="en">One Sprint loops through these events, then repeats — forever inspecting &amp; adapting.</span><span class="th">หนึ่ง Sprint วนผ่านอีเวนต์เหล่านี้แล้วทำซ้ำ — ตรวจสอบและปรับไปเรื่อย ๆ</span></div>
+  </div>
+
+  <div class="callout info">
+    <span class="callout-icon">🔬</span>
+    <div class="callout-text">
+      <span class="en"><strong>Three pillars of empirical control:</strong> <strong>Transparency</strong> (everyone sees the real state) → <strong>Inspection</strong> (check progress often) → <strong>Adaptation</strong> (adjust as soon as you learn). Every event exists to serve these.</span>
+      <span class="th"><strong>3 เสาหลักของการควบคุมเชิงประจักษ์:</strong> <strong>Transparency</strong> (ทุกคนเห็นสถานะจริง) → <strong>Inspection</strong> (ตรวจความคืบหน้าบ่อย ๆ) → <strong>Adaptation</strong> (ปรับทันทีที่ได้เรียนรู้) ทุกอีเวนต์มีไว้เพื่อสิ่งนี้</span>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ 4. ROLES ════════ -->
+<section id="roles">
+  <h2>👥 <span class="en">The 3 Scrum Roles</span><span class="th">3 บทบาทใน Scrum</span></h2>
+  <p>
+    <span class="en">A Scrum Team is small (usually under 10) and cross-functional — it has everything it needs to deliver, with no hand-offs to outside teams.</span>
+    <span class="th">ทีม Scrum ขนาดเล็ก (ปกติไม่เกิน 10 คน) และทำงานข้ามสายงานได้ — มีทุกทักษะที่ต้องใช้ส่งมอบเอง ไม่ต้องส่งงานต่อให้ทีมอื่น</span>
+  </p>
+
+  <div class="role-grid">
+    <div class="role-card" style="--rc:#22c55e">
+      <div class="role-icon">🎯</div>
+      <div class="role-name"><span class="en">Product Owner</span><span class="th">Product Owner</span></div>
+      <div class="role-tag"><span class="en">owns the WHAT</span><span class="th">รับผิดชอบ “อะไร”</span></div>
+      <div class="role-desc"><span class="en">Maximizes product value. Owns and orders the Product Backlog so the team always builds the most valuable thing next.</span><span class="th">ทำให้ผลิตภัณฑ์มีคุณค่าสูงสุด เป็นเจ้าของและจัดลำดับ Product Backlog ให้ทีมทำสิ่งที่มีคุณค่าที่สุดเสมอ</span></div>
+      <ul class="role-list">
+        <li><span class="en">Defines &amp; prioritizes backlog</span><span class="th">กำหนดและจัดลำดับ backlog</span></li>
+        <li><span class="en">Single voice of the customer</span><span class="th">เป็นเสียงเดียวของลูกค้า</span></li>
+        <li><span class="en">Says yes / no to scope</span><span class="th">ตัดสินใจรับ/ไม่รับงาน</span></li>
+      </ul>
+    </div>
+    <div class="role-card" style="--rc:#14b8a6">
+      <div class="role-icon">🛡️</div>
+      <div class="role-name"><span class="en">Scrum Master</span><span class="th">Scrum Master</span></div>
+      <div class="role-tag"><span class="en">owns the HOW (process)</span><span class="th">รับผิดชอบ “กระบวนการ”</span></div>
+      <div class="role-desc"><span class="en">A servant-leader and coach. Removes blockers, protects the team from distractions, and keeps Scrum healthy. <em>Not</em> a boss.</span><span class="th">เป็นผู้นำแบบรับใช้และโค้ช คอยกำจัดอุปสรรค ปกป้องทีมจากสิ่งรบกวน และทำให้ Scrum ดำเนินไปอย่างมีสุขภาพดี <em>ไม่ใช่</em> หัวหน้า</span></div>
+      <ul class="role-list">
+        <li><span class="en">Removes impediments</span><span class="th">กำจัดอุปสรรค</span></li>
+        <li><span class="en">Facilitates the events</span><span class="th">อำนวยอีเวนต์ต่าง ๆ</span></li>
+        <li><span class="en">Coaches on Agile</span><span class="th">โค้ชเรื่อง Agile</span></li>
+      </ul>
+    </div>
+    <div class="role-card" style="--rc:#4ade80">
+      <div class="role-icon">🛠️</div>
+      <div class="role-name"><span class="en">Developers</span><span class="th">Developers</span></div>
+      <div class="role-tag"><span class="en">own the BUILDING</span><span class="th">รับผิดชอบ “การสร้าง”</span></div>
+      <div class="role-desc"><span class="en">The people who turn backlog items into a Done Increment. Self-organizing — they decide how to do the work themselves.</span><span class="th">คนที่เปลี่ยนรายการใน backlog ให้เป็น Increment ที่ Done จัดการตัวเองได้ — ตัดสินใจวิธีทำงานกันเอง</span></div>
+      <ul class="role-list">
+        <li><span class="en">Build, test &amp; ship</span><span class="th">สร้าง ทดสอบ และส่งมอบ</span></li>
+        <li><span class="en">Estimate the work</span><span class="th">ประเมินงาน</span></li>
+        <li><span class="en">Own the Sprint Backlog</span><span class="th">เป็นเจ้าของ Sprint Backlog</span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="callout warn">
+    <span class="callout-icon">⚠️</span>
+    <div class="callout-text">
+      <span class="en">There is <strong>no "project manager"</strong> in Scrum. Responsibility is split: PO owns value, Developers own delivery, Scrum Master owns the process. A common anti-pattern is a Scrum Master who acts like a task-assigning manager.</span>
+      <span class="th">ใน Scrum <strong>ไม่มี “project manager”</strong> ความรับผิดชอบถูกแบ่ง: PO ดูแลคุณค่า, Developers ดูแลการส่งมอบ, Scrum Master ดูแลกระบวนการ — anti-pattern ที่พบบ่อยคือ Scrum Master ที่ทำตัวเป็นผู้จัดการคอยสั่งงาน</span>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ 5. ARTIFACTS ════════ -->
+<section id="artifacts">
+  <h2>📦 <span class="en">The 3 Scrum Artifacts</span><span class="th">3 อาร์ทิแฟกต์ใน Scrum</span></h2>
+  <p>
+    <span class="en">Artifacts hold the work and make it transparent. Each has a <strong>commitment</strong> that keeps it focused.</span>
+    <span class="th">อาร์ทิแฟกต์เก็บงานและทำให้มันโปร่งใส แต่ละอันมี <strong>commitment</strong> ที่ทำให้มีโฟกัส</span>
+  </p>
+
+  <div class="vb-wrap">
+    <div class="vb-grid vb-3">
+      <div class="vbox">
+        <div class="vb-icon">📋</div>
+        <div class="vb-title"><span class="en">Product Backlog</span><span class="th">Product Backlog</span></div>
+        <div class="vb-body"><span class="en">The single, ordered list of everything the product might need. Owned by the PO, always evolving.</span><span class="th">รายการเดียวที่จัดลำดับแล้วของทุกอย่างที่ผลิตภัณฑ์อาจต้องการ PO เป็นเจ้าของ เปลี่ยนแปลงตลอด</span>
+          <ul class="vb-list"><li><span class="en">Commitment: <strong>Product Goal</strong></span><span class="th">Commitment: <strong>Product Goal</strong></span></li></ul>
+        </div>
+      </div>
+      <div class="vbox">
+        <div class="vb-icon">🎯</div>
+        <div class="vb-title"><span class="en">Sprint Backlog</span><span class="th">Sprint Backlog</span></div>
+        <div class="vb-body"><span class="en">The slice of work the team commits to this Sprint, plus the plan to deliver it. Owned by Developers.</span><span class="th">ส่วนของงานที่ทีมรับมาทำใน Sprint นี้ พร้อมแผนการส่งมอบ Developers เป็นเจ้าของ</span>
+          <ul class="vb-list"><li><span class="en">Commitment: <strong>Sprint Goal</strong></span><span class="th">Commitment: <strong>Sprint Goal</strong></span></li></ul>
+        </div>
+      </div>
+      <div class="vbox">
+        <div class="vb-icon">✅</div>
+        <div class="vb-title"><span class="en">Increment</span><span class="th">Increment</span></div>
+        <div class="vb-body"><span class="en">A usable, "Done" step toward the goal. Every Increment must meet the Definition of Done.</span><span class="th">ก้าวที่ใช้งานได้และ “Done” เข้าใกล้เป้าหมาย ทุก Increment ต้องผ่าน Definition of Done</span>
+          <ul class="vb-list"><li><span class="en">Commitment: <strong>Definition of Done</strong></span><span class="th">Commitment: <strong>Definition of Done</strong></span></li></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h3>📝 <span class="en">User Story format</span><span class="th">รูปแบบ User Story</span></h3>
+  <p>
+    <span class="en">Backlog items are often written as <strong>User Stories</strong> — small, value-focused, told from the user's view, with acceptance criteria that define "done".</span>
+    <span class="th">รายการใน backlog มักเขียนเป็น <strong>User Story</strong> — ชิ้นเล็ก เน้นคุณค่า เล่าจากมุมผู้ใช้ พร้อม acceptance criteria ที่บอกว่า “เสร็จ” คืออะไร</span>
+  </p>
+  <div class="code-block">
+    <div class="code-header"><span>user-story.md</span></div>
+    <pre data-lang="markdown"><code class="language-markdown"># Story: Reset forgotten password
+
+As a   registered user
+I want to reset my password via email
+So that I can regain access without contacting support
+
+## Acceptance Criteria
+- [ ] "Forgot password?" link on the login page
+- [ ] Submitting a valid email sends a reset link
+- [ ] Reset link expires after 30 minutes
+- [ ] Unknown emails show the same success message (no user enumeration)
+
+Estimate: 5 points   ·   Priority: High</code></pre>
+  </div>
+
+  <div class="callout tip">
+    <span class="callout-icon">📐</span>
+    <div class="callout-text">
+      <span class="en">Good stories follow <strong>INVEST</strong>: <strong>I</strong>ndependent, <strong>N</strong>egotiable, <strong>V</strong>aluable, <strong>E</strong>stimable, <strong>S</strong>mall, <strong>T</strong>estable.</span>
+      <span class="th">Story ที่ดีเป็นไปตาม <strong>INVEST</strong>: <strong>I</strong>ndependent (อิสระ), <strong>N</strong>egotiable (ต่อรองได้), <strong>V</strong>aluable (มีคุณค่า), <strong>E</strong>stimable (ประเมินได้), <strong>S</strong>mall (เล็ก), <strong>T</strong>estable (ทดสอบได้)</span>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ 6. EVENTS ════════ -->
+<section id="events">
+  <h2>🔄 <span class="en">The 5 Scrum Events</span><span class="th">5 อีเวนต์ใน Scrum</span></h2>
+  <p>
+    <span class="en">The Sprint is the container; the other four events happen inside it. All are <strong>time-boxed</strong> — they end on time, done or not.</span>
+    <span class="th">Sprint คือกล่องที่ห่อทุกอย่าง อีกสี่อีเวนต์เกิดขึ้นภายในนั้น ทุกอีเวนต์มี <strong>time-box</strong> — จบตรงเวลา ไม่ว่าจะเสร็จหรือไม่</span>
+  </p>
+
+  <ul class="cer-list">
+    <li>
+      <strong>🏃 <span class="en">The Sprint</span><span class="th">Sprint</span> <span class="when"><span class="en">1–4 weeks</span><span class="th">1–4 สัปดาห์</span></span></strong>
+      <span class="body"><span class="en">The heartbeat. A fixed-length cycle that produces a Done Increment. A new Sprint starts the moment the last one ends — no gaps.</span><span class="th">หัวใจของ Scrum รอบความยาวคงที่ที่ผลิต Increment ที่ Done — Sprint ใหม่เริ่มทันทีที่อันเก่าจบ ไม่มีช่องว่าง</span></span>
+    </li>
+    <li>
+      <strong>📝 <span class="en">Sprint Planning</span><span class="th">Sprint Planning</span> <span class="when">≤ 8h</span></strong>
+      <span class="body"><span class="en">Kicks off the Sprint. The team answers: <em>Why</em> (Sprint Goal), <em>What</em> (which backlog items), and <em>How</em> (the plan) — producing the Sprint Backlog.</span><span class="th">เปิด Sprint ทีมตอบ: <em>ทำไม</em> (Sprint Goal), <em>อะไร</em> (เลือกรายการใด), และ <em>อย่างไร</em> (แผน) — ได้ออกมาเป็น Sprint Backlog</span></span>
+    </li>
+    <li>
+      <strong>☀️ <span class="en">Daily Scrum</span><span class="th">Daily Scrum</span> <span class="when">15 min</span></strong>
+      <span class="body"><span class="en">A daily 15-minute sync for Developers to inspect progress toward the Sprint Goal and re-plan the day. Not a status report to a manager.</span><span class="th">ซิงก์ 15 นาทีทุกวันให้ Developers ตรวจความคืบหน้าสู่ Sprint Goal และวางแผนวันนั้นใหม่ ไม่ใช่การรายงานสถานะให้หัวหน้า</span></span>
+    </li>
+    <li>
+      <strong>🎬 <span class="en">Sprint Review</span><span class="th">Sprint Review</span> <span class="when">≤ 4h</span></strong>
+      <span class="body"><span class="en">At Sprint's end, the team demos the Increment to stakeholders, gathers feedback, and adapts the Product Backlog together. Working software, not slides.</span><span class="th">ท้าย Sprint ทีมโชว์ Increment ให้ผู้มีส่วนได้ส่วนเสีย รับฟีดแบ็ก และปรับ Product Backlog ร่วมกัน — โชว์ของจริง ไม่ใช่สไลด์</span></span>
+    </li>
+    <li>
+      <strong>🔍 <span class="en">Sprint Retrospective</span><span class="th">Sprint Retrospective</span> <span class="when">≤ 3h</span></strong>
+      <span class="body"><span class="en">The team inspects <em>itself</em> — what went well, what didn't, what to change — and commits to concrete improvements for the next Sprint.</span><span class="th">ทีมตรวจสอบ <em>ตัวเอง</em> — อะไรดี อะไรไม่ดี อะไรควรเปลี่ยน — แล้วตกลงสิ่งที่จะปรับปรุงอย่างเป็นรูปธรรมใน Sprint ถัดไป</span></span>
+    </li>
+  </ul>
+
+  <div class="callout danger">
+    <span class="callout-icon">⏱️</span>
+    <div class="callout-text">
+      <span class="en"><strong>Time-boxes are maximums, not targets.</strong> A Daily Scrum that runs 40 minutes, or a Retro that gets skipped "because we're busy", are both signs the framework is breaking down.</span>
+      <span class="th"><strong>Time-box คือเพดานสูงสุด ไม่ใช่เป้าหมายให้ทำให้ครบ</strong> Daily Scrum ที่ลากไป 40 นาที หรือ Retro ที่ถูกข้าม “เพราะงานยุ่ง” ล้วนเป็นสัญญาณว่าเฟรมเวิร์กกำลังพัง</span>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ 7. ESTIMATION + BURNDOWN ════════ -->
+<section id="estimation">
+  <h2>📐 <span class="en">Estimation &amp; Tracking</span><span class="th">การประเมินและติดตามงาน</span></h2>
+  <p class="lead">
+    <span class="en">Scrum teams estimate in <strong>Story Points</strong> — relative effort, not hours. Points capture complexity, uncertainty, and volume together. Over time, the team's average points-per-Sprint becomes its <strong>velocity</strong>, used to forecast.</span>
+    <span class="th">ทีม Scrum ประเมินด้วย <strong>Story Points</strong> — ความพยายามเชิงเปรียบเทียบ ไม่ใช่ชั่วโมง แต้มรวมความซับซ้อน ความไม่แน่นอน และปริมาณเข้าด้วยกัน เมื่อเวลาผ่านไป ค่าเฉลี่ยแต้มต่อ Sprint ของทีมจะกลายเป็น <strong>velocity</strong> ที่ใช้พยากรณ์งาน</span>
+  </p>
+
+  <h3>🃏 <span class="en">Planning Poker (Fibonacci)</span><span class="th">Planning Poker (ฟีโบนักชี)</span></h3>
+  <p>
+    <span class="en">The team estimates together using a Fibonacci-like scale. The gaps get wider on purpose — big things are inherently fuzzy, so don't pretend "21" is more precise than "20".</span>
+    <span class="th">ทีมประเมินร่วมกันด้วยสเกลคล้ายฟีโบนักชี ช่องว่างกว้างขึ้นเรื่อย ๆ โดยตั้งใจ — งานใหญ่ย่อมคลุมเครือ จึงไม่ต้องเสแสร้งว่า “21” แม่นกว่า “20”</span>
+  </p>
+  <div class="vb-wrap">
+    <div class="vb-grid vb-4">
+      <div class="vbox"><div class="vb-title">1 – 2</div><div class="vb-body"><span class="en">Trivial, well understood</span><span class="th">เล็กมาก เข้าใจชัด</span></div></div>
+      <div class="vbox"><div class="vb-title">3 – 5</div><div class="vb-body"><span class="en">Normal story, some unknowns</span><span class="th">Story ปกติ มีจุดไม่แน่นอนบ้าง</span></div></div>
+      <div class="vbox"><div class="vb-title">8 – 13</div><div class="vb-body"><span class="en">Large &amp; risky — consider splitting</span><span class="th">ใหญ่และเสี่ยง — ควรพิจารณาแตกย่อย</span></div></div>
+      <div class="vbox"><div class="vb-title">21+ / ?</div><div class="vb-body"><span class="en">Too big or unclear — make it an Epic, slice it</span><span class="th">ใหญ่หรือคลุมเครือไป — ทำเป็น Epic แล้วซอย</span></div></div>
+    </div>
+  </div>
+
+  <h3>📉 <span class="en">Sprint Burndown</span><span class="th">Sprint Burndown</span></h3>
+  <p>
+    <span class="en">A burndown chart tracks remaining work over the Sprint. The dashed line is the ideal pace; the green line is reality. If reality stays above ideal, the team is at risk of missing the Sprint Goal.</span>
+    <span class="th">กราฟ burndown ติดตามงานที่เหลือตลอด Sprint เส้นประคือจังหวะอุดมคติ เส้นเขียวคือความจริง ถ้าความจริงอยู่เหนือเส้นอุดมคติ ทีมเสี่ยงทำ Sprint Goal ไม่ทัน</span>
+  </p>
+  <div class="diagram-wrap">
+    <svg class="burn-svg" viewBox="0 0 600 300" role="img" aria-label="Sprint burndown chart">
+      <!-- grid -->
+      <line class="grid-line" x1="60" y1="40" x2="60" y2="250"/>
+      <line class="grid-line" x1="60" y1="250" x2="560" y2="250"/>
+      <line class="grid-line" x1="60" y1="145" x2="560" y2="145"/>
+      <line class="grid-line" x1="60" y1="92" x2="560" y2="92"/>
+      <line class="grid-line" x1="60" y1="197" x2="560" y2="197"/>
+      <!-- axis labels -->
+      <text x="20" y="45">40</text><text x="20" y="150">20</text><text x="20" y="255">0</text>
+      <text x="55" y="270">D1</text><text x="175" y="270">D3</text><text x="295" y="270">D5</text><text x="415" y="270">D7</text><text x="535" y="270">D10</text>
+      <text x="250" y="292" style="font-weight:700;fill:#94a3b8"><tspan class="en">Sprint days →</tspan></text>
+      <!-- ideal -->
+      <line class="ideal" x1="60" y1="40" x2="560" y2="250"/>
+      <!-- actual (animated draw): starts 40, plateaus, then burns down -->
+      <polyline class="actual" points="60,40 110,38 160,70 210,75 260,110 310,150 360,150 410,185 460,205 510,235 560,250"/>
+      <!-- end dots -->
+      <circle class="dot" cx="60" cy="40" r="4" style="animation-delay:.2s"/>
+      <circle class="dot" cx="310" cy="150" r="4" style="animation-delay:1.8s"/>
+      <circle class="dot" cx="560" cy="250" r="5" style="animation-delay:3.4s"/>
+      <text x="430" y="35" style="fill:#475569"><tspan class="en">ideal</tspan><tspan class="th">อุดมคติ</tspan></text>
+      <text x="300" y="135" style="fill:#22c55e;font-weight:700"><tspan class="en">actual</tspan><tspan class="th">ของจริง</tspan></text>
+    </svg>
+    <div class="diagram-cap"><span class="en">Flat early (work just started), then a steady burn to zero by the last day.</span><span class="th">ช่วงต้นราบ (เพิ่งเริ่ม) แล้วค่อย ๆ ลดลงจนเหลือศูนย์ในวันสุดท้าย</span></div>
+  </div>
+  <div class="callout tip">
+    <span class="callout-icon">💚</span>
+    <div class="callout-text">
+      <span class="en"><strong>Velocity is for forecasting, not judging.</strong> Comparing two teams' velocities is meaningless — points are relative to each team. Use it to plan; never weaponize it.</span>
+      <span class="th"><strong>Velocity มีไว้พยากรณ์ ไม่ใช่ตัดสิน</strong> การเอา velocity สองทีมมาเทียบกันไม่มีความหมาย — แต้มสัมพันธ์กับแต่ละทีม ใช้เพื่อวางแผน อย่าเอาไปเป็นอาวุธกดดัน</span>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ 8. BOARD ANIMATION ════════ -->
+<section id="board">
+  <h2>🗂️ <span class="en">The Scrum Board</span><span class="th">Scrum Board</span></h2>
+  <p>
+    <span class="en">The team makes the Sprint Backlog visible on a board. Cards flow left to right — <strong>To Do → In Progress → Done</strong> — giving everyone a shared, real-time picture of the Sprint.</span>
+    <span class="th">ทีมทำ Sprint Backlog ให้มองเห็นได้บนบอร์ด การ์ดไหลจากซ้ายไปขวา — <strong>To Do → In Progress → Done</strong> — ทำให้ทุกคนเห็นภาพ Sprint แบบเรียลไทม์ร่วมกัน</span>
+  </p>
+
+  <div class="board">
+    <div class="board-col col-todo">
+      <div class="col-head">📋 To Do</div>
+      <div class="tcard"><span class="pts">3</span><span class="en">OAuth login</span><span class="th">เข้าระบบด้วย OAuth</span></div>
+      <div class="tcard"><span class="pts">5</span><span class="en">Export to CSV</span><span class="th">ส่งออกเป็น CSV</span></div>
+      <div class="tcard"><span class="pts">2</span><span class="en">Dark mode toggle</span><span class="th">สลับโหมดมืด</span></div>
+    </div>
+    <div class="board-col col-doing">
+      <div class="col-head">🛠️ In Progress</div>
+      <div class="tcard flow"><span class="pts">5</span><span class="en">Reset password</span><span class="th">รีเซ็ตรหัสผ่าน</span></div>
+      <div class="tcard"><span class="pts">3</span><span class="en">Search filters</span><span class="th">ตัวกรองการค้นหา</span></div>
+    </div>
+    <div class="board-col col-done">
+      <div class="col-head">✅ Done</div>
+      <div class="tcard demo"><span class="pts">8</span><span class="en">User profile page</span><span class="th">หน้าโปรไฟล์ผู้ใช้</span></div>
+      <div class="tcard"><span class="pts">2</span><span class="en">Email validation</span><span class="th">ตรวจสอบอีเมล</span></div>
+    </div>
+  </div>
+  <div class="callout info">
+    <span class="callout-icon">🚦</span>
+    <div class="callout-text">
+      <span class="en">A card is only <strong>Done</strong> when it meets the <strong>Definition of Done</strong> — e.g. code reviewed, tested, documented, and deployable. "Almost done" is not Done. (Many teams add WIP limits to stop too many cards piling up in one column — that's borrowed from <strong>Kanban</strong>.)</span>
+      <span class="th">การ์ดจะ <strong>Done</strong> ได้ก็ต่อเมื่อผ่าน <strong>Definition of Done</strong> — เช่น รีวิวโค้ดแล้ว เทสต์แล้ว มีเอกสาร และพร้อม deploy “เกือบเสร็จ” ไม่นับว่า Done (หลายทีมใส่ WIP limit เพื่อกันการ์ดกองในคอลัมน์เดียว — ยืมมาจาก <strong>Kanban</strong>)</span>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ 9. PITFALLS ════════ -->
+<section id="pitfalls">
+  <h2>⚠️ <span class="en">Common Pitfalls</span><span class="th">กับดักที่พบบ่อย</span></h2>
+  <p>
+    <span class="en">Most "Scrum doesn't work" stories are really "we did the ceremonies but missed the point." Watch for these <strong>anti-patterns</strong>.</span>
+    <span class="th">เรื่องเล่าว่า “Scrum ใช้ไม่ได้” ส่วนใหญ่จริง ๆ คือ “เราทำพิธีกรรมครบแต่พลาดแก่นของมัน” ระวัง <strong>anti-pattern</strong> เหล่านี้</span>
+  </p>
+  <div class="vb-wrap">
+    <div class="vb-grid vb-2">
+      <div class="vbox">
+        <div class="vb-icon">🎭</div>
+        <div class="vb-title"><span class="en">Water-Scrum-Fall</span><span class="th">Water-Scrum-Fall</span></div>
+        <div class="vb-body"><span class="en">Sprints in the middle, but big up-front specs and one giant release at the end. Agile theatre, not Agile.</span><span class="th">มี Sprint ตรงกลาง แต่ยังเขียนสเปกใหญ่ตอนต้นและปล่อยของก้อนใหญ่ตอนจบ — เป็นละคร Agile ไม่ใช่ Agile จริง</span></div>
+      </div>
+      <div class="vbox">
+        <div class="vb-icon">📊</div>
+        <div class="vb-title"><span class="en">Velocity as a target</span><span class="th">เอา Velocity เป็นเป้า</span></div>
+        <div class="vb-body"><span class="en">Pushing for "more points" leads to inflated estimates and cut corners. Velocity describes; it shouldn't command.</span><span class="th">การกดดันให้ได้ “แต้มเยอะขึ้น” ทำให้ประเมินเฟ้อและลัดขั้นตอน Velocity ใช้บรรยาย ไม่ใช่สั่งการ</span></div>
+      </div>
+      <div class="vbox">
+        <div class="vb-icon">🗣️</div>
+        <div class="vb-title"><span class="en">Daily as status report</span><span class="th">Daily เป็นรายงานสถานะ</span></div>
+        <div class="vb-body"><span class="en">If the Daily Scrum talks to the manager instead of re-planning together, it has lost its purpose.</span><span class="th">ถ้า Daily Scrum กลายเป็นการรายงานหัวหน้าแทนการวางแผนร่วมกัน มันก็เสียจุดประสงค์ไปแล้ว</span></div>
+      </div>
+      <div class="vbox">
+        <div class="vb-icon">⏭️</div>
+        <div class="vb-title"><span class="en">Skipping the Retro</span><span class="th">ข้าม Retro</span></div>
+        <div class="vb-body"><span class="en">No Retro = no improvement. The team repeats the same mistakes Sprint after Sprint.</span><span class="th">ไม่มี Retro = ไม่มีการพัฒนา ทีมทำพลาดเรื่องเดิมซ้ำไปทุก Sprint</span></div>
+      </div>
+      <div class="vbox">
+        <div class="vb-icon">🧱</div>
+        <div class="vb-title"><span class="en">Changing the Sprint Goal</span><span class="th">เปลี่ยน Sprint Goal กลางทาง</span></div>
+        <div class="vb-body"><span class="en">Constantly injecting new work mid-Sprint destroys focus and the ability to forecast.</span><span class="th">ยัดงานใหม่กลาง Sprint ตลอดเวลา ทำลายโฟกัสและความสามารถในการพยากรณ์</span></div>
+      </div>
+      <div class="vbox">
+        <div class="vb-icon">📚</div>
+        <div class="vb-title"><span class="en">Undefined "Done"</span><span class="th">ไม่นิยาม “Done”</span></div>
+        <div class="vb-body"><span class="en">No shared Definition of Done means "done" means something different to everyone — and bugs ship.</span><span class="th">ไม่มี Definition of Done ร่วมกัน ทำให้ “เสร็จ” แปลว่าคนละอย่างสำหรับแต่ละคน — แล้วบั๊กก็หลุดออกไป</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout tip">
+    <span class="callout-icon">🎓</span>
+    <div class="callout-text">
+      <span class="en"><strong>The point of Scrum isn't the ceremonies — it's the feedback loop.</strong> If every Sprint your team ships something real, learns from it, and gets a little better, you're doing Agile. Everything else is detail.</span>
+      <span class="th"><strong>แก่นของ Scrum ไม่ใช่พิธีกรรม แต่คือลูปฟีดแบ็ก</strong> ถ้าทุก Sprint ทีมส่งของจริงออกไป เรียนรู้จากมัน และเก่งขึ้นทีละนิด คุณกำลังทำ Agile อยู่ ที่เหลือเป็นแค่รายละเอียด</span>
+    </div>
+  </div>
+</section>
+
+</div><!-- /container -->
+
+<footer>
+  <span class="en">Software Architecture Patterns &nbsp;·&nbsp; Agile &amp; Scrum #24 &nbsp;·&nbsp; Bilingual EN / TH</span>
+  <span class="th">สื่อการสอน Software Architecture Patterns &nbsp;·&nbsp; Agile &amp; Scrum #24 &nbsp;·&nbsp; สองภาษา EN / TH</span>
+</footer>
+
+<script>
+  hljs.highlightAll();
+  // Bilingual toggle — swaps a body class; CSS does the rest. Persists choice.
+  (function(){
+    var body = document.body, sw = document.getElementById('langSwitch');
+    function set(lang){
+      body.classList.toggle('lang-th', lang==='th');
+      body.classList.toggle('lang-en', lang!=='th');
+      document.documentElement.lang = lang;
+      sw.querySelectorAll('button').forEach(function(b){ b.classList.toggle('active', b.dataset.lang===lang); });
+      try{ localStorage.setItem('lang', lang); }catch(e){}
+    }
+    sw.addEventListener('click', function(e){ if(e.target.dataset.lang) set(e.target.dataset.lang); });
+    var saved; try{ saved = localStorage.getItem('lang'); }catch(e){}
+    set(saved || 'en');
+  })();
+</script>
+<script src="common.js"></script>
+</body>
+</html>
