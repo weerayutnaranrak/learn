@@ -50,17 +50,17 @@ a:hover{text-decoration:underline}
 .pyramid-layer{display:flex;align-items:center;justify-content:center;border-radius:8px;font-size:.82rem;font-weight:700;color:#fff;padding:.5rem 1rem}
 </style>
 </head>
-<body>
+<body class="lang-th">
 
 <nav class="topnav">
-  <a href="index.html" class="back-btn">← กลับหน้าหลัก</a>
+  <a href="index.html" class="back-btn">← <span class="en">Home</span><span class="th">กลับหน้าหลัก</span></a>
   <span class="nav-title">19 / <span>Testing Patterns</span></span>
 </nav>
 
 <div class="hero">
-  <div class="hero-badge">🧪 หัวข้อที่ 19</div>
+  <div class="hero-badge">🧪 <span class="en">Topic 19</span><span class="th">หัวข้อที่ 19</span></div>
   <h1>Testing Patterns</h1>
-  <p>Test Pyramid, TDD, Test Doubles (Mock/Stub/Fake/Spy), Table-driven Tests, Integration Tests — วิธีเขียน test ใน Go อย่างถูกต้อง</p>
+  <p>Test Pyramid, TDD, Test Doubles (Mock/Stub/Fake/Spy), Table-driven Tests, Integration Tests — <span class="en">how to write tests in Go the right way</span><span class="th">วิธีเขียน test ใน Go อย่างถูกต้อง</span></p>
 </div>
 
 <div class="content">
@@ -68,77 +68,77 @@ a:hover{text-decoration:underline}
 <!-- TEST PYRAMID -->
 <div class="section">
   <div class="section-title" style="color:#10b981">🔺 Test Pyramid</div>
-  <div class="section-sub">สัดส่วนที่เหมาะสมของ test แต่ละชนิด</div>
+  <div class="section-sub"><span class="en">The right proportion of each kind of test</span><span class="th">สัดส่วนที่เหมาะสมของ test แต่ละชนิด</span></div>
 
   <div class="pyramid">
     <div class="pyramid-layer" style="width:40%;background:rgba(239,68,68,.7)">E2E Tests</div>
     <div class="pyramid-layer" style="width:65%;background:rgba(251,191,36,.7)">Integration Tests</div>
-    <div class="pyramid-layer" style="width:100%;background:rgba(16,185,129,.7)">Unit Tests (มากที่สุด)</div>
+    <div class="pyramid-layer" style="width:100%;background:rgba(16,185,129,.7)">Unit Tests <span class="en">(most)</span><span class="th">(มากที่สุด)</span></div>
   </div>
 
   <div style="background:#0d1117;border:1px solid #1e293b;border-radius:14px;overflow:hidden;margin:1.5rem 0">
     <div style="background:#111827;padding:10px 20px;display:grid;grid-template-columns:130px 1fr 1fr 80px;font-size:.77rem;font-weight:700;color:#64748b;gap:12px">
-      <div>ชนิด</div><div>ทดสอบอะไร</div><div>ลักษณะ</div><div>สัดส่วน</div>
+      <div><span class="en">Type</span><span class="th">ชนิด</span></div><div><span class="en">Tests what</span><span class="th">ทดสอบอะไร</span></div><div><span class="en">Characteristics</span><span class="th">ลักษณะ</span></div><div><span class="en">Share</span><span class="th">สัดส่วน</span></div>
     </div>
     <div style="display:grid;grid-template-columns:130px 1fr 1fr 80px;padding:10px 20px;font-size:.82rem;border-bottom:1px solid #0f172a;gap:12px;align-items:center">
       <div style="color:#34d399;font-weight:700">Unit Test</div>
-      <div style="color:#94a3b8">function/method เดียว — isolate</div>
-      <div style="color:#64748b">เร็ว, ไม่ต้อง infra, เยอะได้</div>
+      <div style="color:#94a3b8"><span class="en">A single function/method — isolated</span><span class="th">function/method เดียว — isolate</span></div>
+      <div style="color:#64748b"><span class="en">Fast, no infra, can have many</span><span class="th">เร็ว, ไม่ต้อง infra, เยอะได้</span></div>
       <div style="color:#34d399">~70%</div>
     </div>
     <div style="display:grid;grid-template-columns:130px 1fr 1fr 80px;padding:10px 20px;font-size:.82rem;border-bottom:1px solid #0f172a;gap:12px;align-items:center">
       <div style="color:#fbbf24;font-weight:700">Integration Test</div>
-      <div style="color:#94a3b8">หลาย component ทำงานร่วมกัน</div>
-      <div style="color:#64748b">ต้องการ DB/queue จริง, ช้ากว่า</div>
+      <div style="color:#94a3b8"><span class="en">Several components working together</span><span class="th">หลาย component ทำงานร่วมกัน</span></div>
+      <div style="color:#64748b"><span class="en">Needs a real DB/queue, slower</span><span class="th">ต้องการ DB/queue จริง, ช้ากว่า</span></div>
       <div style="color:#fbbf24">~20%</div>
     </div>
     <div style="display:grid;grid-template-columns:130px 1fr 1fr 80px;padding:10px 20px;font-size:.82rem;gap:12px;align-items:center">
       <div style="color:#f87171;font-weight:700">E2E Test</div>
-      <div style="color:#94a3b8">ทั้งระบบตั้งแต่ UI ถึง DB</div>
-      <div style="color:#64748b">ช้ามาก, flaky ได้, น้อยพอ</div>
+      <div style="color:#94a3b8"><span class="en">The whole system, from UI to DB</span><span class="th">ทั้งระบบตั้งแต่ UI ถึง DB</span></div>
+      <div style="color:#64748b"><span class="en">Very slow, can be flaky, keep few</span><span class="th">ช้ามาก, flaky ได้, น้อยพอ</span></div>
       <div style="color:#f87171">~10%</div>
     </div>
   </div>
 
   <div class="callout">
-    <strong>ทำไม Unit Test ต้องมากที่สุด?</strong> รันเร็ว (milliseconds), ไม่ต้องการ infra, ชี้จุด bug ได้ทันที — ถ้า unit test ผ่านแล้ว integration test จะหา "glue bug" ที่เหลือ
+    <span class="en"><strong>Why should there be the most unit tests?</strong> They run fast (milliseconds), need no infra, and pinpoint bugs immediately — once unit tests pass, integration tests catch the remaining "glue bugs"</span><span class="th"><strong>ทำไม Unit Test ต้องมากที่สุด?</strong> รันเร็ว (milliseconds), ไม่ต้องการ infra, ชี้จุด bug ได้ทันที — ถ้า unit test ผ่านแล้ว integration test จะหา "glue bug" ที่เหลือ</span>
   </div>
 </div>
 
 <!-- TEST DOUBLES -->
 <div class="section">
   <div class="section-title" style="color:#10b981">🎭 Test Doubles</div>
-  <div class="section-sub">วิธีแทนที่ dependency จริงใน unit test</div>
+  <div class="section-sub"><span class="en">How to replace real dependencies in a unit test</span><span class="th">วิธีแทนที่ dependency จริงใน unit test</span></div>
 
   <div style="background:#0d1117;border:1px solid #1e293b;border-radius:14px;overflow:hidden;margin:1.5rem 0">
     <div style="background:#111827;padding:10px 20px;display:grid;grid-template-columns:80px 1fr 1.5fr;font-size:.77rem;font-weight:700;color:#64748b;gap:12px">
-      <div>ชนิด</div><div>ทำอะไร</div><div>ใช้เมื่อไหร่</div>
+      <div><span class="en">Type</span><span class="th">ชนิด</span></div><div><span class="en">What it does</span><span class="th">ทำอะไร</span></div><div><span class="en">When to use</span><span class="th">ใช้เมื่อไหร่</span></div>
     </div>
     <div style="display:grid;grid-template-columns:80px 1fr 1.5fr;padding:10px 20px;font-size:.82rem;border-bottom:1px solid #0f172a;gap:12px;align-items:center">
       <div style="color:#34d399;font-weight:700">Stub</div>
-      <div style="color:#94a3b8">คืนค่าที่กำหนดไว้ล่วงหน้า</div>
-      <div style="color:#64748b">ต้องการ input ที่ controllable ให้ code ที่ test</div>
+      <div style="color:#94a3b8"><span class="en">Returns predefined values</span><span class="th">คืนค่าที่กำหนดไว้ล่วงหน้า</span></div>
+      <div style="color:#64748b"><span class="en">When the code under test needs controllable input</span><span class="th">ต้องการ input ที่ controllable ให้ code ที่ test</span></div>
     </div>
     <div style="display:grid;grid-template-columns:80px 1fr 1.5fr;padding:10px 20px;font-size:.82rem;border-bottom:1px solid #0f172a;gap:12px;align-items:center">
       <div style="color:#60a5fa;font-weight:700">Mock</div>
-      <div style="color:#94a3b8">บันทึกว่าถูกเรียกอย่างไร แล้ว assert ทีหลัง</div>
-      <div style="color:#64748b">ต้องการ verify ว่า dependency ถูกเรียกถูกต้อง</div>
+      <div style="color:#94a3b8"><span class="en">Records how it was called, then assert later</span><span class="th">บันทึกว่าถูกเรียกอย่างไร แล้ว assert ทีหลัง</span></div>
+      <div style="color:#64748b"><span class="en">When you need to verify the dependency was called correctly</span><span class="th">ต้องการ verify ว่า dependency ถูกเรียกถูกต้อง</span></div>
     </div>
     <div style="display:grid;grid-template-columns:80px 1fr 1.5fr;padding:10px 20px;font-size:.82rem;border-bottom:1px solid #0f172a;gap:12px;align-items:center">
       <div style="color:#a78bfa;font-weight:700">Fake</div>
-      <div style="color:#94a3b8">implementation จริงๆ แต่ใช้แทน production</div>
-      <div style="color:#64748b">in-memory DB แทน Postgres, local queue แทน Kafka</div>
+      <div style="color:#94a3b8"><span class="en">A real implementation, but used in place of production</span><span class="th">implementation จริงๆ แต่ใช้แทน production</span></div>
+      <div style="color:#64748b"><span class="en">In-memory DB instead of Postgres, local queue instead of Kafka</span><span class="th">in-memory DB แทน Postgres, local queue แทน Kafka</span></div>
     </div>
     <div style="display:grid;grid-template-columns:80px 1fr 1.5fr;padding:10px 20px;font-size:.82rem;gap:12px;align-items:center">
       <div style="color:#f97316;font-weight:700">Spy</div>
-      <div style="color:#94a3b8">เรียก real implementation แต่บันทึกด้วย</div>
-      <div style="color:#64748b">ต้องการ behavior จริงแต่อยากรู้ว่ามีการเรียก method</div>
+      <div style="color:#94a3b8"><span class="en">Calls the real implementation but also records</span><span class="th">เรียก real implementation แต่บันทึกด้วย</span></div>
+      <div style="color:#64748b"><span class="en">When you want real behavior but also to know a method was called</span><span class="th">ต้องการ behavior จริงแต่อยากรู้ว่ามีการเรียก method</span></div>
     </div>
   </div>
 
   <div class="code-block">
     <div class="code-header">
-      <span>Stub, Mock, Fake ใน Go — ไม่ต้องใช้ library</span>
+      <span><span class="en">Stub, Mock, Fake in Go — no library needed</span><span class="th">Stub, Mock, Fake ใน Go — ไม่ต้องใช้ library</span></span>
       <span class="lang-tag">Go · Test Doubles</span>
     </div>
     <pre data-lang="go"><code class="language-go">// ── Interface ที่จะ test ───────────────────────────────────
@@ -306,20 +306,19 @@ describe('UserService', () => {
 <!-- TABLE DRIVEN TESTS -->
 <div class="section">
   <div class="section-title" style="color:#10b981">📋 Table-driven Tests</div>
-  <div class="section-sub">Go idiom ที่ทำให้ test เยอะ case ได้โดยไม่ซ้ำ code</div>
+  <div class="section-sub"><span class="en">A Go idiom for testing many cases without duplicating code</span><span class="th">Go idiom ที่ทำให้ test เยอะ case ได้โดยไม่ซ้ำ code</span></div>
 
   <div style="background:linear-gradient(135deg,#041810,#062010);border:1px solid #10b98130;border-radius:12px;padding:1.2rem 1.4rem;margin-bottom:1.5rem">
     <div style="font-size:.83rem;color:#94a3b8;line-height:1.8">
-      <span style="color:#6ee7b7;font-weight:700">แนวคิด:</span> เขียน test logic ครั้งเดียว แต่รันกับ input หลายชุดโดยใช้ <code>[]struct</code> เป็น test table — Go testing รองรับด้วย <code>t.Run()</code><br>
-      <span style="color:#6ee7b7;font-weight:700">ข้อดี:</span> เพิ่ม case ใหม่แค่เพิ่มแถวใน table, ชื่อ test ชัดเจน, ง่ายต่อการ debug เมื่อ fail
+      <span class="en"><span style="color:#6ee7b7;font-weight:700">Idea:</span> write the test logic once but run it against many input sets using a <code>[]struct</code> as a test table — Go testing supports this with <code>t.Run()</code><br><span style="color:#6ee7b7;font-weight:700">Benefits:</span> add a new case by just adding a row, clear test names, easy to debug on failure</span><span class="th"><span style="color:#6ee7b7;font-weight:700">แนวคิด:</span> เขียน test logic ครั้งเดียว แต่รันกับ input หลายชุดโดยใช้ <code>[]struct</code> เป็น test table — Go testing รองรับด้วย <code>t.Run()</code><br><span style="color:#6ee7b7;font-weight:700">ข้อดี:</span> เพิ่ม case ใหม่แค่เพิ่มแถวใน table, ชื่อ test ชัดเจน, ง่ายต่อการ debug เมื่อ fail</span>
     </div>
   </div>
 
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
     <div class="code-block" style="border-color:#ef444430">
       <div class="code-header">
-        <span>❌ เขียน test แยกทุก case — ซ้ำซ้อน</span>
-        <span class="lang-bad">ผิดหลักการ</span>
+        <span>❌ <span class="en">A separate test per case — repetitive</span><span class="th">เขียน test แยกทุก case — ซ้ำซ้อน</span></span>
+        <span class="lang-bad"><span class="en">anti-pattern</span><span class="th">ผิดหลักการ</span></span>
       </div>
       <pre><code class="language-go">func TestDiscount_VIP(t *testing.T) {
     got := CalcDiscount(1000, "vip")
@@ -345,8 +344,8 @@ func TestDiscount_NewUser(t *testing.T) {
     </div>
     <div class="code-block" style="border-color:#4ade8030">
       <div class="code-header">
-        <span>✅ Table-driven — เพิ่ม case แค่เพิ่มแถว</span>
-        <span class="lang-good">ถูกหลักการ</span>
+        <span>✅ <span class="en">Table-driven — add a case by adding a row</span><span class="th">Table-driven — เพิ่ม case แค่เพิ่มแถว</span></span>
+        <span class="lang-good"><span class="en">good practice</span><span class="th">ถูกหลักการ</span></span>
       </div>
       <pre><code class="language-go">func TestCalcDiscount(t *testing.T) {
     tests := []struct {
@@ -379,26 +378,26 @@ func TestDiscount_NewUser(t *testing.T) {
 <!-- TDD -->
 <div class="section">
   <div class="section-title" style="color:#10b981">🔄 TDD — Test Driven Development</div>
-  <div class="section-sub">เขียน test ก่อน แล้วค่อยเขียน code ให้ผ่าน</div>
+  <div class="section-sub"><span class="en">Write the test first, then write code to make it pass</span><span class="th">เขียน test ก่อน แล้วค่อยเขียน code ให้ผ่าน</span></div>
 
   <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:1.5rem 0">
     <div style="background:#1a0404;border:2px solid #ef4444;border-radius:12px;padding:16px;text-align:center">
       <div style="font-size:1.5rem;font-weight:900;color:#ef4444;margin-bottom:8px">🔴 Red</div>
-      <div style="font-size:.82rem;color:#94a3b8">เขียน test ที่ <strong style="color:#fca5a5">fail</strong> ก่อน<br>test ต้อง compile ได้แต่ fail</div>
+      <div style="font-size:.82rem;color:#94a3b8"><span class="en">Write a test that <strong style="color:#fca5a5">fails</strong> first<br>it must compile but fail</span><span class="th">เขียน test ที่ <strong style="color:#fca5a5">fail</strong> ก่อน<br>test ต้อง compile ได้แต่ fail</span></div>
     </div>
     <div style="background:#041a04;border:2px solid #4ade80;border-radius:12px;padding:16px;text-align:center">
       <div style="font-size:1.5rem;font-weight:900;color:#4ade80;margin-bottom:8px">🟢 Green</div>
-      <div style="font-size:.82rem;color:#94a3b8">เขียน code <strong style="color:#86efac">น้อยที่สุด</strong><br>ที่ทำให้ test ผ่าน</div>
+      <div style="font-size:.82rem;color:#94a3b8"><span class="en">Write the <strong style="color:#86efac">least</strong> code<br>that makes the test pass</span><span class="th">เขียน code <strong style="color:#86efac">น้อยที่สุด</strong><br>ที่ทำให้ test ผ่าน</span></div>
     </div>
     <div style="background:#040a1a;border:2px solid #60a5fa;border-radius:12px;padding:16px;text-align:center">
       <div style="font-size:1.5rem;font-weight:900;color:#60a5fa;margin-bottom:8px">🔵 Refactor</div>
-      <div style="font-size:.82rem;color:#94a3b8">ทำความสะอาด code<br>โดย test ยังต้องผ่าน</div>
+      <div style="font-size:.82rem;color:#94a3b8"><span class="en">Clean up the code<br>while keeping tests green</span><span class="th">ทำความสะอาด code<br>โดย test ยังต้องผ่าน</span></div>
     </div>
   </div>
 
   <div class="code-block">
     <div class="code-header">
-      <span>TDD cycle — สร้าง PasswordValidator ทีละขั้น</span>
+      <span><span class="en">TDD cycle — building a PasswordValidator step by step</span><span class="th">TDD cycle — สร้าง PasswordValidator ทีละขั้น</span></span>
       <span class="lang-tag">Go · TDD</span>
     </div>
     <pre><code class="language-go">// ── 1. RED: เขียน test ก่อน — ยังไม่มี ValidatePassword ─────
@@ -469,19 +468,18 @@ func ValidatePassword(pwd string, rules ...PasswordRule) error {
   </div>
 
   <div class="callout" style="border-left-color:#10b981">
-    <strong>TDD ช่วยออกแบบ API:</strong> การเขียน test ก่อนบังคับให้คิดจาก "ผู้ใช้" ก่อน — ถ้า test อ่านยากหมายความว่า API ออกแบบมาไม่ดี แก้ API ก่อนแก้ implementation
+    <span class="en"><strong>TDD helps you design APIs:</strong> writing the test first forces you to think from the "user's" point of view — if the test is hard to read, the API is poorly designed, so fix the API before the implementation</span><span class="th"><strong>TDD ช่วยออกแบบ API:</strong> การเขียน test ก่อนบังคับให้คิดจาก "ผู้ใช้" ก่อน — ถ้า test อ่านยากหมายความว่า API ออกแบบมาไม่ดี แก้ API ก่อนแก้ implementation</span>
   </div>
 </div>
 
 <!-- INTEGRATION TEST -->
 <div class="section">
   <div class="section-title" style="color:#10b981">🔌 Integration Tests</div>
-  <div class="section-sub">ทดสอบ component หลายตัวทำงานร่วมกันกับ infra จริง</div>
+  <div class="section-sub"><span class="en">Test several components working together against real infra</span><span class="th">ทดสอบ component หลายตัวทำงานร่วมกันกับ infra จริง</span></div>
 
   <div style="background:linear-gradient(135deg,#041810,#062010);border:1px solid #10b98130;border-radius:12px;padding:1.2rem 1.4rem;margin-bottom:1.5rem">
     <div style="font-size:.83rem;color:#94a3b8;line-height:1.8">
-      <span style="color:#6ee7b7;font-weight:700">เมื่อไหร่ใช้:</span> เมื่อต้องการมั่นใจว่า SQL query ถูกต้อง, migration ไม่พัง, หรือ HTTP handler คืน response ถูก format<br>
-      <span style="color:#6ee7b7;font-weight:700">ใน Go:</span> ใช้ <code>testcontainers-go</code> สร้าง Docker container จริงใน test, หรือ <code>httptest.NewServer()</code> สำหรับ HTTP integration test
+      <span class="en"><span style="color:#6ee7b7;font-weight:700">When to use:</span> when you need confidence that a SQL query is correct, a migration doesn't break, or an HTTP handler returns a correctly formatted response<br><span style="color:#6ee7b7;font-weight:700">In Go:</span> use <code>testcontainers-go</code> to spin up a real Docker container in tests, or <code>httptest.NewServer()</code> for HTTP integration tests</span><span class="th"><span style="color:#6ee7b7;font-weight:700">เมื่อไหร่ใช้:</span> เมื่อต้องการมั่นใจว่า SQL query ถูกต้อง, migration ไม่พัง, หรือ HTTP handler คืน response ถูก format<br><span style="color:#6ee7b7;font-weight:700">ใน Go:</span> ใช้ <code>testcontainers-go</code> สร้าง Docker container จริงใน test, หรือ <code>httptest.NewServer()</code> สำหรับ HTTP integration test</span>
     </div>
   </div>
 
@@ -554,32 +552,32 @@ func TestOrderRepo_Integration(t *testing.T) {
   </div>
 
   <div class="callout warn">
-    <strong>Build tags:</strong> ใช้ <code>//go:build integration</code> แยก integration test ออกจาก unit test — รัน <code>go test ./...</code> สำหรับ unit, <code>go test -tags integration ./...</code> สำหรับทั้งหมด
+    <span class="en"><strong>Build tags:</strong> use <code>//go:build integration</code> to separate integration tests from unit tests — run <code>go test ./...</code> for units, and <code>go test -tags integration ./...</code> for everything</span><span class="th"><strong>Build tags:</strong> ใช้ <code>//go:build integration</code> แยก integration test ออกจาก unit test — รัน <code>go test ./...</code> สำหรับ unit, <code>go test -tags integration ./...</code> สำหรับทั้งหมด</span>
   </div>
 </div>
 
 <!-- GOLDEN PATH -->
 <div class="section">
   <div class="section-title" style="color:#10b981">📌 Quick Reference</div>
-  <div class="section-sub">เมื่อไหร่ใช้อะไร</div>
+  <div class="section-sub"><span class="en">When to use what</span><span class="th">เมื่อไหร่ใช้อะไร</span></div>
 
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin:1.5rem 0">
     <div style="background:#0d1117;border:1px solid #1e293b;border-left:3px solid #34d399;border-radius:12px;padding:16px">
-      <div style="font-size:.8rem;font-weight:700;color:#34d399;margin-bottom:8px">✅ Unit Test เหมาะกับ</div>
-      <div style="font-size:.8rem;color:#64748b;line-height:1.8">Business logic, validation, calculation<br>Pure functions, domain rules<br>Fast feedback loop ระหว่าง coding</div>
+      <div style="font-size:.8rem;font-weight:700;color:#34d399;margin-bottom:8px">✅ <span class="en">Unit tests are good for</span><span class="th">Unit Test เหมาะกับ</span></div>
+      <div style="font-size:.8rem;color:#64748b;line-height:1.8"><span class="en">Business logic, validation, calculation<br>Pure functions, domain rules<br>A fast feedback loop while coding</span><span class="th">Business logic, validation, calculation<br>Pure functions, domain rules<br>Fast feedback loop ระหว่าง coding</span></div>
     </div>
     <div style="background:#0d1117;border:1px solid #1e293b;border-left:3px solid #fbbf24;border-radius:12px;padding:16px">
-      <div style="font-size:.8rem;font-weight:700;color:#fbbf24;margin-bottom:8px">🔌 Integration Test เหมาะกับ</div>
-      <div style="font-size:.8rem;color:#64748b;line-height:1.8">SQL queries และ DB migrations<br>HTTP handlers กับ real service<br>Message queue producer/consumer</div>
+      <div style="font-size:.8rem;font-weight:700;color:#fbbf24;margin-bottom:8px">🔌 <span class="en">Integration tests are good for</span><span class="th">Integration Test เหมาะกับ</span></div>
+      <div style="font-size:.8rem;color:#64748b;line-height:1.8"><span class="en">SQL queries and DB migrations<br>HTTP handlers with a real service<br>Message queue producer/consumer</span><span class="th">SQL queries และ DB migrations<br>HTTP handlers กับ real service<br>Message queue producer/consumer</span></div>
     </div>
     <div style="background:#0d1117;border:1px solid #1e293b;border-left:3px solid #60a5fa;border-radius:12px;padding:16px">
-      <div style="font-size:.8rem;font-weight:700;color:#60a5fa;margin-bottom:8px">🎭 Test Double เลือกอย่างไร</div>
-      <div style="font-size:.8rem;color:#64748b;line-height:1.8">Stub: ต้องการ input ที่ควบคุมได้<br>Mock: ต้อง verify ว่า method ถูกเรียก<br>Fake: logic ซับซ้อน, mock จะยุ่งยาก</div>
+      <div style="font-size:.8rem;font-weight:700;color:#60a5fa;margin-bottom:8px">🎭 <span class="en">How to pick a test double</span><span class="th">Test Double เลือกอย่างไร</span></div>
+      <div style="font-size:.8rem;color:#64748b;line-height:1.8"><span class="en">Stub: you need controllable input<br>Mock: you must verify a method was called<br>Fake: logic is complex, mocking gets messy</span><span class="th">Stub: ต้องการ input ที่ควบคุมได้<br>Mock: ต้อง verify ว่า method ถูกเรียก<br>Fake: logic ซับซ้อน, mock จะยุ่งยาก</span></div>
     </div>
   </div>
 
   <div class="callout info">
-    <strong>หลีกเลี่ยง Over-mocking:</strong> ถ้า mock เยอะกว่า code จริง — test นั้นอาจไม่ได้ test behavior จริง แต่ test ว่า "code เรียก method ในลำดับที่ต้องการ" ซึ่งเปราะบางมาก ใช้ Fake แทนถ้าเป็นไปได้
+    <span class="en"><strong>Avoid over-mocking:</strong> if there's more mock than real code, the test may not test real behavior but only that "the code calls methods in a certain order" — which is very brittle. Use a Fake instead when possible</span><span class="th"><strong>หลีกเลี่ยง Over-mocking:</strong> ถ้า mock เยอะกว่า code จริง — test นั้นอาจไม่ได้ test behavior จริง แต่ test ว่า "code เรียก method ในลำดับที่ต้องการ" ซึ่งเปราะบางมาก ใช้ Fake แทนถ้าเป็นไปได้</span>
   </div>
 </div>
 
@@ -615,5 +613,6 @@ document.querySelectorAll('.code-block').forEach(block => {
   header.appendChild(btn)
 })
 </script>
+<script src="i18n.js"></script>
 </body>
 </html>

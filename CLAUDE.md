@@ -6,7 +6,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Thai-language educational website covering Software Architecture & Design patterns. Pure static HTML/CSS/JS — no build tools, no package manager, no framework. Open any `.html` file directly in a browser.
 
-**23 topics across 5 categories.** Each topic is a self-contained HTML file. Quick-read summaries for every topic live in `summaries/` — start there to get the lay of the land before opening any HTML file.
+**24 topics across 6 categories.** Each topic is a self-contained HTML file. Quick-read summaries for every topic live in `summaries/` — start there to get the lay of the land before opening any HTML file.
+
+## Bilingual (EN/TH) — `i18n.js`
+
+Every page includes `<script src="i18n.js"></script>` before `</body>`. It injects a floating EN/TH switch (bottom-right), remembers the choice in `localStorage` across pages, and toggles a `lang-th` / `lang-en` class on `<body>`. Default language is **Thai**.
+
+To make text bilingual, wrap it in paired spans: `<span class="en">English</span><span class="th">ไทย</span>`. Unwrapped text shows in both modes, so a page that isn't translated yet still renders fine. Set `<body class="lang-th">` statically to avoid a flash before the script runs. `index.html` and `24-agile-scrum.html` are fully bilingual; other topic pages are TH-only for now (toggle works, content stays Thai until translated). New topic pages should ship bilingual.
 
 ## Custom Agent
 

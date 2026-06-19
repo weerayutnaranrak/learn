@@ -61,27 +61,27 @@ a{color:#4ade80;text-decoration:none}
 .mvc-box-item{background:color-mix(in srgb,var(--bc) 10%,#0d1117);border-radius:6px;padding:.4rem .7rem;font-size:.73rem;color:var(--bc);font-weight:600}
 </style>
 </head>
-<body>
+<body class="lang-th">
 <nav class="topnav">
-  <a href="index.html" class="back-btn">← กลับหน้าหลัก</a>
+  <a href="index.html" class="back-btn">← <span class="en">Home</span><span class="th">กลับหน้าหลัก</span></a>
   <span class="nav-title">07 / <span>Model-View-Controller (MVC)</span></span>
 </nav>
 <div class="hero">
   <div class="hero-badge">🎯 UI Architecture Pattern</div>
   <h1>Model-View-Controller</h1>
-  <p>แยก Application ออกเป็น 3 ส่วน: Data (Model), Presentation (View), Logic (Controller) — pattern ยอดนิยมสำหรับ Web Applications มาตั้งแต่ปี 1970s</p>
+  <p><span class="en">Split the application into 3 parts: Data (Model), Presentation (View), Logic (Controller) — a popular pattern for web applications since the 1970s</span><span class="th">แยก Application ออกเป็น 3 ส่วน: Data (Model), Presentation (View), Logic (Controller) — pattern ยอดนิยมสำหรับ Web Applications มาตั้งแต่ปี 1970s</span></p>
 </div>
 <div class="content">
 
 <!-- ── 3 COMPONENTS ── -->
 <div class="section">
-  <div class="section-title">🧩 3 ส่วนหลักของ MVC</div>
+  <div class="section-title">🧩 <span class="en">The 3 core parts of MVC</span><span class="th">3 ส่วนหลักของ MVC</span></div>
 
   <div class="mvc-row">
     <div class="mvc-box" style="--bc:#6366f1">
       <div style="font-size:2.5rem;margin-bottom:.5rem">🗃️</div>
       <div class="mvc-box-title">Model</div>
-      <div class="mvc-box-sub">รับผิดชอบ <strong>Data</strong> และ <strong>Business Logic</strong> ไม่รู้จัก View หรือ Controller</div>
+      <div class="mvc-box-sub"><span class="en">Responsible for <strong>Data</strong> and <strong>Business Logic</strong>. Knows nothing about View or Controller</span><span class="th">รับผิดชอบ <strong>Data</strong> และ <strong>Business Logic</strong> ไม่รู้จัก View หรือ Controller</span></div>
       <div class="mvc-box-items">
         <div class="mvc-box-item">📊 Data structures</div>
         <div class="mvc-box-item">✅ Validation rules</div>
@@ -93,7 +93,7 @@ a{color:#4ade80;text-decoration:none}
     <div class="mvc-box" style="--bc:#4ade80">
       <div style="font-size:2.5rem;margin-bottom:.5rem">🖼️</div>
       <div class="mvc-box-title">View</div>
-      <div class="mvc-box-sub">รับผิดชอบ <strong>Presentation</strong> เท่านั้น — แสดงข้อมูลที่ Controller ส่งมา</div>
+      <div class="mvc-box-sub"><span class="en">Responsible for <strong>Presentation</strong> only — displays the data the Controller passes in</span><span class="th">รับผิดชอบ <strong>Presentation</strong> เท่านั้น — แสดงข้อมูลที่ Controller ส่งมา</span></div>
       <div class="mvc-box-items">
         <div class="mvc-box-item">🌐 HTML Templates</div>
         <div class="mvc-box-item">🎨 CSS Styling</div>
@@ -105,7 +105,7 @@ a{color:#4ade80;text-decoration:none}
     <div class="mvc-box" style="--bc:#f59e0b">
       <div style="font-size:2.5rem;margin-bottom:.5rem">🎮</div>
       <div class="mvc-box-title">Controller</div>
-      <div class="mvc-box-sub">รับ <strong>Input</strong> จาก User, เรียก Model, เลือก View ที่ตอบ</div>
+      <div class="mvc-box-sub"><span class="en">Takes <strong>Input</strong> from the user, calls the Model, picks the View to respond with</span><span class="th">รับ <strong>Input</strong> จาก User, เรียก Model, เลือก View ที่ตอบ</span></div>
       <div class="mvc-box-items">
         <div class="mvc-box-item">📥 Handle HTTP request</div>
         <div class="mvc-box-item">🔀 Route to logic</div>
@@ -118,19 +118,19 @@ a{color:#4ade80;text-decoration:none}
 
   <!-- VISUAL: Data Flow -->
   <div class="vb-wrap">
-    <div class="vb-label">🔄 Data Flow ใน MVC</div>
+    <div class="vb-label">🔄 <span class="en">Data flow in MVC</span><span class="th">Data Flow ใน MVC</span></div>
     <div style="background:#0d1117;border:1px solid #1e293b;border-radius:12px;padding:1.5rem;margin:1rem 0">
       <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;justify-content:center">
         <div style="background:#001820;border:1.5px solid #22d3ee;border-radius:8px;padding:.6rem 1rem;text-align:center;min-width:80px">
           <div style="font-size:1.2rem">👤</div>
           <div style="font-size:.75rem;font-weight:700;color:#67e8f9">User</div>
-          <div style="font-size:.65rem;color:#475569">คลิก/ส่งฟอร์ม</div>
+          <div style="font-size:.65rem;color:#475569"><span class="en">Click / submit form</span><span class="th">คลิก/ส่งฟอร์ม</span></div>
         </div>
         <div style="color:#334155;font-size:1.5rem">→</div>
         <div style="background:color-mix(in srgb,#f59e0b 8%,#07090f);border:1.5px solid #f59e0b;border-radius:8px;padding:.6rem 1rem;text-align:center;min-width:80px">
           <div style="font-size:1.2rem">🎮</div>
           <div style="font-size:.75rem;font-weight:700;color:#fcd34d">Controller</div>
-          <div style="font-size:.65rem;color:#475569">รับ Request</div>
+          <div style="font-size:.65rem;color:#475569"><span class="en">Receive request</span><span class="th">รับ Request</span></div>
         </div>
         <div style="display:flex;flex-direction:column;align-items:center;gap:.3rem">
           <div style="color:#6366f1;font-size:.8rem;font-weight:600">→ call</div>
@@ -139,7 +139,7 @@ a{color:#4ade80;text-decoration:none}
         <div style="background:color-mix(in srgb,#6366f1 8%,#07090f);border:1.5px solid #6366f1;border-radius:8px;padding:.6rem 1rem;text-align:center;min-width:80px">
           <div style="font-size:1.2rem">🗃️</div>
           <div style="font-size:.75rem;font-weight:700;color:#a5b4fc">Model</div>
-          <div style="font-size:.65rem;color:#475569">ดึง/บันทึก Data</div>
+          <div style="font-size:.65rem;color:#475569"><span class="en">Fetch / save data</span><span class="th">ดึง/บันทึก Data</span></div>
         </div>
         <div style="display:flex;flex-direction:column;align-items:center;gap:.3rem">
           <div style="color:#4ade80;font-size:.8rem;font-weight:600">→ pass data</div>
@@ -154,7 +154,7 @@ a{color:#4ade80;text-decoration:none}
         <div style="background:#001820;border:1.5px solid #22d3ee;border-radius:8px;padding:.6rem 1rem;text-align:center;min-width:80px">
           <div style="font-size:1.2rem">📺</div>
           <div style="font-size:.75rem;font-weight:700;color:#67e8f9">Browser</div>
-          <div style="font-size:.65rem;color:#475569">แสดงผล</div>
+          <div style="font-size:.65rem;color:#475569"><span class="en">Display</span><span class="th">แสดงผล</span></div>
         </div>
       </div>
     </div>
@@ -162,18 +162,18 @@ a{color:#4ade80;text-decoration:none}
 
   <!-- VISUAL: MVC Variants -->
   <div class="vb-wrap">
-    <div class="vb-label">🔀 MVC Variants ที่นิยมใช้</div>
+    <div class="vb-label">🔀 <span class="en">Popular MVC variants</span><span class="th">MVC Variants ที่นิยมใช้</span></div>
     <div class="vb-grid vb-4">
       <div class="vbox" style="--ac:#4ade80">
         <span class="vb-icon">🌐</span>
         <div class="vb-title">MVC (Classic)</div>
-        <div class="vb-body">Server-side rendering — Controller ส่ง HTML กลับ</div>
+        <div class="vb-body"><span class="en">Server-side rendering — the Controller returns HTML</span><span class="th">Server-side rendering — Controller ส่ง HTML กลับ</span></div>
         <span class="vb-chip">Rails · Laravel · Go</span>
       </div>
       <div class="vbox" style="--ac:#22d3ee">
         <span class="vb-icon">📊</span>
         <div class="vb-title">MVP</div>
-        <div class="vb-body">Model-View-Presenter — View passive, Presenter ควบคุม</div>
+        <div class="vb-body"><span class="en">Model-View-Presenter — the View is passive, the Presenter controls it</span><span class="th">Model-View-Presenter — View passive, Presenter ควบคุม</span></div>
         <span class="vb-chip">Android · WinForms</span>
       </div>
       <div class="vbox" style="--ac:#6366f1">
@@ -185,16 +185,16 @@ a{color:#4ade80;text-decoration:none}
       <div class="vbox" style="--ac:#f59e0b">
         <span class="vb-icon">⚡</span>
         <div class="vb-title">MVC (API)</div>
-        <div class="vb-body">View คือ JSON response — สำหรับ REST APIs</div>
+        <div class="vb-body"><span class="en">The View is a JSON response — for REST APIs</span><span class="th">View คือ JSON response — สำหรับ REST APIs</span></div>
         <span class="vb-chip">REST · Go · Express</span>
       </div>
     </div>
   </div>
 
   <div class="callout">
-    <strong>ความแตกต่างสำคัญ:</strong>
+    <span class="en"><strong>The key distinction:</strong> <strong>the Model knows neither the View nor the Controller</strong> — so business logic can be reused across many UIs, e.g. the same Model with a web view, a mobile JSON response, and CLI output</span><span class="th"><strong>ความแตกต่างสำคัญ:</strong>
     <strong>Model ไม่รู้จัก View ไม่รู้จัก Controller</strong> — ทำให้ business logic reuse ได้หลาย UI
-    เช่น ใช้ Model เดียวกันกับ Web View, Mobile JSON response, และ CLI output
+    เช่น ใช้ Model เดียวกันกับ Web View, Mobile JSON response, และ CLI output</span>
   </div>
 </div>
 
@@ -285,7 +285,7 @@ a{color:#4ade80;text-decoration:none}
 
 <!-- ── CODE ── -->
 <div class="section">
-  <div class="section-title">💻 ตัวอย่าง Go — MVC Web Application</div>
+  <div class="section-title">💻 <span class="en">Go example — MVC Web Application</span><span class="th">ตัวอย่าง Go — MVC Web Application</span></div>
 
   <div class="code-block">
     <div class="code-header"><span>model/product.go — Model (Data + Business Logic)</span><span class="lang">Go</span></div>
@@ -549,7 +549,7 @@ func main() {
 
 <!-- ── SUMMARY ── -->
 <div class="section">
-  <div class="section-title">✅ สรุป MVC</div>
+  <div class="section-title">✅ <span class="en">Summary — MVC</span><span class="th">สรุป MVC</span></div>
   <div class="vb-grid vb-3">
     <div class="vbox" style="--ac:#6366f1">
       <span class="vb-icon">🗃️</span>
@@ -557,34 +557,34 @@ func main() {
       <ul class="vb-list">
         <li>Business logic &amp; validation</li>
         <li>Database queries</li>
-        <li>ไม่รู้จัก HTTP หรือ HTML</li>
-        <li>Testable อิสระ</li>
+        <li><span class="en">Knows nothing about HTTP or HTML</span><span class="th">ไม่รู้จัก HTTP หรือ HTML</span></li>
+        <li><span class="en">Independently testable</span><span class="th">Testable อิสระ</span></li>
       </ul>
     </div>
     <div class="vbox" style="--ac:#4ade80">
       <span class="vb-icon">🖼️</span>
       <div class="vb-title">View — Display</div>
       <ul class="vb-list">
-        <li>แสดงข้อมูลที่รับมาเท่านั้น</li>
-        <li>ไม่มี business logic</li>
+        <li><span class="en">Only displays the data it receives</span><span class="th">แสดงข้อมูลที่รับมาเท่านั้น</span></li>
+        <li><span class="en">No business logic</span><span class="th">ไม่มี business logic</span></li>
         <li>HTML Template / JSON</li>
-        <li>เปลี่ยน UI ไม่ต้องแก้ Model</li>
+        <li><span class="en">Change the UI without touching the Model</span><span class="th">เปลี่ยน UI ไม่ต้องแก้ Model</span></li>
       </ul>
     </div>
     <div class="vbox" style="--ac:#f59e0b">
       <span class="vb-icon">🎮</span>
       <div class="vb-title">Controller — Bridge</div>
       <ul class="vb-list">
-        <li>รับ Input → เรียก Model</li>
-        <li>ส่งข้อมูล → View</li>
-        <li>Thin Controller (ไม่อ้วน!)</li>
-        <li>ไม่ใส่ logic ซับซ้อนที่นี่</li>
+        <li><span class="en">Take input → call the Model</span><span class="th">รับ Input → เรียก Model</span></li>
+        <li><span class="en">Pass data → to the View</span><span class="th">ส่งข้อมูล → View</span></li>
+        <li><span class="en">Thin Controller (don't make it fat!)</span><span class="th">Thin Controller (ไม่อ้วน!)</span></li>
+        <li><span class="en">Don't put complex logic here</span><span class="th">ไม่ใส่ logic ซับซ้อนที่นี่</span></li>
       </ul>
     </div>
   </div>
   <div class="callout tip">
-    <strong>Anti-pattern: Fat Controller</strong> — Controller ที่มี business logic เยอะ
-    ควรย้าย logic ไปอยู่ใน Model หรือ Service ทำให้ Controller "Thin" — แค่ coordinate เท่านั้น
+    <span class="en"><strong>Anti-pattern: Fat Controller</strong> — a controller stuffed with business logic. Move that logic into the Model or a Service to keep the Controller "thin" — it should only coordinate</span><span class="th"><strong>Anti-pattern: Fat Controller</strong> — Controller ที่มี business logic เยอะ
+    ควรย้าย logic ไปอยู่ใน Model หรือ Service ทำให้ Controller "Thin" — แค่ coordinate เท่านั้น</span>
   </div>
 </div>
 
@@ -650,5 +650,6 @@ document.querySelectorAll('.code-block').forEach(block => {
   header.appendChild(btn)
 })
 </script>
+<script src="i18n.js"></script>
 </body>
 </html>

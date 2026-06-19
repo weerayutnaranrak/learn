@@ -11,13 +11,7 @@
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Segoe UI',sans-serif;background:#07090f;color:#e2e8f0;line-height:1.7}
 
-/* ── Bilingual toggle (CSS-driven, zero framework) ── */
-.th{display:none}
-body.lang-th .th{display:revert}
-body.lang-th .en{display:none}
-.lang-switch{display:flex;gap:0;border:1px solid #14b8a650;border-radius:20px;overflow:hidden}
-.lang-switch button{background:transparent;color:#5eead4;border:none;padding:5px 14px;font-size:.78rem;font-weight:700;cursor:pointer;letter-spacing:1px;transition:background .2s,color .2s}
-.lang-switch button.active{background:linear-gradient(135deg,#14b8a6,#22c55e);color:#06140f}
+/* Bilingual toggle styles + floating switch are injected by i18n.js (site-wide) */
 
 /* ── Hero ── */
 .hero{background:linear-gradient(135deg,#07090f 0%,#08171a 50%,#07090f 100%);padding:60px 40px;text-align:center;border-bottom:1px solid #14b8a620;position:relative;overflow:hidden}
@@ -200,7 +194,7 @@ footer{text-align:center;padding:2rem;color:#334155;font-size:.82rem;border-top:
 }
 </style>
 </head>
-<body class="lang-en">
+<body class="lang-th">
 
 <nav>
   <a href="index.html" class="nav-home">← <span class="en">Home</span><span class="th">กลับหน้าหลัก</span></a>
@@ -215,10 +209,6 @@ footer{text-align:center;padding:2rem;color:#334155;font-size:.82rem;border-top:
     <a href="#estimation" class="toc-link">📐 Estimation</a>
     <a href="#board" class="toc-link">🗂️ Board</a>
     <a href="#pitfalls" class="toc-link">⚠️ Pitfalls</a>
-    <div class="lang-switch" id="langSwitch">
-      <button data-lang="en" class="active">EN</button>
-      <button data-lang="th">TH</button>
-    </div>
   </div>
 </nav>
 
@@ -905,21 +895,8 @@ Estimate: 5 points   ·   Priority: High</code></pre>
 
 <script>
   hljs.highlightAll();
-  // Bilingual toggle — swaps a body class; CSS does the rest. Persists choice.
-  (function(){
-    var body = document.body, sw = document.getElementById('langSwitch');
-    function set(lang){
-      body.classList.toggle('lang-th', lang==='th');
-      body.classList.toggle('lang-en', lang!=='th');
-      document.documentElement.lang = lang;
-      sw.querySelectorAll('button').forEach(function(b){ b.classList.toggle('active', b.dataset.lang===lang); });
-      try{ localStorage.setItem('lang', lang); }catch(e){}
-    }
-    sw.addEventListener('click', function(e){ if(e.target.dataset.lang) set(e.target.dataset.lang); });
-    var saved; try{ saved = localStorage.getItem('lang'); }catch(e){}
-    set(saved || 'en');
-  })();
 </script>
 <script src="common.js"></script>
+<script src="i18n.js"></script>
 </body>
 </html>

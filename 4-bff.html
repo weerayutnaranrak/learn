@@ -55,52 +55,52 @@ a{color:#fbbf24;text-decoration:none}
 @keyframes flowDown{0%{stroke-dashoffset:-30}100%{stroke-dashoffset:0}}
 </style>
 </head>
-<body>
+<body class="lang-th">
 
 <nav class="topnav">
-  <a href="index.html" class="back-btn">← กลับหน้าหลัก</a>
+  <a href="index.html" class="back-btn">← <span class="en">Home</span><span class="th">กลับหน้าหลัก</span></a>
   <span class="nav-title">04 / <span>BFF Architecture</span></span>
 </nav>
 
 <div class="hero">
-  <div class="hero-badge">🔀 หัวข้อที่ 4</div>
+  <div class="hero-badge">🔀 <span class="en">Topic 4</span><span class="th">หัวข้อที่ 4</span></div>
   <h1>BFF Architecture</h1>
-  <p>Backend for Frontend — สร้าง Backend Layer ที่ tailored สำหรับแต่ละ Client Type แทนที่จะมี Generic API เดียวสำหรับทุกคน</p>
+  <p><span class="en">Backend for Frontend — build a backend layer tailored to each client type instead of one generic API for everyone</span><span class="th">Backend for Frontend — สร้าง Backend Layer ที่ tailored สำหรับแต่ละ Client Type แทนที่จะมี Generic API เดียวสำหรับทุกคน</span></p>
 </div>
 
 <div class="content">
 
 <!-- ── PROBLEM ── -->
 <div class="section">
-  <div class="section-title">😣 ปัญหาที่ BFF แก้</div>
-  <div class="section-sub">ทำไม Generic API เดียวไม่พอ?</div>
+  <div class="section-title">😣 <span class="en">Problems BFF solves</span><span class="th">ปัญหาที่ BFF แก้</span></div>
+  <div class="section-sub"><span class="en">Why isn't a single generic API enough?</span><span class="th">ทำไม Generic API เดียวไม่พอ?</span></div>
 
   <p style="color:#94a3b8;margin-bottom:1.5rem">
-    เมื่อระบบมีหลาย client (Web, Mobile App, Smart TV, IoT) แต่ละตัวมีความต้องการต่างกันมาก:
+    <span class="en">When a system has many clients (Web, Mobile App, Smart TV, IoT), each has very different needs:</span><span class="th">เมื่อระบบมีหลาย client (Web, Mobile App, Smart TV, IoT) แต่ละตัวมีความต้องการต่างกันมาก:</span>
   </p>
 
   <div class="concept-grid">
     <div class="concept-card" style="--c:#ef4444">
-      <div class="label">ปัญหา 1</div>
+      <div class="label"><span class="en">Problem 1</span><span class="th">ปัญหา 1</span></div>
       <h3>Over-fetching / Under-fetching</h3>
-      <p>Web ต้องการข้อมูลเยอะ, Mobile ต้องการแค่บางส่วน — Generic API ให้มาเท่ากัน ทำให้ mobile โหลดข้อมูลเกินความจำเป็น</p>
+      <p><span class="en">Web needs lots of data, mobile needs only some — a generic API gives both the same, so mobile downloads more than it needs</span><span class="th">Web ต้องการข้อมูลเยอะ, Mobile ต้องการแค่บางส่วน — Generic API ให้มาเท่ากัน ทำให้ mobile โหลดข้อมูลเกินความจำเป็น</span></p>
     </div>
     <div class="concept-card" style="--c:#f59e0b">
-      <div class="label">ปัญหา 2</div>
+      <div class="label"><span class="en">Problem 2</span><span class="th">ปัญหา 2</span></div>
       <h3>N+1 Client Calls</h3>
-      <p>Mobile ต้อง call 5 endpoints เพื่อแสดง 1 หน้า ทำให้ช้า และ battery drain — เพราะ microservices ไม่รู้จัก client context</p>
+      <p><span class="en">Mobile has to call 5 endpoints to render one screen — slow and battery-draining — because the microservices don't know the client context</span><span class="th">Mobile ต้อง call 5 endpoints เพื่อแสดง 1 หน้า ทำให้ช้า และ battery drain — เพราะ microservices ไม่รู้จัก client context</span></p>
     </div>
     <div class="concept-card" style="--c:#ef4444">
-      <div class="label">ปัญหา 3</div>
-      <h3>Coupling ระหว่าง Client และ Microservices</h3>
-      <p>Client รู้จัก microservices ทุกตัว — เปลี่ยน internal structure ทีไร client ต้องอัพเดทตาม</p>
+      <div class="label"><span class="en">Problem 3</span><span class="th">ปัญหา 3</span></div>
+      <h3><span class="en">Coupling between client and microservices</span><span class="th">Coupling ระหว่าง Client และ Microservices</span></h3>
+      <p><span class="en">The client knows every microservice — change the internal structure and the client has to update too</span><span class="th">Client รู้จัก microservices ทุกตัว — เปลี่ยน internal structure ทีไร client ต้องอัพเดทตาม</span></p>
     </div>
   </div>
 
   <div class="callout">
-    <strong>BFF Pattern แก้ด้วย:</strong> สร้าง "Backend" แยกสำหรับแต่ละ client type
+    <span class="en"><strong>The BFF pattern solves this by:</strong> building a separate "backend" for each client type — Web BFF, Mobile BFF, Smart TV BFF — each aggregating data from the microservices and returning only what that client needs</span><span class="th"><strong>BFF Pattern แก้ด้วย:</strong> สร้าง "Backend" แยกสำหรับแต่ละ client type
     — Web BFF, Mobile BFF, Smart TV BFF
-    แต่ละตัว aggregate data จาก microservices แล้วส่งเฉพาะที่ client นั้นต้องการ
+    แต่ละตัว aggregate data จาก microservices แล้วส่งเฉพาะที่ client นั้นต้องการ</span>
   </div>
 
   <!-- BFF Diagram -->
@@ -197,7 +197,7 @@ a{color:#fbbf24;text-decoration:none}
       </line>
 
       <!-- Labels -->
-      <text x="340" y="308" text-anchor="middle" fill="#334155" font-size="9">แต่ละ BFF เรียก services ที่ต้องการ — Aggregate เป็น response เดียว</text>
+      <text x="340" y="308" text-anchor="middle" fill="#334155" font-size="9"><tspan class="en">Each BFF calls only the services it needs — aggregates into a single response</tspan><tspan class="th">แต่ละ BFF เรียก services ที่ต้องการ — Aggregate เป็น response เดียว</tspan></text>
 
       <defs>
         <marker id="pa" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#6366f1"/></marker>
@@ -210,8 +210,8 @@ a{color:#fbbf24;text-decoration:none}
 
 <!-- ── CODE ── -->
 <div class="section">
-  <div class="section-title">💻 ตัวอย่าง Go — Web BFF vs Mobile BFF</div>
-  <div class="section-sub">แสดงความแตกต่างของ Response ที่แต่ละ BFF ส่งให้ Client</div>
+  <div class="section-title">💻 <span class="en">Go example — Web BFF vs Mobile BFF</span><span class="th">ตัวอย่าง Go — Web BFF vs Mobile BFF</span></div>
+  <div class="section-sub"><span class="en">Showing the difference in the response each BFF returns to its client</span><span class="th">แสดงความแตกต่างของ Response ที่แต่ละ BFF ส่งให้ Client</span></div>
 
   <div class="code-block">
     <div class="code-header">
@@ -615,7 +615,7 @@ func toMobileDetail(p *clients.Product) MobileProductDetail {
 
   <div class="code-block">
     <div class="code-header">
-      <span>cmd/main.go — Run ทั้ง 2 BFF Servers</span>
+      <span>cmd/main.go — <span class="en">Run both BFF servers</span><span class="th">Run ทั้ง 2 BFF Servers</span></span>
       <span class="lang">Go</span>
     </div>
     <pre><code class="language-go">package main
@@ -657,78 +657,78 @@ func main() {
 
 <!-- ── RESPONSE COMPARISON ── -->
 <div class="section">
-  <div class="section-title">📊 เปรียบเทียบ Response Size</div>
+  <div class="section-title">📊 <span class="en">Comparing response size</span><span class="th">เปรียบเทียบ Response Size</span></div>
 
   <table class="compare">
     <tr>
-      <th>ด้าน</th>
+      <th><span class="en">Aspect</span><span class="th">ด้าน</span></th>
       <th>Web BFF Response</th>
       <th>Mobile BFF Response</th>
     </tr>
     <tr>
-      <td>ขนาด Response</td>
+      <td><span class="en">Response size</span><span class="th">ขนาด Response</span></td>
       <td>~15KB (full data + recommendations + cart)</td>
       <td>~1.5KB (minimal, gzip)</td>
     </tr>
     <tr>
       <td>Number of Calls</td>
       <td>1 call → BFF fan-out 3 upstream calls</td>
-      <td>1 call → BFF ทำ 1-2 upstream calls</td>
+      <td><span class="en">1 call → BFF makes 1-2 upstream calls</span><span class="th">1 call → BFF ทำ 1-2 upstream calls</span></td>
     </tr>
     <tr>
       <td>Images</td>
-      <td>ทุกรูป (อาจ 10+ URLs)</td>
-      <td>max 3 รูป</td>
+      <td><span class="en">All images (possibly 10+ URLs)</span><span class="th">ทุกรูป (อาจ 10+ URLs)</span></td>
+      <td><span class="en">max 3 images</span><span class="th">max 3 รูป</span></td>
     </tr>
     <tr>
       <td>Description</td>
-      <td>เต็ม (2000+ chars)</td>
+      <td><span class="en">Full (2000+ chars)</span><span class="th">เต็ม (2000+ chars)</span></td>
       <td>150 chars (truncated)</td>
     </tr>
     <tr>
       <td>Pagination</td>
-      <td>Offset-based (แสดงเลขหน้า)</td>
+      <td><span class="en">Offset-based (page numbers)</span><span class="th">Offset-based (แสดงเลขหน้า)</span></td>
       <td>Cursor-based (infinite scroll)</td>
     </tr>
     <tr>
       <td>Cart Info</td>
-      <td>มี (แสดง mini cart)</td>
-      <td>ไม่มี (separate cart page)</td>
+      <td><span class="en">Yes (shows a mini cart)</span><span class="th">มี (แสดง mini cart)</span></td>
+      <td><span class="en">No (separate cart page)</span><span class="th">ไม่มี (separate cart page)</span></td>
     </tr>
     <tr>
       <td>Cache</td>
       <td>5 minutes</td>
-      <td>30 minutes (mobile tolerates stale)</td>
+      <td><span class="en">30 minutes (mobile tolerates stale)</span><span class="th">30 minutes (mobile tolerates stale)</span></td>
     </tr>
   </table>
 </div>
 
 <!-- ── WHEN TO USE ── -->
 <div class="section">
-  <div class="section-title">✅ สรุปและ Best Practices</div>
+  <div class="section-title">✅ <span class="en">Summary &amp; Best Practices</span><span class="th">สรุปและ Best Practices</span></div>
 
   <div class="concept-grid">
     <div class="concept-card" style="--c:#10b981">
-      <div class="label">ข้อดี</div>
-      <h3>ควรใช้เมื่อ</h3>
-      <p>• มี clients หลายประเภท (Web, Mobile, TV, IoT)<br>• Client ต้องการ aggregate หลาย APIs<br>• ต้องการ optimize bandwidth สำหรับ mobile<br>• Teams แยกกัน (Frontend team owned BFF)</p>
+      <div class="label"><span class="en">Pros</span><span class="th">ข้อดี</span></div>
+      <h3><span class="en">Use it when</span><span class="th">ควรใช้เมื่อ</span></h3>
+      <p><span class="en">• You have several client types (Web, Mobile, TV, IoT)<br>• Clients need to aggregate many APIs<br>• You want to optimize bandwidth for mobile<br>• Separate teams (frontend team owns the BFF)</span><span class="th">• มี clients หลายประเภท (Web, Mobile, TV, IoT)<br>• Client ต้องการ aggregate หลาย APIs<br>• ต้องการ optimize bandwidth สำหรับ mobile<br>• Teams แยกกัน (Frontend team owned BFF)</span></p>
     </div>
     <div class="concept-card" style="--c:#f59e0b">
-      <div class="label">ระวัง</div>
+      <div class="label"><span class="en">Caution</span><span class="th">ระวัง</span></div>
       <h3>Trade-offs</h3>
-      <p>• เพิ่ม services ที่ต้อง maintain<br>• Duplication logic ระหว่าง BFFs<br>• ถ้า clients ต้องการข้อมูลเหมือนกัน ใช้ single API Gateway แทน</p>
+      <p><span class="en">• More services to maintain<br>• Duplicated logic across BFFs<br>• If clients need the same data, use a single API Gateway instead</span><span class="th">• เพิ่ม services ที่ต้อง maintain<br>• Duplication logic ระหว่าง BFFs<br>• ถ้า clients ต้องการข้อมูลเหมือนกัน ใช้ single API Gateway แทน</span></p>
     </div>
   </div>
 
   <div class="callout tip">
-    <strong>Tip:</strong> ถ้ามีหลาย clients แต่ต้องการข้อมูลเหมือนกัน — ใช้ <strong>GraphQL</strong> แทน
-    GraphQL ให้ client เลือกเอง fields ที่ต้องการ โดยไม่ต้องสร้าง BFF แยก
+    <span class="en"><strong>Tip:</strong> if you have many clients but they need the same data — use <strong>GraphQL</strong> instead. GraphQL lets the client pick the fields it wants without building a separate BFF</span><span class="th"><strong>Tip:</strong> ถ้ามีหลาย clients แต่ต้องการข้อมูลเหมือนกัน — ใช้ <strong>GraphQL</strong> แทน
+    GraphQL ให้ client เลือกเอง fields ที่ต้องการ โดยไม่ต้องสร้าง BFF แยก</span>
   </div>
 </div>
 
 <div style="text-align:center;margin:3rem 0;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
   <a href="3-event-driven.html" style="display:inline-flex;align-items:center;gap:.5rem;background:#0d1117;border:1px solid #1e293b;color:#64748b;padding:.7rem 1.5rem;border-radius:10px;font-size:.88rem">← Event Driven</a>
-  <a href="5-atomic.html" style="display:inline-flex;align-items:center;gap:.5rem;background:#0d1117;border:1px solid #1e293b;color:#fbbf24;padding:.7rem 1.5rem;border-radius:10px;font-weight:600;font-size:.88rem">หัวข้อถัดไป: Atomic Design →</a>
+  <a href="5-atomic.html" style="display:inline-flex;align-items:center;gap:.5rem;background:#0d1117;border:1px solid #1e293b;color:#fbbf24;padding:.7rem 1.5rem;border-radius:10px;font-weight:600;font-size:.88rem"><span class="en">Next: Atomic Design</span><span class="th">หัวข้อถัดไป: Atomic Design</span> →</a>
 </div>
 
 </div>
@@ -789,5 +789,6 @@ document.querySelectorAll('.code-block').forEach(block => {
   header.appendChild(btn)
 })
 </script>
+<script src="i18n.js"></script>
 </body>
 </html>

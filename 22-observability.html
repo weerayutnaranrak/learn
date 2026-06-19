@@ -51,17 +51,17 @@ a:hover{text-decoration:underline}
 .pillar-desc{font-size:.82rem;color:#64748b;line-height:1.7}
 </style>
 </head>
-<body>
+<body class="lang-th">
 
 <nav class="topnav">
-  <a href="index.html" class="back-btn">← กลับหน้าหลัก</a>
+  <a href="index.html" class="back-btn">← <span class="en">Home</span><span class="th">กลับหน้าหลัก</span></a>
   <span class="nav-title">22 / <span>Observability</span></span>
 </nav>
 
 <div class="hero">
-  <div class="hero-badge">🔭 หัวข้อที่ 22</div>
+  <div class="hero-badge">🔭 <span class="en">Topic 22</span><span class="th">หัวข้อที่ 22</span></div>
   <h1>Observability</h1>
-  <p>3 pillars — Logs, Metrics, Traces — รู้ว่าระบบทำอะไรอยู่ โดยไม่ต้องเดา ด้วย structured logging, Prometheus, และ OpenTelemetry</p>
+  <p><span class="en">3 pillars — Logs, Metrics, Traces — know what your system is doing without guessing, using structured logging, Prometheus and OpenTelemetry</span><span class="th">3 pillars — Logs, Metrics, Traces — รู้ว่าระบบทำอะไรอยู่ โดยไม่ต้องเดา ด้วย structured logging, Prometheus, และ OpenTelemetry</span></p>
 </div>
 
 <div class="content">
@@ -69,44 +69,47 @@ a:hover{text-decoration:underline}
 <!-- 3 PILLARS -->
 <div class="section">
   <div class="section-title" style="color:#06b6d4">🔭 3 Pillars of Observability</div>
-  <div class="section-sub">แต่ละ pillar ตอบคำถามต่างกัน — ใช้ร่วมกันถึงจะเข้าใจระบบได้สมบูรณ์</div>
+  <div class="section-sub"><span class="en">Each pillar answers a different question — use all three together to fully understand the system</span><span class="th">แต่ละ pillar ตอบคำถามต่างกัน — ใช้ร่วมกันถึงจะเข้าใจระบบได้สมบูรณ์</span></div>
 
   <div class="pillar-grid">
     <div class="pillar" style="--lc:#10b981;--bg:rgba(16,185,129,.05)">
       <div class="pillar-icon">📄</div>
       <div class="pillar-name">Logs</div>
-      <div class="pillar-desc">บันทึกเหตุการณ์ที่เกิดขึ้น — "WHAT happened"<br>ดี: debug รายละเอียด<br>ข้อจำกัด: มาก → แพง, ต้องค้นหา</div>
+      <div class="pillar-desc"><span class="en">Records events that happened — "WHAT happened"<br>Good: detailed debugging<br>Limit: high volume → costly, must be searched</span><span class="th">บันทึกเหตุการณ์ที่เกิดขึ้น — "WHAT happened"<br>ดี: debug รายละเอียด<br>ข้อจำกัด: มาก → แพง, ต้องค้นหา</span></div>
     </div>
     <div class="pillar" style="--lc:#f97316;--bg:rgba(249,115,22,.05)">
       <div class="pillar-icon">📊</div>
       <div class="pillar-name">Metrics</div>
-      <div class="pillar-desc">ตัวเลขสรุปที่วัดต่อเนื่อง — "HOW MUCH"<br>ดี: alert, dashboard, trend<br>ข้อจำกัด: รู้ว่าผิดแต่ไม่รู้ทำไม</div>
+      <div class="pillar-desc"><span class="en">Aggregated numbers measured continuously — "HOW MUCH"<br>Good: alerts, dashboards, trends<br>Limit: tells you something's wrong, not why</span><span class="th">ตัวเลขสรุปที่วัดต่อเนื่อง — "HOW MUCH"<br>ดี: alert, dashboard, trend<br>ข้อจำกัด: รู้ว่าผิดแต่ไม่รู้ทำไม</span></div>
     </div>
     <div class="pillar" style="--lc:#a78bfa;--bg:rgba(167,139,250,.05)">
       <div class="pillar-icon">🔗</div>
       <div class="pillar-name">Traces</div>
-      <div class="pillar-desc">ติดตาม request ข้าม service — "WHERE slow"<br>ดี: หา bottleneck ใน distributed system<br>ข้อจำกัด: overhead, ต้อง instrument</div>
+      <div class="pillar-desc"><span class="en">Follows a request across services — "WHERE slow"<br>Good: find bottlenecks in a distributed system<br>Limit: overhead, requires instrumentation</span><span class="th">ติดตาม request ข้าม service — "WHERE slow"<br>ดี: หา bottleneck ใน distributed system<br>ข้อจำกัด: overhead, ต้อง instrument</span></div>
     </div>
   </div>
 
   <div class="callout">
-    <strong>คำถามที่แต่ละ pillar ตอบ:</strong>
+    <span class="en"><strong>What each pillar answers:</strong>
+    <strong>Logs</strong> → "Why did order #123 fail?" &nbsp;|&nbsp;
+    <strong>Metrics</strong> → "What's the error rate this hour?" &nbsp;|&nbsp;
+    <strong>Traces</strong> → "The request is slow — which service is slow?"</span><span class="th"><strong>คำถามที่แต่ละ pillar ตอบ:</strong>
     <strong>Logs</strong> → "ทำไม order #123 ถึงล้มเหลว?" &nbsp;|&nbsp;
     <strong>Metrics</strong> → "error rate ชั่วโมงนี้เป็นเท่าไหร่?" &nbsp;|&nbsp;
-    <strong>Traces</strong> → "request ช้า — ช้าที่ service ไหน?"
+    <strong>Traces</strong> → "request ช้า — ช้าที่ service ไหน?"</span>
   </div>
 </div>
 
 <!-- STRUCTURED LOGGING -->
 <div class="section">
   <div class="section-title" style="color:#10b981">📄 Structured Logging</div>
-  <div class="section-sub">log เป็น JSON แทน plain text — ค้นหา filter ได้ทันที</div>
+  <div class="section-sub"><span class="en">Log as JSON instead of plain text — searchable and filterable instantly</span><span class="th">log เป็น JSON แทน plain text — ค้นหา filter ได้ทันที</span></div>
 
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
     <div class="code-block" style="border-color:#ef444430">
       <div class="code-header">
-        <span>❌ Unstructured log — ค้นหายาก</span>
-        <span class="lang-bad">ผิดหลักการ</span>
+        <span>❌ <span class="en">Unstructured log — hard to search</span><span class="th">Unstructured log — ค้นหายาก</span></span>
+        <span class="lang-bad"><span class="en">anti-pattern</span><span class="th">ผิดหลักการ</span></span>
       </div>
       <pre><code class="language-go">// อ่านได้ แต่ machine parse ไม่ได้
 // ไม่มีโครงสร้าง → กรองข้าม service ไม่ได้
@@ -119,8 +122,8 @@ log.Printf("[2024-01-15 10:30:00] INFO: Order %s placed, total=%.2f",
     </div>
     <div class="code-block" style="border-color:#4ade8030">
       <div class="code-header">
-        <span>✅ Structured logging ด้วย slog (Go 1.21+)</span>
-        <span class="lang-good">ถูกหลักการ</span>
+        <span>✅ <span class="en">Structured logging with slog (Go 1.21+)</span><span class="th">Structured logging ด้วย slog (Go 1.21+)</span></span>
+        <span class="lang-good"><span class="en">good practice</span><span class="th">ถูกหลักการ</span></span>
       </div>
       <pre><code class="language-go">// slog — standard library ตั้งแต่ Go 1.21
 logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
@@ -144,7 +147,7 @@ logger.Info("order_placed",
 
   <div class="code-block">
     <div class="code-header">
-      <span>Logger ที่ดี — context propagation และ default fields</span>
+      <span><span class="en">A good logger — context propagation and default fields</span><span class="th">Logger ที่ดี — context propagation และ default fields</span></span>
       <span class="lang-tag">Go · slog</span>
     </div>
     <pre><code class="language-go">// ── Logger Middleware: ใส่ request fields ให้ทุก log ────────
@@ -205,32 +208,32 @@ logger.Error("db_query_failed",
 <!-- METRICS -->
 <div class="section">
   <div class="section-title" style="color:#f97316">📊 Metrics — Prometheus</div>
-  <div class="section-sub">ตัวเลขที่วัดต่อเนื่อง สำหรับ alert และ dashboard</div>
+  <div class="section-sub"><span class="en">Continuously measured numbers for alerts and dashboards</span><span class="th">ตัวเลขที่วัดต่อเนื่อง สำหรับ alert และ dashboard</span></div>
 
   <div style="background:#0d1117;border:1px solid #1e293b;border-radius:14px;overflow:hidden;margin:1.5rem 0">
     <div style="background:#111827;padding:10px 20px;display:grid;grid-template-columns:100px 1fr 1.5fr;font-size:.77rem;font-weight:700;color:#64748b;gap:12px">
-      <div>ชนิด</div><div>คือ</div><div>ใช้กับ</div>
+      <div><span class="en">Type</span><span class="th">ชนิด</span></div><div><span class="en">What it is</span><span class="th">คือ</span></div><div><span class="en">Used for</span><span class="th">ใช้กับ</span></div>
     </div>
     <div style="display:grid;grid-template-columns:100px 1fr 1.5fr;padding:10px 20px;font-size:.82rem;border-bottom:1px solid #0f172a;gap:12px;align-items:center">
       <div style="color:#34d399;font-weight:700">Counter</div>
-      <div style="color:#94a3b8">นับขึ้นอย่างเดียว (0, 1, 2, ...)</div>
+      <div style="color:#94a3b8"><span class="en">Only counts up (0, 1, 2, ...)</span><span class="th">นับขึ้นอย่างเดียว (0, 1, 2, ...)</span></div>
       <div style="color:#64748b">requests_total, errors_total, orders_created</div>
     </div>
     <div style="display:grid;grid-template-columns:100px 1fr 1.5fr;padding:10px 20px;font-size:.82rem;border-bottom:1px solid #0f172a;gap:12px;align-items:center">
       <div style="color:#60a5fa;font-weight:700">Gauge</div>
-      <div style="color:#94a3b8">ขึ้นลงได้</div>
+      <div style="color:#94a3b8"><span class="en">Can go up and down</span><span class="th">ขึ้นลงได้</span></div>
       <div style="color:#64748b">goroutines_active, memory_used, queue_size</div>
     </div>
     <div style="display:grid;grid-template-columns:100px 1fr 1.5fr;padding:10px 20px;font-size:.82rem;gap:12px;align-items:center">
       <div style="color:#a78bfa;font-weight:700">Histogram</div>
-      <div style="color:#94a3b8">กระจาย value ใน buckets</div>
+      <div style="color:#94a3b8"><span class="en">Distributes values into buckets</span><span class="th">กระจาย value ใน buckets</span></div>
       <div style="color:#64748b">request_duration_seconds, response_size_bytes</div>
     </div>
   </div>
 
   <div class="code-block">
     <div class="code-header">
-      <span>Prometheus metrics ใน Go — RED Method</span>
+      <span><span class="en">Prometheus metrics in Go — the RED Method</span><span class="th">Prometheus metrics ใน Go — RED Method</span></span>
       <span class="lang-tag">Go · Prometheus</span>
     </div>
     <pre><code class="language-go">// ── RED Method: Rate, Errors, Duration ───────────────────────
@@ -320,12 +323,11 @@ http.Handle("/metrics", promhttp.Handler())
 <!-- DISTRIBUTED TRACING -->
 <div class="section">
   <div class="section-title" style="color:#a78bfa">🔗 Distributed Tracing — OpenTelemetry</div>
-  <div class="section-sub">ติดตาม request ข้ามหลาย service ด้วย trace_id เดียวกัน</div>
+  <div class="section-sub"><span class="en">Follow a request across many services using one shared trace_id</span><span class="th">ติดตาม request ข้ามหลาย service ด้วย trace_id เดียวกัน</span></div>
 
   <div style="background:linear-gradient(135deg,#100820,#180d30);border:1px solid #a78bfa30;border-radius:12px;padding:1.2rem 1.4rem;margin-bottom:1.5rem">
     <div style="font-size:.83rem;color:#94a3b8;line-height:1.8">
-      <span style="color:#c4b5fd;font-weight:700">ปัญหา:</span> user report ว่า checkout ช้า — มี 5 service ในเส้นทาง ไม่รู้ว่าช้าที่ไหน logs แต่ละ service ดูแยกกัน<br>
-      <span style="color:#c4b5fd;font-weight:700">Trace:</span> ทุก request ได้ <strong>trace_id</strong> เดียวกันตลอด — แต่ละ service สร้าง <strong>span</strong> บอก ว่าทำอะไร เริ่ม-จบตอนไหน ทำให้เห็น waterfall diagram
+      <span class="en"><span style="color:#c4b5fd;font-weight:700">Problem:</span> a user reports checkout is slow — there are 5 services in the path and you don't know where the slowdown is; each service's logs are viewed separately<br><span style="color:#c4b5fd;font-weight:700">Trace:</span> every request carries the same <strong>trace_id</strong> throughout — each service creates a <strong>span</strong> saying what it did and when it started/ended, giving you a waterfall diagram</span><span class="th"><span style="color:#c4b5fd;font-weight:700">ปัญหา:</span> user report ว่า checkout ช้า — มี 5 service ในเส้นทาง ไม่รู้ว่าช้าที่ไหน logs แต่ละ service ดูแยกกัน<br><span style="color:#c4b5fd;font-weight:700">Trace:</span> ทุก request ได้ <strong>trace_id</strong> เดียวกันตลอด — แต่ละ service สร้าง <strong>span</strong> บอก ว่าทำอะไร เริ่ม-จบตอนไหน ทำให้เห็น waterfall diagram</span>
     </div>
   </div>
 
@@ -413,7 +415,7 @@ func (n *HTTPNotifier) Notify(ctx context.Context, o Order) error {
 
   <div class="code-block">
     <div class="code-header">
-      <span>Correlate ทั้ง 3 pillars — trace_id เชื่อม logs + traces + metrics</span>
+      <span><span class="en">Correlate all 3 pillars — trace_id links logs + traces + metrics</span><span class="th">Correlate ทั้ง 3 pillars — trace_id เชื่อม logs + traces + metrics</span></span>
       <span class="lang-tag">Go · Correlation</span>
     </div>
     <pre><code class="language-go">// ── Middleware ที่รวม Logs + Traces + Metrics ─────────────────
@@ -470,43 +472,47 @@ func ObservabilityMiddleware(
 <!-- GOLDEN SIGNALS + ALERT -->
 <div class="section">
   <div class="section-title" style="color:#06b6d4">📌 Golden Signals & Alerting</div>
-  <div class="section-sub">4 metrics ที่ต้อง monitor ทุก service</div>
+  <div class="section-sub"><span class="en">The 4 metrics every service should monitor</span><span class="th">4 metrics ที่ต้อง monitor ทุก service</span></div>
 
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin:1.5rem 0">
     <div style="background:#0d1117;border:1px solid #1e293b;border-left:3px solid #34d399;border-radius:12px;padding:16px">
       <div style="font-size:.8rem;font-weight:700;color:#34d399;margin-bottom:8px">📈 Latency</div>
-      <div style="font-size:.8rem;color:#64748b;line-height:1.8">เวลาตอบสนอง — แยก success vs error<br><code style="color:#86efac;font-size:.75rem">p50, p95, p99</code></div>
+      <div style="font-size:.8rem;color:#64748b;line-height:1.8"><span class="en">Response time — split success vs error</span><span class="th">เวลาตอบสนอง — แยก success vs error</span><br><code style="color:#86efac;font-size:.75rem">p50, p95, p99</code></div>
     </div>
     <div style="background:#0d1117;border:1px solid #1e293b;border-left:3px solid #60a5fa;border-radius:12px;padding:16px">
       <div style="font-size:.8rem;font-weight:700;color:#60a5fa;margin-bottom:8px">🔢 Traffic</div>
-      <div style="font-size:.8rem;color:#64748b;line-height:1.8">จำนวน request ต่อวินาที<br><code style="color:#93c5fd;font-size:.75rem">rate(requests_total[1m])</code></div>
+      <div style="font-size:.8rem;color:#64748b;line-height:1.8"><span class="en">Requests per second</span><span class="th">จำนวน request ต่อวินาที</span><br><code style="color:#93c5fd;font-size:.75rem">rate(requests_total[1m])</code></div>
     </div>
     <div style="background:#0d1117;border:1px solid #1e293b;border-left:3px solid #ef4444;border-radius:12px;padding:16px">
       <div style="font-size:.8rem;font-weight:700;color:#ef4444;margin-bottom:8px">❌ Errors</div>
-      <div style="font-size:.8rem;color:#64748b;line-height:1.8">สัดส่วน error ต่อ request ทั้งหมด<br><code style="color:#fca5a5;font-size:.75rem">errors/total &gt; 1%</code></div>
+      <div style="font-size:.8rem;color:#64748b;line-height:1.8"><span class="en">Share of errors out of all requests</span><span class="th">สัดส่วน error ต่อ request ทั้งหมด</span><br><code style="color:#fca5a5;font-size:.75rem">errors/total &gt; 1%</code></div>
     </div>
     <div style="background:#0d1117;border:1px solid #1e293b;border-left:3px solid #fbbf24;border-radius:12px;padding:16px">
       <div style="font-size:.8rem;font-weight:700;color:#fbbf24;margin-bottom:8px">🗜️ Saturation</div>
-      <div style="font-size:.8rem;color:#64748b;line-height:1.8">ระบบใกล้เต็ม capacity ไหม<br><code style="color:#fde68a;font-size:.75rem">CPU, memory, goroutines</code></div>
+      <div style="font-size:.8rem;color:#64748b;line-height:1.8"><span class="en">Is the system near full capacity?</span><span class="th">ระบบใกล้เต็ม capacity ไหม</span><br><code style="color:#fde68a;font-size:.75rem">CPU, memory, goroutines</code></div>
     </div>
   </div>
 
   <div class="callout tip">
-    <strong>Stack แนะนำ:</strong>
+    <span class="en"><strong>Recommended stack:</strong>
+    Logs → <strong>slog</strong> + <strong>Loki</strong> (or CloudWatch) &nbsp;|&nbsp;
+    Metrics → <strong>Prometheus</strong> + <strong>Grafana</strong> &nbsp;|&nbsp;
+    Traces → <strong>OpenTelemetry</strong> + <strong>Jaeger / Tempo</strong><br>
+    All correlated by the <strong>trace_id</strong> embedded in logs and span attributes</span><span class="th"><strong>Stack แนะนำ:</strong>
     Logs → <strong>slog</strong> + <strong>Loki</strong> (หรือ CloudWatch) &nbsp;|&nbsp;
     Metrics → <strong>Prometheus</strong> + <strong>Grafana</strong> &nbsp;|&nbsp;
     Traces → <strong>OpenTelemetry</strong> + <strong>Jaeger / Tempo</strong><br>
-    ทั้งหมด correlate กันด้วย <strong>trace_id</strong> ที่ใส่ใน log และ span attribute
+    ทั้งหมด correlate กันด้วย <strong>trace_id</strong> ที่ใส่ใน log และ span attribute</span>
   </div>
 
   <div class="callout warn">
-    <strong>Observability ≠ Monitoring:</strong> Monitoring คือ "รู้ว่าผิดพลาด" — Observability คือ "รู้ว่าทำไม ผิดพลาดโดยไม่ต้องแก้ code เพิ่ม" ต่างกันที่ <strong>cardinality ของ data และการ correlate</strong> ข้ามระบบ
+    <span class="en"><strong>Observability ≠ Monitoring:</strong> monitoring is "knowing something is wrong" — observability is "knowing why it's wrong without adding more code". The difference lies in the <strong>cardinality of the data and the correlation</strong> across the system</span><span class="th"><strong>Observability ≠ Monitoring:</strong> Monitoring คือ "รู้ว่าผิดพลาด" — Observability คือ "รู้ว่าทำไม ผิดพลาดโดยไม่ต้องแก้ code เพิ่ม" ต่างกันที่ <strong>cardinality ของ data และการ correlate</strong> ข้ามระบบ</span>
   </div>
 </div>
 
 <div style="text-align:center;margin:3rem 0;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
   <a href="21-saga.html" style="display:inline-flex;align-items:center;gap:.5rem;background:#0d1117;border:1px solid #1e293b;color:#64748b;padding:.7rem 1.5rem;border-radius:10px;font-size:.88rem">← Saga Pattern</a>
-  <a href="index.html" style="display:inline-flex;align-items:center;gap:.5rem;background:#0d1117;border:1px solid #06b6d440;color:#67e8f9;padding:.7rem 1.5rem;border-radius:10px;font-weight:600;font-size:.88rem">กลับหน้าหลัก →</a>
+  <a href="index.html" style="display:inline-flex;align-items:center;gap:.5rem;background:#0d1117;border:1px solid #06b6d440;color:#67e8f9;padding:.7rem 1.5rem;border-radius:10px;font-weight:600;font-size:.88rem"><span class="en">Home</span><span class="th">กลับหน้าหลัก</span> →</a>
 </div>
 
 </div>
@@ -536,5 +542,6 @@ document.querySelectorAll('.code-block').forEach(block => {
   header.appendChild(btn)
 })
 </script>
+<script src="i18n.js"></script>
 </body>
 </html>

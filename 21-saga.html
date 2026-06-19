@@ -53,35 +53,34 @@ a:hover{text-decoration:underline}
 .flow-step.comp{border-color:#fbbf2440;color:#fde68a}
 </style>
 </head>
-<body>
+<body class="lang-th">
 
 <nav class="topnav">
-  <a href="index.html" class="back-btn">← กลับหน้าหลัก</a>
+  <a href="index.html" class="back-btn">← <span class="en">Home</span><span class="th">กลับหน้าหลัก</span></a>
   <span class="nav-title">21 / <span>Saga Pattern</span></span>
 </nav>
 
 <div class="hero">
-  <div class="hero-badge">📜 หัวข้อที่ 21</div>
+  <div class="hero-badge">📜 <span class="en">Topic 21</span><span class="th">หัวข้อที่ 21</span></div>
   <h1>Saga Pattern</h1>
-  <p>Distributed Transaction ใน Microservices — เมื่อ 2PC ไม่เหมาะอีกต่อไป Saga ใช้ compensating transactions แทนเพื่อรักษา consistency</p>
+  <p><span class="en">Distributed transactions in microservices — when 2PC no longer fits, Saga uses compensating transactions instead to preserve consistency</span><span class="th">Distributed Transaction ใน Microservices — เมื่อ 2PC ไม่เหมาะอีกต่อไป Saga ใช้ compensating transactions แทนเพื่อรักษา consistency</span></p>
 </div>
 
 <div class="content">
 
 <!-- PROBLEM -->
 <div class="section">
-  <div class="section-title" style="color:#fb923c">❓ ปัญหา: Distributed Transaction</div>
-  <div class="section-sub">เมื่อ transaction ต้องข้ามหลาย service พร้อมกัน</div>
+  <div class="section-title" style="color:#fb923c">❓ <span class="en">The Problem: Distributed Transactions</span><span class="th">ปัญหา: Distributed Transaction</span></div>
+  <div class="section-sub"><span class="en">When a transaction must span several services at once</span><span class="th">เมื่อ transaction ต้องข้ามหลาย service พร้อมกัน</span></div>
 
   <div style="background:linear-gradient(135deg,#0e0a04,#1a1004);border:1px solid #fb923c30;border-radius:12px;padding:1.2rem 1.4rem;margin-bottom:1.5rem">
     <div style="font-size:.83rem;color:#94a3b8;line-height:1.8">
-      <span style="color:#fdba74;font-weight:700">สถานการณ์:</span> ลูกค้าสั่งซื้อ → ต้อง 1) ตัดสต็อก 2) ตัดเงิน 3) สร้าง shipment — ถ้า service ใดล้มเหลวระหว่างทาง ข้อมูลจะ inconsistent<br>
-      <span style="color:#fdba74;font-weight:700">2-Phase Commit (2PC) แก้ได้ไหม?</span> ได้ใน monolith แต่ใน microservices — 2PC ต้องการ distributed lock ข้ามหลาย DB ซึ่งทำให้ latency สูงและ availability ต่ำมาก
+      <span class="en"><span style="color:#fdba74;font-weight:700">Scenario:</span> A customer places an order → the system must 1) reserve stock 2) charge payment 3) create a shipment — if any service fails midway, the data ends up inconsistent<br><span style="color:#fdba74;font-weight:700">Can 2-Phase Commit (2PC) solve it?</span> Yes in a monolith, but in microservices 2PC needs a distributed lock across many DBs, which causes high latency and very poor availability</span><span class="th"><span style="color:#fdba74;font-weight:700">สถานการณ์:</span> ลูกค้าสั่งซื้อ → ต้อง 1) ตัดสต็อก 2) ตัดเงิน 3) สร้าง shipment — ถ้า service ใดล้มเหลวระหว่างทาง ข้อมูลจะ inconsistent<br><span style="color:#fdba74;font-weight:700">2-Phase Commit (2PC) แก้ได้ไหม?</span> ได้ใน monolith แต่ใน microservices — 2PC ต้องการ distributed lock ข้ามหลาย DB ซึ่งทำให้ latency สูงและ availability ต่ำมาก</span>
     </div>
   </div>
 
   <div style="margin:1.5rem 0">
-    <div style="font-size:.82rem;color:#475569;margin-bottom:.5rem">Happy path: ทุก step สำเร็จ</div>
+    <div style="font-size:.82rem;color:#475569;margin-bottom:.5rem">Happy path: <span class="en">every step succeeds</span><span class="th">ทุก step สำเร็จ</span></div>
     <div class="flow">
       <div class="flow-step ok">1. Create Order</div><div class="flow-arrow">→</div>
       <div class="flow-step ok">2. Reserve Stock</div><div class="flow-arrow">→</div>
@@ -90,7 +89,7 @@ a:hover{text-decoration:underline}
       <div class="flow-step ok">✅ Done</div>
     </div>
 
-    <div style="font-size:.82rem;color:#475569;margin-bottom:.5rem;margin-top:1rem">Failure path: Payment ล้มเหลว — ต้อง compensate</div>
+    <div style="font-size:.82rem;color:#475569;margin-bottom:.5rem;margin-top:1rem">Failure path: <span class="en">Payment fails — must compensate</span><span class="th">Payment ล้มเหลว — ต้อง compensate</span></div>
     <div class="flow">
       <div class="flow-step ok">1. Create Order ✓</div><div class="flow-arrow">→</div>
       <div class="flow-step ok">2. Reserve Stock ✓</div><div class="flow-arrow">→</div>
@@ -101,25 +100,24 @@ a:hover{text-decoration:underline}
   </div>
 
   <div class="callout">
-    <strong>Saga = Eventual Consistency:</strong> ไม่ได้รับประกัน ACID atomicity ทั้งหมดในทันที แต่รับประกันว่าระบบจะ <strong>สุดท้ายกลับสู่ consistent state</strong> ไม่ว่า step ไหนจะล้มเหลว
+    <span class="en"><strong>Saga = Eventual Consistency:</strong> it doesn't guarantee full ACID atomicity instantly, but it guarantees the system will <strong>eventually return to a consistent state</strong> no matter which step fails</span><span class="th"><strong>Saga = Eventual Consistency:</strong> ไม่ได้รับประกัน ACID atomicity ทั้งหมดในทันที แต่รับประกันว่าระบบจะ <strong>สุดท้ายกลับสู่ consistent state</strong> ไม่ว่า step ไหนจะล้มเหลว</span>
   </div>
 </div>
 
 <!-- CHOREOGRAPHY -->
 <div class="section">
   <div class="section-title" style="color:#fb923c">🎭 Choreography-based Saga</div>
-  <div class="section-sub">แต่ละ service ฟัง event และตัดสินใจเอง — ไม่มี central coordinator</div>
+  <div class="section-sub"><span class="en">Each service listens to events and decides on its own — no central coordinator</span><span class="th">แต่ละ service ฟัง event และตัดสินใจเอง — ไม่มี central coordinator</span></div>
 
   <div style="background:linear-gradient(135deg,#0e0a04,#1a1004);border:1px solid #fb923c30;border-radius:12px;padding:1.2rem 1.4rem;margin-bottom:1.5rem">
     <div style="font-size:.83rem;color:#94a3b8;line-height:1.8">
-      <span style="color:#fdba74;font-weight:700">วิธีทำงาน:</span> แต่ละ service publish event หลังทำงานสำเร็จ → service ถัดไปฟัง event นั้นแล้วทำงานต่อ → ถ้า error ก็ publish compensating event<br>
-      <span style="color:#fdba74;font-weight:700">เหมาะกับ:</span> saga ที่ไม่ซับซ้อน, step น้อย, team อยากให้แต่ละ service เป็นอิสระ
+      <span class="en"><span style="color:#fdba74;font-weight:700">How it works:</span> each service publishes an event after it succeeds → the next service listens to that event and continues → on error it publishes a compensating event<br><span style="color:#fdba74;font-weight:700">Good for:</span> simple sagas with few steps, when the team wants each service to stay independent</span><span class="th"><span style="color:#fdba74;font-weight:700">วิธีทำงาน:</span> แต่ละ service publish event หลังทำงานสำเร็จ → service ถัดไปฟัง event นั้นแล้วทำงานต่อ → ถ้า error ก็ publish compensating event<br><span style="color:#fdba74;font-weight:700">เหมาะกับ:</span> saga ที่ไม่ซับซ้อน, step น้อย, team อยากให้แต่ละ service เป็นอิสระ</span>
     </div>
   </div>
 
   <div class="code-block">
     <div class="code-header">
-      <span>Choreography Saga — Order flow ผ่าน events</span>
+      <span>Choreography Saga — <span class="en">Order flow via events</span><span class="th">Order flow ผ่าน events</span></span>
       <span class="lang-tag">Go · Choreography</span>
     </div>
     <pre><code class="language-go">// ── Events ────────────────────────────────────────────────
@@ -218,12 +216,11 @@ func wireChoreography(bus EventBus, inv *InventoryService,
 <!-- ORCHESTRATION -->
 <div class="section">
   <div class="section-title" style="color:#fb923c">🎬 Orchestration-based Saga</div>
-  <div class="section-sub">มี central orchestrator ที่รู้ทุก step และสั่งแต่ละ service</div>
+  <div class="section-sub"><span class="en">A central orchestrator knows every step and commands each service</span><span class="th">มี central orchestrator ที่รู้ทุก step และสั่งแต่ละ service</span></div>
 
   <div style="background:linear-gradient(135deg,#0e0a04,#1a1004);border:1px solid #fb923c30;border-radius:12px;padding:1.2rem 1.4rem;margin-bottom:1.5rem">
     <div style="font-size:.83rem;color:#94a3b8;line-height:1.8">
-      <span style="color:#fdba74;font-weight:700">วิธีทำงาน:</span> Orchestrator (state machine) สั่ง service แต่ละตัวตามลำดับ ถ้า step ใด fail orchestrator สั่ง compensate ตาม step ย้อนหลัง<br>
-      <span style="color:#fdba74;font-weight:700">เหมาะกับ:</span> saga ที่ซับซ้อน มีหลาย branch, ต้องการเห็น flow ชัดเจนจากจุดเดียว, ง่ายต่อการ debug
+      <span class="en"><span style="color:#fdba74;font-weight:700">How it works:</span> the orchestrator (a state machine) calls each service in order; if any step fails, the orchestrator triggers compensation back through the previous steps<br><span style="color:#fdba74;font-weight:700">Good for:</span> complex sagas with many branches, when you want a clear flow from a single place and easy debugging</span><span class="th"><span style="color:#fdba74;font-weight:700">วิธีทำงาน:</span> Orchestrator (state machine) สั่ง service แต่ละตัวตามลำดับ ถ้า step ใด fail orchestrator สั่ง compensate ตาม step ย้อนหลัง<br><span style="color:#fdba74;font-weight:700">เหมาะกับ:</span> saga ที่ซับซ้อน มีหลาย branch, ต้องการเห็น flow ชัดเจนจากจุดเดียว, ง่ายต่อการ debug</span>
     </div>
   </div>
 
@@ -351,48 +348,48 @@ func (m *SagaManager) Resume(ctx context.Context, sagaID string) error {
 <!-- COMPARISON -->
 <div class="section">
   <div class="section-title" style="color:#fb923c">⚖️ Choreography vs Orchestration</div>
-  <div class="section-sub">เลือกใช้ให้ถูกกับ use case</div>
+  <div class="section-sub"><span class="en">Pick the right one for your use case</span><span class="th">เลือกใช้ให้ถูกกับ use case</span></div>
 
   <div style="background:#0d1117;border:1px solid #1e293b;border-radius:14px;overflow:hidden;margin:1.5rem 0">
     <div style="background:#111827;padding:10px 20px;display:grid;grid-template-columns:1fr 1fr 1fr;font-size:.77rem;font-weight:700;color:#64748b;gap:12px">
-      <div>มิติ</div><div style="color:#f97316">🎭 Choreography</div><div style="color:#60a5fa">🎬 Orchestration</div>
+      <div><span class="en">Dimension</span><span class="th">มิติ</span></div><div style="color:#f97316">🎭 Choreography</div><div style="color:#60a5fa">🎬 Orchestration</div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:10px 20px;font-size:.82rem;border-bottom:1px solid #0f172a;gap:12px;align-items:start">
       <div style="color:#94a3b8;font-weight:600">Coupling</div>
-      <div style="color:#64748b">Loose — services ไม่รู้จักกัน</div>
-      <div style="color:#64748b">Orchestrator รู้จักทุก service</div>
+      <div style="color:#64748b"><span class="en">Loose — services don't know each other</span><span class="th">Loose — services ไม่รู้จักกัน</span></div>
+      <div style="color:#64748b"><span class="en">Orchestrator knows every service</span><span class="th">Orchestrator รู้จักทุก service</span></div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:10px 20px;font-size:.82rem;border-bottom:1px solid #0f172a;gap:12px;align-items:start">
       <div style="color:#94a3b8;font-weight:600">Visibility</div>
-      <div style="color:#64748b">ยาก — ต้อง trace events</div>
-      <div style="color:#64748b">ง่าย — orchestrator เก็บ state</div>
+      <div style="color:#64748b"><span class="en">Hard — you must trace events</span><span class="th">ยาก — ต้อง trace events</span></div>
+      <div style="color:#64748b"><span class="en">Easy — orchestrator holds the state</span><span class="th">ง่าย — orchestrator เก็บ state</span></div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:10px 20px;font-size:.82rem;border-bottom:1px solid #0f172a;gap:12px;align-items:start">
       <div style="color:#94a3b8;font-weight:600">Complexity</div>
-      <div style="color:#64748b">ง่ายเริ่มต้น ซับซ้อนเมื่อ flow เพิ่ม</div>
-      <div style="color:#64748b">ซับซ้อนกว่าตอนเริ่ม แต่ scale ได้</div>
+      <div style="color:#64748b"><span class="en">Easy to start, complex as flows grow</span><span class="th">ง่ายเริ่มต้น ซับซ้อนเมื่อ flow เพิ่ม</span></div>
+      <div style="color:#64748b"><span class="en">More complex up front, but scales</span><span class="th">ซับซ้อนกว่าตอนเริ่ม แต่ scale ได้</span></div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:10px 20px;font-size:.82rem;border-bottom:1px solid #0f172a;gap:12px;align-items:start">
       <div style="color:#94a3b8;font-weight:600">Testing</div>
-      <div style="color:#64748b">ยาก — ต้องจำลอง event chain</div>
-      <div style="color:#64748b">ง่าย — test orchestrator โดยตรง</div>
+      <div style="color:#64748b"><span class="en">Hard — must simulate the event chain</span><span class="th">ยาก — ต้องจำลอง event chain</span></div>
+      <div style="color:#64748b"><span class="en">Easy — test the orchestrator directly</span><span class="th">ง่าย — test orchestrator โดยตรง</span></div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:10px 20px;font-size:.82rem;gap:12px;align-items:start">
-      <div style="color:#94a3b8;font-weight:600">เหมาะกับ</div>
+      <div style="color:#94a3b8;font-weight:600"><span class="en">Good for</span><span class="th">เหมาะกับ</span></div>
       <div style="color:#64748b">Simple flow, Event-driven first system</div>
       <div style="color:#64748b">Complex flow, Long-running process</div>
     </div>
   </div>
 
   <div class="callout warn">
-    <strong>Idempotency สำคัญมาก:</strong> ทุก step ใน saga ต้องเป็น idempotent — รัน 2 ครั้งให้ผลเหมือนรัน 1 ครั้ง เพราะ message อาจถูกส่งซ้ำ ใช้ idempotency key ทุกครั้ง
+    <span class="en"><strong>Idempotency is critical:</strong> every step in a saga must be idempotent — running it twice gives the same result as running it once, because messages may be delivered more than once. Always use an idempotency key</span><span class="th"><strong>Idempotency สำคัญมาก:</strong> ทุก step ใน saga ต้องเป็น idempotent — รัน 2 ครั้งให้ผลเหมือนรัน 1 ครั้ง เพราะ message อาจถูกส่งซ้ำ ใช้ idempotency key ทุกครั้ง</span>
   </div>
 </div>
 
 <!-- OUTBOX PATTERN -->
 <div class="section">
-  <div class="section-title" style="color:#fb923c">📤 Outbox Pattern — ส่ง event ได้แน่นอน</div>
-  <div class="section-sub">แก้ปัญหา "save to DB แล้ว publish event ล้มเหลว"</div>
+  <div class="section-title" style="color:#fb923c">📤 <span class="en">Outbox Pattern — guaranteed event delivery</span><span class="th">Outbox Pattern — ส่ง event ได้แน่นอน</span></div>
+  <div class="section-sub"><span class="en">Fixes the "saved to DB but publishing the event failed" problem</span><span class="th">แก้ปัญหา "save to DB แล้ว publish event ล้มเหลว"</span></div>
 
   <div class="code-block">
     <div class="code-header">
@@ -460,7 +457,7 @@ func (r *OutboxRelay) Run(ctx context.Context) {
   </div>
 
   <div class="callout tip">
-    <strong>Outbox + Saga = Reliable Saga:</strong> Outbox รับประกันว่า event ถึง message broker แน่นอน, Saga รับประกันว่าระบบกลับสู่ consistent state — ใช้ร่วมกันสำหรับ distributed transaction ที่เชื่อถือได้
+    <span class="en"><strong>Outbox + Saga = Reliable Saga:</strong> the Outbox guarantees events reach the message broker, the Saga guarantees the system returns to a consistent state — use them together for trustworthy distributed transactions</span><span class="th"><strong>Outbox + Saga = Reliable Saga:</strong> Outbox รับประกันว่า event ถึง message broker แน่นอน, Saga รับประกันว่าระบบกลับสู่ consistent state — ใช้ร่วมกันสำหรับ distributed transaction ที่เชื่อถือได้</span>
   </div>
 </div>
 
@@ -496,5 +493,6 @@ document.querySelectorAll('.code-block').forEach(block => {
   header.appendChild(btn)
 })
 </script>
+<script src="i18n.js"></script>
 </body>
 </html>

@@ -57,24 +57,24 @@ a{color:#22d3ee;text-decoration:none}
 .diagram-title{font-size:.75rem;color:#475569;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:1.5rem}
 </style>
 </head>
-<body>
+<body class="lang-th">
 <nav class="topnav">
-  <a href="index.html" class="back-btn">← กลับหน้าหลัก</a>
+  <a href="index.html" class="back-btn">← <span class="en">Home</span><span class="th">กลับหน้าหลัก</span></a>
   <span class="nav-title">09 / <span>Client-Server Pattern</span></span>
 </nav>
 <div class="hero">
-  <div class="hero-badge">🖥️ สถาปัตยกรรมพื้นฐาน</div>
+  <div class="hero-badge">🖥️ <span class="en">Foundational architecture</span><span class="th">สถาปัตยกรรมพื้นฐาน</span></div>
   <h1>Client-Server Pattern</h1>
-  <p>รากฐานของระบบ Networked ทุกประเภท — Client ส่ง Request, Server ประมวลผลและส่ง Response กลับ ทำให้แยก Concern ระหว่างผู้ขอและผู้ให้บริการ</p>
+  <p><span class="en">The foundation of every kind of networked system — the Client sends a Request, the Server processes it and sends a Response back, separating the concerns of requester and provider</span><span class="th">รากฐานของระบบ Networked ทุกประเภท — Client ส่ง Request, Server ประมวลผลและส่ง Response กลับ ทำให้แยก Concern ระหว่างผู้ขอและผู้ให้บริการ</span></p>
 </div>
 <div class="content">
 
 <div class="section">
-  <div class="section-title">💡 Client-Server Pattern คืออะไร?</div>
+  <div class="section-title">💡 <span class="en">What is the Client-Server Pattern?</span><span class="th">Client-Server Pattern คืออะไร?</span></div>
   <div class="section-sub">The foundation of all networked applications</div>
   <p style="color:#94a3b8;margin-bottom:1.5rem">
-    แบ่งระบบออกเป็น 2 ฝ่าย: <strong style="color:#e2e8f0">Client</strong> (ผู้ขอบริการ) กับ <strong style="color:#e2e8f0">Server</strong> (ผู้ให้บริการ)
-    Client ส่ง Request → Server ประมวลผล → ส่ง Response กลับ
+    <span class="en">Split the system into two sides: a <strong style="color:#e2e8f0">Client</strong> (the service requester) and a <strong style="color:#e2e8f0">Server</strong> (the service provider). Client sends a Request → Server processes it → sends a Response back</span><span class="th">แบ่งระบบออกเป็น 2 ฝ่าย: <strong style="color:#e2e8f0">Client</strong> (ผู้ขอบริการ) กับ <strong style="color:#e2e8f0">Server</strong> (ผู้ให้บริการ)
+    Client ส่ง Request → Server ประมวลผล → ส่ง Response กลับ</span>
   </p>
 
   <!-- VISUAL: Request-Response Flow -->
@@ -84,7 +84,7 @@ a{color:#22d3ee;text-decoration:none}
       <div class="rr-box" style="--bc:#22d3ee">
         <div style="font-size:2rem;margin-bottom:.5rem">💻</div>
         <div style="font-weight:700;color:#67e8f9;margin-bottom:.3rem">CLIENT</div>
-        <div style="font-size:.75rem;color:#64748b">ส่ง Request<br>รอ Response<br>แสดงผล</div>
+        <div style="font-size:.75rem;color:#64748b"><span class="en">Sends Request<br>Waits for Response<br>Renders result</span><span class="th">ส่ง Request<br>รอ Response<br>แสดงผล</span></div>
       </div>
       <div class="rr-mid">
         <div class="rr-arrow" style="color:#22d3ee">→ Request (HTTP/TCP/gRPC)</div>
@@ -96,19 +96,19 @@ a{color:#22d3ee;text-decoration:none}
       <div class="rr-box" style="--bc:#10b981">
         <div style="font-size:2rem;margin-bottom:.5rem">🖥️</div>
         <div style="font-weight:700;color:#6ee7b7;margin-bottom:.3rem">SERVER</div>
-        <div style="font-size:.75rem;color:#64748b">รับ Request<br>ประมวลผล<br>ส่งผลลัพธ์</div>
+        <div style="font-size:.75rem;color:#64748b"><span class="en">Receives Request<br>Processes it<br>Returns result</span><span class="th">รับ Request<br>ประมวลผล<br>ส่งผลลัพธ์</span></div>
       </div>
     </div>
   </div>
 
   <!-- VISUAL: Client Types -->
   <div class="vb-wrap">
-    <div class="vb-label">👤 ประเภทของ Client</div>
+    <div class="vb-label">👤 <span class="en">Types of Client</span><span class="th">ประเภทของ Client</span></div>
     <div class="vb-grid vb-3">
       <div class="vbox" style="--ac:#22d3ee">
         <span class="vb-icon">🌐</span>
         <div class="vb-title">Thin Client</div>
-        <div class="vb-body">Logic เกือบทั้งหมดอยู่ที่ Server</div>
+        <div class="vb-body"><span class="en">Almost all logic lives on the server</span><span class="th">Logic เกือบทั้งหมดอยู่ที่ Server</span></div>
         <ul class="vb-list">
           <li>Web Browser (HTML)</li>
           <li>Terminal / SSH</li>
@@ -119,7 +119,7 @@ a{color:#22d3ee;text-decoration:none}
       <div class="vbox" style="--ac:#8b5cf6">
         <span class="vb-icon">📱</span>
         <div class="vb-title">Fat / Rich Client</div>
-        <div class="vb-body">มี Business Logic บางส่วนอยู่ที่ Client</div>
+        <div class="vb-body"><span class="en">Some business logic lives on the client</span><span class="th">มี Business Logic บางส่วนอยู่ที่ Client</span></div>
         <ul class="vb-list">
           <li>Mobile App (iOS/Android)</li>
           <li>Desktop App (Electron)</li>
@@ -130,9 +130,9 @@ a{color:#22d3ee;text-decoration:none}
       <div class="vbox" style="--ac:#10b981">
         <span class="vb-icon">🤖</span>
         <div class="vb-title">API Client</div>
-        <div class="vb-body">Service อื่นที่ call API</div>
+        <div class="vb-body"><span class="en">Another service calling an API</span><span class="th">Service อื่นที่ call API</span></div>
         <ul class="vb-list">
-          <li>Microservice ที่ call upstream</li>
+          <li><span class="en">A microservice calling upstream</span><span class="th">Microservice ที่ call upstream</span></li>
           <li>Script / Bot / Crawler</li>
           <li>SDK / Library</li>
         </ul>
@@ -143,7 +143,7 @@ a{color:#22d3ee;text-decoration:none}
 
   <!-- VISUAL: Server Types -->
   <div class="vb-wrap">
-    <div class="vb-label">🖥️ ประเภทของ Server</div>
+    <div class="vb-label">🖥️ <span class="en">Types of Server</span><span class="th">ประเภทของ Server</span></div>
     <div class="vb-grid vb-4">
       <div class="vbox" style="--ac:#6366f1">
         <span class="vb-icon">🌐</span>
@@ -160,7 +160,7 @@ a{color:#22d3ee;text-decoration:none}
       <div class="vbox" style="--ac:#f59e0b">
         <span class="vb-icon">🗄️</span>
         <div class="vb-title">Database Server</div>
-        <div class="vb-body">Store และ retrieve data</div>
+        <div class="vb-body"><span class="en">Store and retrieve data</span><span class="th">Store และ retrieve data</span></div>
         <ul class="vb-list"><li>PostgreSQL, MongoDB</li><li>Port 5432 / 27017</li></ul>
       </div>
       <div class="vbox" style="--ac:#10b981">
@@ -174,7 +174,7 @@ a{color:#22d3ee;text-decoration:none}
 
   <!-- VISUAL: Protocols -->
   <div class="vb-wrap">
-    <div class="vb-label">📡 Protocol ที่ใช้สื่อสาร</div>
+    <div class="vb-label">📡 <span class="en">Communication protocols</span><span class="th">Protocol ที่ใช้สื่อสาร</span></div>
     <div class="vb-grid vb-4">
       <div class="vbox" style="--ac:#22d3ee">
         <span class="vb-icon">🌐</span>
@@ -204,9 +204,9 @@ a{color:#22d3ee;text-decoration:none}
   </div>
 
   <div class="callout">
-    <strong>Key Insight:</strong> Client-Server ไม่ได้หมายถึง browser กับ web server เท่านั้น —
+    <span class="en"><strong>Key Insight:</strong> Client-Server doesn't only mean a browser and a web server — any service that calls another service's API is also a client-server relationship. Even microservices use this pattern at the service-to-service level</span><span class="th"><strong>Key Insight:</strong> Client-Server ไม่ได้หมายถึง browser กับ web server เท่านั้น —
     ทุก Service ที่ call API ของ Service อื่น ก็เป็น Client-Server relationship เช่นกัน
-    แม้แต่ Microservices ก็ใช้ pattern นี้ในระดับ service-to-service
+    แม้แต่ Microservices ก็ใช้ pattern นี้ในระดับ service-to-service</span>
   </div>
 </div>
 
@@ -304,7 +304,7 @@ a{color:#22d3ee;text-decoration:none}
 
 <!-- ── CODE ── -->
 <div class="section">
-  <div class="section-title">💻 ตัวอย่าง Go — HTTP Server &amp; Client</div>
+  <div class="section-title">💻 <span class="en">Go example — HTTP Server &amp; Client</span><span class="th">ตัวอย่าง Go — HTTP Server &amp; Client</span></div>
 
   <div class="code-block">
     <div class="code-header"><span>server/main.go — Go HTTP Server</span><span class="lang">Go</span></div>
@@ -602,18 +602,18 @@ func main() {
 
 <!-- ── SUMMARY ── -->
 <div class="section">
-  <div class="section-title">✅ สรุป Client-Server Patterns</div>
+  <div class="section-title">✅ <span class="en">Summary — Client-Server Patterns</span><span class="th">สรุป Client-Server Patterns</span></div>
   <div class="vb-wrap">
-    <div class="vb-label">📊 เปรียบเทียบ Protocols</div>
+    <div class="vb-label">📊 <span class="en">Comparing protocols</span><span class="th">เปรียบเทียบ Protocols</span></div>
     <div class="vb-grid vb-2">
       <div class="vbox" style="--ac:#22d3ee">
         <span class="vb-icon">🔁</span>
         <div class="vb-title">HTTP/REST — Request-Response</div>
         <ul class="vb-list">
-          <li>Stateless — แต่ละ request อิสระ</li>
-          <li>เหมาะกับ CRUD Operations</li>
-          <li>ง่าย, cache ได้, scale ง่าย</li>
-          <li>ไม่ดีสำหรับ real-time</li>
+          <li><span class="en">Stateless — each request is independent</span><span class="th">Stateless — แต่ละ request อิสระ</span></li>
+          <li><span class="en">Good for CRUD operations</span><span class="th">เหมาะกับ CRUD Operations</span></li>
+          <li><span class="en">Simple, cacheable, easy to scale</span><span class="th">ง่าย, cache ได้, scale ง่าย</span></li>
+          <li><span class="en">Not great for real-time</span><span class="th">ไม่ดีสำหรับ real-time</span></li>
         </ul>
       </div>
       <div class="vbox" style="--ac:#6366f1">
@@ -621,9 +621,9 @@ func main() {
         <div class="vb-title">WebSocket — Bi-directional</div>
         <ul class="vb-list">
           <li>Persistent connection</li>
-          <li>Server สามารถ push ไปหา client</li>
-          <li>เหมาะกับ Chat, Games, Live Data</li>
-          <li>Resource หนักกว่า HTTP</li>
+          <li><span class="en">Server can push to the client</span><span class="th">Server สามารถ push ไปหา client</span></li>
+          <li><span class="en">Good for Chat, Games, Live Data</span><span class="th">เหมาะกับ Chat, Games, Live Data</span></li>
+          <li><span class="en">Heavier on resources than HTTP</span><span class="th">Resource หนักกว่า HTTP</span></li>
         </ul>
       </div>
     </div>
@@ -631,7 +631,7 @@ func main() {
 </div>
 
 <div style="text-align:center;margin:3rem 0;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
-  <a href="index.html" style="background:#0d1117;border:1px solid #1e293b;color:#64748b;padding:.7rem 1.5rem;border-radius:10px;font-size:.88rem">← หน้าหลัก</a>
+  <a href="index.html" style="background:#0d1117;border:1px solid #1e293b;color:#64748b;padding:.7rem 1.5rem;border-radius:10px;font-size:.88rem">← <span class="en">Home</span><span class="th">หน้าหลัก</span></a>
   <a href="9-microservice.html" style="background:#0d1117;border:1px solid #1e293b;color:#22d3ee;padding:.7rem 1.5rem;border-radius:10px;font-weight:600;font-size:.88rem">Microservice Architecture →</a>
 </div>
 </div>
@@ -692,5 +692,6 @@ document.querySelectorAll('.code-block').forEach(block => {
   header.appendChild(btn)
 })
 </script>
+<script src="i18n.js"></script>
 </body>
 </html>

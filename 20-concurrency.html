@@ -51,25 +51,25 @@ a:hover{text-decoration:underline}
 .pattern-nav .p-name{font-size:.65rem;color:#64748b;margin-top:4px;line-height:1.3}
 </style>
 </head>
-<body>
+<body class="lang-th">
 
 <nav class="topnav">
-  <a href="index.html" class="back-btn">← กลับหน้าหลัก</a>
+  <a href="index.html" class="back-btn">← <span class="en">Home</span><span class="th">กลับหน้าหลัก</span></a>
   <span class="nav-title">20 / <span>Go Concurrency Patterns</span></span>
 </nav>
 
 <div class="hero">
-  <div class="hero-badge">⚡ หัวข้อที่ 20</div>
+  <div class="hero-badge">⚡ <span class="en">Topic 20</span><span class="th">หัวข้อที่ 20</span></div>
   <h1>Go Concurrency Patterns</h1>
-  <p>"Do not communicate by sharing memory; instead, share memory by communicating." — Pike. Worker Pool, Pipeline, Fan-out/Fan-in, Semaphore และ Context cancellation</p>
+  <p>"Do not communicate by sharing memory; instead, share memory by communicating." — Pike. <span class="en">Worker Pool, Pipeline, Fan-out/Fan-in, Semaphore and Context cancellation</span><span class="th">Worker Pool, Pipeline, Fan-out/Fan-in, Semaphore และ Context cancellation</span></p>
 </div>
 
 <div class="content">
 
 <!-- OVERVIEW -->
 <div class="section">
-  <div class="section-title" style="color:#38bdf8">📋 ภาพรวม</div>
-  <div class="section-sub">Goroutine + Channel คือเครื่องมือหลัก — patterns ช่วยจัดระเบียบการใช้</div>
+  <div class="section-title" style="color:#38bdf8">📋 <span class="en">Overview</span><span class="th">ภาพรวม</span></div>
+  <div class="section-sub"><span class="en">Goroutines + channels are the core tools — patterns help organize how you use them</span><span class="th">Goroutine + Channel คือเครื่องมือหลัก — patterns ช่วยจัดระเบียบการใช้</span></div>
 
   <div class="pattern-nav">
     <a href="#worker-pool" style="--sc:#38bdf8">
@@ -95,27 +95,26 @@ a:hover{text-decoration:underline}
   </div>
 
   <div class="callout">
-    <strong>Goroutine vs Thread:</strong> Goroutine เริ่มต้นที่ ~2KB stack (thread ~1MB), Go runtime schedule เอง — spawn หลายแสนตัวได้โดยไม่ OOM แต่ต้องระวัง goroutine leak
+    <span class="en"><strong>Goroutine vs Thread:</strong> a goroutine starts at ~2KB of stack (a thread ~1MB) and the Go runtime schedules them itself — you can spawn hundreds of thousands without OOM, but watch out for goroutine leaks</span><span class="th"><strong>Goroutine vs Thread:</strong> Goroutine เริ่มต้นที่ ~2KB stack (thread ~1MB), Go runtime schedule เอง — spawn หลายแสนตัวได้โดยไม่ OOM แต่ต้องระวัง goroutine leak</span>
   </div>
 </div>
 
 <!-- WORKER POOL -->
 <div class="section" id="worker-pool">
   <div class="section-title" style="color:#38bdf8">👷 Worker Pool</div>
-  <div class="section-sub">จำกัดจำนวน goroutine ที่ทำงานพร้อมกัน — ป้องกัน resource exhaustion</div>
+  <div class="section-sub"><span class="en">Limit how many goroutines run at once — prevents resource exhaustion</span><span class="th">จำกัดจำนวน goroutine ที่ทำงานพร้อมกัน — ป้องกัน resource exhaustion</span></div>
 
   <div style="background:linear-gradient(135deg,#040e18,#071620);border:1px solid #38bdf830;border-radius:12px;padding:1.2rem 1.4rem;margin-bottom:1.5rem">
     <div style="font-size:.83rem;color:#94a3b8;line-height:1.8">
-      <span style="color:#7dd3fc;font-weight:700">ปัญหา:</span> ถ้า spawn goroutine 1 ตัวต่อ job โดยไม่จำกัด — เมื่อ job เยอะมาก goroutine จะมากจนกิน memory หรือทำให้ DB connection pool หมด<br>
-      <span style="color:#7dd3fc;font-weight:700">วิธีแก้:</span> สร้าง worker N ตัวที่รับงานจาก channel — queue ยาวแค่ไหนก็ประมวลผลทีละ N งาน
+      <span class="en"><span style="color:#7dd3fc;font-weight:700">Problem:</span> if you spawn one goroutine per job with no limit, a huge number of jobs creates so many goroutines that they eat memory or exhaust the DB connection pool<br><span style="color:#7dd3fc;font-weight:700">Fix:</span> create N workers that pull jobs from a channel — however long the queue gets, only N jobs run at a time</span><span class="th"><span style="color:#7dd3fc;font-weight:700">ปัญหา:</span> ถ้า spawn goroutine 1 ตัวต่อ job โดยไม่จำกัด — เมื่อ job เยอะมาก goroutine จะมากจนกิน memory หรือทำให้ DB connection pool หมด<br><span style="color:#7dd3fc;font-weight:700">วิธีแก้:</span> สร้าง worker N ตัวที่รับงานจาก channel — queue ยาวแค่ไหนก็ประมวลผลทีละ N งาน</span>
     </div>
   </div>
 
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
     <div class="code-block" style="border-color:#ef444430">
       <div class="code-header">
-        <span>❌ Goroutine ไม่จำกัด — อันตราย</span>
-        <span class="lang-bad">ผิดหลักการ</span>
+        <span>❌ <span class="en">Unbounded goroutines — dangerous</span><span class="th">Goroutine ไม่จำกัด — อันตราย</span></span>
+        <span class="lang-bad"><span class="en">anti-pattern</span><span class="th">ผิดหลักการ</span></span>
       </div>
       <pre><code class="language-go">// ถ้า orders มี 100,000 รายการ
 // → spawn 100,000 goroutines พร้อมกัน
@@ -126,8 +125,8 @@ for _, order := range orders {
     </div>
     <div class="code-block" style="border-color:#4ade8030">
       <div class="code-header">
-        <span>✅ Worker Pool — จำกัด 10 goroutine</span>
-        <span class="lang-good">ถูกหลักการ</span>
+        <span>✅ <span class="en">Worker Pool — capped at 10 goroutines</span><span class="th">Worker Pool — จำกัด 10 goroutine</span></span>
+        <span class="lang-good"><span class="en">good practice</span><span class="th">ถูกหลักการ</span></span>
       </div>
       <pre><code class="language-go">func ProcessOrders(orders []Order, workers int) {
     jobs := make(chan Order, len(orders))
@@ -159,7 +158,7 @@ ProcessOrders(orders, 10)</code></pre>
 
   <div class="code-block">
     <div class="code-header">
-      <span>Worker Pool พร้อม result collection และ error handling</span>
+      <span><span class="en">Worker Pool with result collection and error handling</span><span class="th">Worker Pool พร้อม result collection และ error handling</span></span>
       <span class="lang-tag">Go · Production-ready</span>
     </div>
     <pre><code class="language-go">type Result struct {
@@ -211,12 +210,11 @@ func ProcessOrdersConcurrent(
 <!-- PIPELINE -->
 <div class="section" id="pipeline">
   <div class="section-title" style="color:#4ade80">🔀 Pipeline</div>
-  <div class="section-sub">เชื่อม goroutine เป็นสายพาน — แต่ละ stage รับจาก channel ก่อนหน้า ส่งออก channel ถัดไป</div>
+  <div class="section-sub"><span class="en">Chain goroutines like a conveyor belt — each stage reads from the previous channel and writes to the next</span><span class="th">เชื่อม goroutine เป็นสายพาน — แต่ละ stage รับจาก channel ก่อนหน้า ส่งออก channel ถัดไป</span></div>
 
   <div style="background:linear-gradient(135deg,#041408,#081e0e);border:1px solid #4ade8030;border-radius:12px;padding:1.2rem 1.4rem;margin-bottom:1.5rem">
     <div style="font-size:.83rem;color:#94a3b8;line-height:1.8">
-      <span style="color:#86efac;font-weight:700">ปัญหา:</span> data ต้องผ่านการประมวลผลหลายขั้นตอน (fetch → parse → validate → store) ถ้าทำ sequential ต้องรอแต่ละ batch เสร็จก่อน<br>
-      <span style="color:#86efac;font-weight:700">วิธีแก้:</span> Pipeline ทำให้แต่ละ stage ทำงานพร้อมกัน — stage 2 เริ่มได้ทันทีที่ stage 1 มี output แรก ไม่ต้องรอ batch เสร็จ
+      <span class="en"><span style="color:#86efac;font-weight:700">Problem:</span> data must pass through several processing steps (fetch → parse → validate → store); doing it sequentially means waiting for each batch to finish first<br><span style="color:#86efac;font-weight:700">Fix:</span> a pipeline lets every stage run concurrently — stage 2 can start as soon as stage 1 produces its first output, no need to wait for the whole batch</span><span class="th"><span style="color:#86efac;font-weight:700">ปัญหา:</span> data ต้องผ่านการประมวลผลหลายขั้นตอน (fetch → parse → validate → store) ถ้าทำ sequential ต้องรอแต่ละ batch เสร็จก่อน<br><span style="color:#86efac;font-weight:700">วิธีแก้:</span> Pipeline ทำให้แต่ละ stage ทำงานพร้อมกัน — stage 2 เริ่มได้ทันทีที่ stage 1 มี output แรก ไม่ต้องรอ batch เสร็จ</span>
     </div>
   </div>
 
@@ -295,18 +293,17 @@ func main() {
 <!-- FAN-OUT FAN-IN -->
 <div class="section" id="fanout">
   <div class="section-title" style="color:#a78bfa">📡 Fan-out / Fan-in</div>
-  <div class="section-sub">กระจายงานให้หลาย goroutine (fan-out) แล้วรวม result กลับมา (fan-in)</div>
+  <div class="section-sub"><span class="en">Spread work across many goroutines (fan-out), then merge the results back (fan-in)</span><span class="th">กระจายงานให้หลาย goroutine (fan-out) แล้วรวม result กลับมา (fan-in)</span></div>
 
   <div style="background:linear-gradient(135deg,#100820,#180d30);border:1px solid #a78bfa30;border-radius:12px;padding:1.2rem 1.4rem;margin-bottom:1.5rem">
     <div style="font-size:.83rem;color:#94a3b8;line-height:1.8">
-      <span style="color:#c4b5fd;font-weight:700">Fan-out:</span> แบ่งงานจาก 1 channel ให้ worker หลายตัวทำงานพร้อมกัน — ใช้เมื่อ stage ใดช้าเป็นพิเศษ<br>
-      <span style="color:#c4b5fd;font-weight:700">Fan-in (Merge):</span> รวม output จากหลาย channel กลับมาเป็น 1 channel — ใช้หลัง fan-out เพื่อรับ result ทั้งหมด
+      <span class="en"><span style="color:#c4b5fd;font-weight:700">Fan-out:</span> split work from one channel across many workers running in parallel — use it when a particular stage is especially slow<br><span style="color:#c4b5fd;font-weight:700">Fan-in (Merge):</span> combine output from many channels back into one — used after fan-out to collect all results</span><span class="th"><span style="color:#c4b5fd;font-weight:700">Fan-out:</span> แบ่งงานจาก 1 channel ให้ worker หลายตัวทำงานพร้อมกัน — ใช้เมื่อ stage ใดช้าเป็นพิเศษ<br><span style="color:#c4b5fd;font-weight:700">Fan-in (Merge):</span> รวม output จากหลาย channel กลับมาเป็น 1 channel — ใช้หลัง fan-out เพื่อรับ result ทั้งหมด</span>
     </div>
   </div>
 
   <div class="code-block">
     <div class="code-header">
-      <span>Fan-out / Fan-in — call 3 external APIs พร้อมกัน</span>
+      <span>Fan-out / Fan-in — <span class="en">call 3 external APIs in parallel</span><span class="th">call 3 external APIs พร้อมกัน</span></span>
       <span class="lang-tag">Go · Fan-out/Fan-in</span>
     </div>
     <pre><code class="language-go">// merge รวม channel หลายอันเป็น 1
@@ -376,18 +373,17 @@ func GetBestPrice(ctx context.Context, sku string) (float64, error) {
 <!-- SEMAPHORE -->
 <div class="section" id="semaphore">
   <div class="section-title" style="color:#fbbf24">🚦 Semaphore</div>
-  <div class="section-sub">จำกัดจำนวน concurrent operations โดยใช้ buffered channel</div>
+  <div class="section-sub"><span class="en">Limit the number of concurrent operations using a buffered channel</span><span class="th">จำกัดจำนวน concurrent operations โดยใช้ buffered channel</span></div>
 
   <div style="background:linear-gradient(135deg,#141004,#201808);border:1px solid #fbbf2430;border-radius:12px;padding:1.2rem 1.4rem;margin-bottom:1.5rem">
     <div style="font-size:.83rem;color:#94a3b8;line-height:1.8">
-      <span style="color:#fde68a;font-weight:700">ปัญหา:</span> บาง resource มีจำกัด เช่น DB connection pool มี 20 connection — ถ้า goroutine มากกว่า 20 ทำงานพร้อมกันจะรอ timeout<br>
-      <span style="color:#fde68a;font-weight:700">วิธีแก้:</span> buffered channel ขนาด N ทำหน้าที่เป็น semaphore — ส่ง token เข้าก่อนทำงาน, รับออกเมื่อเสร็จ
+      <span class="en"><span style="color:#fde68a;font-weight:700">Problem:</span> some resources are limited — e.g. a DB connection pool with 20 connections — so if more than 20 goroutines run at once they'll wait and time out<br><span style="color:#fde68a;font-weight:700">Fix:</span> a buffered channel of size N acts as a semaphore — send a token before working, receive it back when done</span><span class="th"><span style="color:#fde68a;font-weight:700">ปัญหา:</span> บาง resource มีจำกัด เช่น DB connection pool มี 20 connection — ถ้า goroutine มากกว่า 20 ทำงานพร้อมกันจะรอ timeout<br><span style="color:#fde68a;font-weight:700">วิธีแก้:</span> buffered channel ขนาด N ทำหน้าที่เป็น semaphore — ส่ง token เข้าก่อนทำงาน, รับออกเมื่อเสร็จ</span>
     </div>
   </div>
 
   <div class="code-block">
     <div class="code-header">
-      <span>Semaphore ด้วย buffered channel</span>
+      <span><span class="en">Semaphore using a buffered channel</span><span class="th">Semaphore ด้วย buffered channel</span></span>
       <span class="lang-tag">Go · Semaphore</span>
     </div>
     <pre><code class="language-go">// Semaphore type
@@ -455,18 +451,17 @@ func processBatchWeighted(ctx context.Context, items []Item) error {
 <!-- CONTEXT CANCELLATION -->
 <div class="section" id="context">
   <div class="section-title" style="color:#f472b6">🛑 Context Cancellation</div>
-  <div class="section-sub">หยุด goroutine chain ทั้งหมดอย่างสะอาด</div>
+  <div class="section-sub"><span class="en">Stop an entire goroutine chain cleanly</span><span class="th">หยุด goroutine chain ทั้งหมดอย่างสะอาด</span></div>
 
   <div style="background:linear-gradient(135deg,#1a0410,#280618);border:1px solid #f472b630;border-radius:12px;padding:1.2rem 1.4rem;margin-bottom:1.5rem">
     <div style="font-size:.83rem;color:#94a3b8;line-height:1.8">
-      <span style="color:#f9a8d4;font-weight:700">กฎสำคัญ:</span> goroutine ที่ spawn ออกไปต้องมีทางหยุดเสมอ — ถ้าไม่มี เรียกว่า "goroutine leak" ซึ่งทำให้ memory ค่อยๆ เพิ่มจนระบบพัง<br>
-      <span style="color:#f9a8d4;font-weight:700">วิธี:</span> ส่ง <code>context.Context</code> เข้าทุก goroutine — ตรวจ <code>ctx.Done()</code> เพื่อรู้ว่าต้องหยุด
+      <span class="en"><span style="color:#f9a8d4;font-weight:700">Key rule:</span> every goroutine you spawn must always have a way to stop — without one you get a "goroutine leak" that slowly grows memory until the system crashes<br><span style="color:#f9a8d4;font-weight:700">How:</span> pass a <code>context.Context</code> into every goroutine — check <code>ctx.Done()</code> to know when to stop</span><span class="th"><span style="color:#f9a8d4;font-weight:700">กฎสำคัญ:</span> goroutine ที่ spawn ออกไปต้องมีทางหยุดเสมอ — ถ้าไม่มี เรียกว่า "goroutine leak" ซึ่งทำให้ memory ค่อยๆ เพิ่มจนระบบพัง<br><span style="color:#f9a8d4;font-weight:700">วิธี:</span> ส่ง <code>context.Context</code> เข้าทุก goroutine — ตรวจ <code>ctx.Done()</code> เพื่อรู้ว่าต้องหยุด</span>
     </div>
   </div>
 
   <div class="code-block">
     <div class="code-header">
-      <span>Context — timeout, cancel, และ goroutine leak prevention</span>
+      <span>Context — <span class="en">timeout, cancel, and goroutine leak prevention</span><span class="th">timeout, cancel, และ goroutine leak prevention</span></span>
       <span class="lang-tag">Go · Context</span>
     </div>
     <pre><code class="language-go">// ── 1. WithTimeout: หยุดอัตโนมัติหลัง N วินาที ─────────────
@@ -538,42 +533,42 @@ func AuthMiddleware(next http.Handler) http.Handler {
   </div>
 
   <div class="callout danger">
-    <strong>Goroutine Leak:</strong> goroutine ที่ block บน channel และไม่มีใครปิด channel นั้น จะค้างอยู่ตลอดไป ใช้ <code>goleak</code> library ใน test เพื่อตรวจหา leak อัตโนมัติ
+    <span class="en"><strong>Goroutine Leak:</strong> a goroutine blocked on a channel that nobody ever closes stays stuck forever. Use the <code>goleak</code> library in tests to detect leaks automatically</span><span class="th"><strong>Goroutine Leak:</strong> goroutine ที่ block บน channel และไม่มีใครปิด channel นั้น จะค้างอยู่ตลอดไป ใช้ <code>goleak</code> library ใน test เพื่อตรวจหา leak อัตโนมัติ</span>
   </div>
 </div>
 
 <!-- SUMMARY -->
 <div class="section">
   <div class="section-title" style="color:#38bdf8">📌 Quick Reference</div>
-  <div class="section-sub">เมื่อไหร่ใช้ pattern ไหน</div>
+  <div class="section-sub"><span class="en">When to use which pattern</span><span class="th">เมื่อไหร่ใช้ pattern ไหน</span></div>
 
   <div style="background:#0d1117;border:1px solid #1e293b;border-radius:14px;overflow:hidden;margin:1.5rem 0">
     <div style="background:#111827;padding:10px 20px;display:grid;grid-template-columns:130px 1fr 1.5fr;font-size:.77rem;font-weight:700;color:#64748b;gap:12px">
-      <div>Pattern</div><div>ใช้เมื่อ</div><div>ตัวอย่างในงานจริง</div>
+      <div>Pattern</div><div><span class="en">Use when</span><span class="th">ใช้เมื่อ</span></div><div><span class="en">Real-world example</span><span class="th">ตัวอย่างในงานจริง</span></div>
     </div>
     <div style="display:grid;grid-template-columns:130px 1fr 1.5fr;padding:10px 20px;font-size:.82rem;border-bottom:1px solid #0f172a;gap:12px;align-items:center">
       <div style="color:#38bdf8;font-weight:700">Worker Pool</div>
-      <div style="color:#94a3b8">งานเยอะแต่ต้องจำกัด resource</div>
+      <div style="color:#94a3b8"><span class="en">Lots of work but resources must be capped</span><span class="th">งานเยอะแต่ต้องจำกัด resource</span></div>
       <div style="color:#64748b">process batch orders, resize images</div>
     </div>
     <div style="display:grid;grid-template-columns:130px 1fr 1.5fr;padding:10px 20px;font-size:.82rem;border-bottom:1px solid #0f172a;gap:12px;align-items:center">
       <div style="color:#4ade80;font-weight:700">Pipeline</div>
-      <div style="color:#94a3b8">data ต้องผ่านหลายขั้นตอน</div>
+      <div style="color:#94a3b8"><span class="en">Data must pass through several stages</span><span class="th">data ต้องผ่านหลายขั้นตอน</span></div>
       <div style="color:#64748b">ETL pipeline, stream processing</div>
     </div>
     <div style="display:grid;grid-template-columns:130px 1fr 1.5fr;padding:10px 20px;font-size:.82rem;border-bottom:1px solid #0f172a;gap:12px;align-items:center">
       <div style="color:#a78bfa;font-weight:700">Fan-out/Fan-in</div>
-      <div style="color:#94a3b8">งานแบ่งได้และรวมกลับได้</div>
+      <div style="color:#94a3b8"><span class="en">Work can be split and merged back</span><span class="th">งานแบ่งได้และรวมกลับได้</span></div>
       <div style="color:#64748b">call หลาย API พร้อมกัน, parallel search</div>
     </div>
     <div style="display:grid;grid-template-columns:130px 1fr 1.5fr;padding:10px 20px;font-size:.82rem;border-bottom:1px solid #0f172a;gap:12px;align-items:center">
       <div style="color:#fbbf24;font-weight:700">Semaphore</div>
-      <div style="color:#94a3b8">จำกัด concurrency ของ resource จำกัด</div>
+      <div style="color:#94a3b8"><span class="en">Cap concurrency on a limited resource</span><span class="th">จำกัด concurrency ของ resource จำกัด</span></div>
       <div style="color:#64748b">DB pool, file handle limit, rate limit</div>
     </div>
     <div style="display:grid;grid-template-columns:130px 1fr 1.5fr;padding:10px 20px;font-size:.82rem;gap:12px;align-items:center">
       <div style="color:#f472b6;font-weight:700">Context</div>
-      <div style="color:#94a3b8">ต้องการหยุด goroutine chain</div>
+      <div style="color:#94a3b8"><span class="en">You need to stop a goroutine chain</span><span class="th">ต้องการหยุด goroutine chain</span></div>
       <div style="color:#64748b">HTTP timeout, graceful shutdown</div>
     </div>
   </div>
@@ -611,5 +606,6 @@ document.querySelectorAll('.code-block').forEach(block => {
   header.appendChild(btn)
 })
 </script>
+<script src="i18n.js"></script>
 </body>
 </html>
