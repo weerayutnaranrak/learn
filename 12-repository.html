@@ -94,10 +94,10 @@ p{color:#94a3b8;margin-bottom:14px}
 }
 </style>
 </head>
-<body>
+<body class="lang-th">
 
 <nav>
-  <a href="index.html" class="nav-home">← กลับหน้าหลัก</a>
+  <a href="index.html" class="nav-home">← <span class="en">Home</span><span class="th">กลับหน้าหลัก</span></a>
   <div class="nav-links">
     <a href="11-soa.html">← SOA</a>
     <a href="13-cqrs.html">CQRS →</a>
@@ -107,20 +107,20 @@ p{color:#94a3b8;margin-bottom:14px}
 <div class="hero">
   <div class="hero-badge">Design Pattern #12</div>
   <h1>Repository Pattern</h1>
-  <p>แยก Business Logic ออกจาก Data Access ด้วย Abstraction Layer — ทำให้ทดสอบง่าย เปลี่ยน Database ง่าย</p>
+  <p><span class="en">Separate business logic from data access with an abstraction layer — making it easy to test and easy to swap the database</span><span class="th">แยก Business Logic ออกจาก Data Access ด้วย Abstraction Layer — ทำให้ทดสอบง่าย เปลี่ยน Database ง่าย</span></p>
 </div>
 
 <div class="container">
 
   <!-- Core Concept -->
   <section>
-    <h2>Repository Pattern คืออะไร?</h2>
-    <p>Repository Pattern เป็น design pattern ที่ใส่ <strong>abstraction layer</strong> ระหว่าง business logic กับ data access code โดย Business Layer จะคุยกับ Repository <em>Interface</em> เท่านั้น ไม่รู้จักว่า data เก็บอยู่ที่ไหน (PostgreSQL, MongoDB, In-Memory, API)</p>
+    <h2><span class="en">What is the Repository Pattern?</span><span class="th">Repository Pattern คืออะไร?</span></h2>
+    <p><span class="en">The Repository Pattern puts an <strong>abstraction layer</strong> between business logic and data-access code. The business layer talks only to a Repository <em>interface</em> and doesn't know where the data is stored (PostgreSQL, MongoDB, in-memory, API)</span><span class="th">Repository Pattern เป็น design pattern ที่ใส่ <strong>abstraction layer</strong> ระหว่าง business logic กับ data access code โดย Business Layer จะคุยกับ Repository <em>Interface</em> เท่านั้น ไม่รู้จักว่า data เก็บอยู่ที่ไหน (PostgreSQL, MongoDB, In-Memory, API)</span></p>
 
     <div class="layer-flow">
       <div class="layer-block business">
         <div class="layer-name green">🧠 Business Layer / Use Case</div>
-        <div class="layer-desc">Business logic, rules, orchestration — ไม่รู้จัก SQL, ORM, หรือ database driver</div>
+        <div class="layer-desc"><span class="en">Business logic, rules, orchestration — knows nothing about SQL, ORM or database drivers</span><span class="th">Business logic, rules, orchestration — ไม่รู้จัก SQL, ORM, หรือ database driver</span></div>
         <div class="layer-badge">Calls interface only</div>
       </div>
       <div class="layer-arrow">⬇️</div>
@@ -132,7 +132,7 @@ p{color:#94a3b8;margin-bottom:14px}
       <div class="layer-arrow">⬇️</div>
       <div class="layer-block repo-if">
         <div class="layer-name blue">🔌 Repository Interface</div>
-        <div class="layer-desc"><strong>The contract</strong> — กำหนด operations: Find, Save, Delete, List (กำแพงระหว่าง domain กับ infrastructure)</div>
+        <div class="layer-desc"><span class="en"><strong>The contract</strong> — defines operations: Find, Save, Delete, List (the wall between domain and infrastructure)</span><span class="th"><strong>The contract</strong> — กำหนด operations: Find, Save, Delete, List (กำแพงระหว่าง domain กับ infrastructure)</span></div>
         <div class="layer-badge">Interface boundary</div>
       </div>
       <div class="layer-arrow">⬇️</div>
@@ -144,7 +144,7 @@ p{color:#94a3b8;margin-bottom:14px}
       <div class="layer-arrow">⬇️</div>
       <div class="layer-block db">
         <div class="layer-name red">💾 Data Sources</div>
-        <div class="layer-desc">PostgreSQL, MongoDB, Redis, REST API, File System — ซ่อนอยู่ใน implementation</div>
+        <div class="layer-desc"><span class="en">PostgreSQL, MongoDB, Redis, REST API, File System — hidden inside the implementation</span><span class="th">PostgreSQL, MongoDB, Redis, REST API, File System — ซ่อนอยู่ใน implementation</span></div>
         <div class="layer-badge">Infrastructure</div>
       </div>
     </div>
@@ -152,34 +152,34 @@ p{color:#94a3b8;margin-bottom:14px}
 
   <!-- Benefits boxes -->
   <section>
-    <h2>ประโยชน์หลัก</h2>
+    <h2><span class="en">Key benefits</span><span class="th">ประโยชน์หลัก</span></h2>
     <div class="vb-wrap">
       <div class="vb-grid vb-4">
         <div class="vbox">
           <div class="vb-icon">🧪</div>
           <div class="vb-title">Testability</div>
-          <div class="vb-body">ใช้ InMemoryRepo ใน unit tests แทน database จริง ทำให้ test เร็วและไม่ต้องการ infrastructure</div>
+          <div class="vb-body"><span class="en">Use an InMemoryRepo in unit tests instead of a real database — tests are fast and need no infrastructure</span><span class="th">ใช้ InMemoryRepo ใน unit tests แทน database จริง ทำให้ test เร็วและไม่ต้องการ infrastructure</span></div>
           <span class="vb-chip">Unit Tests</span>
           <span class="vb-chip">No DB needed</span>
         </div>
         <div class="vbox">
           <div class="vb-icon">🔄</div>
           <div class="vb-title">Flexibility</div>
-          <div class="vb-body">เปลี่ยน database ได้โดยไม่แตะ business logic — เปลี่ยนจาก MySQL เป็น PostgreSQL แค่ swap implementation</div>
+          <div class="vb-body"><span class="en">Swap the database without touching business logic — going from MySQL to PostgreSQL is just swapping the implementation</span><span class="th">เปลี่ยน database ได้โดยไม่แตะ business logic — เปลี่ยนจาก MySQL เป็น PostgreSQL แค่ swap implementation</span></div>
           <span class="vb-chip">Swappable DB</span>
           <span class="vb-chip">Easy migration</span>
         </div>
         <div class="vbox">
           <div class="vb-icon">🧱</div>
           <div class="vb-title">Separation of Concerns</div>
-          <div class="vb-body">Business logic ไม่มี SQL อยู่เลย — domain code อ่านง่าย maintain ง่าย เปลี่ยน query ไม่กระทบ logic</div>
+          <div class="vb-body"><span class="en">Business logic has no SQL at all — domain code is easy to read and maintain, and changing a query doesn't affect the logic</span><span class="th">Business logic ไม่มี SQL อยู่เลย — domain code อ่านง่าย maintain ง่าย เปลี่ยน query ไม่กระทบ logic</span></div>
           <span class="vb-chip">Clean Code</span>
           <span class="vb-chip">DDD-ready</span>
         </div>
         <div class="vbox">
           <div class="vb-icon">♻️</div>
           <div class="vb-title">Reusability</div>
-          <div class="vb-body">Repository ใช้ได้หลาย use case — findByID ใช้ได้ทั้ง GetOrder, UpdateOrder, DeleteOrder</div>
+          <div class="vb-body"><span class="en">A repository serves many use cases — findByID works for GetOrder, UpdateOrder and DeleteOrder alike</span><span class="th">Repository ใช้ได้หลาย use case — findByID ใช้ได้ทั้ง GetOrder, UpdateOrder, DeleteOrder</span></div>
           <span class="vb-chip">DRY</span>
           <span class="vb-chip">Centralized queries</span>
         </div>
@@ -192,7 +192,7 @@ p{color:#94a3b8;margin-bottom:14px}
     <h2>Before vs After</h2>
     <div class="compare-grid">
       <div class="compare-box">
-        <div class="compare-header bad">❌ Without Repository — Business logic รู้จัก SQL</div>
+        <div class="compare-header bad">❌ <span class="en">Without Repository — business logic knows SQL</span><span class="th">Without Repository — Business logic รู้จัก SQL</span></div>
         <div class="compare-body">
           <pre data-lang="go"><code class="language-go">// Service มี SQL โดยตรง — ทดสอบยาก
 func (s *OrderService) GetOrder(id string) (*Order, error) {
@@ -226,7 +226,7 @@ class OrderService {
         </div>
       </div>
       <div class="compare-box">
-        <div class="compare-header good">✅ With Repository — Business logic สะอาด</div>
+        <div class="compare-header good">✅ <span class="en">With Repository — business logic stays clean</span><span class="th">With Repository — Business logic สะอาด</span></div>
         <div class="compare-body">
           <pre data-lang="go"><code class="language-go">// Service ไม่รู้จัก SQL เลย
 func (s *OrderService) GetOrder(id string) (*Order, error) {
@@ -369,7 +369,7 @@ class OrderService {
         <div class="vbox">
           <div class="vb-icon">📋</div>
           <div class="vb-title">Generic Repository</div>
-          <div class="vb-body">Repository&lt;T&gt; ที่ใช้ได้กับทุก entity — มี CRUD พื้นฐานพร้อมใช้</div>
+          <div class="vb-body"><span class="en">A Repository&lt;T&gt; that works for any entity — basic CRUD ready to use</span><span class="th">Repository&lt;T&gt; ที่ใช้ได้กับทุก entity — มี CRUD พื้นฐานพร้อมใช้</span></div>
           <ul class="vb-list">
             <li>FindByID(id) T</li>
             <li>FindAll() []T</li>
@@ -381,7 +381,7 @@ class OrderService {
         <div class="vbox">
           <div class="vb-icon">🎯</div>
           <div class="vb-title">Specific Repository</div>
-          <div class="vb-body">Repository สำหรับ entity หนึ่งๆ มี query เฉพาะ domain ที่ generic ทำไม่ได้</div>
+          <div class="vb-body"><span class="en">A repository for one specific entity, with domain-specific queries a generic one can't do</span><span class="th">Repository สำหรับ entity หนึ่งๆ มี query เฉพาะ domain ที่ generic ทำไม่ได้</span></div>
           <ul class="vb-list">
             <li>FindByCustomerID()</li>
             <li>FindByStatus()</li>
@@ -393,7 +393,7 @@ class OrderService {
         <div class="vbox">
           <div class="vb-icon">🎨</div>
           <div class="vb-title">Decorator Repository</div>
-          <div class="vb-body">Wrap repository อื่นเพื่อเพิ่ม behavior เช่น caching, logging, retry โดยไม่แก้ implementation</div>
+          <div class="vb-body"><span class="en">Wraps another repository to add behavior like caching, logging or retry without changing the implementation</span><span class="th">Wrap repository อื่นเพื่อเพิ่ม behavior เช่น caching, logging, retry โดยไม่แก้ implementation</span></div>
           <ul class="vb-list">
             <li>CachedRepo (Redis)</li>
             <li>LoggedRepo</li>
@@ -408,7 +408,7 @@ class OrderService {
 
   <!-- Go Code -->
   <section>
-    <h2>ตัวอย่าง Code (Go)</h2>
+    <h2><span class="en">Code example (Go)</span><span class="th">ตัวอย่าง Code (Go)</span></h2>
 
     <div class="code-section">
       <div class="code-file">
@@ -818,24 +818,24 @@ func main() {
       <div class="vb-grid vb-2">
         <div class="vbox">
           <div class="vb-icon">✅</div>
-          <div class="vb-title">ควรทำ</div>
+          <div class="vb-title"><span class="en">Do</span><span class="th">ควรทำ</span></div>
           <ul class="vb-list">
-            <li>Define interface ใน domain layer ไม่ใช่ infrastructure</li>
-            <li>Return domain errors เช่น ErrNotFound ไม่ใช่ sql.ErrNoRows</li>
-            <li>ใช้ Context ทุก method เพื่อรองรับ cancellation</li>
-            <li>InMemoryRepo สำหรับ unit tests ทุกครั้ง</li>
-            <li>1 repository ต่อ 1 aggregate root</li>
+            <li><span class="en">Define the interface in the domain layer, not infrastructure</span><span class="th">Define interface ใน domain layer ไม่ใช่ infrastructure</span></li>
+            <li><span class="en">Return domain errors like ErrNotFound, not sql.ErrNoRows</span><span class="th">Return domain errors เช่น ErrNotFound ไม่ใช่ sql.ErrNoRows</span></li>
+            <li><span class="en">Use Context on every method to support cancellation</span><span class="th">ใช้ Context ทุก method เพื่อรองรับ cancellation</span></li>
+            <li><span class="en">Always use an InMemoryRepo for unit tests</span><span class="th">InMemoryRepo สำหรับ unit tests ทุกครั้ง</span></li>
+            <li><span class="en">One repository per aggregate root</span><span class="th">1 repository ต่อ 1 aggregate root</span></li>
           </ul>
         </div>
         <div class="vbox">
           <div class="vb-icon">⚠️</div>
-          <div class="vb-title">ระวัง</div>
+          <div class="vb-title"><span class="en">Caution</span><span class="th">ระวัง</span></div>
           <ul class="vb-list">
-            <li>อย่า leak SQL errors ขึ้นมา business layer</li>
-            <li>อย่าใส่ business logic ใน repository</li>
-            <li>อย่าสร้าง Generic Repository ที่ไม่มี type safety</li>
-            <li>อย่า query ข้าม aggregate ใน 1 repository</li>
-            <li>อย่าลืม Close() rows ใน query loops</li>
+            <li><span class="en">Don't leak SQL errors up into the business layer</span><span class="th">อย่า leak SQL errors ขึ้นมา business layer</span></li>
+            <li><span class="en">Don't put business logic in the repository</span><span class="th">อย่าใส่ business logic ใน repository</span></li>
+            <li><span class="en">Don't build a generic repository with no type safety</span><span class="th">อย่าสร้าง Generic Repository ที่ไม่มี type safety</span></li>
+            <li><span class="en">Don't query across aggregates in one repository</span><span class="th">อย่า query ข้าม aggregate ใน 1 repository</span></li>
+            <li><span class="en">Don't forget to Close() rows in query loops</span><span class="th">อย่าลืม Close() rows ใน query loops</span></li>
           </ul>
         </div>
       </div>

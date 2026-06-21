@@ -87,10 +87,10 @@ p{color:#94a3b8;margin-bottom:14px}
 }
 </style>
 </head>
-<body>
+<body class="lang-th">
 
 <nav>
-  <a href="index.html" class="nav-home">← กลับหน้าหลัก</a>
+  <a href="index.html" class="nav-home">← <span class="en">Home</span><span class="th">กลับหน้าหลัก</span></a>
   <div class="nav-links">
     <a href="12-repository.html">← Repository</a>
     <a href="14-p2p.html">P2P →</a>
@@ -100,32 +100,32 @@ p{color:#94a3b8;margin-bottom:14px}
 <div class="hero">
   <div class="hero-badge">Design Pattern #13</div>
   <h1>CQRS</h1>
-  <p>Command Query Responsibility Segregation — แยก "การเขียน" และ "การอ่าน" ออกจากกันอย่างสมบูรณ์ เพื่อ Performance และ Scalability สูงสุด</p>
+  <p><span class="en">Command Query Responsibility Segregation — fully separate "writes" from "reads" for maximum performance and scalability</span><span class="th">Command Query Responsibility Segregation — แยก "การเขียน" และ "การอ่าน" ออกจากกันอย่างสมบูรณ์ เพื่อ Performance และ Scalability สูงสุด</span></p>
 </div>
 
 <div class="container">
 
   <!-- Core Concept -->
   <section>
-    <h2>CQRS คืออะไร?</h2>
-    <p>CQRS คือ pattern ที่แบ่งระบบออกเป็น 2 ด้านชัดเจน: <strong>Command Side</strong> (เขียน/แก้ไขข้อมูล) และ <strong>Query Side</strong> (อ่านข้อมูล) แต่ละด้านมี model, database, และ handler ของตัวเอง ทำให้ optimize แต่ละด้านได้อิสระ</p>
-    <p>หลักการพื้นฐานมาจาก CQS (Command Query Separation) ของ Bertrand Meyer: <em>"A function should either change state, or return a value — never both."</em></p>
+    <h2><span class="en">What is CQRS?</span><span class="th">CQRS คืออะไร?</span></h2>
+    <p><span class="en">CQRS is a pattern that splits the system into two clear sides: a <strong>Command Side</strong> (writes/changes data) and a <strong>Query Side</strong> (reads data). Each has its own model, database and handlers, so you can optimize each side independently</span><span class="th">CQRS คือ pattern ที่แบ่งระบบออกเป็น 2 ด้านชัดเจน: <strong>Command Side</strong> (เขียน/แก้ไขข้อมูล) และ <strong>Query Side</strong> (อ่านข้อมูล) แต่ละด้านมี model, database, และ handler ของตัวเอง ทำให้ optimize แต่ละด้านได้อิสระ</span></p>
+    <p><span class="en">The underlying principle comes from CQS (Command Query Separation) by Bertrand Meyer: <em>"A function should either change state, or return a value — never both."</em></span><span class="th">หลักการพื้นฐานมาจาก CQS (Command Query Separation) ของ Bertrand Meyer: <em>"A function should either change state, or return a value — never both."</em></span></p>
 
     <div class="cqrs-split">
       <div class="cqrs-side cmd-side">
         <div class="side-header red">⚡ Command Side (Write)</div>
-        <div class="side-tag red">แก้ไขสถานะของระบบ</div>
+        <div class="side-tag red"><span class="en">Changes system state</span><span class="th">แก้ไขสถานะของระบบ</span></div>
         <div class="side-item"><span class="side-dot red"></span>Commands: CreateOrder, CancelOrder, UpdateStock</div>
         <div class="side-item"><span class="side-dot red"></span>Validates business rules</div>
         <div class="side-item"><span class="side-dot red"></span>Produces Domain Events</div>
         <div class="side-item"><span class="side-dot red"></span>Write-optimized database (normalized)</div>
-        <div class="side-item"><span class="side-dot red"></span>Returns void / error เท่านั้น</div>
+        <div class="side-item"><span class="side-dot red"></span><span class="en">Returns void / error only</span><span class="th">Returns void / error เท่านั้น</span></div>
         <div class="side-item"><span class="side-dot red"></span>Consistency: strong</div>
         <div class="side-item"><span class="side-dot red"></span>Throughput: medium</div>
       </div>
       <div class="cqrs-side qry-side">
         <div class="side-header blue">🔍 Query Side (Read)</div>
-        <div class="side-tag blue">คืนค่าโดยไม่แก้ไขข้อมูล</div>
+        <div class="side-tag blue"><span class="en">Returns data without changing it</span><span class="th">คืนค่าโดยไม่แก้ไขข้อมูล</span></div>
         <div class="side-item"><span class="side-dot blue"></span>Queries: GetOrder, ListOrders, GetSummary</div>
         <div class="side-item"><span class="side-dot blue"></span>No business rule validation</div>
         <div class="side-item"><span class="side-dot blue"></span>Consumes Domain Events → updates projections</div>
@@ -139,13 +139,13 @@ p{color:#94a3b8;margin-bottom:14px}
 
   <!-- Sub-concepts -->
   <section>
-    <h2>Concepts ที่เกี่ยวข้อง</h2>
+    <h2><span class="en">Related concepts</span><span class="th">Concepts ที่เกี่ยวข้อง</span></h2>
     <div class="vb-wrap">
       <div class="vb-grid vb-4">
         <div class="vbox">
           <div class="vb-icon">📩</div>
           <div class="vb-title">Command</div>
-          <div class="vb-body">Intent ที่จะเปลี่ยน state — ตั้งชื่อด้วย imperative verb</div>
+          <div class="vb-body"><span class="en">An intent to change state — named with an imperative verb</span><span class="th">Intent ที่จะเปลี่ยน state — ตั้งชื่อด้วย imperative verb</span></div>
           <ul class="vb-list">
             <li>PlaceOrderCmd</li>
             <li>CancelOrderCmd</li>
@@ -156,7 +156,7 @@ p{color:#94a3b8;margin-bottom:14px}
         <div class="vbox">
           <div class="vb-icon">🔎</div>
           <div class="vb-title">Query</div>
-          <div class="vb-body">ขอข้อมูลโดยไม่มี side effects — pure read operation</div>
+          <div class="vb-body"><span class="en">Requests data with no side effects — a pure read operation</span><span class="th">ขอข้อมูลโดยไม่มี side effects — pure read operation</span></div>
           <ul class="vb-list">
             <li>GetOrderByIDQuery</li>
             <li>ListOrdersQuery</li>
@@ -167,7 +167,7 @@ p{color:#94a3b8;margin-bottom:14px}
         <div class="vbox">
           <div class="vb-icon">📢</div>
           <div class="vb-title">Domain Event</div>
-          <div class="vb-body">สิ่งที่เกิดขึ้นแล้ว — Command Side publish, Query Side subscribe</div>
+          <div class="vb-body"><span class="en">Something that already happened — the Command side publishes, the Query side subscribes</span><span class="th">สิ่งที่เกิดขึ้นแล้ว — Command Side publish, Query Side subscribe</span></div>
           <ul class="vb-list">
             <li>OrderPlacedEvent</li>
             <li>PaymentConfirmedEvent</li>
@@ -178,7 +178,7 @@ p{color:#94a3b8;margin-bottom:14px}
         <div class="vbox">
           <div class="vb-icon">📊</div>
           <div class="vb-title">Projection / Read Model</div>
-          <div class="vb-body">Denormalized view ที่สร้างจาก events — optimized สำหรับ query หนึ่งๆ</div>
+          <div class="vb-body"><span class="en">A denormalized view built from events — optimized for one specific query</span><span class="th">Denormalized view ที่สร้างจาก events — optimized สำหรับ query หนึ่งๆ</span></div>
           <ul class="vb-list">
             <li>OrderSummaryView</li>
             <li>CustomerDashboard</li>
@@ -195,17 +195,17 @@ p{color:#94a3b8;margin-bottom:14px}
         <div class="vbox">
           <div class="vb-icon">🎯</div>
           <div class="vb-title">Command Handler</div>
-          <div class="vb-body">รับ Command → validate → update aggregate → publish events → return void/error ไม่ return data</div>
+          <div class="vb-body"><span class="en">Takes a Command → validate → update the aggregate → publish events → return void/error, never data</span><span class="th">รับ Command → validate → update aggregate → publish events → return void/error ไม่ return data</span></div>
         </div>
         <div class="vbox">
           <div class="vb-icon">📖</div>
           <div class="vb-title">Query Handler</div>
-          <div class="vb-body">รับ Query → query read model โดยตรง → return DTO ไม่แตะ write database เลย</div>
+          <div class="vb-body"><span class="en">Takes a Query → queries the read model directly → returns a DTO, never touching the write database</span><span class="th">รับ Query → query read model โดยตรง → return DTO ไม่แตะ write database เลย</span></div>
         </div>
         <div class="vbox">
           <div class="vb-icon">⚙️</div>
           <div class="vb-title">Event Handler / Projector</div>
-          <div class="vb-body">Subscribe events จาก Command side → อัพเดท read model/projections ให้ query side</div>
+          <div class="vb-body"><span class="en">Subscribes to events from the Command side → updates the read model/projections for the Query side</span><span class="th">Subscribe events จาก Command side → อัพเดท read model/projections ให้ query side</span></div>
         </div>
       </div>
     </div>
@@ -359,7 +359,7 @@ p{color:#94a3b8;margin-bottom:14px}
   <!-- Event Sourcing combo -->
   <section>
     <h2>CQRS + Event Sourcing</h2>
-    <p>CQRS มักใช้คู่กับ Event Sourcing — แทนที่จะเก็บ current state เก็บ events ทุกตัวที่เคยเกิด แล้ว replay เพื่อสร้าง state ปัจจุบัน</p>
+    <p><span class="en">CQRS is often paired with Event Sourcing — instead of storing the current state, store every event that ever happened and replay them to rebuild the current state</span><span class="th">CQRS มักใช้คู่กับ Event Sourcing — แทนที่จะเก็บ current state เก็บ events ทุกตัวที่เคยเกิด แล้ว replay เพื่อสร้าง state ปัจจุบัน</span></p>
 
     <div class="es-flow">
       <div class="es-step">
@@ -405,22 +405,22 @@ p{color:#94a3b8;margin-bottom:14px}
         <div class="vbox">
           <div class="vb-icon">⏪</div>
           <div class="vb-title">Complete Audit Trail</div>
-          <div class="vb-body">ทุก event ถูกเก็บ รู้ได้ว่าระบบอยู่ในสถานะอะไรตอนไหน temporal query ได้</div>
+          <div class="vb-body"><span class="en">Every event is kept, so you know the system's state at any point in time — temporal queries are possible</span><span class="th">ทุก event ถูกเก็บ รู้ได้ว่าระบบอยู่ในสถานะอะไรตอนไหน temporal query ได้</span></div>
         </div>
         <div class="vbox">
           <div class="vb-icon">🔄</div>
           <div class="vb-title">Replay & Rebuild</div>
-          <div class="vb-body">Rebuild read model ใหม่ทั้งหมดได้ด้วยการ replay events — เพิ่ม projection ใหม่ได้เสมอ</div>
+          <div class="vb-body"><span class="en">Rebuild the entire read model by replaying events — you can always add a new projection</span><span class="th">Rebuild read model ใหม่ทั้งหมดได้ด้วยการ replay events — เพิ่ม projection ใหม่ได้เสมอ</span></div>
         </div>
         <div class="vbox">
           <div class="vb-icon">🐛</div>
           <div class="vb-title">Debugging</div>
-          <div class="vb-body">Debug ง่าย — replay events ถึง point ที่มีปัญหา เห็น state ได้ทุก step</div>
+          <div class="vb-body"><span class="en">Easy debugging — replay events up to the point of the problem and see the state at every step</span><span class="th">Debug ง่าย — replay events ถึง point ที่มีปัญหา เห็น state ได้ทุก step</span></div>
         </div>
         <div class="vbox">
           <div class="vb-icon">📈</div>
           <div class="vb-title">Multiple Projections</div>
-          <div class="vb-body">Events เดียวกัน → หลาย read models แต่ละอย่าง optimized สำหรับ use case ต่าง</div>
+          <div class="vb-body"><span class="en">The same events → many read models, each optimized for a different use case</span><span class="th">Events เดียวกัน → หลาย read models แต่ละอย่าง optimized สำหรับ use case ต่าง</span></div>
         </div>
       </div>
     </div>
@@ -428,7 +428,7 @@ p{color:#94a3b8;margin-bottom:14px}
 
   <!-- Go Code -->
   <section>
-    <h2>ตัวอย่าง Code (Go)</h2>
+    <h2><span class="en">Code example (Go)</span><span class="th">ตัวอย่าง Code (Go)</span></h2>
 
     <div class="code-section">
       <div class="code-file">
@@ -742,29 +742,29 @@ func main() {
 
   <!-- When to use -->
   <section>
-    <h2>เมื่อไหร่ควรใช้ CQRS?</h2>
+    <h2><span class="en">When should you use CQRS?</span><span class="th">เมื่อไหร่ควรใช้ CQRS?</span></h2>
     <div class="vb-wrap">
       <div class="vb-grid vb-2">
         <div class="vbox">
           <div class="vb-icon">✅</div>
-          <div class="vb-title">เหมาะกับ</div>
+          <div class="vb-title"><span class="en">Good for</span><span class="th">เหมาะกับ</span></div>
           <ul class="vb-list">
-            <li>Read/Write ratio ไม่สมดุล (read มากกว่า write 10x+)</li>
-            <li>Complex business logic ฝั่ง write, complex reporting ฝั่ง read</li>
-            <li>ต้องการ audit trail / event history สมบูรณ์</li>
-            <li>Scalability — scale read/write tier อิสระ</li>
-            <li>ระบบที่ต้องการ multiple views ของ data เดียวกัน</li>
+            <li><span class="en">An unbalanced read/write ratio (reads 10x+ writes)</span><span class="th">Read/Write ratio ไม่สมดุล (read มากกว่า write 10x+)</span></li>
+            <li><span class="en">Complex business logic on the write side, complex reporting on the read side</span><span class="th">Complex business logic ฝั่ง write, complex reporting ฝั่ง read</span></li>
+            <li><span class="en">A need for a complete audit trail / event history</span><span class="th">ต้องการ audit trail / event history สมบูรณ์</span></li>
+            <li><span class="en">Scalability — scale read/write tiers independently</span><span class="th">Scalability — scale read/write tier อิสระ</span></li>
+            <li><span class="en">Systems needing multiple views of the same data</span><span class="th">ระบบที่ต้องการ multiple views ของ data เดียวกัน</span></li>
           </ul>
         </div>
         <div class="vbox">
           <div class="vb-icon">⚠️</div>
-          <div class="vb-title">ระวัง</div>
+          <div class="vb-title"><span class="en">Caution</span><span class="th">ระวัง</span></div>
           <ul class="vb-list">
-            <li>Complexity สูงมาก — ไม่เหมาะกับ CRUD อย่างเดียว</li>
-            <li>Eventual consistency — user อาจเห็น data เก่า momentarily</li>
-            <li>ต้องเขียน code เยอะขึ้น — 2 models, 2 databases, projectors</li>
-            <li>Debug ยากกว่า — trace event flow ข้าม services</li>
-            <li>Overkill สำหรับ small/simple applications</li>
+            <li><span class="en">Very high complexity — not for plain CRUD</span><span class="th">Complexity สูงมาก — ไม่เหมาะกับ CRUD อย่างเดียว</span></li>
+            <li><span class="en">Eventual consistency — users may briefly see stale data</span><span class="th">Eventual consistency — user อาจเห็น data เก่า momentarily</span></li>
+            <li><span class="en">More code to write — 2 models, 2 databases, projectors</span><span class="th">ต้องเขียน code เยอะขึ้น — 2 models, 2 databases, projectors</span></li>
+            <li><span class="en">Harder to debug — tracing event flow across services</span><span class="th">Debug ยากกว่า — trace event flow ข้าม services</span></li>
+            <li><span class="en">Overkill for small/simple applications</span><span class="th">Overkill สำหรับ small/simple applications</span></li>
           </ul>
         </div>
       </div>

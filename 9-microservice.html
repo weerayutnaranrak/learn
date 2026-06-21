@@ -59,44 +59,44 @@ a{color:#fb923c;text-decoration:none}
 .compare-box{background:#0d1117;border:1.5px solid #1e293b;border-radius:12px;padding:1.2rem}
 </style>
 </head>
-<body>
+<body class="lang-th">
 <nav class="topnav">
-  <a href="index.html" class="back-btn">← กลับหน้าหลัก</a>
+  <a href="index.html" class="back-btn">← <span class="en">Home</span><span class="th">กลับหน้าหลัก</span></a>
   <span class="nav-title">10 / <span>Microservice Architecture</span></span>
 </nav>
 <div class="hero">
   <div class="hero-badge">🏗️ Distributed Architecture</div>
   <h1>Microservice Architecture</h1>
-  <p>แบ่ง Application ใหญ่เป็น Services เล็กๆ อิสระ — Deploy แยก, Scale แยก, Fail แยก ทำให้ทีมใหญ่ทำงานขนานกันได้โดยไม่ชนกัน</p>
+  <p><span class="en">Split a large application into small, independent services — deploy separately, scale separately, fail separately, letting large teams work in parallel without conflicts.</span><span class="th">แบ่ง Application ใหญ่เป็น Services เล็กๆ อิสระ — Deploy แยก, Scale แยก, Fail แยก ทำให้ทีมใหญ่ทำงานขนานกันได้โดยไม่ชนกัน</span></p>
 </div>
 <div class="content">
 
 <!-- ── MONOLITH VS MICRO ── -->
 <div class="section">
   <div class="section-title">💡 Monolith vs Microservices</div>
-  <div class="section-sub">เข้าใจปัญหาของ Monolith ก่อนจะเข้าใจว่าทำไมต้องมี Microservices</div>
+  <div class="section-sub"><span class="en">Understand the problems of a Monolith first, then you'll understand why Microservices exist.</span><span class="th">เข้าใจปัญหาของ Monolith ก่อนจะเข้าใจว่าทำไมต้องมี Microservices</span></div>
 
   <div class="compare-split">
     <div class="compare-box" style="border-color:#ef4444">
       <div style="font-size:1.4rem;margin-bottom:.5rem">🧱 Monolith</div>
-      <div style="font-size:.85rem;font-weight:700;color:#fca5a5;margin-bottom:.7rem">ทุกอย่างอยู่ใน 1 Process</div>
+      <div style="font-size:.85rem;font-weight:700;color:#fca5a5;margin-bottom:.7rem"><span class="en">Everything in 1 Process</span><span class="th">ทุกอย่างอยู่ใน 1 Process</span></div>
       <div style="background:#0a0a0a;border-radius:8px;padding:.8rem;margin-bottom:.7rem;font-size:.72rem;text-align:center">
         <div style="background:#1e1010;border:1px solid #3d1010;border-radius:6px;padding:.4rem;color:#fca5a5;margin-bottom:.3rem">User Module</div>
         <div style="background:#1e1010;border:1px solid #3d1010;border-radius:6px;padding:.4rem;color:#fca5a5;margin-bottom:.3rem">Order Module</div>
         <div style="background:#1e1010;border:1px solid #3d1010;border-radius:6px;padding:.4rem;color:#fca5a5;margin-bottom:.3rem">Payment Module</div>
         <div style="background:#1e1010;border:1px solid #3d1010;border-radius:6px;padding:.4rem;color:#fca5a5">Notification Module</div>
-        <div style="font-size:.65rem;color:#475569;margin-top:.4rem">↑ ทุกอย่างใน 1 Binary, 1 DB</div>
+        <div style="font-size:.65rem;color:#475569;margin-top:.4rem"><span class="en">↑ Everything in 1 Binary, 1 DB</span><span class="th">↑ ทุกอย่างใน 1 Binary, 1 DB</span></div>
       </div>
       <ul style="list-style:none;display:flex;flex-direction:column;gap:.25rem">
-        <li style="font-size:.75rem;color:#64748b;padding-left:.9rem;position:relative"><span style="position:absolute;left:0;color:#ef4444">✗</span> Deploy ทั้งหมดพร้อมกัน</li>
-        <li style="font-size:.75rem;color:#64748b;padding-left:.9rem;position:relative"><span style="position:absolute;left:0;color:#ef4444">✗</span> Scale ทั้งหมดหรือไม่ scale</li>
-        <li style="font-size:.75rem;color:#64748b;padding-left:.9rem;position:relative"><span style="position:absolute;left:0;color:#ef4444">✗</span> Bug หนึ่งล้มทั้งระบบ</li>
-        <li style="font-size:.75rem;color:#64748b;padding-left:.9rem;position:relative"><span style="position:absolute;left:0;color:#10b981">✓</span> ง่ายสำหรับ early stage</li>
+        <li style="font-size:.75rem;color:#64748b;padding-left:.9rem;position:relative"><span style="position:absolute;left:0;color:#ef4444">✗</span> <span class="en">Must deploy everything at once</span><span class="th">Deploy ทั้งหมดพร้อมกัน</span></li>
+        <li style="font-size:.75rem;color:#64748b;padding-left:.9rem;position:relative"><span style="position:absolute;left:0;color:#ef4444">✗</span> <span class="en">Scale all or nothing</span><span class="th">Scale ทั้งหมดหรือไม่ scale</span></li>
+        <li style="font-size:.75rem;color:#64748b;padding-left:.9rem;position:relative"><span style="position:absolute;left:0;color:#ef4444">✗</span> <span class="en">One bug can take down the whole system</span><span class="th">Bug หนึ่งล้มทั้งระบบ</span></li>
+        <li style="font-size:.75rem;color:#64748b;padding-left:.9rem;position:relative"><span style="position:absolute;left:0;color:#10b981">✓</span> <span class="en">Simple for early stage</span><span class="th">ง่ายสำหรับ early stage</span></li>
       </ul>
     </div>
     <div class="compare-box" style="border-color:#10b981">
       <div style="font-size:1.4rem;margin-bottom:.5rem">🏗️ Microservices</div>
-      <div style="font-size:.85rem;font-weight:700;color:#6ee7b7;margin-bottom:.7rem">แต่ละ Service อิสระ</div>
+      <div style="font-size:.85rem;font-weight:700;color:#6ee7b7;margin-bottom:.7rem"><span class="en">Each Service is Independent</span><span class="th">แต่ละ Service อิสระ</span></div>
       <div style="background:#0a0a0a;border-radius:8px;padding:.8rem;margin-bottom:.7rem;font-size:.72rem;display:grid;grid-template-columns:1fr 1fr;gap:.3rem">
         <div style="background:#041008;border:1px solid #0a3020;border-radius:6px;padding:.4rem;color:#6ee7b7;text-align:center">👤 User Svc<br><span style="color:#334155">:3001</span></div>
         <div style="background:#041008;border:1px solid #0a3020;border-radius:6px;padding:.4rem;color:#6ee7b7;text-align:center">📦 Order Svc<br><span style="color:#334155">:3002</span></div>
@@ -104,22 +104,22 @@ a{color:#fb923c;text-decoration:none}
         <div style="background:#041008;border:1px solid #0a3020;border-radius:6px;padding:.4rem;color:#6ee7b7;text-align:center">📧 Notify Svc<br><span style="color:#334155">:3004</span></div>
       </div>
       <ul style="list-style:none;display:flex;flex-direction:column;gap:.25rem">
-        <li style="font-size:.75rem;color:#64748b;padding-left:.9rem;position:relative"><span style="position:absolute;left:0;color:#10b981">✓</span> Deploy แยกกันได้</li>
-        <li style="font-size:.75rem;color:#64748b;padding-left:.9rem;position:relative"><span style="position:absolute;left:0;color:#10b981">✓</span> Scale เฉพาะ Service ที่ต้องการ</li>
-        <li style="font-size:.75rem;color:#64748b;padding-left:.9rem;position:relative"><span style="position:absolute;left:0;color:#10b981">✓</span> Service ล้มไม่กระทบทั้งระบบ</li>
-        <li style="font-size:.75rem;color:#64748b;padding-left:.9rem;position:relative"><span style="position:absolute;left:0;color:#ef4444">✗</span> ซับซ้อนกว่า Monolith มาก</li>
+        <li style="font-size:.75rem;color:#64748b;padding-left:.9rem;position:relative"><span style="position:absolute;left:0;color:#10b981">✓</span> <span class="en">Can deploy independently</span><span class="th">Deploy แยกกันได้</span></li>
+        <li style="font-size:.75rem;color:#64748b;padding-left:.9rem;position:relative"><span style="position:absolute;left:0;color:#10b981">✓</span> <span class="en">Scale only the services you need</span><span class="th">Scale เฉพาะ Service ที่ต้องการ</span></li>
+        <li style="font-size:.75rem;color:#64748b;padding-left:.9rem;position:relative"><span style="position:absolute;left:0;color:#10b981">✓</span> <span class="en">One service failing doesn't take down the whole system</span><span class="th">Service ล้มไม่กระทบทั้งระบบ</span></li>
+        <li style="font-size:.75rem;color:#64748b;padding-left:.9rem;position:relative"><span style="position:absolute;left:0;color:#ef4444">✗</span> <span class="en">Much more complex than a Monolith</span><span class="th">ซับซ้อนกว่า Monolith มาก</span></li>
       </ul>
     </div>
   </div>
 
   <!-- VISUAL: Core Components -->
   <div class="vb-wrap">
-    <div class="vb-label">🧩 ส่วนประกอบหลักของ Microservice System</div>
+    <div class="vb-label">🧩 <span class="en">Core Components of a Microservice System</span><span class="th">ส่วนประกอบหลักของ Microservice System</span></div>
     <div class="vb-grid vb-4">
       <div class="vbox" style="--ac:#fb923c">
         <span class="vb-icon">🚪</span>
         <div class="vb-title">API Gateway</div>
-        <div class="vb-body">จุดเข้าเดียว (Single Entry Point) สำหรับทุก Client</div>
+        <div class="vb-body"><span class="en">Single Entry Point for all clients.</span><span class="th">จุดเข้าเดียว (Single Entry Point) สำหรับทุก Client</span></div>
         <ul class="vb-list">
           <li>Route → Service</li>
           <li>Auth / Rate Limit</li>
@@ -130,7 +130,7 @@ a{color:#fb923c;text-decoration:none}
       <div class="vbox" style="--ac:#6366f1">
         <span class="vb-icon">🗂️</span>
         <div class="vb-title">Service Discovery</div>
-        <div class="vb-body">Services ค้นหากันเองแบบ dynamic</div>
+        <div class="vb-body"><span class="en">Services locate each other dynamically.</span><span class="th">Services ค้นหากันเองแบบ dynamic</span></div>
         <ul class="vb-list">
           <li>Register เมื่อ start</li>
           <li>Deregister เมื่อ stop</li>
@@ -141,7 +141,7 @@ a{color:#fb923c;text-decoration:none}
       <div class="vbox" style="--ac:#10b981">
         <span class="vb-icon">📨</span>
         <div class="vb-title">Message Bus</div>
-        <div class="vb-body">Async communication ระหว่าง services</div>
+        <div class="vb-body"><span class="en">Async communication between services.</span><span class="th">Async communication ระหว่าง services</span></div>
         <ul class="vb-list">
           <li>Decouple producers/consumers</li>
           <li>Buffer load spikes</li>
@@ -152,18 +152,18 @@ a{color:#fb923c;text-decoration:none}
       <div class="vbox" style="--ac:#22d3ee">
         <span class="vb-icon">🔌</span>
         <div class="vb-title">Circuit Breaker</div>
-        <div class="vb-body">ป้องกัน cascade failure ระหว่าง services</div>
+        <div class="vb-body"><span class="en">Prevents cascade failures between services.</span><span class="th">ป้องกัน cascade failure ระหว่าง services</span></div>
         <ul class="vb-list">
-          <li>Open เมื่อ error มาก</li>
-          <li>Half-open ทดสอบ</li>
-          <li>Close เมื่อปกติ</li>
+          <li><span class="en">Open when errors are high</span><span class="th">Open เมื่อ error มาก</span></li>
+          <li><span class="en">Half-open to probe</span><span class="th">Half-open ทดสอบ</span></li>
+          <li><span class="en">Close when normal</span><span class="th">Close เมื่อปกติ</span></li>
         </ul>
         <span class="vb-chip">Hystrix · Resilience4j</span>
       </div>
       <div class="vbox" style="--ac:#8b5cf6">
         <span class="vb-icon">⚖️</span>
         <div class="vb-title">Load Balancer</div>
-        <div class="vb-body">กระจาย traffic ไปยัง instances หลายตัว</div>
+        <div class="vb-body"><span class="en">Distributes traffic across multiple instances.</span><span class="th">กระจาย traffic ไปยัง instances หลายตัว</span></div>
         <ul class="vb-list">
           <li>Round Robin</li>
           <li>Least Connections</li>
@@ -196,7 +196,7 @@ a{color:#fb923c;text-decoration:none}
       <div class="vbox" style="--ac:#34d399">
         <span class="vb-icon">🛡️</span>
         <div class="vb-title">Service Mesh</div>
-        <div class="vb-body">Infra layer สำหรับ service-to-service</div>
+        <div class="vb-body"><span class="en">Infrastructure layer for service-to-service communication.</span><span class="th">Infra layer สำหรับ service-to-service</span></div>
         <ul class="vb-list">
           <li>mTLS (mutual auth)</li>
           <li>Traffic management</li>
@@ -209,32 +209,32 @@ a{color:#fb923c;text-decoration:none}
 
   <!-- VISUAL: Communication Patterns -->
   <div class="vb-wrap">
-    <div class="vb-label">📡 วิธีสื่อสารระหว่าง Services</div>
+    <div class="vb-label">📡 <span class="en">How Services Communicate</span><span class="th">วิธีสื่อสารระหว่าง Services</span></div>
     <div class="vb-grid vb-3">
       <div class="vbox" style="--ac:#22d3ee">
         <span class="vb-icon">🔁</span>
         <div class="vb-title">Synchronous (REST/gRPC)</div>
-        <div class="vb-body">Service A รอผล Service B</div>
+        <div class="vb-body"><span class="en">Service A waits for a result from Service B.</span><span class="th">Service A รอผล Service B</span></div>
         <ul class="vb-list">
-          <li>ง่าย, response ทันที</li>
-          <li>Tight coupling มากขึ้น</li>
-          <li>เหมาะกับ: Query, Auth</li>
+          <li><span class="en">Simple, immediate response</span><span class="th">ง่าย, response ทันที</span></li>
+          <li><span class="en">Tighter coupling</span><span class="th">Tight coupling มากขึ้น</span></li>
+          <li><span class="en">Good for: Query, Auth</span><span class="th">เหมาะกับ: Query, Auth</span></li>
         </ul>
       </div>
       <div class="vbox" style="--ac:#10b981">
         <span class="vb-icon">📨</span>
         <div class="vb-title">Asynchronous (Events)</div>
-        <div class="vb-body">Service A publish แล้วไม่รอ</div>
+        <div class="vb-body"><span class="en">Service A publishes and doesn't wait.</span><span class="th">Service A publish แล้วไม่รอ</span></div>
         <ul class="vb-list">
           <li>Loose coupling</li>
-          <li>Scale ได้ดีกว่า</li>
-          <li>เหมาะกับ: Notifications, Processing</li>
+          <li><span class="en">Scales better</span><span class="th">Scale ได้ดีกว่า</span></li>
+          <li><span class="en">Good for: Notifications, Processing</span><span class="th">เหมาะกับ: Notifications, Processing</span></li>
         </ul>
       </div>
       <div class="vbox" style="--ac:#f59e0b">
         <span class="vb-icon">📋</span>
         <div class="vb-title">Saga Pattern</div>
-        <div class="vb-body">Distributed transaction ข้าม services</div>
+        <div class="vb-body"><span class="en">Distributed transaction spanning multiple services.</span><span class="th">Distributed transaction ข้าม services</span></div>
         <ul class="vb-list">
           <li>Choreography (event-based)</li>
           <li>Orchestration (central coordinator)</li>
@@ -245,8 +245,7 @@ a{color:#fb923c;text-decoration:none}
   </div>
 
   <div class="callout">
-    <strong>สำคัญ:</strong> แต่ละ Microservice ควรมี <strong>Database ของตัวเอง</strong> (Database per Service)
-    ห้ามแชร์ DB ระหว่าง services — เพราะจะทำให้ tight coupling และเปลี่ยน schema ไม่ได้
+    <strong><span class="en">Important:</span><span class="th">สำคัญ:</span></strong> <span class="en">Each Microservice should have its <strong>own Database</strong> (Database per Service). Never share a DB between services — it creates tight coupling and makes schema changes impossible.</span><span class="th">แต่ละ Microservice ควรมี <strong>Database ของตัวเอง</strong> (Database per Service) ห้ามแชร์ DB ระหว่าง services — เพราะจะทำให้ tight coupling และเปลี่ยน schema ไม่ได้</span>
   </div>
 </div>
 
@@ -356,7 +355,7 @@ a{color:#fb923c;text-decoration:none}
 
 <!-- ── CODE ── -->
 <div class="section">
-  <div class="section-title">💻 ตัวอย่าง Go — Microservices ในชีวิตจริง</div>
+  <div class="section-title">💻 <span class="en">Go Examples — Microservices in Practice</span><span class="th">ตัวอย่าง Go — Microservices ในชีวิตจริง</span></div>
 
   <div class="code-block">
     <div class="code-header"><span>user-service/main.go — User Microservice</span><span class="lang">Go</span></div>
@@ -800,39 +799,39 @@ func (c *UserServiceClient) GetUser(ctx context.Context, userID string) (*UserIn
 
 <!-- ── SUMMARY ── -->
 <div class="section">
-  <div class="section-title">✅ สรุป — เมื่อไหร่ควรใช้ Microservices?</div>
+  <div class="section-title">✅ <span class="en">Summary — When Should You Use Microservices?</span><span class="th">สรุป — เมื่อไหร่ควรใช้ Microservices?</span></div>
   <div class="vb-grid vb-2">
     <div class="vbox" style="--ac:#10b981">
       <span class="vb-icon">✅</span>
-      <div class="vb-title">ควรใช้เมื่อ</div>
+      <div class="vb-title"><span class="en">Use When</span><span class="th">ควรใช้เมื่อ</span></div>
       <ul class="vb-list">
-        <li>ทีมใหญ่ (10+ คน) ต้องการ autonomy</li>
-        <li>Services ต้อง scale ต่างกัน (checkout ≠ browse)</li>
-        <li>Technology stack แต่ละส่วนต่างกัน</li>
-        <li>System ต้องการ high availability แต่ละส่วน</li>
+        <li><span class="en">Large team (10+ people) needs autonomy</span><span class="th">ทีมใหญ่ (10+ คน) ต้องการ autonomy</span></li>
+        <li><span class="en">Services need to scale differently (checkout ≠ browse)</span><span class="th">Services ต้อง scale ต่างกัน (checkout ≠ browse)</span></li>
+        <li><span class="en">Different technology stacks per area</span><span class="th">Technology stack แต่ละส่วนต่างกัน</span></li>
+        <li><span class="en">System requires high availability per component</span><span class="th">System ต้องการ high availability แต่ละส่วน</span></li>
       </ul>
     </div>
     <div class="vbox" style="--ac:#ef4444">
       <span class="vb-icon">⚠️</span>
-      <div class="vb-title">ไม่ควรใช้เมื่อ</div>
+      <div class="vb-title"><span class="en">Avoid When</span><span class="th">ไม่ควรใช้เมื่อ</span></div>
       <ul class="vb-list">
-        <li>Startup ขนาดเล็ก (ทีม 1-5 คน)</li>
-        <li>ยังไม่รู้ domain boundaries ชัดเจน</li>
-        <li>ไม่มี infrastructure ที่พร้อม (K8s, monitoring)</li>
-        <li>"Premature optimization" — เริ่ม Monolith ก่อน</li>
+        <li><span class="en">Small startup (1–5 person team)</span><span class="th">Startup ขนาดเล็ก (ทีม 1-5 คน)</span></li>
+        <li><span class="en">Domain boundaries aren't clear yet</span><span class="th">ยังไม่รู้ domain boundaries ชัดเจน</span></li>
+        <li><span class="en">No infrastructure ready (K8s, monitoring)</span><span class="th">ไม่มี infrastructure ที่พร้อม (K8s, monitoring)</span></li>
+        <li><span class="en">"Premature optimization" — start with a Monolith first</span><span class="th">"Premature optimization" — เริ่ม Monolith ก่อน</span></li>
       </ul>
     </div>
   </div>
   <div class="callout warn">
     <strong>Martin Fowler's Advice:</strong> "Don't start with microservices.
     Start with a monolith, understand your domain, then extract services when you need to."
-    — อย่า over-engineer ตั้งแต่ต้น
+    — <span class="en">Don't over-engineer from the start.</span><span class="th">อย่า over-engineer ตั้งแต่ต้น</span>
   </div>
 </div>
 
 <div style="text-align:center;margin:3rem 0;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
   <a href="8-client-server.html" style="background:#0d1117;border:1px solid #1e293b;color:#64748b;padding:.7rem 1.5rem;border-radius:10px;font-size:.88rem">← Client-Server</a>
-  <a href="10-mvc.html" style="background:#0d1117;border:1px solid #1e293b;color:#fb923c;padding:.7rem 1.5rem;border-radius:10px;font-weight:600;font-size:.88rem">MVC Pattern →</a>
+  <a href="10-mvc.html" style="background:#0d1117;border:1px solid #1e293b;color:#fb923c;padding:.7rem 1.5rem;border-radius:10px;font-weight:600;font-size:.88rem"><span class="en">MVC Pattern</span><span class="th">MVC Pattern</span> →</a>
 </div>
 </div>
 <script>hljs.highlightAll()</script>

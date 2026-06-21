@@ -56,25 +56,25 @@ a:hover{text-decoration:underline}
 .pattern-nav .p-cat{font-size:.6rem;color:var(--sc);margin-top:2px}
 </style>
 </head>
-<body>
+<body class="lang-th">
 
 <nav class="topnav">
-  <a href="index.html" class="back-btn">← กลับหน้าหลัก</a>
+  <a href="index.html" class="back-btn">← <span class="en">Home</span><span class="th">กลับหน้าหลัก</span></a>
   <span class="nav-title">18 / <span>Design Patterns (GoF)</span></span>
 </nav>
 
 <div class="hero">
   <div class="hero-badge">🎨 หัวข้อที่ 18</div>
   <h1>Design Patterns (GoF)</h1>
-  <p>23 patterns จาก Gang of Four — วิธีแก้ปัญหา OOP ที่พบบ่อย แบ่งเป็น Creational, Structural, Behavioral พร้อมตัวอย่าง Go ทุก pattern</p>
+  <p><span class="en">23 patterns from the Gang of Four — common OOP solutions divided into Creational, Structural, and Behavioral, with Go examples for every pattern.</span><span class="th">23 patterns จาก Gang of Four — วิธีแก้ปัญหา OOP ที่พบบ่อย แบ่งเป็น Creational, Structural, Behavioral พร้อมตัวอย่าง Go ทุก pattern</span></p>
 </div>
 
 <div class="content">
 
 <!-- OVERVIEW -->
 <div class="section">
-  <div class="section-title" style="color:#8b5cf6">📋 ภาพรวม</div>
-  <div class="section-sub">6 patterns ที่ใช้บ่อยที่สุดในงานจริง</div>
+  <div class="section-title" style="color:#8b5cf6">📋 <span class="en">Overview</span><span class="th">ภาพรวม</span></div>
+  <div class="section-sub"><span class="en">6 patterns most commonly used in practice</span><span class="th">6 patterns ที่ใช้บ่อยที่สุดในงานจริง</span></div>
 
   <div class="pattern-nav">
     <a href="#factory" style="--sc:#f97316">
@@ -111,42 +111,42 @@ a:hover{text-decoration:underline}
 
   <div style="background:#0d1117;border:1px solid #1e293b;border-radius:14px;overflow:hidden;margin:1.5rem 0">
     <div style="background:#111827;padding:10px 20px;display:grid;grid-template-columns:110px 1fr 1.8fr;font-size:.77rem;font-weight:700;color:#64748b;gap:12px">
-      <div>กลุ่ม</div><div>Pattern</div><div>แก้ปัญหาอะไร</div>
+      <div><span class="en">Category</span><span class="th">กลุ่ม</span></div><div>Pattern</div><div><span class="en">Problem Solved</span><span class="th">แก้ปัญหาอะไร</span></div>
     </div>
     <div style="display:grid;grid-template-columns:110px 1fr 1.8fr;padding:10px 20px;font-size:.82rem;border-bottom:1px solid #0f172a;gap:12px;align-items:center">
       <div style="color:#f97316;font-weight:700;font-size:.75rem">Creational</div>
       <div style="color:#e2e8f0;font-weight:600">Factory Method</div>
-      <div style="color:#64748b">สร้าง object โดยไม่ระบุ concrete type ที่ caller</div>
+      <div style="color:#64748b"><span class="en">Create an object without specifying a concrete type at the caller.</span><span class="th">สร้าง object โดยไม่ระบุ concrete type ที่ caller</span></div>
     </div>
     <div style="display:grid;grid-template-columns:110px 1fr 1.8fr;padding:10px 20px;font-size:.82rem;border-bottom:1px solid #0f172a;gap:12px;align-items:center">
       <div style="color:#f97316;font-weight:700;font-size:.75rem">Creational</div>
       <div style="color:#e2e8f0;font-weight:600">Builder</div>
-      <div style="color:#64748b">สร้าง object ที่มี field เยอะ ทีละขั้นตอนอย่างชัดเจน</div>
+      <div style="color:#64748b"><span class="en">Build objects with many fields step by step, clearly.</span><span class="th">สร้าง object ที่มี field เยอะ ทีละขั้นตอนอย่างชัดเจน</span></div>
     </div>
     <div style="display:grid;grid-template-columns:110px 1fr 1.8fr;padding:10px 20px;font-size:.82rem;border-bottom:1px solid #0f172a;gap:12px;align-items:center">
       <div style="color:#22d3ee;font-weight:700;font-size:.75rem">Structural</div>
       <div style="color:#e2e8f0;font-weight:600">Decorator</div>
-      <div style="color:#64748b">เพิ่ม behavior ให้ object โดยไม่แก้ต้นฉบับ — wrap ซ้อนได้</div>
+      <div style="color:#64748b"><span class="en">Add behavior to an object without modifying the original — stackable wrapping.</span><span class="th">เพิ่ม behavior ให้ object โดยไม่แก้ต้นฉบับ — wrap ซ้อนได้</span></div>
     </div>
     <div style="display:grid;grid-template-columns:110px 1fr 1.8fr;padding:10px 20px;font-size:.82rem;border-bottom:1px solid #0f172a;gap:12px;align-items:center">
       <div style="color:#4ade80;font-weight:700;font-size:.75rem">Behavioral</div>
       <div style="color:#e2e8f0;font-weight:600">Strategy</div>
-      <div style="color:#64748b">เปลี่ยน algorithm ที่ใช้ได้ตอน runtime โดยไม่แก้ caller</div>
+      <div style="color:#64748b"><span class="en">Swap the algorithm used at runtime without modifying the caller.</span><span class="th">เปลี่ยน algorithm ที่ใช้ได้ตอน runtime โดยไม่แก้ caller</span></div>
     </div>
     <div style="display:grid;grid-template-columns:110px 1fr 1.8fr;padding:10px 20px;font-size:.82rem;border-bottom:1px solid #0f172a;gap:12px;align-items:center">
       <div style="color:#4ade80;font-weight:700;font-size:.75rem">Behavioral</div>
       <div style="color:#e2e8f0;font-weight:600">Observer</div>
-      <div style="color:#64748b">แจ้ง object หลายตัวเมื่อ state เปลี่ยน โดยไม่ coupling กัน</div>
+      <div style="color:#64748b"><span class="en">Notify multiple objects when state changes, without direct coupling.</span><span class="th">แจ้ง object หลายตัวเมื่อ state เปลี่ยน โดยไม่ coupling กัน</span></div>
     </div>
     <div style="display:grid;grid-template-columns:110px 1fr 1.8fr;padding:10px 20px;font-size:.82rem;gap:12px;align-items:center">
       <div style="color:#4ade80;font-weight:700;font-size:.75rem">Behavioral</div>
       <div style="color:#e2e8f0;font-weight:600">Chain of Responsibility</div>
-      <div style="color:#64748b">ส่ง request ผ่าน handler chain — แต่ละตัวเลือกว่าจะจัดการหรือส่งต่อ</div>
+      <div style="color:#64748b"><span class="en">Pass requests along a handler chain — each decides to handle or forward.</span><span class="th">ส่ง request ผ่าน handler chain — แต่ละตัวเลือกว่าจะจัดการหรือส่งต่อ</span></div>
     </div>
   </div>
 
   <div class="callout">
-    <strong>GoF กับ SOLID:</strong> Design Patterns ส่วนใหญ่ <strong>คือ SOLID ในทางปฏิบัติ</strong> — Strategy = OCP, Observer = OCP+SRP, Decorator = OCP, Factory = DIP
+    <strong><span class="en">GoF and SOLID:</span><span class="th">GoF กับ SOLID:</span></strong> <span class="en">Most Design Patterns <strong>are SOLID in practice</strong> — Strategy = OCP, Observer = OCP+SRP, Decorator = OCP, Factory = DIP</span><span class="th">Design Patterns ส่วนใหญ่ <strong>คือ SOLID ในทางปฏิบัติ</strong> — Strategy = OCP, Observer = OCP+SRP, Decorator = OCP, Factory = DIP</span>
   </div>
 </div>
 
@@ -162,16 +162,16 @@ a:hover{text-decoration:underline}
 
   <div style="background:linear-gradient(135deg,#1a0c04,#2a1206);border:1px solid #f9731630;border-radius:12px;padding:1.2rem 1.4rem;margin-bottom:1.5rem">
     <div style="font-size:.83rem;color:#94a3b8;line-height:1.8">
-      <span style="color:#fdba74;font-weight:700">ปัญหา:</span> code ต้องสร้าง object แต่ไม่อยากผูกกับ concrete type — อยากเปลี่ยน implementation ได้ทีหลัง<br>
-      <span style="color:#fdba74;font-weight:700">วิธีแก้:</span> ซ่อนการสร้าง object ไว้ใน factory function/method — caller รู้แค่ interface ไม่รู้ concrete type
+      <span style="color:#fdba74;font-weight:700"><span class="en">Problem:</span><span class="th">ปัญหา:</span></span> <span class="en">Code needs to create objects without coupling to a concrete type — you want to swap implementations later.</span><span class="th">code ต้องสร้าง object แต่ไม่อยากผูกกับ concrete type — อยากเปลี่ยน implementation ได้ทีหลัง</span><br>
+      <span style="color:#fdba74;font-weight:700"><span class="en">Solution:</span><span class="th">วิธีแก้:</span></span> <span class="en">Hide object creation inside a factory function/method — callers only know the interface, not the concrete type.</span><span class="th">ซ่อนการสร้าง object ไว้ใน factory function/method — caller รู้แค่ interface ไม่รู้ concrete type</span>
     </div>
   </div>
 
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
     <div class="code-block" style="border-color:#ef444430">
       <div class="code-header">
-        <span>❌ สร้าง concrete type โดยตรง</span>
-        <span class="lang-bad">ผิดหลักการ</span>
+        <span>❌ <span class="en">Creating concrete type directly</span><span class="th">สร้าง concrete type โดยตรง</span></span>
+        <span class="lang-bad"><span class="en">Anti-pattern</span><span class="th">ผิดหลักการ</span></span>
       </div>
       <pre data-lang="go"><code class="language-go">// caller รู้ว่าเป็น SMTPMailer
 // ถ้าอยากเปลี่ยนเป็น SendGrid ต้องแก้ทุกจุด
@@ -208,8 +208,8 @@ async function sendAlert(admin: User) {
     </div>
     <div class="code-block" style="border-color:#4ade8030">
       <div class="code-header">
-        <span>✅ Factory ซ่อน concrete type</span>
-        <span class="lang-good">ถูกหลักการ</span>
+        <span>✅ <span class="en">Factory hides concrete type</span><span class="th">Factory ซ่อน concrete type</span></span>
+        <span class="lang-good"><span class="en">Best practice</span><span class="th">ถูกหลักการ</span></span>
       </div>
       <pre data-lang="go"><code class="language-go">type Mailer interface {
     Send(to, body string) error
@@ -260,7 +260,7 @@ await sendWelcome(mailer, user);</code></pre>
   </div>
 
   <div class="callout" style="border-left-color:#f97316">
-    <strong>ใน Go:</strong> Factory มักเป็น <code>NewXxx()</code> function ที่คืน interface ไม่ใช่ concrete type — เป็น convention ที่ใช้ทั่ว standard library
+    <strong><span class="en">In Go:</span><span class="th">ใน Go:</span></strong> <span class="en">Factories are usually <code>NewXxx()</code> functions that return an interface, not a concrete type — a convention used throughout the standard library.</span><span class="th">Factory มักเป็น <code>NewXxx()</code> function ที่คืน interface ไม่ใช่ concrete type — เป็น convention ที่ใช้ทั่ว standard library</span>
   </div>
 </div>
 

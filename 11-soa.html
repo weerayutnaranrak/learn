@@ -102,10 +102,10 @@ p{color:#94a3b8;margin-bottom:14px}
 }
 </style>
 </head>
-<body>
+<body class="lang-th">
 
 <nav>
-  <a href="index.html" class="nav-home">← กลับหน้าหลัก</a>
+  <a href="index.html" class="nav-home">← <span class="en">Home</span><span class="th">กลับหน้าหลัก</span></a>
   <div class="nav-links">
     <a href="10-mvc.html">← MVC</a>
     <a href="12-repository.html">Repository →</a>
@@ -115,24 +115,24 @@ p{color:#94a3b8;margin-bottom:14px}
 <div class="hero">
   <div class="hero-badge">Architecture Pattern #11</div>
   <h1>Service-Oriented Architecture</h1>
-  <p>ระบบที่ประกอบด้วย Services อิสระที่สื่อสารกันผ่าน Standard Protocol — รากฐานของ Enterprise Integration</p>
+  <p><span class="en">A system made of independent services that communicate over standard protocols — the foundation of enterprise integration</span><span class="th">ระบบที่ประกอบด้วย Services อิสระที่สื่อสารกันผ่าน Standard Protocol — รากฐานของ Enterprise Integration</span></p>
 </div>
 
 <div class="container">
 
   <!-- Core Concept -->
   <section>
-    <h2>SOA คืออะไร?</h2>
-    <p>SOA (Service-Oriented Architecture) คือ architectural style ที่ระบบซอฟต์แวร์ถูกออกแบบในรูปของ <strong>Services</strong> ที่มีขอบเขตชัดเจน สามารถค้นหาได้ผ่าน Registry และสื่อสารกันผ่าน Standard Protocol เช่น SOAP, REST หรือ Message Queue</p>
+    <h2><span class="en">What is SOA?</span><span class="th">SOA คืออะไร?</span></h2>
+    <p><span class="en">SOA (Service-Oriented Architecture) is an architectural style where the software system is designed as <strong>Services</strong> with clear boundaries, discoverable through a Registry and communicating over standard protocols such as SOAP, REST or a Message Queue</span><span class="th">SOA (Service-Oriented Architecture) คือ architectural style ที่ระบบซอฟต์แวร์ถูกออกแบบในรูปของ <strong>Services</strong> ที่มีขอบเขตชัดเจน สามารถค้นหาได้ผ่าน Registry และสื่อสารกันผ่าน Standard Protocol เช่น SOAP, REST หรือ Message Queue</span></p>
 
     <div class="role-grid">
       <div class="role-box provider">
         <div class="role-icon">🏭</div>
         <div class="role-name">Service Provider</div>
-        <div class="role-desc">ผู้ให้บริการ — publish service เข้า registry พร้อม contract</div>
+        <div class="role-desc"><span class="en">The provider — publishes the service to the registry with a contract</span><span class="th">ผู้ให้บริการ — publish service เข้า registry พร้อม contract</span></div>
         <ul>
           <li>Implement business logic</li>
-          <li>Expose เป็น endpoint</li>
+          <li><span class="en">Expose as an endpoint</span><span class="th">Expose เป็น endpoint</span></li>
           <li>Publish WSDL/OpenAPI</li>
           <li>Handle versioning</li>
         </ul>
@@ -140,10 +140,10 @@ p{color:#94a3b8;margin-bottom:14px}
       <div class="role-box consumer">
         <div class="role-icon">💻</div>
         <div class="role-name">Service Consumer</div>
-        <div class="role-desc">ผู้ใช้บริการ — ค้นหา service จาก registry แล้วเรียกใช้</div>
+        <div class="role-desc"><span class="en">The consumer — finds a service in the registry and calls it</span><span class="th">ผู้ใช้บริการ — ค้นหา service จาก registry แล้วเรียกใช้</span></div>
         <ul>
-          <li>ค้นหาจาก Registry</li>
-          <li>Bind ตาม contract</li>
+          <li><span class="en">Look up in the Registry</span><span class="th">ค้นหาจาก Registry</span></li>
+          <li><span class="en">Bind to the contract</span><span class="th">Bind ตาม contract</span></li>
           <li>Handle errors/timeouts</li>
           <li>Manage retries</li>
         </ul>
@@ -151,7 +151,7 @@ p{color:#94a3b8;margin-bottom:14px}
       <div class="role-box registry">
         <div class="role-icon">📋</div>
         <div class="role-name">Service Registry</div>
-        <div class="role-desc">ตัวกลาง — เก็บรายการ services ที่ available พร้อม metadata</div>
+        <div class="role-desc"><span class="en">The middleman — keeps a list of available services with metadata</span><span class="th">ตัวกลาง — เก็บรายการ services ที่ available พร้อม metadata</span></div>
         <ul>
           <li>UDDI (Universal Description)</li>
           <li>Discovery & Integration</li>
@@ -165,11 +165,11 @@ p{color:#94a3b8;margin-bottom:14px}
   <!-- ESB -->
   <section>
     <h2>Enterprise Service Bus (ESB)</h2>
-    <p>ESB เป็นหัวใจของ SOA — ทำหน้าที่เป็น middleware ที่เชื่อม services เข้าหากัน โดยจัดการ routing, transformation, orchestration, และ protocol mediation</p>
+    <p><span class="en">The ESB is the heart of SOA — it acts as the middleware that connects services together, handling routing, transformation, orchestration and protocol mediation</span><span class="th">ESB เป็นหัวใจของ SOA — ทำหน้าที่เป็น middleware ที่เชื่อม services เข้าหากัน โดยจัดการ routing, transformation, orchestration, และ protocol mediation</span></p>
 
     <div class="esb-box">
       <div class="esb-title">🚌 Enterprise Service Bus</div>
-      <div class="esb-subtitle">Middleware backbone ที่เชื่อม services ทั้งหมดเข้าหากัน</div>
+      <div class="esb-subtitle"><span class="en">The middleware backbone that connects all services together</span><span class="th">Middleware backbone ที่เชื่อม services ทั้งหมดเข้าหากัน</span></div>
       <div class="esb-features">
         <div class="esb-feature">🔀 Message Routing</div>
         <div class="esb-feature">🔄 Data Transformation</div>
@@ -188,17 +188,17 @@ p{color:#94a3b8;margin-bottom:14px}
         <div class="vbox">
           <div class="vb-icon">📄</div>
           <div class="vb-title">WSDL / OpenAPI</div>
-          <div class="vb-body">คำอธิบาย service interface — operations, parameters, data types, endpoints</div>
+          <div class="vb-body"><span class="en">Describes the service interface — operations, parameters, data types, endpoints</span><span class="th">คำอธิบาย service interface — operations, parameters, data types, endpoints</span></div>
         </div>
         <div class="vbox">
           <div class="vb-icon">📦</div>
           <div class="vb-title">Service Schema</div>
-          <div class="vb-body">กำหนด structure ของ request/response — XML Schema, JSON Schema</div>
+          <div class="vb-body"><span class="en">Defines the structure of request/response — XML Schema, JSON Schema</span><span class="th">กำหนด structure ของ request/response — XML Schema, JSON Schema</span></div>
         </div>
         <div class="vbox">
           <div class="vb-icon">📜</div>
           <div class="vb-title">SLA Policy</div>
-          <div class="vb-body">ข้อตกลง quality of service — availability 99.9%, latency &lt; 200ms, throughput</div>
+          <div class="vb-body"><span class="en">A quality-of-service agreement — availability 99.9%, latency &lt; 200ms, throughput</span><span class="th">ข้อตกลง quality of service — availability 99.9%, latency &lt; 200ms, throughput</span></div>
         </div>
         <div class="vbox">
           <div class="vb-icon">🔐</div>
@@ -361,7 +361,7 @@ p{color:#94a3b8;margin-bottom:14px}
         <div class="vbox">
           <div class="vb-icon">🔄</div>
           <div class="vb-title">Orchestration</div>
-          <div class="vb-body">Central coordinator (ESB/BPM) ควบคุม flow ระหว่าง services ทั้งหมด</div>
+          <div class="vb-body"><span class="en">A central coordinator (ESB/BPM) controls the flow across all services</span><span class="th">Central coordinator (ESB/BPM) ควบคุม flow ระหว่าง services ทั้งหมด</span></div>
           <ul class="vb-list">
             <li>Centralized control</li>
             <li>BPEL workflows</li>
@@ -372,7 +372,7 @@ p{color:#94a3b8;margin-bottom:14px}
         <div class="vbox">
           <div class="vb-icon">🎵</div>
           <div class="vb-title">Choreography</div>
-          <div class="vb-body">Services ตัดสินใจเองว่าจะ react กับ events อย่างไร ไม่มี central controller</div>
+          <div class="vb-body"><span class="en">Services decide for themselves how to react to events — no central controller</span><span class="th">Services ตัดสินใจเองว่าจะ react กับ events อย่างไร ไม่มี central controller</span></div>
           <ul class="vb-list">
             <li>Decentralized</li>
             <li>Event-driven</li>
@@ -383,7 +383,7 @@ p{color:#94a3b8;margin-bottom:14px}
         <div class="vbox">
           <div class="vb-icon">🔌</div>
           <div class="vb-title">Service Facade</div>
-          <div class="vb-body">Expose simplified interface สำหรับ client ซ่อนความซับซ้อนภายใน</div>
+          <div class="vb-body"><span class="en">Expose a simplified interface for clients, hiding internal complexity</span><span class="th">Expose simplified interface สำหรับ client ซ่อนความซับซ้อนภายใน</span></div>
           <ul class="vb-list">
             <li>Coarse-grained API</li>
             <li>Hides internal complexity</li>
@@ -400,21 +400,21 @@ p{color:#94a3b8;margin-bottom:14px}
         <div class="vbox">
           <div class="vb-icon">🧩</div>
           <div class="vb-title">Atomic Service</div>
-          <div class="vb-body">Service ขนาดเล็ก ทำสิ่งเดียว เช่น getCustomer(), validatePayment()</div>
+          <div class="vb-body"><span class="en">A small service that does one thing, e.g. getCustomer(), validatePayment()</span><span class="th">Service ขนาดเล็ก ทำสิ่งเดียว เช่น getCustomer(), validatePayment()</span></div>
           <span class="vb-chip">Fine-grained</span>
           <span class="vb-chip">Reusable</span>
         </div>
         <div class="vbox">
           <div class="vb-icon">📦</div>
           <div class="vb-title">Composite Service</div>
-          <div class="vb-body">รวม Atomic services หลายตัวเป็น higher-level operation เช่น placeOrder()</div>
+          <div class="vb-body"><span class="en">Combines several atomic services into a higher-level operation, e.g. placeOrder()</span><span class="th">รวม Atomic services หลายตัวเป็น higher-level operation เช่น placeOrder()</span></div>
           <span class="vb-chip">Orchestrated</span>
           <span class="vb-chip">Business Process</span>
         </div>
         <div class="vbox">
           <div class="vb-icon">🏢</div>
           <div class="vb-title">Process Service</div>
-          <div class="vb-body">Long-running business process ที่ span หลาย services มี state management</div>
+          <div class="vb-body"><span class="en">A long-running business process spanning many services, with state management</span><span class="th">Long-running business process ที่ span หลาย services มี state management</span></div>
           <span class="vb-chip">Stateful</span>
           <span class="vb-chip">Long-lived</span>
         </div>
@@ -429,30 +429,30 @@ p{color:#94a3b8;margin-bottom:14px}
       <div class="vs-col soa-col">
         <div class="vs-header pink">🏛️ SOA</div>
         <div class="vs-item"><span class="vs-dot pink"></span>Enterprise-wide integration</div>
-        <div class="vs-item"><span class="vs-dot pink"></span>ESB เป็น central backbone</div>
+        <div class="vs-item"><span class="vs-dot pink"></span><span class="en">ESB as the central backbone</span><span class="th">ESB เป็น central backbone</span></div>
         <div class="vs-item"><span class="vs-dot pink"></span>SOAP, XML, WSDL</div>
         <div class="vs-item"><span class="vs-dot pink"></span>Coarse-grained services</div>
-        <div class="vs-item"><span class="vs-dot pink"></span>Share database ได้</div>
-        <div class="vs-item"><span class="vs-dot pink"></span>Deploy พร้อมกัน</div>
-        <div class="vs-item"><span class="vs-dot pink"></span>เหมาะกับ Legacy integration</div>
+        <div class="vs-item"><span class="vs-dot pink"></span><span class="en">Can share a database</span><span class="th">Share database ได้</span></div>
+        <div class="vs-item"><span class="vs-dot pink"></span><span class="en">Deployed together</span><span class="th">Deploy พร้อมกัน</span></div>
+        <div class="vs-item"><span class="vs-dot pink"></span><span class="en">Good for legacy integration</span><span class="th">เหมาะกับ Legacy integration</span></div>
       </div>
       <div class="vs-divider">VS</div>
       <div class="vs-col micro-col">
         <div class="vs-header blue">🔬 Microservices</div>
         <div class="vs-item"><span class="vs-dot blue"></span>Application-level decomposition</div>
-        <div class="vs-item"><span class="vs-dot blue"></span>API Gateway เป็น entry point</div>
+        <div class="vs-item"><span class="vs-dot blue"></span><span class="en">API Gateway as the entry point</span><span class="th">API Gateway เป็น entry point</span></div>
         <div class="vs-item"><span class="vs-dot blue"></span>REST, gRPC, Message Queue</div>
         <div class="vs-item"><span class="vs-dot blue"></span>Fine-grained services</div>
         <div class="vs-item"><span class="vs-dot blue"></span>Database per service</div>
-        <div class="vs-item"><span class="vs-dot blue"></span>Deploy อิสระ</div>
-        <div class="vs-item"><span class="vs-dot blue"></span>เหมาะกับ Cloud-native</div>
+        <div class="vs-item"><span class="vs-dot blue"></span><span class="en">Deployed independently</span><span class="th">Deploy อิสระ</span></div>
+        <div class="vs-item"><span class="vs-dot blue"></span><span class="en">Good for cloud-native</span><span class="th">เหมาะกับ Cloud-native</span></div>
       </div>
     </div>
   </section>
 
   <!-- Go Code -->
   <section>
-    <h2>ตัวอย่าง Code (Go)</h2>
+    <h2><span class="en">Code example (Go)</span><span class="th">ตัวอย่าง Code (Go)</span></h2>
 
     <div class="code-section">
       <div class="code-file">
@@ -711,29 +711,29 @@ func main() {
 
   <!-- When to use -->
   <section>
-    <h2>เมื่อไหร่ควรใช้ SOA?</h2>
+    <h2><span class="en">When should you use SOA?</span><span class="th">เมื่อไหร่ควรใช้ SOA?</span></h2>
     <div class="vb-wrap">
       <div class="vb-grid vb-2">
         <div class="vbox">
           <div class="vb-icon">✅</div>
-          <div class="vb-title">เหมาะกับ</div>
+          <div class="vb-title"><span class="en">Good for</span><span class="th">เหมาะกับ</span></div>
           <ul class="vb-list">
-            <li>Large enterprise ที่มี legacy systems หลายระบบ</li>
-            <li>ต้องการ integrate ระบบที่ใช้ต่าง protocol (SOAP, REST, MQ)</li>
-            <li>Business processes ซับซ้อน ต้อง orchestrate หลาย services</li>
-            <li>ต้องการ governance และ SLA ที่ชัดเจน</li>
+            <li><span class="en">Large enterprises with many legacy systems</span><span class="th">Large enterprise ที่มี legacy systems หลายระบบ</span></li>
+            <li><span class="en">Integrating systems on different protocols (SOAP, REST, MQ)</span><span class="th">ต้องการ integrate ระบบที่ใช้ต่าง protocol (SOAP, REST, MQ)</span></li>
+            <li><span class="en">Complex business processes orchestrating many services</span><span class="th">Business processes ซับซ้อน ต้อง orchestrate หลาย services</span></li>
+            <li><span class="en">A need for clear governance and SLAs</span><span class="th">ต้องการ governance และ SLA ที่ชัดเจน</span></li>
             <li>Enterprise-wide service reuse</li>
           </ul>
         </div>
         <div class="vbox">
           <div class="vb-icon">⚠️</div>
-          <div class="vb-title">ระวัง</div>
+          <div class="vb-title"><span class="en">Caution</span><span class="th">ระวัง</span></div>
           <ul class="vb-list">
-            <li>ESB กลายเป็น single point of failure</li>
-            <li>"ESB spaghetti" — logic รั่วเข้า ESB มากเกินไป</li>
-            <li>ค่าใช้จ่าย ESB software สูง (Oracle, MuleSoft, IBM)</li>
-            <li>Performance overhead จาก transformation</li>
-            <li>Complexity สูงสำหรับ small team</li>
+            <li><span class="en">The ESB becomes a single point of failure</span><span class="th">ESB กลายเป็น single point of failure</span></li>
+            <li><span class="en">"ESB spaghetti" — too much logic leaks into the ESB</span><span class="th">"ESB spaghetti" — logic รั่วเข้า ESB มากเกินไป</span></li>
+            <li><span class="en">ESB software is expensive (Oracle, MuleSoft, IBM)</span><span class="th">ค่าใช้จ่าย ESB software สูง (Oracle, MuleSoft, IBM)</span></li>
+            <li><span class="en">Performance overhead from transformation</span><span class="th">Performance overhead จาก transformation</span></li>
+            <li><span class="en">High complexity for a small team</span><span class="th">Complexity สูงสำหรับ small team</span></li>
           </ul>
         </div>
       </div>

@@ -59,58 +59,58 @@ a{color:#38bdf8;text-decoration:none}
 @keyframes flowOut{0%{stroke-dashoffset:-60}100%{stroke-dashoffset:0}}
 </style>
 </head>
-<body>
+<body class="lang-th">
 
 <nav class="topnav">
-  <a href="index.html" class="back-btn">← กลับหน้าหลัก</a>
+  <a href="index.html" class="back-btn">← <span class="en">Home</span><span class="th">กลับหน้าหลัก</span></a>
   <span class="nav-title">02 / <span>Hexagonal Architecture</span></span>
 </nav>
 
 <div class="hero">
-  <div class="hero-badge">⬡ หัวข้อที่ 2</div>
+  <div class="hero-badge">⬡ <span class="en">Topic 2</span><span class="th">หัวข้อที่ 2</span></div>
   <h1>Hexagonal Architecture</h1>
-  <p>หรือที่รู้จักในชื่อ "Ports &amp; Adapters" — แยก Business Logic ออกจาก Infrastructure ให้ Core ของระบบทดสอบได้โดยไม่ต้องง้อ Database</p>
+  <p><span class="en">Also known as "Ports &amp; Adapters" — separate business logic from infrastructure so the system's core is testable without relying on a database</span><span class="th">หรือที่รู้จักในชื่อ "Ports &amp; Adapters" — แยก Business Logic ออกจาก Infrastructure ให้ Core ของระบบทดสอบได้โดยไม่ต้องง้อ Database</span></p>
 </div>
 
 <div class="content">
 
 <!-- ── PROBLEM ── -->
 <div class="section">
-  <div class="section-title">😣 ปัญหาที่ Hexagonal แก้</div>
-  <div class="section-sub">ทำไมถึงต้องการ architecture แบบนี้?</div>
+  <div class="section-title">😣 <span class="en">Problems Hexagonal solves</span><span class="th">ปัญหาที่ Hexagonal แก้</span></div>
+  <div class="section-sub"><span class="en">Why do we need this kind of architecture?</span><span class="th">ทำไมถึงต้องการ architecture แบบนี้?</span></div>
 
   <p style="color:#94a3b8;margin-bottom:1.5rem">
-    ใน Traditional Layered Architecture ปัญหาที่พบบ่อยคือ:
+    <span class="en">In a traditional layered architecture, the common problems are:</span><span class="th">ใน Traditional Layered Architecture ปัญหาที่พบบ่อยคือ:</span>
   </p>
 
   <div class="concept-grid">
     <div class="concept-card" style="--c:#ef4444">
-      <div class="label">ปัญหา 1</div>
-      <h3>Business Logic ผูกกับ Database</h3>
-      <p>เปลี่ยน database ไม่ได้ เพราะ SQL queries อยู่กระจัดกระจายทั่ว codebase ต้อง mock DB ทุกครั้งที่ test</p>
+      <div class="label"><span class="en">Problem 1</span><span class="th">ปัญหา 1</span></div>
+      <h3><span class="en">Business logic coupled to the database</span><span class="th">Business Logic ผูกกับ Database</span></h3>
+      <p><span class="en">You can't switch databases because SQL queries are scattered across the codebase, and you must mock the DB every time you test</span><span class="th">เปลี่ยน database ไม่ได้ เพราะ SQL queries อยู่กระจัดกระจายทั่ว codebase ต้อง mock DB ทุกครั้งที่ test</span></p>
     </div>
     <div class="concept-card" style="--c:#f59e0b">
-      <div class="label">ปัญหา 2</div>
-      <h3>Test ยาก</h3>
-      <p>ต้องมี DB connection จริงๆ ถึงจะ test ได้ unit test ช้า brittle ทำให้ developer ไม่ test</p>
+      <div class="label"><span class="en">Problem 2</span><span class="th">ปัญหา 2</span></div>
+      <h3><span class="en">Hard to test</span><span class="th">Test ยาก</span></h3>
+      <p><span class="en">You need a real DB connection to test; unit tests are slow and brittle, so developers stop testing</span><span class="th">ต้องมี DB connection จริงๆ ถึงจะ test ได้ unit test ช้า brittle ทำให้ developer ไม่ test</span></p>
     </div>
     <div class="concept-card" style="--c:#ef4444">
-      <div class="label">ปัญหา 3</div>
-      <h3>เปลี่ยน Technology ยาก</h3>
-      <p>อยากเปลี่ยนจาก HTTP เป็น gRPC หรือจาก PostgreSQL เป็น MongoDB ต้องแก้ทั้งระบบ</p>
+      <div class="label"><span class="en">Problem 3</span><span class="th">ปัญหา 3</span></div>
+      <h3><span class="en">Hard to change technology</span><span class="th">เปลี่ยน Technology ยาก</span></h3>
+      <p><span class="en">Switching from HTTP to gRPC, or PostgreSQL to MongoDB, means rewriting the whole system</span><span class="th">อยากเปลี่ยนจาก HTTP เป็น gRPC หรือจาก PostgreSQL เป็น MongoDB ต้องแก้ทั้งระบบ</span></p>
     </div>
   </div>
 
   <div class="callout">
-    <strong>Hexagonal Architecture แก้ปัญหานี้ด้วย:</strong> กำหนดให้ Core (Business Logic) อยู่ตรงกลาง
+    <span class="en"><strong>Hexagonal Architecture solves this by:</strong> placing the Core (business logic) at the center and letting it talk to the outside world only through <strong>Ports (interfaces)</strong> — technology can change without affecting the Core at all</span><span class="th"><strong>Hexagonal Architecture แก้ปัญหานี้ด้วย:</strong> กำหนดให้ Core (Business Logic) อยู่ตรงกลาง
     และสื่อสารกับโลกภายนอกผ่าน <strong>Ports (interfaces)</strong> เท่านั้น
-    — Technology สามารถเปลี่ยนได้โดยไม่กระทบ Core เลย
+    — Technology สามารถเปลี่ยนได้โดยไม่กระทบ Core เลย</span>
   </div>
 </div>
 
 <!-- ── CONCEPT ── -->
 <div class="section">
-  <div class="section-title">⬡ แนวคิดหลัก</div>
+  <div class="section-title">⬡ <span class="en">Core concept</span><span class="th">แนวคิดหลัก</span></div>
   <div class="section-sub">Ports and Adapters Pattern — Alistair Cockburn, 2005</div>
 
   <!-- Hexagonal Diagram -->
@@ -236,34 +236,34 @@ a{color:#38bdf8;text-decoration:none}
     <div class="concept-card" style="--c:#10b981">
       <div class="label">Primary Port</div>
       <h3>Driving / Input Side</h3>
-      <p>Interface ที่ Core <strong>expose</strong> ออกไปให้ outside world เรียกใช้ เช่น <code>UserService interface</code> — HTTP Handler จะ call interface นี้</p>
+      <p><span class="en">An interface the Core <strong>exposes</strong> for the outside world to call, e.g. <code>UserService interface</code> — the HTTP Handler calls this interface</span><span class="th">Interface ที่ Core <strong>expose</strong> ออกไปให้ outside world เรียกใช้ เช่น <code>UserService interface</code> — HTTP Handler จะ call interface นี้</span></p>
     </div>
     <div class="concept-card" style="--c:#6366f1">
       <div class="label">Secondary Port</div>
       <h3>Driven / Output Side</h3>
-      <p>Interface ที่ Core <strong>กำหนด</strong> และต้องการจาก outside world เช่น <code>UserRepository interface</code> — PostgreSQL จะ implement interface นี้</p>
+      <p><span class="en">An interface the Core <strong>defines</strong> and needs from the outside world, e.g. <code>UserRepository interface</code> — PostgreSQL implements this interface</span><span class="th">Interface ที่ Core <strong>กำหนด</strong> และต้องการจาก outside world เช่น <code>UserRepository interface</code> — PostgreSQL จะ implement interface นี้</span></p>
     </div>
     <div class="concept-card" style="--c:#10b981">
       <div class="label">Primary Adapter</div>
       <h3>Driving Adapter</h3>
-      <p>ตัวที่ <strong>drive</strong> Core — HTTP Handler, gRPC Server, CLI Command, Test — ฝั่งซ้ายของ hexagon</p>
+      <p><span class="en">The thing that <strong>drives</strong> the Core — HTTP Handler, gRPC Server, CLI Command, Test — the left side of the hexagon</span><span class="th">ตัวที่ <strong>drive</strong> Core — HTTP Handler, gRPC Server, CLI Command, Test — ฝั่งซ้ายของ hexagon</span></p>
     </div>
     <div class="concept-card" style="--c:#6366f1">
       <div class="label">Secondary Adapter</div>
       <h3>Driven Adapter</h3>
-      <p>ตัวที่ Core <strong>drive</strong> — PostgreSQL, MongoDB, SMTP, Kafka — ฝั่งขวา ต้อง implement Secondary Port</p>
+      <p><span class="en">The thing the Core <strong>drives</strong> — PostgreSQL, MongoDB, SMTP, Kafka — the right side; must implement a Secondary Port</span><span class="th">ตัวที่ Core <strong>drive</strong> — PostgreSQL, MongoDB, SMTP, Kafka — ฝั่งขวา ต้อง implement Secondary Port</span></p>
     </div>
   </div>
 </div>
 
 <!-- ── CODE EXAMPLE ── -->
 <div class="section">
-  <div class="section-title">💻 ตัวอย่าง Go — User Registration Service</div>
-  <div class="section-sub">แสดง Core → Ports → Adapters อย่างชัดเจน</div>
+  <div class="section-title">💻 <span class="en">Go example — User Registration Service</span><span class="th">ตัวอย่าง Go — User Registration Service</span></div>
+  <div class="section-sub"><span class="en">Clearly showing Core → Ports → Adapters</span><span class="th">แสดง Core → Ports → Adapters อย่างชัดเจน</span></div>
 
   <div class="code-block">
     <div class="code-header">
-      <span>core/domain.go — Domain Objects (ไม่ depend อะไรเลย)</span>
+      <span>core/domain.go — <span class="en">Domain Objects (depend on nothing)</span><span class="th">Domain Objects (ไม่ depend อะไรเลย)</span></span>
       <span class="lang">Go</span>
     </div>
     <pre><code class="language-go">package core
@@ -301,7 +301,7 @@ func (e Email) String() string { return string(e) }</code></pre>
 
   <div class="code-block">
     <div class="code-header">
-      <span>core/ports.go — Ports (Interfaces ที่ Core กำหนด)</span>
+      <span>core/ports.go — <span class="en">Ports (interfaces the Core defines)</span><span class="th">Ports (Interfaces ที่ Core กำหนด)</span></span>
       <span class="lang">Go</span>
     </div>
     <pre><code class="language-go">package core
@@ -563,7 +563,7 @@ func (r *PostgresUserRepository) FindAll(ctx context.Context) ([]*core.User, err
 
   <div class="code-block">
     <div class="code-header">
-      <span>adapters/secondary/memory_repo.go — In-Memory Adapter (สำหรับ Test!)</span>
+      <span>adapters/secondary/memory_repo.go — <span class="en">In-Memory Adapter (for tests!)</span><span class="th">In-Memory Adapter (สำหรับ Test!)</span></span>
       <span class="lang">Go</span>
     </div>
     <pre><code class="language-go">package memory
@@ -627,7 +627,7 @@ func (r *InMemoryUserRepository) FindAll(ctx context.Context) ([]*core.User, err
 
   <div class="code-block">
     <div class="code-header">
-      <span>core/service_test.go — Unit Test ไม่ต้องมี DB จริง!</span>
+      <span>core/service_test.go — <span class="en">Unit test with no real DB!</span><span class="th">Unit Test ไม่ต้องมี DB จริง!</span></span>
       <span class="lang">Go</span>
     </div>
     <pre><code class="language-go">package core_test
@@ -699,7 +699,7 @@ func TestRegisterUser_InvalidEmail(t *testing.T) {
 
   <div class="code-block">
     <div class="code-header">
-      <span>cmd/main.go — Wiring (ประกอบทุกอย่างเข้าด้วยกัน)</span>
+      <span>cmd/main.go — <span class="en">Wiring (assembling everything)</span><span class="th">Wiring (ประกอบทุกอย่างเข้าด้วยกัน)</span></span>
       <span class="lang">Go</span>
     </div>
     <pre><code class="language-go">package main
@@ -749,55 +749,59 @@ func main() {
   </div>
 
   <div class="callout tip">
-    <strong>ข้อดีหลักของ Hexagonal Architecture:</strong><br>
+    <span class="en"><strong>Key benefits of Hexagonal Architecture:</strong><br>
+    • <strong>Testability</strong> — test the Core without a real DB (use in-memory instead)<br>
+    • <strong>Flexibility</strong> — switch PostgreSQL → MongoDB by changing only the Adapter<br>
+    • <strong>Maintainability</strong> — business logic lives in the Core — not scattered<br>
+    • <strong>Dependency Rule</strong> — everything depends inward → the Core depends on nothing</span><span class="th"><strong>ข้อดีหลักของ Hexagonal Architecture:</strong><br>
     • <strong>Testability</strong> — test Core ได้โดยไม่ต้องมี DB จริง (ใช้ in-memory แทน)<br>
     • <strong>Flexibility</strong> — เปลี่ยน PostgreSQL → MongoDB ได้ โดยแก้แค่ Adapter<br>
     • <strong>Maintainability</strong> — Business logic อยู่ที่ Core — ไม่กระจัดกระจาย<br>
-    • <strong>Dependency Rule</strong> — ทุกอย่าง depend inward → Core ไม่ depend อะไรเลย
+    • <strong>Dependency Rule</strong> — ทุกอย่าง depend inward → Core ไม่ depend อะไรเลย</span>
   </div>
 </div>
 
 <!-- ── VS LAYERED ── -->
 <div class="section">
-  <div class="section-title">⚖️ เปรียบเทียบกับ Traditional Layered Architecture</div>
+  <div class="section-title">⚖️ <span class="en">Compared to Traditional Layered Architecture</span><span class="th">เปรียบเทียบกับ Traditional Layered Architecture</span></div>
 
   <table class="compare">
     <tr>
-      <th>ด้าน</th>
+      <th><span class="en">Aspect</span><span class="th">ด้าน</span></th>
       <th>Traditional Layered</th>
       <th>Hexagonal Architecture</th>
     </tr>
     <tr>
       <td>Dependency</td>
-      <td>Controller → Service → Repository → DB<br><small style="color:#475569">ทุกชั้น depend กัน chain</small></td>
-      <td>Adapters → Ports ← Core<br><small style="color:#475569">Core ไม่ depend ใคร</small></td>
+      <td>Controller → Service → Repository → DB<br><small style="color:#475569"><span class="en">every layer depends in a chain</span><span class="th">ทุกชั้น depend กัน chain</span></small></td>
+      <td>Adapters → Ports ← Core<br><small style="color:#475569"><span class="en">the Core depends on no one</span><span class="th">Core ไม่ depend ใคร</span></small></td>
     </tr>
     <tr>
       <td>Testing</td>
-      <td>ต้องมี DB จริง / mock ซับซ้อน</td>
-      <td>ใช้ in-memory adapter แทนได้ง่าย</td>
+      <td><span class="en">Needs a real DB / complex mocking</span><span class="th">ต้องมี DB จริง / mock ซับซ้อน</span></td>
+      <td><span class="en">Easily swap in an in-memory adapter</span><span class="th">ใช้ in-memory adapter แทนได้ง่าย</span></td>
     </tr>
     <tr>
-      <td>เปลี่ยน DB</td>
-      <td>แก้หลาย files</td>
-      <td>แก้แค่ Secondary Adapter</td>
+      <td><span class="en">Change DB</span><span class="th">เปลี่ยน DB</span></td>
+      <td><span class="en">Edit many files</span><span class="th">แก้หลาย files</span></td>
+      <td><span class="en">Edit only the Secondary Adapter</span><span class="th">แก้แค่ Secondary Adapter</span></td>
     </tr>
     <tr>
-      <td>เปลี่ยน Protocol</td>
-      <td>ซับซ้อน ถ้า code ผสมกัน</td>
-      <td>สร้าง Primary Adapter ใหม่</td>
+      <td><span class="en">Change protocol</span><span class="th">เปลี่ยน Protocol</span></td>
+      <td><span class="en">Complex if code is mixed together</span><span class="th">ซับซ้อน ถ้า code ผสมกัน</span></td>
+      <td><span class="en">Add a new Primary Adapter</span><span class="th">สร้าง Primary Adapter ใหม่</span></td>
     </tr>
     <tr>
       <td>Complexity</td>
-      <td>ง่ายกว่าสำหรับ CRUD เล็กๆ</td>
-      <td>เหมาะกับระบบซับซ้อนที่ต้องการ testability</td>
+      <td><span class="en">Simpler for small CRUD</span><span class="th">ง่ายกว่าสำหรับ CRUD เล็กๆ</span></td>
+      <td><span class="en">Good for complex systems needing testability</span><span class="th">เหมาะกับระบบซับซ้อนที่ต้องการ testability</span></td>
     </tr>
   </table>
 </div>
 
 <!-- ── FILE STRUCTURE ── -->
 <div class="section">
-  <div class="section-title">📁 โครงสร้างไฟล์</div>
+  <div class="section-title">📁 <span class="en">File structure</span><span class="th">โครงสร้างไฟล์</span></div>
   <div class="code-block">
     <div class="code-header">
       <span>Project Structure</span>
@@ -827,7 +831,7 @@ func main() {
 
 <div style="text-align:center;margin:3rem 0;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
   <a href="1-ddd.html" style="display:inline-flex;align-items:center;gap:.5rem;background:#0d1117;border:1px solid #1e293b;color:#64748b;padding:.7rem 1.5rem;border-radius:10px;font-size:.88rem">← DDD</a>
-  <a href="3-event-driven.html" style="display:inline-flex;align-items:center;gap:.5rem;background:#0d1117;border:1px solid #1e293b;color:#38bdf8;padding:.7rem 1.5rem;border-radius:10px;font-weight:600;font-size:.88rem">หัวข้อถัดไป: Event Driven Design →</a>
+  <a href="3-event-driven.html" style="display:inline-flex;align-items:center;gap:.5rem;background:#0d1117;border:1px solid #1e293b;color:#38bdf8;padding:.7rem 1.5rem;border-radius:10px;font-weight:600;font-size:.88rem"><span class="en">Next: Event Driven Design</span><span class="th">หัวข้อถัดไป: Event Driven Design</span> →</a>
 </div>
 
 </div>

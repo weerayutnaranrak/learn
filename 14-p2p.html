@@ -105,10 +105,10 @@ p{color:#94a3b8;margin-bottom:14px}
 }
 </style>
 </head>
-<body>
+<body class="lang-th">
 
 <nav>
-  <a href="index.html" class="nav-home">← กลับหน้าหลัก</a>
+  <a href="index.html" class="nav-home">← <span class="en">Home</span><span class="th">กลับหน้าหลัก</span></a>
   <div class="nav-links">
     <a href="13-cqrs.html">← CQRS</a>
     <a href="index.html">Home</a>
@@ -118,58 +118,58 @@ p{color:#94a3b8;margin-bottom:14px}
 <div class="hero">
   <div class="hero-badge">Architecture Pattern #14</div>
   <h1>Peer-to-Peer Architecture</h1>
-  <p>ทุก Node ทำหน้าที่เป็นทั้ง Client และ Server — ไม่มี Central Authority ระบบกระจาย Resilient และ Scalable</p>
+  <p><span class="en">Every Node acts as both Client and Server — no Central Authority. Distributed, Resilient, and Scalable.</span><span class="th">ทุก Node ทำหน้าที่เป็นทั้ง Client และ Server — ไม่มี Central Authority ระบบกระจาย Resilient และ Scalable</span></p>
 </div>
 
 <div class="container">
 
   <!-- Core Concept -->
   <section>
-    <h2>P2P คืออะไร?</h2>
-    <p>Peer-to-Peer (P2P) คือ architectural pattern ที่แต่ละ node ในระบบ (<strong>peer</strong>) มีความสามารถเท่ากัน — สามารถทำหน้าที่เป็น client (ขอ resource) และ server (ให้ resource) ได้พร้อมกัน โดยไม่พึ่ง central server</p>
+    <h2><span class="en">What is P2P?</span><span class="th">P2P คืออะไร?</span></h2>
+    <p><span class="en">Peer-to-Peer (P2P) is an architectural pattern where every node in the system (<strong>peer</strong>) is equal — it can act as a client (requesting resources) and a server (providing resources) simultaneously, without relying on a central server.</span><span class="th">Peer-to-Peer (P2P) คือ architectural pattern ที่แต่ละ node ในระบบ (<strong>peer</strong>) มีความสามารถเท่ากัน — สามารถทำหน้าที่เป็น client (ขอ resource) และ server (ให้ resource) ได้พร้อมกัน โดยไม่พึ่ง central server</span></p>
 
     <div class="arch-compare">
       <div class="arch-box cs">
         <div class="arch-box-header blue">🏢 Client-Server</div>
-        <div class="arch-point"><span class="dot blue"></span>Central server ควบคุมทุกอย่าง</div>
-        <div class="arch-point"><span class="dot blue"></span>Clients รับบริการจาก server</div>
-        <div class="arch-point"><span class="dot blue"></span>Server เป็น single point of failure</div>
-        <div class="arch-point"><span class="dot blue"></span>Scale โดยเพิ่ม server capacity</div>
-        <div class="arch-point"><span class="dot blue"></span>ผู้ดูแลควบคุม data ได้</div>
-        <div class="arch-point"><span class="dot blue"></span>เหมาะกับ web apps, APIs</div>
+        <div class="arch-point"><span class="dot blue"></span><span class="en">Central server controls everything</span><span class="th">Central server ควบคุมทุกอย่าง</span></div>
+        <div class="arch-point"><span class="dot blue"></span><span class="en">Clients receive service from server</span><span class="th">Clients รับบริการจาก server</span></div>
+        <div class="arch-point"><span class="dot blue"></span><span class="en">Server is a single point of failure</span><span class="th">Server เป็น single point of failure</span></div>
+        <div class="arch-point"><span class="dot blue"></span><span class="en">Scale by adding server capacity</span><span class="th">Scale โดยเพิ่ม server capacity</span></div>
+        <div class="arch-point"><span class="dot blue"></span><span class="en">Operator controls data</span><span class="th">ผู้ดูแลควบคุม data ได้</span></div>
+        <div class="arch-point"><span class="dot blue"></span><span class="en">Great for web apps, APIs</span><span class="th">เหมาะกับ web apps, APIs</span></div>
       </div>
       <div class="arch-box p2p">
         <div class="arch-box-header amber">🕸️ Peer-to-Peer</div>
-        <div class="arch-point"><span class="dot amber"></span>ไม่มี central authority</div>
-        <div class="arch-point"><span class="dot amber"></span>Peers ให้และรับบริการซึ่งกัน</div>
-        <div class="arch-point"><span class="dot amber"></span>Resilient — ไม่มี single failure point</div>
-        <div class="arch-point"><span class="dot amber"></span>Scale อัตโนมัติ — peer ใหม่เพิ่ม capacity</div>
-        <div class="arch-point"><span class="dot amber"></span>ข้อมูลกระจาย ไม่มีผู้ควบคุม</div>
-        <div class="arch-point"><span class="dot amber"></span>เหมาะกับ file sharing, blockchain, messaging</div>
+        <div class="arch-point"><span class="dot amber"></span><span class="en">No central authority</span><span class="th">ไม่มี central authority</span></div>
+        <div class="arch-point"><span class="dot amber"></span><span class="en">Peers provide and receive service mutually</span><span class="th">Peers ให้และรับบริการซึ่งกัน</span></div>
+        <div class="arch-point"><span class="dot amber"></span><span class="en">Resilient — no single failure point</span><span class="th">Resilient — ไม่มี single failure point</span></div>
+        <div class="arch-point"><span class="dot amber"></span><span class="en">Auto-scales — new peers add capacity</span><span class="th">Scale อัตโนมัติ — peer ใหม่เพิ่ม capacity</span></div>
+        <div class="arch-point"><span class="dot amber"></span><span class="en">Data distributed — no single controller</span><span class="th">ข้อมูลกระจาย ไม่มีผู้ควบคุม</span></div>
+        <div class="arch-point"><span class="dot amber"></span><span class="en">Great for file sharing, blockchain, messaging</span><span class="th">เหมาะกับ file sharing, blockchain, messaging</span></div>
       </div>
     </div>
   </section>
 
   <!-- P2P Types -->
   <section>
-    <h2>ประเภทของ P2P Networks</h2>
+    <h2><span class="en">Types of P2P Networks</span><span class="th">ประเภทของ P2P Networks</span></h2>
     <div class="p2p-types">
       <div class="p2p-type pure">
         <div class="p2p-type-icon">🕸️</div>
         <div class="p2p-type-name amber">Pure P2P</div>
-        <div class="p2p-type-desc">ทุก node เท่ากันสมบูรณ์ ไม่มี node พิเศษใดๆ เลย ค้นหา resource โดย flood ถาม neighbors</div>
-        <div class="p2p-type-example">Gnutella (เวอร์ชันแรก)</div>
+        <div class="p2p-type-desc"><span class="en">All nodes are perfectly equal — no special nodes at all. Find resources by flooding queries to neighbors.</span><span class="th">ทุก node เท่ากันสมบูรณ์ ไม่มี node พิเศษใดๆ เลย ค้นหา resource โดย flood ถาม neighbors</span></div>
+        <div class="p2p-type-example"><span class="en">Gnutella (early version)</span><span class="th">Gnutella (เวอร์ชันแรก)</span></div>
       </div>
       <div class="p2p-type hybrid">
         <div class="p2p-type-icon">🌐</div>
         <div class="p2p-type-name green">Hybrid P2P</div>
-        <div class="p2p-type-desc">มี central index server สำหรับ discovery แต่ data transfer เกิดระหว่าง peers โดยตรง</div>
+        <div class="p2p-type-desc"><span class="en">Has a central index server for discovery, but data transfer happens directly between peers.</span><span class="th">มี central index server สำหรับ discovery แต่ data transfer เกิดระหว่าง peers โดยตรง</span></div>
         <div class="p2p-type-example">Napster, BitTorrent tracker</div>
       </div>
       <div class="p2p-type structured">
         <div class="p2p-type-icon">🔷</div>
         <div class="p2p-type-name indigo">Structured P2P (DHT)</div>
-        <div class="p2p-type-desc">ใช้ Distributed Hash Table จัดระเบียบ nodes ตาม key space — ค้นหา O(log N) โดยไม่ต้องมี index server</div>
+        <div class="p2p-type-desc"><span class="en">Uses a Distributed Hash Table to organize nodes by key space — O(log N) lookups with no index server needed.</span><span class="th">ใช้ Distributed Hash Table จัดระเบียบ nodes ตาม key space — ค้นหา O(log N) โดยไม่ต้องมี index server</span></div>
         <div class="p2p-type-example">Kademlia, Chord, IPFS</div>
       </div>
     </div>
@@ -177,13 +177,13 @@ p{color:#94a3b8;margin-bottom:14px}
 
   <!-- Core concepts boxes -->
   <section>
-    <h2>Concepts หลัก</h2>
+    <h2><span class="en">Core Concepts</span><span class="th">Concepts หลัก</span></h2>
     <div class="vb-wrap">
       <div class="vb-grid vb-4">
         <div class="vbox">
           <div class="vb-icon">🔑</div>
           <div class="vb-title">DHT (Distributed Hash Table)</div>
-          <div class="vb-body">แผนที่กระจาย key→value ทั่วทุก node — แต่ละ node รับผิดชอบ key range ของตัวเอง</div>
+          <div class="vb-body"><span class="en">A distributed map of key→value across all nodes — each node is responsible for its own key range.</span><span class="th">แผนที่กระจาย key→value ทั่วทุก node — แต่ละ node รับผิดชอบ key range ของตัวเอง</span></div>
           <ul class="vb-list">
             <li>Lookup: O(log N) hops</li>
             <li>No central index</li>
@@ -193,7 +193,7 @@ p{color:#94a3b8;margin-bottom:14px}
         <div class="vbox">
           <div class="vb-icon">🏠</div>
           <div class="vb-title">Node ID & Routing</div>
-          <div class="vb-body">แต่ละ peer มี unique ID (hash) ใช้กำหนดว่า data ชิ้นไหนควรเก็บที่ peer ไหน</div>
+          <div class="vb-body"><span class="en">Each peer has a unique ID (hash) that determines which data it is responsible for storing.</span><span class="th">แต่ละ peer มี unique ID (hash) ใช้กำหนดว่า data ชิ้นไหนควรเก็บที่ peer ไหน</span></div>
           <ul class="vb-list">
             <li>SHA1/SHA256 hash</li>
             <li>Consistent hashing</li>
@@ -203,7 +203,7 @@ p{color:#94a3b8;margin-bottom:14px}
         <div class="vbox">
           <div class="vb-icon">🤝</div>
           <div class="vb-title">Peer Discovery</div>
-          <div class="vb-body">วิธีค้นหา peers ในเครือข่าย — bootstrap nodes, mDNS, DHT crawl, tracker</div>
+          <div class="vb-body"><span class="en">How to find peers in the network — bootstrap nodes, mDNS, DHT crawl, tracker.</span><span class="th">วิธีค้นหา peers ในเครือข่าย — bootstrap nodes, mDNS, DHT crawl, tracker</span></div>
           <ul class="vb-list">
             <li>Bootstrap nodes</li>
             <li>mDNS (local network)</li>
@@ -213,7 +213,7 @@ p{color:#94a3b8;margin-bottom:14px}
         <div class="vbox">
           <div class="vb-icon">📦</div>
           <div class="vb-title">Data Replication</div>
-          <div class="vb-body">เก็บ copy ของ data ไว้หลาย nodes เพื่อ availability เมื่อ node ออกจากเครือข่าย</div>
+          <div class="vb-body"><span class="en">Stores copies of data across multiple nodes for availability when a node leaves the network.</span><span class="th">เก็บ copy ของ data ไว้หลาย nodes เพื่อ availability เมื่อ node ออกจากเครือข่าย</span></div>
           <ul class="vb-list">
             <li>Replication factor k</li>
             <li>Auto-repair on churn</li>
@@ -224,27 +224,27 @@ p{color:#94a3b8;margin-bottom:14px}
     </div>
 
     <div class="vb-wrap">
-      <div class="vb-label">Network Challenges</div>
+      <div class="vb-label"><span class="en">Network Challenges</span><span class="th">Network Challenges</span></div>
       <div class="vb-grid vb-4">
         <div class="vbox">
           <div class="vb-icon">🔄</div>
           <div class="vb-title">Churn</div>
-          <div class="vb-body">Nodes เข้าและออกตลอดเวลา — ระบบต้องปรับตัวและ re-route data อัตโนมัติ</div>
+          <div class="vb-body"><span class="en">Nodes join and leave constantly — the system must adapt and re-route data automatically.</span><span class="th">Nodes เข้าและออกตลอดเวลา — ระบบต้องปรับตัวและ re-route data อัตโนมัติ</span></div>
         </div>
         <div class="vbox">
           <div class="vb-icon">🔓</div>
           <div class="vb-title">NAT Traversal</div>
-          <div class="vb-body">Peers อยู่หลัง NAT router — ต้องใช้ STUN/TURN/hole-punching เพื่อ connect กัน</div>
+          <div class="vb-body"><span class="en">Peers sit behind NAT routers — requires STUN/TURN/hole-punching to establish connections.</span><span class="th">Peers อยู่หลัง NAT router — ต้องใช้ STUN/TURN/hole-punching เพื่อ connect กัน</span></div>
         </div>
         <div class="vbox">
           <div class="vb-icon">👺</div>
           <div class="vb-title">Sybil Attack</div>
-          <div class="vb-body">ผู้โจมตีสร้าง fake nodes จำนวนมาก — ต้องการ Proof of Work หรือ reputation system</div>
+          <div class="vb-body"><span class="en">Attacker creates many fake nodes — requires Proof of Work or a reputation system to defend.</span><span class="th">ผู้โจมตีสร้าง fake nodes จำนวนมาก — ต้องการ Proof of Work หรือ reputation system</span></div>
         </div>
         <div class="vbox">
           <div class="vb-icon">⚡</div>
           <div class="vb-title">Eventual Consistency</div>
-          <div class="vb-body">Data update กระจายไม่พร้อมกัน — nodes อาจเห็น data version ต่างกันชั่วคราว</div>
+          <div class="vb-body"><span class="en">Data updates propagate asynchronously — nodes may temporarily see different versions of the data.</span><span class="th">Data update กระจายไม่พร้อมกัน — nodes อาจเห็น data version ต่างกันชั่วคราว</span></div>
         </div>
       </div>
     </div>
@@ -252,7 +252,7 @@ p{color:#94a3b8;margin-bottom:14px}
 
   <!-- P2P Network Animated Diagram -->
   <section>
-    <h2>P2P Network Diagram</h2>
+    <h2><span class="en">P2P Network Diagram</span><span class="th">P2P Network Diagram</span></h2>
     <div class="diagram-wrap">
       <svg viewBox="0 0 860 500" xmlns="http://www.w3.org/2000/svg">
         <defs>
@@ -421,38 +421,38 @@ p{color:#94a3b8;margin-bottom:14px}
 
   <!-- Real-world examples -->
   <section>
-    <h2>ตัวอย่างในชีวิตจริง</h2>
+    <h2><span class="en">Real-World Examples</span><span class="th">ตัวอย่างในชีวิตจริง</span></h2>
     <div class="examples-grid">
       <div class="example-card">
         <div class="example-card-icon">🧲</div>
         <div class="example-card-name">BitTorrent</div>
         <div class="example-card-type">File Sharing</div>
-        <div class="example-card-desc">แบ่ง file เป็น pieces กระจายระหว่าง peers ใช้ DHT ค้นหา</div>
+        <div class="example-card-desc"><span class="en">Splits files into pieces distributed among peers; uses DHT for discovery.</span><span class="th">แบ่ง file เป็น pieces กระจายระหว่าง peers ใช้ DHT ค้นหา</span></div>
       </div>
       <div class="example-card">
         <div class="example-card-icon">₿</div>
         <div class="example-card-name">Bitcoin</div>
         <div class="example-card-type">Blockchain</div>
-        <div class="example-card-desc">Distributed ledger — ทุก node เก็บ transaction history</div>
+        <div class="example-card-desc"><span class="en">Distributed ledger — every node stores the full transaction history.</span><span class="th">Distributed ledger — ทุก node เก็บ transaction history</span></div>
       </div>
       <div class="example-card">
         <div class="example-card-icon">🌐</div>
         <div class="example-card-name">IPFS</div>
         <div class="example-card-type">Distributed Storage</div>
-        <div class="example-card-desc">Content-addressed storage ใช้ Kademlia DHT</div>
+        <div class="example-card-desc"><span class="en">Content-addressed storage using Kademlia DHT.</span><span class="th">Content-addressed storage ใช้ Kademlia DHT</span></div>
       </div>
       <div class="example-card">
         <div class="example-card-icon">📞</div>
         <div class="example-card-name">WebRTC</div>
         <div class="example-card-type">Real-time Comm</div>
-        <div class="example-card-desc">Video call โดยตรงระหว่าง browsers ใช้ STUN/TURN</div>
+        <div class="example-card-desc"><span class="en">Direct video calls between browsers using STUN/TURN.</span><span class="th">Video call โดยตรงระหว่าง browsers ใช้ STUN/TURN</span></div>
       </div>
     </div>
   </section>
 
   <!-- Go Code -->
   <section>
-    <h2>ตัวอย่าง Code (Go)</h2>
+    <h2><span class="en">Code Examples (Go)</span><span class="th">ตัวอย่าง Code (Go)</span></h2>
 
     <div class="code-section">
       <div class="code-file">
@@ -842,32 +842,32 @@ func main() {
 
   <!-- WebRTC P2P -->
   <section>
-    <h2>P2P ใน Browser — WebRTC Pattern</h2>
+    <h2><span class="en">P2P in the Browser — WebRTC Pattern</span><span class="th">P2P ใน Browser — WebRTC Pattern</span></h2>
     <div class="vb-wrap">
       <div class="vb-label">WebRTC Connection Flow</div>
       <div class="vb-grid vb-4">
         <div class="vbox">
           <div class="vb-icon">📡</div>
           <div class="vb-title">STUN Server</div>
-          <div class="vb-body">ช่วย peer รู้ public IP ของตัวเอง สำหรับ NAT traversal — ไม่ relay data</div>
+          <div class="vb-body"><span class="en">Helps a peer discover its own public IP for NAT traversal — does not relay data.</span><span class="th">ช่วย peer รู้ public IP ของตัวเอง สำหรับ NAT traversal — ไม่ relay data</span></div>
           <span class="vb-chip">ICE Candidate</span>
         </div>
         <div class="vbox">
           <div class="vb-icon">🔀</div>
           <div class="vb-title">TURN Server</div>
-          <div class="vb-body">Relay data เมื่อ direct P2P ทำไม่ได้ (strict NAT) — fallback เท่านั้น</div>
+          <div class="vb-body"><span class="en">Relays data when direct P2P is impossible (strict NAT) — fallback only.</span><span class="th">Relay data เมื่อ direct P2P ทำไม่ได้ (strict NAT) — fallback เท่านั้น</span></div>
           <span class="vb-chip">Fallback relay</span>
         </div>
         <div class="vbox">
           <div class="vb-icon">🤝</div>
           <div class="vb-title">Signaling Server</div>
-          <div class="vb-body">แลกเปลี่ยน SDP offer/answer และ ICE candidates ระหว่าง peers — หลังจากนั้นใช้งานไม่ถึง</div>
+          <div class="vb-body"><span class="en">Exchanges SDP offer/answer and ICE candidates between peers — not involved in data transfer afterward.</span><span class="th">แลกเปลี่ยน SDP offer/answer และ ICE candidates ระหว่าง peers — หลังจากนั้นใช้งานไม่ถึง</span></div>
           <span class="vb-chip">WebSocket</span>
         </div>
         <div class="vbox">
           <div class="vb-icon">⚡</div>
           <div class="vb-title">Data Channel</div>
-          <div class="vb-body">Direct P2P data transfer — ต่ำกว่า 50ms latency สำหรับ video, gaming, file transfer</div>
+          <div class="vb-body"><span class="en">Direct P2P data transfer — under 50ms latency for video, gaming, file transfer.</span><span class="th">Direct P2P data transfer — ต่ำกว่า 50ms latency สำหรับ video, gaming, file transfer</span></div>
           <span class="vb-chip">DTLS/SRTP</span>
         </div>
       </div>
@@ -876,31 +876,31 @@ func main() {
 
   <!-- When to use -->
   <section>
-    <h2>เมื่อไหร่ควรใช้ P2P?</h2>
+    <h2><span class="en">When Should You Use P2P?</span><span class="th">เมื่อไหร่ควรใช้ P2P?</span></h2>
     <div class="vb-wrap">
       <div class="vb-grid vb-2">
         <div class="vbox">
           <div class="vb-icon">✅</div>
-          <div class="vb-title">เหมาะกับ</div>
+          <div class="vb-title"><span class="en">Good Fit</span><span class="th">เหมาะกับ</span></div>
           <ul class="vb-list">
-            <li>ต้องการ censorship-resistant / decentralized system</li>
-            <li>File sharing ขนาดใหญ่ที่ bandwidth cost สูงถ้าใช้ central server</li>
-            <li>Real-time communication ที่ต้องการ latency ต่ำ (WebRTC)</li>
-            <li>Blockchain / distributed ledger systems</li>
-            <li>Distributed storage (IPFS, backup systems)</li>
-            <li>Gaming ที่ต้องการ low-latency multiplayer</li>
+            <li><span class="en">Need a censorship-resistant / decentralized system</span><span class="th">ต้องการ censorship-resistant / decentralized system</span></li>
+            <li><span class="en">Large file sharing where bandwidth cost is high with a central server</span><span class="th">File sharing ขนาดใหญ่ที่ bandwidth cost สูงถ้าใช้ central server</span></li>
+            <li><span class="en">Real-time communication requiring low latency (WebRTC)</span><span class="th">Real-time communication ที่ต้องการ latency ต่ำ (WebRTC)</span></li>
+            <li><span class="en">Blockchain / distributed ledger systems</span><span class="th">Blockchain / distributed ledger systems</span></li>
+            <li><span class="en">Distributed storage (IPFS, backup systems)</span><span class="th">Distributed storage (IPFS, backup systems)</span></li>
+            <li><span class="en">Games requiring low-latency multiplayer</span><span class="th">Gaming ที่ต้องการ low-latency multiplayer</span></li>
           </ul>
         </div>
         <div class="vbox">
           <div class="vb-icon">⚠️</div>
-          <div class="vb-title">ระวัง</div>
+          <div class="vb-title"><span class="en">Watch Out</span><span class="th">ระวัง</span></div>
           <ul class="vb-list">
-            <li>ยากต่อการ debug และ monitor</li>
-            <li>Security ซับซ้อน — Sybil attack, data poisoning</li>
-            <li>NAT traversal เป็น pain point บน mobile</li>
-            <li>Eventual consistency — ไม่เหมาะกับ strong consistency</li>
-            <li>Peer churn ทำให้ availability ไม่สม่ำเสมอ</li>
-            <li>ไม่เหมาะกับ transaction-heavy business applications</li>
+            <li><span class="en">Difficult to debug and monitor</span><span class="th">ยากต่อการ debug และ monitor</span></li>
+            <li><span class="en">Complex security — Sybil attack, data poisoning</span><span class="th">Security ซับซ้อน — Sybil attack, data poisoning</span></li>
+            <li><span class="en">NAT traversal is a pain point on mobile</span><span class="th">NAT traversal เป็น pain point บน mobile</span></li>
+            <li><span class="en">Eventual consistency — not suitable for strong consistency</span><span class="th">Eventual consistency — ไม่เหมาะกับ strong consistency</span></li>
+            <li><span class="en">Peer churn makes availability uneven</span><span class="th">Peer churn ทำให้ availability ไม่สม่ำเสมอ</span></li>
+            <li><span class="en">Not suitable for transaction-heavy business applications</span><span class="th">ไม่เหมาะกับ transaction-heavy business applications</span></li>
           </ul>
         </div>
       </div>
