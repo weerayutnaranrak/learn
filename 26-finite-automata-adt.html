@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finite Automata &amp; ADTs — สื่อการสอน</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
+<link rel="stylesheet" href="common.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',sans-serif;background:#07090f;color:#e2e8f0;line-height:1.7}
+
+/* ── Hero ── */
+.hero{background:linear-gradient(135deg,#07090f 0%,#130e00 50%,#07090f 100%);padding:60px 40px;text-align:center;border-bottom:1px solid #f59e0b20;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,#f59e0b20 0%,transparent 65%)}
+.hero-badge{display:inline-block;background:#f59e0b15;border:1px solid #f59e0b50;color:#fcd34d;padding:6px 18px;border-radius:20px;font-size:.8rem;letter-spacing:2px;text-transform:uppercase;margin-bottom:20px}
+.hero h1{font-size:3rem;font-weight:800;background:linear-gradient(135deg,#f59e0b,#fbbf24,#fde68a,#fef3c7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:12px}
+.hero-sub{font-size:1.1rem;color:#94a3b8;max-width:700px;margin:0 auto 20px}
+.hero-chips{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.hero-chip{background:#f59e0b10;border:1px solid #f59e0b30;color:#fbbf24;padding:4px 14px;border-radius:12px;font-size:.78rem}
+
+/* ── Nav ── */
+nav{background:#0d1117;padding:14px 40px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #ffffff10;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px);gap:12px}
+.nav-home{color:#fbbf24;text-decoration:none;font-weight:600;font-size:.9rem;white-space:nowrap}
+.nav-toc{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.toc-link{color:#64748b;text-decoration:none;font-size:.78rem;padding:3px 10px;border-radius:6px;background:#ffffff08;transition:all .2s}
+.toc-link:hover{color:#fbbf24;background:#f59e0b15}
+
+/* ── Layout ── */
+.container{max-width:1150px;margin:0 auto;padding:40px 20px}
+section{margin-bottom:64px;scroll-margin-top:80px}
+h2{font-size:1.65rem;font-weight:700;color:#fbbf24;margin-bottom:8px;padding-bottom:10px;border-bottom:2px solid #f59e0b25;display:flex;align-items:center;gap:10px}
+h3{font-size:1.15rem;font-weight:600;color:#fcd34d;margin:28px 0 14px}
+p{color:#94a3b8;margin-bottom:14px}
+strong{color:#e2e8f0}
+.lead{font-size:1rem;color:#cbd5e1}
+
+/* ── VBox ── */
+.vb-wrap{margin:24px 0}
+.vb-label{font-size:.72rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#fbbf24;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.vb-label::after{content:'';flex:1;height:1px;background:#f59e0b15}
+.vb-grid{display:grid;gap:14px}
+.vb-2{grid-template-columns:repeat(2,1fr)}
+.vb-3{grid-template-columns:repeat(3,1fr)}
+.vb-4{grid-template-columns:repeat(4,1fr)}
+.vbox{background:#0d1117;border:1px solid #f59e0b25;border-radius:14px;padding:18px;transition:transform .2s,border-color .2s,box-shadow .2s}
+.vbox:hover{transform:translateY(-3px);border-color:#fbbf2460;box-shadow:0 8px 24px #f59e0b15}
+.vb-icon{font-size:1.7rem;margin-bottom:8px}
+.vb-title{font-size:.95rem;font-weight:700;color:#e2e8f0;margin-bottom:6px}
+.vb-body{font-size:.83rem;color:#94a3b8;line-height:1.6}
+.vb-list{list-style:none;margin-top:8px}
+.vb-list li{font-size:.82rem;color:#94a3b8;padding:3px 0 3px 14px;position:relative}
+.vb-list li::before{content:'›';position:absolute;left:0;color:#fbbf24}
+
+/* ── Callout ── */
+.callout{border-radius:12px;padding:16px 20px;margin:16px 0;display:flex;gap:12px;align-items:flex-start}
+.callout.info{background:#f59e0b10;border-left:3px solid #f59e0b}
+.callout.warn{background:#ef444410;border-left:3px solid #ef4444}
+.callout.tip{background:#4ade8010;border-left:3px solid #4ade80}
+.callout.danger{background:#ef444410;border-left:3px solid #ef4444}
+.callout-icon{font-size:1.1rem;flex-shrink:0;margin-top:2px}
+.callout-text{font-size:.86rem;color:#94a3b8}
+.callout-text strong{color:#e2e8f0}
+
+/* ── Comparison table ── */
+.compare-wrap{overflow-x:auto;margin:24px 0}
+.compare-table{width:100%;border-collapse:collapse;font-size:.84rem}
+.compare-table th{background:#130e00;color:#fcd34d;padding:11px 14px;text-align:left;border-bottom:2px solid #f59e0b30;white-space:nowrap}
+.compare-table td{padding:11px 14px;border-bottom:1px solid #1e293b;color:#94a3b8;vertical-align:top}
+.compare-table tr:hover td{background:#0d1117}
+.compare-table td:first-child{color:#e2e8f0;font-weight:600}
+
+/* ── Code block ── */
+.code-block{margin:20px 0;border-radius:12px;overflow:hidden;border:1px solid #1e293b}
+.code-header{background:#111827;padding:.7rem 1rem;display:flex;justify-content:space-between;align-items:center}
+.code-header span{font-size:.78rem;color:#64748b;font-weight:600}
+pre{margin:0}
+pre code{font-size:.83rem !important;line-height:1.6 !important}
+
+/* ── Diagram ── */
+.diagram-wrap{background:#0d1117;border:1px solid #1e293b;border-radius:16px;padding:2rem;margin:2rem 0;text-align:center;overflow:hidden}
+.diagram-label{font-size:.75rem;color:#475569;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:1.2rem}
+
+/* ── Before/After split ── */
+.ba-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:24px 0}
+.ba-box{border-radius:14px;padding:16px;border:1px solid}
+.ba-before{background:#ef444408;border-color:#ef444430}
+.ba-after{background:#4ade8008;border-color:#4ade8030}
+.ba-head{font-size:.7rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px}
+.ba-before .ba-head{color:#f87171}
+.ba-after  .ba-head{color:#4ade80}
+
+/* ── Quote ── */
+.quote{background:#130e00;border-left:3px solid #fbbf24;padding:16px 20px;border-radius:0 12px 12px 0;margin:20px 0;font-style:italic;color:#cbd5e1;font-size:.95rem}
+
+/* ── footer ── */
+footer{text-align:center;padding:32px 20px;color:#334155;font-size:.82rem;border-top:1px solid #f59e0b15;margin-top:20px}
+
+@media(max-width:700px){
+  .hero h1{font-size:2rem}
+  .vb-2,.vb-3,.vb-4{grid-template-columns:1fr}
+  .ba-grid{grid-template-columns:1fr}
+  nav{padding:12px 16px}
+}
+</style>
+</head>
+<body class="lang-th">
+
+<nav>
+  <a href="index.html" class="nav-home">← <span class="en">Back</span><span class="th">กลับหน้าหลัก</span></a>
+  <div class="nav-toc">
+    <a href="#fsm"     class="toc-link"><span class="en">FSM Basics</span><span class="th">FSM</span></a>
+    <a href="#clumps"  class="toc-link"><span class="en">Data Clumps</span><span class="th">Data Clumps</span></a>
+    <a href="#adt"     class="toc-link"><span class="en">ADT Refresher</span><span class="th">ADT</span></a>
+    <a href="#mapping" class="toc-link"><span class="en">Recipe</span><span class="th">สูตร</span></a>
+    <a href="#encode"  class="toc-link"><span class="en">FSM → ADT</span><span class="th">FSM → ADT</span></a>
+    <a href="#example" class="toc-link"><span class="en">TCP Example</span><span class="th">ตัวอย่าง</span></a>
+    <a href="#summary" class="toc-link"><span class="en">Summary</span><span class="th">สรุป</span></a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">
+    <span class="en">Design Principles · #26</span>
+    <span class="th">Design Principles · #26</span>
+  </div>
+  <h1>Finite Automata &amp; ADTs</h1>
+  <p class="hero-sub">
+    <span class="en">Model domain lifecycles as Finite State Machines, then encode them as Algebraic Data Types — eliminating Data Clumps and making illegal states unrepresentable at compile time</span>
+    <span class="th">จำลอง lifecycle ของ domain ด้วย Finite State Machine แล้วแปลงเป็น Algebraic Data Types — กำจัด Data Clumps และทำให้ illegal states เป็นไปไม่ได้ตั้งแต่ compile time</span>
+  </p>
+  <div class="hero-chips">
+    <span class="hero-chip">🔄 FSM / DFA</span>
+    <span class="hero-chip">🧮 ADT</span>
+    <span class="hero-chip">🐛 Data Clumps</span>
+    <span class="hero-chip">🔒 Type Safety</span>
+    <span class="hero-chip">♻️ Refactoring</span>
+    <span class="hero-chip">🐹 Go + TypeScript</span>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<section id="fsm">
+<h2>🔄 <span class="en">What is a Finite State Machine?</span><span class="th">Finite State Machine คืออะไร?</span></h2>
+
+<p class="lead">
+  <span class="en">A <strong>Finite State Machine (FSM)</strong>, also called a <strong>Deterministic Finite Automaton (DFA)</strong>, is a mathematical model of computation with a fixed number of states, where the current state plus an input event deterministically produces a new state.</span>
+  <span class="th"><strong>Finite State Machine (FSM)</strong> หรือ <strong>Deterministic Finite Automaton (DFA)</strong> คือแบบจำลองทางคณิตศาสตร์ที่มีจำนวน state คงที่ โดย state ปัจจุบัน + event จะกำหนด state ถัดไปอย่างแน่นอน</span>
+</p>
+
+<div class="vb-wrap">
+  <div class="vb-label"><span class="en">Formal Definition</span><span class="th">นิยามอย่างเป็นทางการ</span></div>
+  <div class="vb-grid vb-3">
+    <div class="vbox">
+      <div class="vb-icon">📦</div>
+      <div class="vb-title">Q — States</div>
+      <div class="vb-body">
+        <span class="en">A finite set of states. Every possible "situation" the system can be in. e.g. {Pending, Confirmed, Shipped, Delivered, Cancelled}</span>
+        <span class="th">เซตของ state ทั้งหมดที่เป็นไปได้ เช่น {Pending, Confirmed, Shipped, Delivered, Cancelled}</span>
+      </div>
+    </div>
+    <div class="vbox">
+      <div class="vb-icon">⚡</div>
+      <div class="vb-title">Σ — Alphabet (Events)</div>
+      <div class="vb-body">
+        <span class="en">The finite set of valid input events/actions. e.g. {confirm, ship, deliver, cancel} — events that trigger transitions</span>
+        <span class="th">เซตของ event/action ที่ valid ทั้งหมด เช่น {confirm, ship, deliver, cancel}</span>
+      </div>
+    </div>
+    <div class="vbox">
+      <div class="vb-icon">δ</div>
+      <div class="vb-title">δ — Transition Function</div>
+      <div class="vb-body">
+        <span class="en">δ: Q × Σ → Q. Given the current state and an event, returns the next state. This is the heart of the machine.</span>
+        <span class="th">δ: Q × Σ → Q รับ state ปัจจุบัน + event แล้วคืน state ถัดไป นี่คือหัวใจของ FSM</span>
+      </div>
+    </div>
+    <div class="vbox">
+      <div class="vb-icon">🚀</div>
+      <div class="vb-title">q₀ — Start State</div>
+      <div class="vb-body">
+        <span class="en">The initial state the machine begins in. e.g. every Order starts as Pending.</span>
+        <span class="th">state เริ่มต้น ทุก Order เริ่มที่ Pending ทุก TCP connection เริ่มที่ Closed</span>
+      </div>
+    </div>
+    <div class="vbox">
+      <div class="vb-icon">🏁</div>
+      <div class="vb-title">F — Accept States</div>
+      <div class="vb-body">
+        <span class="en">Terminal/final states. e.g. Delivered and Cancelled are final — no further transitions are valid from these states.</span>
+        <span class="th">State สุดท้าย เช่น Delivered และ Cancelled ไม่มี transition ออกจาก state เหล่านี้</span>
+      </div>
+    </div>
+    <div class="vbox">
+      <div class="vb-icon">🔑</div>
+      <div class="vb-title">Key Property: Deterministic</div>
+      <div class="vb-body">
+        <span class="en">For every (state, event) pair there is <strong>exactly one</strong> next state — no ambiguity, no randomness. This is the "D" in DFA.</span>
+        <span class="th">ทุกคู่ (state, event) มี next state แค่ <strong>หนึ่งเดียว</strong> ไม่มีความกำกวม นั่นคือ "D" ใน DFA</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Traffic Light FSM Diagram -->
+<div class="diagram-wrap">
+  <div class="diagram-label"><span class="en">Traffic Light — a 3-state DFA</span><span class="th">ไฟจราจร — DFA 3 states</span></div>
+  <svg viewBox="0 0 580 160" fill="none" xmlns="http://www.w3.org/2000/svg" style="max-width:580px;width:100%">
+    <!-- Red -->
+    <circle cx="80"  cy="80" r="40" fill="#1a0808" stroke="#ef4444" stroke-width="2"/>
+    <text x="80" y="75" text-anchor="middle" fill="#f87171" font-size="12" font-weight="700">RED</text>
+    <text x="80" y="92" text-anchor="middle" fill="#ef444480" font-size="9">q₀ start</text>
+    <!-- Green -->
+    <circle cx="290" cy="80" r="40" fill="#071a08" stroke="#4ade80" stroke-width="2"/>
+    <text x="290" y="84" text-anchor="middle" fill="#4ade80" font-size="12" font-weight="700">GREEN</text>
+    <!-- Yellow -->
+    <circle cx="500" cy="80" r="40" fill="#1a1200" stroke="#fbbf24" stroke-width="2"/>
+    <text x="500" y="84" text-anchor="middle" fill="#fbbf24" font-size="12" font-weight="700">YELLOW</text>
+
+    <!-- Red → Green -->
+    <path d="M122,68 Q205,30 248,68" stroke="#4ade80" stroke-width="1.5" fill="none" marker-end="url(#ag)">
+      <animate attributeName="stroke-dasharray" from="0,200" to="200,0" dur="2s" repeatCount="indefinite"/>
+    </path>
+    <text x="205" y="42" text-anchor="middle" fill="#4ade8090" font-size="9">go</text>
+
+    <!-- Green → Yellow -->
+    <path d="M332,68 Q415,30 458,68" stroke="#fbbf24" stroke-width="1.5" fill="none" marker-end="url(#ay)">
+      <animate attributeName="stroke-dasharray" from="0,200" to="200,0" dur="2s" begin=".7s" repeatCount="indefinite"/>
+    </path>
+    <text x="415" y="42" text-anchor="middle" fill="#fbbf2490" font-size="9">slow</text>
+
+    <!-- Yellow → Red (loop back under) -->
+    <path d="M465,118 Q290,165 118,118" stroke="#ef4444" stroke-width="1.5" fill="none" marker-end="url(#ar)">
+      <animate attributeName="stroke-dasharray" from="0,400" to="400,0" dur="2s" begin="1.4s" repeatCount="indefinite"/>
+    </path>
+    <text x="290" y="152" text-anchor="middle" fill="#ef444490" font-size="9">stop</text>
+
+    <defs>
+      <marker id="ag" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto">
+        <path d="M0,0 L7,3.5 L0,7 Z" fill="#4ade80"/>
+      </marker>
+      <marker id="ay" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto">
+        <path d="M0,0 L7,3.5 L0,7 Z" fill="#fbbf24"/>
+      </marker>
+      <marker id="ar" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto">
+        <path d="M0,0 L7,3.5 L0,7 Z" fill="#ef4444"/>
+      </marker>
+    </defs>
+  </svg>
+</div>
+
+<div class="callout info">
+  <span class="callout-icon">💡</span>
+  <div class="callout-text">
+    <span class="en"><strong>The big insight:</strong> Any domain object that "has a lifecycle" is already an FSM — you're just not writing it down. An <code>Order</code>, a <code>UserAccount</code>, a <code>Subscription</code>, a <code>TCP connection</code> all follow this pattern. Making the FSM explicit lets you encode it in the type system.</span>
+    <span class="th"><strong>ข้อสังเกตสำคัญ:</strong> object ที่ "มี lifecycle" ทุกตัวคือ FSM อยู่แล้ว — แค่ยังไม่ได้เขียนออกมา <code>Order</code>, <code>UserAccount</code>, <code>Subscription</code>, <code>TCP connection</code> ล้วนเป็น FSM การทำให้ FSM ชัดเจนช่วยให้เราแปลงมันเป็น type system ได้</span>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<section id="clumps">
+<h2>🐛 <span class="en">Data Clumps — The Code Smell</span><span class="th">Data Clumps — Code Smell ที่พบบ่อย</span></h2>
+
+<p class="lead">
+  <span class="en">From Martin Fowler's <em>Refactoring</em>: a <strong>Data Clump</strong> is when 3 or more fields or parameters always appear together across multiple places, but have never been given their own named type.</span>
+  <span class="th">จาก Martin Fowler ใน <em>Refactoring</em>: <strong>Data Clump</strong> คือเมื่อ field หรือ parameter 3 ตัวขึ้นไปปรากฏด้วยกันในหลายที่ แต่ยังไม่เคยถูกตั้งชื่อเป็น type ของตัวเอง</span>
+</p>
+
+<div class="vb-wrap">
+  <div class="vb-label"><span class="en">3 Classic Clump Patterns</span><span class="th">3 รูปแบบ Clump ที่พบบ่อย</span></div>
+  <div class="vb-grid vb-3">
+    <div class="vbox">
+      <div class="vb-icon">📦</div>
+      <div class="vb-title"><span class="en">Loose Parameter Clump</span><span class="th">Parameter ที่เดินทางด้วยกันเสมอ</span></div>
+      <div class="vb-body">
+        <span class="en">Fields always passed together: <code>startDate, endDate</code> or <code>host, port, timeout</code>. Easy to swap order, validation is duplicated everywhere.</span>
+        <span class="th">field ที่ส่งด้วยกันเสมอ เช่น <code>startDate, endDate</code> หรือ <code>host, port, timeout</code> — สลับลำดับได้ง่าย validation กระจาย</span>
+      </div>
+    </div>
+    <div class="vbox">
+      <div class="vb-icon">🚩</div>
+      <div class="vb-title"><span class="en">Boolean Flag Explosion</span><span class="th">Boolean Flag ระเบิด</span></div>
+      <div class="vb-body">
+        <span class="en">Multiple boolean flags representing mutually exclusive states: <code>isActive, isSuspended, isDeleted</code>. 3 bools = 8 combinations — but only 3 are valid. 5 are bugs waiting to happen.</span>
+        <span class="th">boolean หลายตัวแทน state ที่ exclusive กัน: <code>isActive, isSuspended, isDeleted</code> — 3 bool = 8 combinations แต่ valid แค่ 3 ที่เหลือคือ bug รอระเบิด</span>
+      </div>
+    </div>
+    <div class="vbox">
+      <div class="vb-icon">❓</div>
+      <div class="vb-title"><span class="en">Nullable Sentinel</span><span class="th">ค่า Null แทนความหมายหลายอย่าง</span></div>
+      <div class="vb-body">
+        <span class="en"><code>nil</code> / <code>null</code> used as a sentinel for "not present", "not loaded", or "error" all at once. Ambiguous — callers can't tell the difference.</span>
+        <span class="th"><code>nil</code> ใช้แทนทั้ง "ไม่มีค่า", "ยังไม่โหลด", "เกิด error" — คนเรียกไม่รู้ความแตกต่าง</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="callout warn">
+  <span class="callout-icon">⚠️</span>
+  <div class="callout-text">
+    <span class="en"><strong>Why Data Clumps hurt:</strong> They scatter validation logic, allow callers to pass fields in the wrong order (both <code>time.Time</code> — compiler won't catch it), and make refactoring painful because the "type" lives in every call site simultaneously.</span>
+    <span class="th"><strong>ทำไม Data Clumps ถึงเป็นปัญหา:</strong> validation กระจาย, ลำดับ parameter สลับกันได้ (ทั้งคู่เป็น <code>time.Time</code> compiler ไม่จับ), และการ refactor เจ็บปวดเพราะ "type" กระจายอยู่ทุก call site</span>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<section id="adt">
+<h2>🧮 <span class="en">ADT Quick Refresher</span><span class="th">ADT ย้อนความจำ</span></h2>
+
+<p>
+  <span class="en">For a full treatment of ADTs including IO Monad and Type Classes, see <a href="25-functional-programming.html" style="color:#fbbf24">Topic 25 — Functional Programming</a>. Here is the minimum needed to follow this page.</span>
+  <span class="th">สำหรับเนื้อหา ADT แบบเต็มรวมถึง IO Monad และ Type Classes ดูได้ที่ <a href="25-functional-programming.html" style="color:#fbbf24">หัวข้อ 25 — Functional Programming</a> ส่วนนี้ครอบคลุมเฉพาะที่จำเป็นสำหรับหน้านี้</span>
+</p>
+
+<div class="ba-grid">
+  <div class="ba-box ba-before" style="background:#0a1020;border-color:#6366f150">
+    <div class="ba-head" style="color:#a5b4fc">Product Type (AND — struct)</div>
+    <p style="font-size:.83rem;color:#94a3b8;margin-bottom:10px">
+      <span class="en">All fields are present simultaneously. Cardinality = product of all field cardinalities.</span>
+      <span class="th">ทุก field มีค่าพร้อมกัน Cardinality = ผลคูณของ cardinality ทุก field</span>
+    </p>
+    <div class="code-block">
+      <div class="code-header"><span>product_type.go</span></div>
+      <pre><code class="language-go">type DateRange struct {
+    Start time.Time  // infinite values
+    End   time.Time  // infinite values
+}
+// Cardinality: ∞ × ∞
+// Every (Start, End) pair is possible</code></pre>
+    </div>
+  </div>
+  <div class="ba-box ba-after" style="background:#071a08;border-color:#4ade8050">
+    <div class="ba-head" style="color:#4ade80">Sum Type (OR — discriminated union)</div>
+    <p style="font-size:.83rem;color:#94a3b8;margin-bottom:10px">
+      <span class="en">Exactly one variant is active at a time. Cardinality = sum of all variant cardinalities.</span>
+      <span class="th">มีแค่ variant เดียวที่ active ในแต่ละครั้ง Cardinality = ผลรวมของ cardinality ทุก variant</span>
+    </p>
+    <div class="code-block">
+      <div class="code-header"><span>sum_type.go</span></div>
+      <pre><code class="language-go">// Go: interface + unexported method = sealed sum type
+type Shape interface{ area() float64 }
+
+type Circle   struct{ Radius float64 }
+type Rect     struct{ W, H float64 }
+type Triangle struct{ Base, Height float64 }
+
+// Cardinality: |Circle| + |Rect| + |Triangle|</code></pre>
+    </div>
+  </div>
+</div>
+
+<h3><span class="en">The Counting Argument — Why This Matters</span><span class="th">การนับ Cardinality — ทำไมถึงสำคัญ</span></h3>
+
+<div class="compare-wrap">
+  <table class="compare-table">
+    <thead>
+      <tr>
+        <th><span class="en">Encoding</span><span class="th">การเข้ารหัส</span></th>
+        <th><span class="en">Combinations</span><span class="th">Combinations ที่เป็นไปได้</span></th>
+        <th><span class="en">Valid ones</span><span class="th">ที่ valid จริง</span></th>
+        <th><span class="en">Invalid (bugs)</span><span class="th">ที่ invalid (bugs)</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>isActive bool</code><br><code>isSuspended bool</code><br><code>isDeleted bool</code></td>
+        <td>2 × 2 × 2 = <strong>8</strong></td>
+        <td>3</td>
+        <td style="color:#f87171;font-weight:700">5 invalid states</td>
+      </tr>
+      <tr>
+        <td><code>type Status = Active | Suspended | Deleted</code></td>
+        <td>1 + 1 + 1 = <strong>3</strong></td>
+        <td>3</td>
+        <td style="color:#4ade80;font-weight:700">0 — impossible</td>
+      </tr>
+      <tr>
+        <td><code>isLoading bool</code><br><code>data *User</code><br><code>err error</code></td>
+        <td>2 × 2 × 2 = <strong>8</strong></td>
+        <td>3</td>
+        <td style="color:#f87171;font-weight:700">5 invalid states</td>
+      </tr>
+      <tr>
+        <td><code>type Fetch[T] = Loading | Ok(T) | Err(error)</code></td>
+        <td>1 + ∞ + ∞</td>
+        <td>all of them</td>
+        <td style="color:#4ade80;font-weight:700">0 — impossible</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="quote">
+  <span class="en">"Make illegal states unrepresentable." — Yaron Minsky, Jane Street</span>
+  <span class="th">"ทำให้ illegal states เป็นไปไม่ได้ในระดับ type" — Yaron Minsky, Jane Street</span>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<section id="mapping">
+<h2>♻️ <span class="en">Recipe: Data Clumps → ADTs</span><span class="th">สูตร: Data Clumps → ADTs</span></h2>
+
+<p class="lead">
+  <span class="en">Three refactoring patterns, each matching a clump type to an ADT encoding. Every pattern has a before/after code pair.</span>
+  <span class="th">สูตร refactor 3 แบบ แต่ละแบบจับคู่ clump กับ ADT encoding ที่เหมาะสม พร้อม code before/after ทุกแบบ</span>
+</p>
+
+<!-- Pattern A -->
+<h3>Pattern A — <span class="en">Co-occurring fields → Product Type</span><span class="th">Field ที่ตามกันเสมอ → Product Type</span></h3>
+
+<div class="code-block">
+  <div class="code-header"><span>pattern_a.go — <span class="en">before: data clump</span><span class="th">before: data clump</span></span></div>
+  <pre data-lang="go"><code class="language-go">// startDate and endDate always travel together — but have no type
+func BookRoom(startDate, endDate time.Time, guestName, guestEmail string) error {
+    if !endDate.After(startDate) {
+        return errors.New("end must be after start") // validation duplicated everywhere
+    }
+    // ...
+}
+
+func CalcPrice(startDate, endDate time.Time, roomType string) float64 {
+    days := endDate.Sub(startDate).Hours() / 24  // same logic again
+    return days * rateFor(roomType)
+}</code></pre>
+  <pre data-lang="ts" style="display:none"><code class="language-typescript">// TypeScript: same clump problem
+function bookRoom(startDate: Date, endDate: Date, guestName: string, guestEmail: string): void {
+  if (endDate <= startDate) throw new Error("end must be after start") // duplicated
+  // ...
+}
+
+function calcPrice(startDate: Date, endDate: Date, roomType: string): number {
+  const days = (endDate.getTime() - startDate.getTime()) / 86_400_000
+  return days * rateFor(roomType)
+}</code></pre>
+</div>
+
+<div class="code-block">
+  <div class="code-header"><span>pattern_a.go — <span class="en">after: named Product Types</span><span class="th">after: ตั้งชื่อเป็น Product Types</span></span></div>
+  <pre data-lang="go"><code class="language-go">// Named product types — validation in ONE place
+type DateRange struct {
+    Start time.Time
+    End   time.Time
+}
+
+func (d DateRange) Valid() bool    { return d.End.After(d.Start) }
+func (d DateRange) Days() float64  { return d.End.Sub(d.Start).Hours() / 24 }
+func (d DateRange) Contains(t time.Time) bool {
+    return !t.Before(d.Start) && !t.After(d.End)
+}
+
+type Guest struct {
+    Name  string
+    Email string
+}
+
+func (g Guest) Valid() bool {
+    return g.Name != "" && strings.Contains(g.Email, "@")
+}
+
+// Clean, self-documenting signatures
+func BookRoom(period DateRange, guest Guest) error {
+    if !period.Valid() { return errors.New("invalid date range") }
+    if !guest.Valid()  { return errors.New("invalid guest") }
+    return nil
+}
+
+func CalcPrice(period DateRange, roomType string) float64 {
+    return period.Days() * rateFor(roomType) // reuse the Days() method
+}</code></pre>
+  <pre data-lang="ts" style="display:none"><code class="language-typescript">// Named product types
+interface DateRange {
+  start: Date
+  end:   Date
+}
+
+// Companion functions (no class needed)
+const DateRange = {
+  valid:    (d: DateRange): boolean => d.end > d.start,
+  days:     (d: DateRange): number  => (d.end.getTime() - d.start.getTime()) / 86_400_000,
+  contains: (d: DateRange, t: Date): boolean => t >= d.start && t <= d.end,
+}
+
+interface Guest { name: string; email: string }
+const Guest = {
+  valid: (g: Guest): boolean => g.name !== '' && g.email.includes('@'),
+}
+
+function bookRoom(period: DateRange, guest: Guest): void {
+  if (!DateRange.valid(period)) throw new Error("invalid date range")
+  if (!Guest.valid(guest))     throw new Error("invalid guest")
+}
+
+function calcPrice(period: DateRange, roomType: string): number {
+  return DateRange.days(period) * rateFor(roomType)
+}</code></pre>
+</div>
+
+<!-- Pattern B -->
+<h3>Pattern B — <span class="en">Boolean flag explosion → Sum Type</span><span class="th">Boolean flag ระเบิด → Sum Type</span></h3>
+
+<div class="code-block">
+  <div class="code-header"><span>pattern_b.go</span></div>
+  <pre data-lang="go"><code class="language-go">// ── BEFORE: 3 booleans = 8 combinations, only 3 are valid ──────────────────
+type User struct {
+    ID          string
+    IsActive    bool // could be true at same time as IsSuspended — bug!
+    IsSuspended bool
+    IsDeleted   bool
+}
+
+func (u User) CanLogin() bool {
+    return u.IsActive && !u.IsSuspended && !u.IsDeleted // forget one → security bug
+}
+
+// ── AFTER: Sum Type — exactly 3 valid states ────────────────────────────────
+type AccountStatus int
+
+const (
+    Active    AccountStatus = iota // 0 — default
+    Suspended                      // 1 — violated terms
+    Deleted                        // 2 — soft-deleted
+)
+
+type User struct {
+    ID     string
+    Status AccountStatus // only 3 values possible
+}
+
+func (u User) CanLogin() bool { return u.Status == Active } // simple and correct</code></pre>
+  <pre data-lang="ts" style="display:none"><code class="language-typescript">// ── BEFORE ────────────────────────────────────────────────────────────────────
+interface User {
+  id:          string
+  isActive:    boolean
+  isSuspended: boolean
+  isDeleted:   boolean
+  // 5 combinations are invalid — compiler won't catch them
+}
+
+// ── AFTER: discriminated union ────────────────────────────────────────────────
+type AccountStatus = 'active' | 'suspended' | 'deleted'
+
+interface User {
+  id:     string
+  status: AccountStatus // exactly 3 values
+}
+
+function canLogin(u: User): boolean { return u.status === 'active' }
+
+// TypeScript will error if you miss a case:
+function statusLabel(s: AccountStatus): string {
+  switch (s) {
+    case 'active':    return 'Active'
+    case 'suspended': return 'Suspended'
+    case 'deleted':   return 'Deleted'
+    // exhaustive — no default needed; TS errors if a case is missing
+  }
+}</code></pre>
+</div>
+
+<!-- Pattern C -->
+<h3>Pattern C — <span class="en">Nullable sentinel → Option[T]</span><span class="th">ค่า Null ที่กำกวม → Option[T]</span></h3>
+
+<div class="code-block">
+  <div class="code-header"><span>pattern_c.go</span></div>
+  <pre data-lang="go"><code class="language-go">// ── BEFORE: nil has multiple meanings — ambiguous ─────────────────────────
+type Cart struct {
+    Items    []Item
+    Discount *float64 // nil = no discount? or "not yet loaded"? or error?
+    CouponID *string  // nil = no coupon? or invalid coupon?
+}
+
+func ApplyDiscount(cart Cart) float64 {
+    total := calcTotal(cart.Items)
+    if cart.Discount != nil { // easy to forget this nil check
+        total *= (1 - *cart.Discount)
+    }
+    return total
+}
+
+// ── AFTER: Option[T] — explicit, unambiguous ────────────────────────────────
+type Option[T any] struct{ v *T }
+
+func Some[T any](val T) Option[T]  { return Option[T]{v: &val} }
+func None[T any]() Option[T]       { return Option[T]{} }
+func (o Option[T]) Present() bool  { return o.v != nil }
+func (o Option[T]) Unwrap() (T, bool) {
+    if o.v == nil { var zero T; return zero, false }
+    return *o.v, true
+}
+func (o Option[T]) OrElse(fallback T) T {
+    if v, ok := o.Unwrap(); ok { return v }
+    return fallback
+}
+
+type Cart struct {
+    Items    []Item
+    Discount Option[float64] // Some(0.15) = 15% off; None() = no discount
+    CouponID Option[string]  // explicit, no ambiguity
+}
+
+func ApplyDiscount(cart Cart) float64 {
+    total := calcTotal(cart.Items)
+    discount := cart.Discount.OrElse(0.0) // safe, no nil panic
+    return total * (1 - discount)
+}</code></pre>
+  <pre data-lang="ts" style="display:none"><code class="language-typescript">// ── BEFORE ────────────────────────────────────────────────────────────────────
+interface Cart {
+  items:    Item[]
+  discount: number | null   // null = "no discount"? "not loaded"?
+  couponId: string | null   // ambiguous
+}
+
+// ── AFTER: discriminated Option type ──────────────────────────────────────────
+type Option<T> = { kind: 'none' } | { kind: 'some'; value: T }
+
+const none  = <T>(): Option<T>         => ({ kind: 'none' })
+const some  = <T>(value: T): Option<T> => ({ kind: 'some', value })
+const orElse = <T>(o: Option<T>, fallback: T): T =>
+  o.kind === 'some' ? o.value : fallback
+
+interface Cart {
+  items:    Item[]
+  discount: Option<number>  // Some(0.15) = 15% off; none() = no discount
+  couponId: Option<string>
+}
+
+function applyDiscount(cart: Cart): number {
+  const total    = calcTotal(cart.items)
+  const discount = orElse(cart.discount, 0)
+  return total * (1 - discount)
+}</code></pre>
+</div>
+
+<div class="callout tip">
+  <span class="callout-icon">🚀</span>
+  <div class="callout-text">
+    <span class="en"><strong>The refactoring move is always the same:</strong> (1) find fields that travel together, (2) give them a name, (3) move validation inside, (4) replace all call sites. The ADT encoding follows automatically from whether the fields are AND (product) or OR (sum).</span>
+    <span class="th"><strong>ขั้นตอน refactor เหมือนกันเสมอ:</strong> (1) หา field ที่เดินทางด้วยกัน (2) ตั้งชื่อ (3) ย้าย validation เข้าไปข้างใน (4) แก้ทุก call site จะเป็น product หรือ sum type ขึ้นอยู่กับว่า field เป็นแบบ AND หรือ OR</span>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<section id="encode">
+<h2>🏗️ <span class="en">Encoding FSM as Sum Types</span><span class="th">แปลง FSM เป็น Sum Types</span></h2>
+
+<p class="lead">
+  <span class="en">The design process: first draw the FSM, then mechanically translate each state to a type and each transition to a function. The compiler then enforces the FSM's rules for free.</span>
+  <span class="th">กระบวนการออกแบบ: วาด FSM ก่อน แล้ว mechanically แปลงแต่ละ state เป็น type และแต่ละ transition เป็น function จากนั้น compiler รับผิดชอบบังคับกฎของ FSM แทนเรา</span>
+</p>
+
+<div class="vb-wrap">
+  <div class="vb-label"><span class="en">4-Step Recipe</span><span class="th">สูตร 4 ขั้นตอน</span></div>
+  <div class="vb-grid vb-4">
+    <div class="vbox">
+      <div class="vb-icon">✏️</div>
+      <div class="vb-title"><span class="en">1. Draw states</span><span class="th">1. วาด States</span></div>
+      <div class="vb-body"><span class="en">List every state the system can be in as bubbles. Name them clearly.</span><span class="th">ระบุทุก state ที่ระบบเป็นได้ วาดเป็นวงกลม ตั้งชื่อให้ชัด</span></div>
+    </div>
+    <div class="vbox">
+      <div class="vb-icon">🧱</div>
+      <div class="vb-title"><span class="en">2. Each state → a type</span><span class="th">2. แต่ละ State → type</span></div>
+      <div class="vb-body"><span class="en">Each state becomes its own struct/type carrying only the data available in that state.</span><span class="th">แต่ละ state กลายเป็น struct ของตัวเอง เก็บเฉพาะข้อมูลที่มีในสถานะนั้น</span></div>
+    </div>
+    <div class="vbox">
+      <div class="vb-icon">➡️</div>
+      <div class="vb-title"><span class="en">3. Transitions → functions</span><span class="th">3. Transitions → functions</span></div>
+      <div class="vb-body"><span class="en">Each arrow in the FSM becomes a function: <code>func (current StateA) event() StateB</code>. Return type encodes the destination.</span><span class="th">แต่ละลูกศรใน FSM กลายเป็น function: <code>func (StateA) event() StateB</code> — return type บังคับ destination</span></div>
+    </div>
+    <div class="vbox">
+      <div class="vb-icon">🔒</div>
+      <div class="vb-title"><span class="en">4. Compiler enforces FSM</span><span class="th">4. Compiler บังคับ FSM</span></div>
+      <div class="vb-body"><span class="en">Calling a non-existent transition (e.g. <code>cancel(deliveredOrder)</code>) is a <strong>compile error</strong> — not a runtime panic.</span><span class="th">การเรียก transition ที่ไม่มีอยู่ (เช่น cancel ออเดอร์ที่ส่งแล้ว) คือ <strong>compile error</strong> ไม่ใช่ runtime panic</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- Order FSM Diagram -->
+<div class="diagram-wrap">
+  <div class="diagram-label"><span class="en">Order Lifecycle FSM</span><span class="th">FSM ของ Order Lifecycle</span></div>
+  <svg viewBox="0 0 700 220" fill="none" xmlns="http://www.w3.org/2000/svg" style="max-width:700px;width:100%">
+    <!-- States -->
+    <rect x="10"  y="80" width="110" height="50" rx="10" fill="#0a1020" stroke="#6366f1" stroke-width="1.5"/>
+    <text x="65"  y="110" text-anchor="middle" fill="#a5b4fc" font-size="11" font-weight="700">Pending</text>
+
+    <rect x="175" y="80" width="110" height="50" rx="10" fill="#071a08" stroke="#4ade80" stroke-width="1.5"/>
+    <text x="230" y="110" text-anchor="middle" fill="#4ade80" font-size="11" font-weight="700">Confirmed</text>
+
+    <rect x="340" y="80" width="110" height="50" rx="10" fill="#001a15" stroke="#06b6d4" stroke-width="1.5"/>
+    <text x="395" y="110" text-anchor="middle" fill="#22d3ee" font-size="11" font-weight="700">Shipped</text>
+
+    <rect x="505" y="80" width="110" height="50" rx="10" fill="#070e1a" stroke="#818cf8" stroke-width="1.5"/>
+    <text x="560" y="110" text-anchor="middle" fill="#a5b4fc" font-size="11" font-weight="700">Delivered</text>
+    <text x="560" y="124" text-anchor="middle" fill="#6366f150" font-size="8">🏁 terminal</text>
+
+    <!-- Cancelled (below) -->
+    <rect x="175" y="170" width="110" height="40" rx="10" fill="#1a0808" stroke="#ef4444" stroke-width="1.5"/>
+    <text x="230" y="195" text-anchor="middle" fill="#f87171" font-size="11" font-weight="700">Cancelled</text>
+    <text x="230" y="206" text-anchor="middle" fill="#ef444450" font-size="8">🏁 terminal</text>
+
+    <!-- Transitions -->
+    <!-- Pending → Confirmed -->
+    <line x1="120" y1="105" x2="173" y2="105" stroke="#4ade80" stroke-width="1.5" marker-end="url(#gg)">
+      <animate attributeName="stroke-dasharray" from="0,60" to="60,0" dur="1.5s" repeatCount="indefinite"/>
+    </line>
+    <text x="146" y="99" text-anchor="middle" fill="#4ade8080" font-size="8">confirm()</text>
+
+    <!-- Confirmed → Shipped -->
+    <line x1="285" y1="105" x2="338" y2="105" stroke="#06b6d4" stroke-width="1.5" marker-end="url(#gc)">
+      <animate attributeName="stroke-dasharray" from="0,60" to="60,0" dur="1.5s" begin=".4s" repeatCount="indefinite"/>
+    </line>
+    <text x="311" y="99" text-anchor="middle" fill="#06b6d480" font-size="8">ship()</text>
+
+    <!-- Shipped → Delivered -->
+    <line x1="450" y1="105" x2="503" y2="105" stroke="#818cf8" stroke-width="1.5" marker-end="url(#gp)">
+      <animate attributeName="stroke-dasharray" from="0,60" to="60,0" dur="1.5s" begin=".8s" repeatCount="indefinite"/>
+    </line>
+    <text x="476" y="99" text-anchor="middle" fill="#818cf880" font-size="8">deliver()</text>
+
+    <!-- Pending → Cancelled -->
+    <line x1="65" y1="130" x2="175" y2="178" stroke="#ef4444" stroke-width="1.2" stroke-dasharray="4,2" marker-end="url(#gr)"/>
+    <text x="100" y="162" fill="#ef444480" font-size="8">cancel()</text>
+
+    <!-- Confirmed → Cancelled -->
+    <line x1="230" y1="130" x2="230" y2="168" stroke="#ef4444" stroke-width="1.2" stroke-dasharray="4,2" marker-end="url(#gr)"/>
+    <text x="237" y="154" fill="#ef444480" font-size="8">cancel()</text>
+
+    <!-- Start arrow -->
+    <line x1="0" y1="105" x2="8" y2="105" stroke="#64748b" stroke-width="1.5" marker-end="url(#gs)"/>
+
+    <defs>
+      <marker id="gg" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" fill="#4ade80"/></marker>
+      <marker id="gc" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" fill="#06b6d4"/></marker>
+      <marker id="gp" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" fill="#818cf8"/></marker>
+      <marker id="gr" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" fill="#ef4444"/></marker>
+      <marker id="gs" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" fill="#64748b"/></marker>
+    </defs>
+  </svg>
+</div>
+
+<div class="code-block">
+  <div class="code-header"><span>order_fsm.go — <span class="en">FSM encoded as Go sum type</span><span class="th">FSM แปลงเป็น Go sum type</span></span></div>
+  <pre data-lang="go"><code class="language-go">package order
+
+import "time"
+
+// ── Step 2: Each state is its own type ──────────────────────────────────────
+// Only the data meaningful in that state is carried.
+
+type PendingOrder struct {
+    ID    string
+    Items []Item
+}
+
+type ConfirmedOrder struct {
+    ID          string
+    Items       []Item
+    ConfirmedAt time.Time
+}
+
+type ShippedOrder struct {
+    ID           string
+    TrackingCode string
+    Carrier      string
+}
+
+type DeliveredOrder struct {
+    ID          string
+    DeliveredAt time.Time
+}
+
+type CancelledOrder struct {
+    ID     string
+    Reason string
+}
+
+// ── Step 3: Transitions as pure functions ────────────────────────────────────
+// The function signature IS the FSM edge: (current state) → (next state)
+
+func (o PendingOrder) Confirm() ConfirmedOrder {
+    return ConfirmedOrder{ID: o.ID, Items: o.Items, ConfirmedAt: time.Now()}
+}
+
+func (o PendingOrder) Cancel(reason string) CancelledOrder {
+    return CancelledOrder{ID: o.ID, Reason: reason}
+}
+
+func (o ConfirmedOrder) Ship(tracking, carrier string) ShippedOrder {
+    return ShippedOrder{ID: o.ID, TrackingCode: tracking, Carrier: carrier}
+}
+
+func (o ConfirmedOrder) Cancel(reason string) CancelledOrder {
+    return CancelledOrder{ID: o.ID, Reason: reason}
+}
+
+func (o ShippedOrder) Deliver() DeliveredOrder {
+    return DeliveredOrder{ID: o.ID, DeliveredAt: time.Now()}
+}
+
+// ── There is no CancelledOrder.Cancel() or DeliveredOrder.Cancel() ──────────
+// Calling order.Cancel() on a ShippedOrder is a COMPILE ERROR — not a runtime panic.
+
+// ── Step 4: Sum type = "any Order" ──────────────────────────────────────────
+type Order interface{ orderState() }
+
+func (PendingOrder)   orderState() {}
+func (ConfirmedOrder) orderState() {}
+func (ShippedOrder)   orderState() {}
+func (DeliveredOrder) orderState() {}
+func (CancelledOrder) orderState() {}
+
+// Exhaustive type switch — Go will panic on default if a case is missing
+func PrintStatus(o Order) string {
+    switch v := o.(type) {
+    case PendingOrder:   return "Pending: " + fmt.Sprintf("%d items", len(v.Items))
+    case ConfirmedOrder: return "Confirmed at " + v.ConfirmedAt.Format(time.RFC3339)
+    case ShippedOrder:   return "Shipped: " + v.TrackingCode + " via " + v.Carrier
+    case DeliveredOrder: return "Delivered: " + v.DeliveredAt.Format(time.RFC3339)
+    case CancelledOrder: return "Cancelled: " + v.Reason
+    default:             panic("unreachable — new state added without updating PrintStatus")
+    }
+}</code></pre>
+  <pre data-lang="ts" style="display:none"><code class="language-typescript">// ── Step 2: Each state is a variant of the discriminated union ───────────────
+type Order =
+  | { status: 'pending';   id: string; items: Item[] }
+  | { status: 'confirmed'; id: string; items: Item[]; confirmedAt: Date }
+  | { status: 'shipped';   id: string; trackingCode: string; carrier: string }
+  | { status: 'delivered'; id: string; deliveredAt: Date }
+  | { status: 'cancelled'; id: string; reason: string }
+
+// Convenience aliases
+type Pending   = Extract<Order, { status: 'pending' }>
+type Confirmed = Extract<Order, { status: 'confirmed' }>
+type Shipped   = Extract<Order, { status: 'shipped' }>
+
+// ── Step 3: Transitions as typed functions ───────────────────────────────────
+function confirm(o: Pending): Confirmed {
+  return { status: 'confirmed', id: o.id, items: o.items, confirmedAt: new Date() }
+}
+
+function ship(o: Confirmed, trackingCode: string, carrier: string): Shipped {
+  return { status: 'shipped', id: o.id, trackingCode, carrier }
+}
+
+function deliver(o: Shipped): Extract<Order, { status: 'delivered' }> {
+  return { status: 'delivered', id: o.id, deliveredAt: new Date() }
+}
+
+// cancel only accepts Pending | Confirmed — cannot call on Shipped or Delivered
+function cancel(o: Pending | Confirmed, reason: string): Extract<Order, { status: 'cancelled' }> {
+  return { status: 'cancelled', id: o.id, reason }
+}
+
+// ── Step 4: Exhaustive switch — TypeScript errors on missing cases ────────────
+function printStatus(o: Order): string {
+  switch (o.status) {
+    case 'pending':   return `Pending: ${o.items.length} items`
+    case 'confirmed': return `Confirmed at ${o.confirmedAt.toISOString()}`
+    case 'shipped':   return `Shipped: ${o.trackingCode} via ${o.carrier}`
+    case 'delivered': return `Delivered: ${o.deliveredAt.toISOString()}`
+    case 'cancelled': return `Cancelled: ${o.reason}`
+    // TS will show an error here if you add a new variant and forget this switch
+  }
+}</code></pre>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<section id="example">
+<h2>💻 <span class="en">Full Example: TCP Connection FSM</span><span class="th">ตัวอย่างเต็ม: TCP Connection FSM</span></h2>
+
+<p class="lead">
+  <span class="en">TCP connections follow a well-known state machine. Here we show the contrast between an untyped string-state approach (runtime bugs) and a fully encoded ADT approach (compile-time safety).</span>
+  <span class="th">TCP connection มี state machine ที่มีชื่อเสียง ที่นี่เราแสดงความแตกต่างระหว่าง string-state ที่ไม่มี type (bugs เวลา runtime) กับ ADT ที่ encode เต็ม (safety ตั้งแต่ compile time)</span>
+</p>
+
+<div class="code-block">
+  <div class="code-header"><span>tcp_naive.go — <span class="en">without encoding (runtime bugs)</span><span class="th">ไม่มี encoding (bugs เวลา runtime)</span></span></div>
+  <pre data-lang="go"><code class="language-go">// The naive approach — state stored as a string
+type Conn struct {
+    state      string // "closed" | "connecting" | "established" | "closing"
+    remoteAddr string
+    localPort  int
+}
+
+func (c *Conn) Dial(addr string) error {
+    if c.state != "closed" {
+        return errors.New("already connected")  // easy to forget this guard
+    }
+    c.remoteAddr = addr
+    c.state = "connecting"
+    return nil
+}
+
+func (c *Conn) Send(data []byte) error {
+    if c.state != "established" {  // if you forget this guard → nil-deref crash
+        return errors.New("not connected")
+    }
+    // send data...
+    return nil
+}
+
+// Problems:
+//   c.state = "establihsed"   // typo — compiles, silently breaks Send()
+//   c.Send(data)              // called on a Conn{state:"closed"} — only fails at runtime
+//   No compile-time guarantee that state transitions are valid</code></pre>
+  <pre data-lang="ts" style="display:none"><code class="language-typescript">// Naive: state stored as string
+class Conn {
+  private state: string = 'closed'  // any string accepted — typos compile fine
+  private remoteAddr = ''
+
+  dial(addr: string): void {
+    if (this.state !== 'closed') throw new Error('already connected')
+    this.remoteAddr = addr
+    this.state = 'connecting'
+  }
+
+  send(data: Uint8Array): void {
+    if (this.state !== 'established') throw new Error('not connected')
+    // send...
+  }
+  // Problem: this.state = 'establihsed'  ← typo, compiles, silently breaks send()
+}</code></pre>
+</div>
+
+<div class="code-block">
+  <div class="code-header"><span>tcp_typed.go — <span class="en">with FSM encoding (compile-time safety)</span><span class="th">มี FSM encoding (safety ตั้งแต่ compile time)</span></span></div>
+  <pre data-lang="go"><code class="language-go">package tcp
+
+import (
+    "errors"
+    "net"
+)
+
+// ── States — each carries only the data relevant to that state ───────────────
+
+type Closed struct{} // no data — a Closed connection is just closed
+
+type Connecting struct {
+    RemoteAddr string
+}
+
+type Established struct {
+    RemoteAddr string
+    LocalPort  int
+    conn       net.Conn // actual network connection (private)
+}
+
+type Closing struct {
+    RemoteAddr string
+}
+
+// ── Transitions — signatures ARE the allowed edges ───────────────────────────
+
+// Closed → Connecting
+func (Closed) Dial(addr string) (Connecting, error) {
+    // resolve address, initiate TCP handshake...
+    return Connecting{RemoteAddr: addr}, nil
+}
+
+// Connecting → Established (handshake complete)
+func (c Connecting) Connected(conn net.Conn) Established {
+    return Established{
+        RemoteAddr: c.RemoteAddr,
+        LocalPort:  conn.LocalAddr().(*net.TCPAddr).Port,
+        conn:       conn,
+    }
+}
+
+// Connecting → Closed (handshake failed)
+func (Connecting) Failed() Closed { return Closed{} }
+
+// Established → can send data (only method available in this state!)
+func (c Established) Send(data []byte) error {
+    _, err := c.conn.Write(data)
+    return err
+}
+
+// Established → Closing (initiate graceful close)
+func (c Established) Close() (Closing, error) {
+    if err := c.conn.CloseWrite(); err != nil {
+        return Closing{}, err
+    }
+    return Closing{RemoteAddr: c.RemoteAddr}, nil
+}
+
+// Closing → Closed (fully closed)
+func (Closing) Done() Closed { return Closed{} }
+
+// ── What you CANNOT do ────────────────────────────────────────────────────────
+// var c Closed
+// c.Send(data)      // compile error: Closed has no method Send
+// c.Close()         // compile error: Closed has no method Close
+// c.Connected(conn) // compile error: Closed has no method Connected
+
+// ── Sum type: any connection state ───────────────────────────────────────────
+type ConnState interface{ connState() }
+
+func (Closed)      connState() {}
+func (Connecting)  connState() {}
+func (Established) connState() {}
+func (Closing)     connState() {}
+
+// The type switch is exhaustive — add a state, forget to handle it → panic at startup
+func Describe(s ConnState) string {
+    switch v := s.(type) {
+    case Closed:      return "closed"
+    case Connecting:  return "connecting to " + v.RemoteAddr
+    case Established: return fmt.Sprintf("established (port %d)", v.LocalPort)
+    case Closing:     return "closing " + v.RemoteAddr
+    default:          panic("unhandled TCP state")
+    }
+}</code></pre>
+  <pre data-lang="ts" style="display:none"><code class="language-typescript">// ── States ────────────────────────────────────────────────────────────────────
+type Closed      = { status: 'closed' }
+type Connecting  = { status: 'connecting';   remoteAddr: string }
+type Established = { status: 'established';  remoteAddr: string; localPort: number }
+type Closing     = { status: 'closing';      remoteAddr: string }
+
+type ConnState = Closed | Connecting | Established | Closing
+
+// ── Transitions ──────────────────────────────────────────────────────────────
+function dial(s: Closed, addr: string): Connecting {
+  return { status: 'connecting', remoteAddr: addr }
+}
+
+function connected(s: Connecting, port: number): Established {
+  return { status: 'established', remoteAddr: s.remoteAddr, localPort: port }
+}
+
+function failed(s: Connecting): Closed { return { status: 'closed' } }
+
+// send() only accepts Established — calling it on Closed is a TypeScript error
+function send(s: Established, data: Uint8Array): void {
+  // actual send...
+}
+
+function close(s: Established): Closing {
+  return { status: 'closing', remoteAddr: s.remoteAddr }
+}
+
+function done(s: Closing): Closed { return { status: 'closed' } }
+
+// ── Exhaustive switch ─────────────────────────────────────────────────────────
+function describe(s: ConnState): string {
+  switch (s.status) {
+    case 'closed':      return 'closed'
+    case 'connecting':  return `connecting to ${s.remoteAddr}`
+    case 'established': return `established (port ${s.localPort})`
+    case 'closing':     return `closing ${s.remoteAddr}`
+    // TS errors here if you add a new state variant and forget to handle it
+  }
+}</code></pre>
+</div>
+
+<div class="callout tip">
+  <span class="callout-icon">✅</span>
+  <div class="callout-text">
+    <span class="en"><strong>What the compiler now guarantees:</strong> You cannot call <code>send()</code> on a <code>Closed</code> connection. You cannot call <code>dial()</code> on an <code>Established</code> connection. No nil checks needed. No typo-in-state-string bugs. If you add a new state, every switch/type-assert in the codebase shows a compile error until you handle it.</span>
+    <span class="th"><strong>สิ่งที่ compiler รับประกัน:</strong> ไม่สามารถ <code>send()</code> บน <code>Closed</code> connection ได้ ไม่สามารถ <code>dial()</code> บน <code>Established</code> ได้ ไม่ต้อง nil check ไม่มี bug จาก typo ใน string state ถ้าเพิ่ม state ใหม่ ทุก switch ในโค้ดจะ compile error จนกว่าจะ handle ครบ</span>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<section id="summary">
+<h2>✅ <span class="en">Summary</span><span class="th">สรุป</span></h2>
+
+<div class="vb-wrap">
+  <div class="vb-grid vb-2">
+    <div class="vbox">
+      <div class="vb-icon">🟢</div>
+      <div class="vb-title"><span class="en">Use this when…</span><span class="th">ใช้เมื่อ…</span></div>
+      <ul class="vb-list">
+        <li><span class="en">Domain objects have meaningful lifecycles (Order, Account, Connection)</span><span class="th">Object ใน domain มี lifecycle ที่มีความหมาย</span></li>
+        <li><span class="en">You see 3+ parameters always passed together</span><span class="th">มี parameter 3 ตัวขึ้นไปที่ส่งด้วยกันเสมอ</span></li>
+        <li><span class="en">You see 2+ boolean flags representing mutex states</span><span class="th">มี boolean flag 2 ตัวขึ้นไปที่แทน exclusive states</span></li>
+        <li><span class="en">You find yourself checking <code>if state == "x"</code> everywhere</span><span class="th">โค้ดเต็มไปด้วย <code>if state == "x"</code></span></li>
+        <li><span class="en">Bugs are caused by invalid state combinations (e.g. both active and deleted)</span><span class="th">Bug เกิดจาก state ที่ไม่ valid (เช่น active และ deleted พร้อมกัน)</span></li>
+      </ul>
+    </div>
+    <div class="vbox">
+      <div class="vb-icon">🔴</div>
+      <div class="vb-title"><span class="en">Skip this when…</span><span class="th">ไม่จำเป็นเมื่อ…</span></div>
+      <ul class="vb-list">
+        <li><span class="en">Simple 2-state toggles (active/inactive) — a bool is fine</span><span class="th">Toggle 2 state ธรรมดา (active/inactive) — bool ก็พอ</span></li>
+        <li><span class="en">Pure CRUD with no transitions or business rules</span><span class="th">Pure CRUD ไม่มี transitions หรือ business rules</span></li>
+        <li><span class="en">Throwaway scripts or early prototypes</span><span class="th">Script ชั่วคราวหรือ prototype ระยะแรก</span></li>
+        <li><span class="en">Only 1–2 callers — the clump hasn't repeated enough to hurt</span><span class="th">มี caller แค่ 1–2 จุด clump ยังไม่ซ้ำพอที่จะเจ็บ</span></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<h3><span class="en">Quick Reference</span><span class="th">ตาราง Quick Reference</span></h3>
+<div class="compare-wrap">
+  <table class="compare-table">
+    <thead>
+      <tr>
+        <th><span class="en">Smell</span><span class="th">Code Smell</span></th>
+        <th><span class="en">Pattern</span><span class="th">Pattern</span></th>
+        <th><span class="en">ADT Encoding</span><span class="th">ADT Encoding</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="en">Co-occurring parameters</span><span class="th">Parameter ที่ตามกันเสมอ</span></td>
+        <td><span class="en">Extract into named type</span><span class="th">สร้าง named type</span></td>
+        <td><code>struct { A, B, C }</code> — <span class="en">Product Type</span><span class="th">Product Type</span></td>
+      </tr>
+      <tr>
+        <td><span class="en">Boolean flag explosion</span><span class="th">Boolean flags ระเบิด</span></td>
+        <td><span class="en">Replace with enum</span><span class="th">แทนด้วย enum</span></td>
+        <td><code>type S = A | B | C</code> — <span class="en">Sum Type</span><span class="th">Sum Type</span></td>
+      </tr>
+      <tr>
+        <td><span class="en">Nullable sentinel (<code>nil</code>)</span><span class="th">Null ที่กำกวม</span></td>
+        <td><span class="en">Wrap in Option</span><span class="th">ห่อด้วย Option</span></td>
+        <td><code>None | Some(T)</code> — <span class="en">Sum Type</span><span class="th">Sum Type</span></td>
+      </tr>
+      <tr>
+        <td><span class="en">Invalid state combinations</span><span class="th">State combinations ที่ invalid</span></td>
+        <td><span class="en">Design as FSM first</span><span class="th">ออกแบบเป็น FSM ก่อน</span></td>
+        <td><span class="en">One type per state + transition functions</span><span class="th">หนึ่ง type ต่อ state + transition functions</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="callout info">
+  <span class="callout-icon">🔗</span>
+  <div class="callout-text">
+    <span class="en"><strong>Related topics:</strong> <a href="25-functional-programming.html" style="color:#fbbf24">Topic 25 — Functional Programming</a> (ADT syntax, Pattern Matching, IO Monad in Scala) · <a href="1-ddd.html" style="color:#fbbf24">Topic 01 — DDD</a> (Value Objects and Aggregates as product types) · <a href="13-cqrs.html" style="color:#fbbf24">Topic 13 — CQRS</a> (Event Sourcing: state as sequence of events)</span>
+    <span class="th"><strong>หัวข้อที่เกี่ยวข้อง:</strong> <a href="25-functional-programming.html" style="color:#fbbf24">หัวข้อ 25 — Functional Programming</a> (ADT syntax, Pattern Matching, IO Monad ใน Scala) · <a href="1-ddd.html" style="color:#fbbf24">หัวข้อ 01 — DDD</a> (Value Objects และ Aggregates เป็น product types) · <a href="13-cqrs.html" style="color:#fbbf24">หัวข้อ 13 — CQRS</a> (Event Sourcing: state เป็น sequence of events)</span>
+  </div>
+</div>
+
+<!-- Prev/Next nav -->
+<div style="display:flex;gap:1rem;margin-top:40px;flex-wrap:wrap">
+  <a href="25-functional-programming.html" style="display:inline-flex;align-items:center;gap:.5rem;background:#0d1117;border:1px solid #1e293b;color:#64748b;padding:.7rem 1.5rem;border-radius:10px;font-size:.88rem;text-decoration:none">
+    ← <span class="en">Functional Programming (25)</span><span class="th">Functional Programming (25)</span>
+  </a>
+  <a href="index.html" style="display:inline-flex;align-items:center;gap:.5rem;background:#0d1117;border:1px solid #f59e0b30;color:#fbbf24;padding:.7rem 1.5rem;border-radius:10px;font-weight:600;font-size:.88rem;text-decoration:none">
+    <span class="en">← All Topics</span><span class="th">← หัวข้อทั้งหมด</span>
+  </a>
+</div>
+</section>
+
+</div><!-- /container -->
+
+<footer>
+  <span class="en">Software Architecture Patterns &nbsp;·&nbsp; Finite Automata &amp; ADTs #26 &nbsp;·&nbsp; Bilingual EN / TH</span>
+  <span class="th">สื่อการสอน Software Architecture Patterns &nbsp;·&nbsp; Finite Automata &amp; ADTs #26 &nbsp;·&nbsp; สองภาษา EN / TH</span>
+</footer>
+
+<script>
+  hljs.highlightAll();
+</script>
+<script src="common.js"></script>
+<script src="i18n.js"></script>
+</body>
+</html>

@@ -15,6 +15,7 @@
 | [18-design-patterns.md](18-design-patterns.md) | GoF Design Patterns | Factory, Builder, Decorator, Strategy, Observer, Chain of Responsibility |
 | [19-testing.md](19-testing.md) | Testing Patterns | Test Pyramid, TDD, Stub/Mock/Fake/Spy, Table-driven |
 | [25-functional-programming.md](25-functional-programming.md) | Functional Programming (7 Levels) | Pure Functions, HOFs, ADTs, IO Monad, Type Classes, Scala 3 |
+| [26-finite-automata-adt.md](26-finite-automata-adt.md) | Finite Automata & ADTs | FSM, Product/Sum Types, Data Clumps, State Encoding, Go/TypeScript |
 
 ## 🏗️ Architecture Styles
 
