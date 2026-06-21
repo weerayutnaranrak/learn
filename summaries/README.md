@@ -14,6 +14,7 @@
 | [17-solid.md](17-solid.md) | SOLID Principles | SRP, OCP, LSP, ISP, DIP — before/after Go code |
 | [18-design-patterns.md](18-design-patterns.md) | GoF Design Patterns | Factory, Builder, Decorator, Strategy, Observer, Chain of Responsibility |
 | [19-testing.md](19-testing.md) | Testing Patterns | Test Pyramid, TDD, Stub/Mock/Fake/Spy, Table-driven |
+| [25-functional-programming.md](25-functional-programming.md) | Functional Programming (7 Levels) | Pure Functions, HOFs, ADTs, IO Monad, Type Classes, Scala 3 |
 
 ## 🏗️ Architecture Styles
 

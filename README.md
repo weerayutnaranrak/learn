@@ -4,7 +4,7 @@
 
 > **อ่าน summaries ก่อน:** ดูสรุปทุกหัวข้อได้ที่ [`summaries/`](summaries/README.md)
 
-## หัวข้อทั้งหมด (24 หัวข้อ)
+## หัวข้อทั้งหมด (25 หัวข้อ)
 
 ### 🏛️ Design Principles & Patterns
 
@@ -18,6 +18,7 @@
 | 03 | CQRS | Command/Query separation, Projection, Event Sourcing | `13-cqrs.html` | [📄](summaries/13-cqrs.md) |
 | 04 | HTDP | Design Recipe 6 ขั้นตอน, Examples First | `6-htdp.html` | [📄](summaries/06-htdp.md) |
 | 19 | Testing Patterns | Test Pyramid, TDD, Stub/Mock/Fake/Spy, Table-driven | `19-testing.html` | [📄](summaries/19-testing.md) |
+| 25 | Functional Programming (7 Levels) | Pure Functions, HOFs, ADTs, IO Monad, Type Classes, Scala 3 | `25-functional-programming.html` | [📄](summaries/25-functional-programming.md) |
 
 ### 🏗️ Architecture Styles
 

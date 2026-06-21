@@ -92,35 +92,41 @@ a:hover{text-decoration:underline}
 .pill{display:inline-block;padding:.15rem .55rem;border-radius:4px;font-size:.72rem;font-weight:700}
 </style>
 </head>
-<body>
+<body class="lang-th">
 
 <nav class="topnav">
-  <a href="index.html" class="back-btn">← กลับหน้าหลัก</a>
+  <a href="index.html" class="back-btn"><span class="en">← Back</span><span class="th">← กลับหน้าหลัก</span></a>
   <span class="nav-title">01 / <span>Domain Driven Design</span></span>
 </nav>
 
 <div class="hero">
-  <div class="hero-badge">🏛️ หัวข้อที่ 1</div>
+  <div class="hero-badge"><span class="en">🏛️ Topic 1</span><span class="th">🏛️ หัวข้อที่ 1</span></div>
   <h1>Domain Driven Design</h1>
-  <p>ออกแบบซอฟต์แวร์โดยให้ Business Domain เป็นหัวใจ — code สะท้อนความเป็นจริงของธุรกิจ ไม่ใช่แค่ database schema</p>
+  <p>
+    <span class="en">Design software with the Business Domain at its core — code reflects business reality, not just a database schema</span>
+    <span class="th">ออกแบบซอฟต์แวร์โดยให้ Business Domain เป็นหัวใจ — code สะท้อนความเป็นจริงของธุรกิจ ไม่ใช่แค่ database schema</span>
+  </p>
 </div>
 
 <div class="content">
 
 <!-- ───────── WHAT IS DDD ───────── -->
 <div class="section">
-  <div class="section-title">💡 DDD คืออะไร?</div>
-  <div class="section-sub">แนวคิดที่ Eric Evans เสนอในหนังสือ "Domain-Driven Design" ปี 2003</div>
+  <div class="section-title">💡 <span class="en">What is DDD?</span><span class="th">DDD คืออะไร?</span></div>
+  <div class="section-sub"><span class="en">Concept proposed by Eric Evans in the book "Domain-Driven Design" (2003)</span><span class="th">แนวคิดที่ Eric Evans เสนอในหนังสือ "Domain-Driven Design" ปี 2003</span></div>
 
   <p style="color:#94a3b8;margin-bottom:1.5rem">
-    DDD เป็น <strong style="color:#e2e8f0">วิธีคิด</strong> ในการออกแบบซอฟต์แวร์ที่ซับซ้อน
+    <span class="en">DDD is a <strong style="color:#e2e8f0">mindset</strong> for designing complex software
+    where the <strong style="color:#a5b4fc">Domain (business boundary)</strong> drives the code structure,
+    rather than designing from a database or framework.</span>
+    <span class="th">DDD เป็น <strong style="color:#e2e8f0">วิธีคิด</strong> ในการออกแบบซอฟต์แวร์ที่ซับซ้อน
     โดยให้ <strong style="color:#a5b4fc">Domain (ขอบเขตธุรกิจ)</strong> เป็นตัวกำหนดโครงสร้างของโค้ด
-    แทนที่จะออกแบบจาก database หรือ framework
+    แทนที่จะออกแบบจาก database หรือ framework</span>
   </p>
 
   <div class="callout">
     <strong>Core Idea:</strong> "The domain model and the code should be so closely linked that changing one means changing the other."
-    — แบบจำลองธุรกิจและโค้ดต้องสอดคล้องกันอย่างใกล้ชิด
+    — <span class="en">The business model and code must be closely aligned.</span><span class="th">แบบจำลองธุรกิจและโค้ดต้องสอดคล้องกันอย่างใกล้ชิด</span>
   </div>
 
   <div class="steps">
@@ -128,21 +134,30 @@ a:hover{text-decoration:underline}
       <div class="step-num">1</div>
       <div class="step-body">
         <h4>Focus on the Core Domain</h4>
-        <p>ทำความเข้าใจธุรกิจ (Domain) อย่างลึกซึ้ง ทำงานร่วมกับ Domain Expert เพื่อให้ code สะท้อน business logic ที่แท้จริง</p>
+        <p>
+          <span class="en">Deeply understand the Domain (business). Work closely with Domain Experts so the code truly reflects business logic.</span>
+          <span class="th">ทำความเข้าใจธุรกิจ (Domain) อย่างลึกซึ้ง ทำงานร่วมกับ Domain Expert เพื่อให้ code สะท้อน business logic ที่แท้จริง</span>
+        </p>
       </div>
     </div>
     <div class="step">
       <div class="step-num">2</div>
       <div class="step-body">
-        <h4>Ubiquitous Language (ภาษาร่วม)</h4>
-        <p>Developer และ Domain Expert ใช้ภาษาเดียวกัน คำว่า "Order", "Invoice", "Customer" มีความหมายเดียวกันในทุกที่ — ใน code, ในเอกสาร, ในการพูดคุย</p>
+        <h4>Ubiquitous Language (<span class="en">Shared Language</span><span class="th">ภาษาร่วม</span>)</h4>
+        <p>
+          <span class="en">Developers and Domain Experts use the same language. Terms like "Order", "Invoice", "Customer" mean the same everywhere — in code, docs, and conversation.</span>
+          <span class="th">Developer และ Domain Expert ใช้ภาษาเดียวกัน คำว่า "Order", "Invoice", "Customer" มีความหมายเดียวกันในทุกที่ — ใน code, ในเอกสาร, ในการพูดคุย</span>
+        </p>
       </div>
     </div>
     <div class="step">
       <div class="step-num">3</div>
       <div class="step-body">
         <h4>Model-Driven Design</h4>
-        <p>สร้าง Domain Model (แบบจำลอง) ที่ชัดเจน แล้วแปลง Model นั้นเป็น code โดยตรง — ไม่ต้อง translate ระหว่างชั้น</p>
+        <p>
+          <span class="en">Build a clear Domain Model, then translate it directly into code — no translation layer needed between model and implementation.</span>
+          <span class="th">สร้าง Domain Model (แบบจำลอง) ที่ชัดเจน แล้วแปลง Model นั้นเป็น code โดยตรง — ไม่ต้อง translate ระหว่างชั้น</span>
+        </p>
       </div>
     </div>
   </div>
@@ -151,17 +166,20 @@ a:hover{text-decoration:underline}
 <!-- ───────── BOUNDED CONTEXT ───────── -->
 <div class="section">
   <div class="section-title">🗺️ Bounded Context</div>
-  <div class="section-sub">ขอบเขตที่ Model หนึ่งๆ มีความหมายชัดเจน</div>
+  <div class="section-sub"><span class="en">The boundary within which a specific Model has a clear, unambiguous meaning</span><span class="th">ขอบเขตที่ Model หนึ่งๆ มีความหมายชัดเจน</span></div>
 
   <p style="color:#94a3b8;margin-bottom:1.5rem">
-    ในระบบขนาดใหญ่ คำเดียวกันอาจมีความหมายต่างกันในแต่ละส่วน
+    <span class="en">In large systems, the same word can mean different things in different parts.
+    "Customer" in the Sales system vs. the Accounting system vs. the Shipping system — they differ significantly.
+    <strong style="color:#e2e8f0">Bounded Context</strong> defines the boundary within which a Model has a clear meaning.</span>
+    <span class="th">ในระบบขนาดใหญ่ คำเดียวกันอาจมีความหมายต่างกันในแต่ละส่วน
     เช่น "Customer" ในระบบขาย vs ระบบบัญชี vs ระบบส่งของ — ต่างกันมาก
-    <strong style="color:#e2e8f0">Bounded Context</strong> คือการกำหนดขอบเขตที่ Model นั้นมีความหมายชัดเจน
+    <strong style="color:#e2e8f0">Bounded Context</strong> คือการกำหนดขอบเขตที่ Model นั้นมีความหมายชัดเจน</span>
   </p>
 
   <!-- Animated Bounded Context Diagram -->
   <div class="diagram">
-    <div class="diagram-title">ระบบ E-Commerce — แบ่งเป็น 4 Bounded Contexts</div>
+    <div class="diagram-title"><span class="en">E-Commerce System — divided into 4 Bounded Contexts</span><span class="th">ระบบ E-Commerce — แบ่งเป็น 4 Bounded Contexts</span></div>
     <svg viewBox="0 0 680 300" fill="none" xmlns="http://www.w3.org/2000/svg" style="max-width:680px;width:100%">
       <!-- Order Context -->
       <rect x="20" y="30" width="150" height="110" rx="12" fill="#1a1040" stroke="#6366f1" stroke-width="1.5"/>
@@ -249,47 +267,69 @@ a:hover{text-decoration:underline}
   </div>
 
   <div class="callout">
-    <strong>Context Map:</strong> แต่ละ Bounded Context มี <strong>Ubiquitous Language</strong> ของตัวเอง
+    <strong>Context Map:</strong>
+    <span class="en">Each Bounded Context has its own <strong>Ubiquitous Language</strong>
+    — "Customer" in the Order context might only have an ID and Address,
+    while in the Payment Context it may also carry credit score and payment method.</span>
+    <span class="th">แต่ละ Bounded Context มี <strong>Ubiquitous Language</strong> ของตัวเอง
     — คำว่า "Customer" ในระบบ Order อาจมีแค่ ID และ Address
-    แต่ใน Payment Context อาจมี credit score, payment method ด้วย
+    แต่ใน Payment Context อาจมี credit score, payment method ด้วย</span>
   </div>
 </div>
 
 <!-- ───────── TACTICAL PATTERNS ───────── -->
 <div class="section">
   <div class="section-title">🧱 Building Blocks (Tactical Patterns)</div>
-  <div class="section-sub">ส่วนประกอบที่ใช้สร้าง Domain Model</div>
+  <div class="section-sub"><span class="en">Building blocks used to construct a Domain Model</span><span class="th">ส่วนประกอบที่ใช้สร้าง Domain Model</span></div>
 
   <div class="concept-grid">
     <div class="concept-card" style="--c:#6366f1">
       <div class="label">Entity</div>
       <h3>Entity</h3>
-      <p>สิ่งที่มี <strong>Identity</strong> ชัดเจน (ID) และ State ที่เปลี่ยนได้ตามเวลา เช่น Order, Customer, User — แม้ข้อมูลจะเปลี่ยน แต่ยังเป็น object เดิม</p>
+      <p>
+        <span class="en">Something with a clear <strong>Identity</strong> (ID) and state that changes over time — e.g. Order, Customer, User. Even if its data changes, it remains the same object.</span>
+        <span class="th">สิ่งที่มี <strong>Identity</strong> ชัดเจน (ID) และ State ที่เปลี่ยนได้ตามเวลา เช่น Order, Customer, User — แม้ข้อมูลจะเปลี่ยน แต่ยังเป็น object เดิม</span>
+      </p>
     </div>
     <div class="concept-card" style="--c:#8b5cf6">
       <div class="label">Value Object</div>
       <h3>Value Object</h3>
-      <p>ไม่มี Identity — กำหนดจาก <strong>ค่า</strong> ของมัน เช่น Money(100, "THB") — ถ้าค่าเท่ากัน ก็เป็น object เดียวกัน, Immutable เสมอ</p>
+      <p>
+        <span class="en">No Identity — defined purely by its <strong>value</strong>. e.g. Money(100, "THB") — two instances with the same value are the same object. Always Immutable.</span>
+        <span class="th">ไม่มี Identity — กำหนดจาก <strong>ค่า</strong> ของมัน เช่น Money(100, "THB") — ถ้าค่าเท่ากัน ก็เป็น object เดียวกัน, Immutable เสมอ</span>
+      </p>
     </div>
     <div class="concept-card" style="--c:#06b6d4">
       <div class="label">Aggregate</div>
       <h3>Aggregate Root</h3>
-      <p>กลุ่มของ Entities + VOs ที่รวมกันเป็นหน่วยเดียว มี <strong>Aggregate Root</strong> เป็นประตูเดียวในการเข้าถึง — รับประกัน consistency</p>
+      <p>
+        <span class="en">A cluster of Entities and Value Objects treated as a single unit. The <strong>Aggregate Root</strong> is the only entry point — guaranteeing consistency.</span>
+        <span class="th">กลุ่มของ Entities + VOs ที่รวมกันเป็นหน่วยเดียว มี <strong>Aggregate Root</strong> เป็นประตูเดียวในการเข้าถึง — รับประกัน consistency</span>
+      </p>
     </div>
     <div class="concept-card" style="--c:#10b981">
       <div class="label">Repository</div>
       <h3>Repository</h3>
-      <p>Interface สำหรับ persist และ retrieve Aggregates — ซ่อน Storage detail ไว้ใน Infrastructure ทำให้ Domain ไม่รู้จัก database</p>
+      <p>
+        <span class="en">Interface for persisting and retrieving Aggregates — hides storage details in the Infrastructure layer so the Domain knows nothing about the database.</span>
+        <span class="th">Interface สำหรับ persist และ retrieve Aggregates — ซ่อน Storage detail ไว้ใน Infrastructure ทำให้ Domain ไม่รู้จัก database</span>
+      </p>
     </div>
     <div class="concept-card" style="--c:#f59e0b">
       <div class="label">Domain Service</div>
       <h3>Domain Service</h3>
-      <p>Business logic ที่ <strong>ไม่เป็นธรรมชาติ</strong>ของ Entity ใดๆ เช่น การคำนวณราคาที่ซับซ้อนซึ่งต้องใช้หลาย Aggregates</p>
+      <p>
+        <span class="en">Business logic that doesn't <strong>naturally belong</strong> to any Entity — e.g. complex pricing calculations that require multiple Aggregates.</span>
+        <span class="th">Business logic ที่ <strong>ไม่เป็นธรรมชาติ</strong>ของ Entity ใดๆ เช่น การคำนวณราคาที่ซับซ้อนซึ่งต้องใช้หลาย Aggregates</span>
+      </p>
     </div>
     <div class="concept-card" style="--c:#ec4899">
       <div class="label">Domain Event</div>
       <h3>Domain Event</h3>
-      <p>เหตุการณ์ที่เกิดใน Domain — "สิ่งที่เกิดขึ้นแล้วในอดีต" เช่น OrderPlaced, PaymentReceived — ใช้สื่อสารระหว่าง Contexts</p>
+      <p>
+        <span class="en">Something that happened in the Domain — a fact from the past — e.g. OrderPlaced, PaymentReceived. Used to communicate between Bounded Contexts.</span>
+        <span class="th">เหตุการณ์ที่เกิดใน Domain — "สิ่งที่เกิดขึ้นแล้วในอดีต" เช่น OrderPlaced, PaymentReceived — ใช้สื่อสารระหว่าง Contexts</span>
+      </p>
     </div>
   </div>
 
@@ -297,32 +337,32 @@ a:hover{text-decoration:underline}
   <h3 style="color:#a5b4fc;margin-bottom:1rem;margin-top:2rem">Entity vs Value Object</h3>
   <table class="compare">
     <tr>
-      <th>คุณสมบัติ</th>
+      <th><span class="en">Property</span><span class="th">คุณสมบัติ</span></th>
       <th>Entity</th>
       <th>Value Object</th>
     </tr>
     <tr>
       <td>Identity (ID)</td>
-      <td class="yes">✓ มี ID ชัดเจน</td>
-      <td class="no">✗ ไม่มี</td>
+      <td class="yes">✓ <span class="en">Has a clear ID</span><span class="th">มี ID ชัดเจน</span></td>
+      <td class="no">✗ <span class="en">None</span><span class="th">ไม่มี</span></td>
     </tr>
     <tr>
       <td>Mutability</td>
-      <td class="yes">✓ เปลี่ยนได้</td>
+      <td class="yes">✓ <span class="en">Mutable</span><span class="th">เปลี่ยนได้</span></td>
       <td class="no">✗ Immutable</td>
     </tr>
     <tr>
       <td>Equality</td>
-      <td>เปรียบ ID</td>
-      <td>เปรียบค่า</td>
+      <td><span class="en">Compare by ID</span><span class="th">เปรียบ ID</span></td>
+      <td><span class="en">Compare by value</span><span class="th">เปรียบค่า</span></td>
     </tr>
     <tr>
       <td>Lifecycle</td>
-      <td>มี lifecycle ยาวนาน</td>
-      <td>สั้น — สร้างใหม่ทุกครั้ง</td>
+      <td><span class="en">Long-lived lifecycle</span><span class="th">มี lifecycle ยาวนาน</span></td>
+      <td><span class="en">Short — recreated each time</span><span class="th">สั้น — สร้างใหม่ทุกครั้ง</span></td>
     </tr>
     <tr>
-      <td>ตัวอย่าง</td>
+      <td><span class="en">Examples</span><span class="th">ตัวอย่าง</span></td>
       <td>Order, Customer, Product</td>
       <td>Money, Address, Email, DateRange</td>
     </tr>
@@ -331,8 +371,8 @@ a:hover{text-decoration:underline}
 
 <!-- ───────── CODE EXAMPLE ───────── -->
 <div class="section">
-  <div class="section-title">💻 ตัวอย่าง Go — ระบบ E-Commerce</div>
-  <div class="section-sub">ครอบคลุม Entity, Value Object, Aggregate, Repository, Domain Event, Application Service</div>
+  <div class="section-title">💻 <span class="en">Go Example — E-Commerce System</span><span class="th">ตัวอย่าง Go — ระบบ E-Commerce</span></div>
+  <div class="section-sub"><span class="en">Covers Entity, Value Object, Aggregate, Repository, Domain Event, Application Service</span><span class="th">ครอบคลุม Entity, Value Object, Aggregate, Repository, Domain Event, Application Service</span></div>
 
   <div class="code-block">
     <div class="code-header">
@@ -925,65 +965,91 @@ func (s *OrderApplicationService) CancelOrder(ctx context.Context, orderID, reas
   </div>
 
   <div class="callout success">
-    <strong>สังเกต:</strong> Application Service (<code>PlaceOrder</code>) ไม่มี if/else logic ที่เกี่ยวกับ business
+    <strong><span class="en">Notice:</span><span class="th">สังเกต:</span></strong>
+    <span class="en">The Application Service (<code>PlaceOrder</code>) has no business if/else logic
+    — all rules live in Domain Objects (<code>order.Confirm()</code>, <code>order.Cancel()</code>).
+    The Application Service only <strong>orchestrates</strong> the steps.</span>
+    <span class="th">Application Service (<code>PlaceOrder</code>) ไม่มี if/else logic ที่เกี่ยวกับ business
     — ทุก rule อยู่ใน Domain Objects (<code>order.Confirm()</code>, <code>order.Cancel()</code>)
-    Application Service แค่ <strong>orchestrate</strong> ขั้นตอน
+    Application Service แค่ <strong>orchestrate</strong> ขั้นตอน</span>
   </div>
 </div>
 
 <!-- ───────── LAYER SUMMARY ───────── -->
 <div class="section">
   <div class="section-title">📦 DDD Layers</div>
-  <div class="section-sub">4 ชั้นของ DDD Application</div>
+  <div class="section-sub"><span class="en">4 layers of a DDD Application</span><span class="th">4 ชั้นของ DDD Application</span></div>
 
   <div style="display:flex;flex-direction:column;gap:.8rem;max-width:500px">
     <div class="layer-box" style="border-color:#6366f1">
       <h4 style="color:#a5b4fc">🖥️ Presentation Layer</h4>
-      <p>HTTP Handlers, gRPC, CLI — รับ input จากผู้ใช้/client แปลงเป็น Commands แล้วส่งให้ Application Layer</p>
+      <p>
+        <span class="en">HTTP Handlers, gRPC, CLI — receives input from users/clients, converts it to Commands, and passes them to the Application Layer.</span>
+        <span class="th">HTTP Handlers, gRPC, CLI — รับ input จากผู้ใช้/client แปลงเป็น Commands แล้วส่งให้ Application Layer</span>
+      </p>
     </div>
     <div style="text-align:center;color:#334155;font-size:1.2rem">↕</div>
     <div class="layer-box" style="border-color:#06b6d4">
       <h4 style="color:#67e8f9">⚙️ Application Layer</h4>
-      <p>Application Services — Orchestrates use cases, ไม่มี business logic เอง แค่ coordinate</p>
+      <p>
+        <span class="en">Application Services — orchestrates use cases, contains no business logic itself, only coordinates.</span>
+        <span class="th">Application Services — Orchestrates use cases, ไม่มี business logic เอง แค่ coordinate</span>
+      </p>
     </div>
     <div style="text-align:center;color:#334155;font-size:1.2rem">↕</div>
     <div class="layer-box" style="border-color:#10b981;background:rgba(16,185,129,.05)">
-      <h4 style="color:#6ee7b7">🏛️ Domain Layer ← หัวใจหลัก</h4>
-      <p>Entities, Value Objects, Aggregates, Domain Services, Domain Events — ไม่ depend ชั้นอื่นเลย</p>
+      <h4 style="color:#6ee7b7">🏛️ Domain Layer ← <span class="en">Core</span><span class="th">หัวใจหลัก</span></h4>
+      <p>
+        <span class="en">Entities, Value Objects, Aggregates, Domain Services, Domain Events — depends on no other layer.</span>
+        <span class="th">Entities, Value Objects, Aggregates, Domain Services, Domain Events — ไม่ depend ชั้นอื่นเลย</span>
+      </p>
     </div>
     <div style="text-align:center;color:#334155;font-size:1.2rem">↕</div>
     <div class="layer-box" style="border-color:#f59e0b">
       <h4 style="color:#fcd34d">🗄️ Infrastructure Layer</h4>
-      <p>Repositories (PostgreSQL, MongoDB), Email Service, Event Bus — implement interfaces ที่ Domain กำหนด</p>
+      <p>
+        <span class="en">Repositories (PostgreSQL, MongoDB), Email Service, Event Bus — implements interfaces defined by the Domain.</span>
+        <span class="th">Repositories (PostgreSQL, MongoDB), Email Service, Event Bus — implement interfaces ที่ Domain กำหนด</span>
+      </p>
     </div>
   </div>
 
   <div class="callout" style="margin-top:2rem">
-    <strong>Dependency Rule:</strong> ทุก Layer depend inward — Presentation → Application → Domain ← Infrastructure
-    Domain ไม่ depend ชั้นใดเลย! ทำให้ test ได้ง่ายมาก
+    <strong>Dependency Rule:</strong>
+    <span class="en">All layers depend inward — Presentation → Application → Domain ← Infrastructure.
+    The Domain depends on nothing! This makes it very easy to test.</span>
+    <span class="th">ทุก Layer depend inward — Presentation → Application → Domain ← Infrastructure
+    Domain ไม่ depend ชั้นใดเลย! ทำให้ test ได้ง่ายมาก</span>
   </div>
 </div>
 
 <!-- ───────── SUMMARY ───────── -->
 <div class="section">
-  <div class="section-title">✅ สรุป DDD</div>
+  <div class="section-title">✅ <span class="en">DDD Summary</span><span class="th">สรุป DDD</span></div>
   <div class="concept-grid">
     <div class="concept-card" style="--c:#10b981">
-      <div class="label">ข้อดี</div>
-      <h3>เมื่อไหร่ควรใช้</h3>
-      <p>• Business logic ซับซ้อน<br>• Team ต้องทำงานร่วมกับ Domain Expert<br>• System ต้องการ maintainability สูง<br>• Long-lived applications</p>
+      <div class="label"><span class="en">Pros</span><span class="th">ข้อดี</span></div>
+      <h3><span class="en">When to use</span><span class="th">เมื่อไหร่ควรใช้</span></h3>
+      <p>
+        <span class="en">• Complex business logic<br>• Team needs to collaborate with Domain Experts<br>• System requires high maintainability<br>• Long-lived applications</span>
+        <span class="th">• Business logic ซับซ้อน<br>• Team ต้องทำงานร่วมกับ Domain Expert<br>• System ต้องการ maintainability สูง<br>• Long-lived applications</span>
+      </p>
     </div>
     <div class="concept-card" style="--c:#ef4444">
-      <div class="label">ข้อเสีย</div>
-      <h3>เมื่อไหร่ไม่ควรใช้</h3>
-      <p>• CRUD applications ง่ายๆ<br>• Prototypes หรือ early-stage<br>• Team ไม่คุ้นเคยกับ Domain<br>• Business rules ไม่ซับซ้อน</p>
+      <div class="label"><span class="en">Cons</span><span class="th">ข้อเสีย</span></div>
+      <h3><span class="en">When NOT to use</span><span class="th">เมื่อไหร่ไม่ควรใช้</span></h3>
+      <p>
+        <span class="en">• Simple CRUD applications<br>• Prototypes or early-stage projects<br>• Team unfamiliar with the Domain<br>• Business rules are not complex</span>
+        <span class="th">• CRUD applications ง่ายๆ<br>• Prototypes หรือ early-stage<br>• Team ไม่คุ้นเคยกับ Domain<br>• Business rules ไม่ซับซ้อน</span>
+      </p>
     </div>
   </div>
 </div>
 
 <div style="text-align:center;margin:3rem 0">
   <a href="2-hexagonal.html" style="display:inline-flex;align-items:center;gap:.6rem;background:#0d1117;border:1px solid #1e293b;color:#818cf8;padding:.8rem 1.8rem;border-radius:10px;font-weight:600;font-size:.9rem;transition:all .2s">
-    หัวข้อถัดไป: Hexagonal Architecture →
+    <span class="en">Next: Hexagonal Architecture →</span>
+    <span class="th">หัวข้อถัดไป: Hexagonal Architecture →</span>
   </a>
 </div>
 

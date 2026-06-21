@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Functional Programming — สื่อการสอน</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<link rel="stylesheet" href="common.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',sans-serif;background:#07090f;color:#e2e8f0;line-height:1.7}
+
+/* ── Hero ── */
+.hero{background:linear-gradient(135deg,#07090f 0%,#0d0a1a 50%,#07090f 100%);padding:60px 40px;text-align:center;border-bottom:1px solid #7c3aed20;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,#7c3aed25 0%,transparent 65%)}
+.hero-badge{display:inline-block;background:#7c3aed15;border:1px solid #7c3aed50;color:#c4b5fd;padding:6px 18px;border-radius:20px;font-size:.8rem;letter-spacing:2px;text-transform:uppercase;margin-bottom:20px}
+.hero h1{font-size:3rem;font-weight:800;background:linear-gradient(135deg,#7c3aed,#a78bfa,#c4b5fd,#ddd6fe);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:12px}
+.hero-sub{font-size:1.1rem;color:#94a3b8;max-width:700px;margin:0 auto 20px}
+.hero-chips{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.hero-chip{background:#7c3aed10;border:1px solid #7c3aed30;color:#a78bfa;padding:4px 14px;border-radius:12px;font-size:.78rem}
+
+/* ── Nav ── */
+nav{background:#0d1117;padding:14px 40px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #ffffff10;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px);gap:12px}
+.nav-home{color:#a78bfa;text-decoration:none;font-weight:600;font-size:.9rem;white-space:nowrap}
+.nav-toc{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.toc-link{color:#64748b;text-decoration:none;font-size:.78rem;padding:3px 10px;border-radius:6px;background:#ffffff08;transition:all .2s}
+.toc-link:hover{color:#c4b5fd;background:#7c3aed15}
+
+/* ── Layout ── */
+.container{max-width:1150px;margin:0 auto;padding:40px 20px}
+section{margin-bottom:64px;scroll-margin-top:80px}
+h2{font-size:1.65rem;font-weight:700;color:#a78bfa;margin-bottom:8px;padding-bottom:10px;border-bottom:2px solid #7c3aed25;display:flex;align-items:center;gap:10px}
+h3{font-size:1.15rem;font-weight:600;color:#c4b5fd;margin:28px 0 14px}
+p{color:#94a3b8;margin-bottom:14px}
+strong{color:#e2e8f0}
+.lead{font-size:1rem;color:#cbd5e1}
+
+/* ── VBox ── */
+.vb-wrap{margin:24px 0}
+.vb-label{font-size:.72rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#a78bfa;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.vb-label::after{content:'';flex:1;height:1px;background:#7c3aed15}
+.vb-grid{display:grid;gap:14px}
+.vb-2{grid-template-columns:repeat(2,1fr)}
+.vb-3{grid-template-columns:repeat(3,1fr)}
+.vb-4{grid-template-columns:repeat(4,1fr)}
+.vbox{background:#0d1117;border:1px solid #7c3aed25;border-radius:14px;padding:18px;transition:transform .2s,border-color .2s,box-shadow .2s}
+.vbox:hover{transform:translateY(-3px);border-color:#a78bfa60;box-shadow:0 8px 24px #7c3aed15}
+.vb-icon{font-size:1.7rem;margin-bottom:8px}
+.vb-title{font-size:.95rem;font-weight:700;color:#e2e8f0;margin-bottom:6px}
+.vb-body{font-size:.83rem;color:#94a3b8;line-height:1.6}
+.vb-list{list-style:none;margin-top:8px}
+.vb-list li{font-size:.82rem;color:#94a3b8;padding:3px 0 3px 14px;position:relative}
+.vb-list li::before{content:'›';position:absolute;left:0;color:#a78bfa}
+
+/* ── Callout ── */
+.callout{border-radius:12px;padding:16px 20px;margin:16px 0;display:flex;gap:12px;align-items:flex-start}
+.callout.info{background:#7c3aed10;border-left:3px solid #7c3aed}
+.callout.warn{background:#f59e0b10;border-left:3px solid #f59e0b}
+.callout.tip{background:#4ade8010;border-left:3px solid #4ade80}
+.callout.danger{background:#ef444410;border-left:3px solid #ef4444}
+.callout-icon{font-size:1.1rem;flex-shrink:0;margin-top:2px}
+.callout-text{font-size:.86rem;color:#94a3b8}
+.callout-text strong{color:#e2e8f0}
+
+/* ── Comparison table ── */
+.compare-wrap{overflow-x:auto;margin:24px 0}
+.compare-table{width:100%;border-collapse:collapse;font-size:.84rem}
+.compare-table th{background:#0d0a1a;color:#c4b5fd;padding:11px 14px;text-align:left;border-bottom:2px solid #7c3aed30;white-space:nowrap}
+.compare-table td{padding:11px 14px;border-bottom:1px solid #1e293b;color:#94a3b8;vertical-align:top}
+.compare-table tr:hover td{background:#0d1117}
+.compare-table td:first-child{color:#e2e8f0;font-weight:600}
+
+/* ── Level Ladder ── */
+.level-ladder{list-style:none;margin:24px 0;counter-reset:lvl}
+.level-ladder li{counter-increment:lvl;padding:14px 16px 14px 60px;position:relative;border-left:2px solid #7c3aed30;margin-left:18px;margin-bottom:10px;background:#0d111780;border-radius:0 12px 12px 0;transition:border-color .2s}
+.level-ladder li:hover{border-left-color:#a78bfa}
+.level-ladder li::before{content:"L" counter(lvl);position:absolute;left:-20px;top:14px;width:36px;height:36px;background:linear-gradient(135deg,#7c3aed,#a78bfa);color:#fff;border-radius:50%;font-size:.78rem;font-weight:800;display:flex;align-items:center;justify-content:center}
+.level-ladder li strong{color:#c4b5fd;display:block;font-size:.92rem;margin-bottom:3px}
+.level-ladder li span{font-size:.84rem;color:#94a3b8}
+
+/* ── Code block ── */
+.code-block{margin:20px 0;border-radius:12px;overflow:hidden;border:1px solid #1e293b}
+.code-header{background:#111827;padding:.7rem 1rem;display:flex;justify-content:space-between;align-items:center}
+.code-header span{font-size:.78rem;color:#64748b;font-weight:600}
+pre{margin:0}
+pre code{font-size:.83rem !important;line-height:1.6 !important}
+
+/* ── FP diagram ── */
+.fp-rooms{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:24px 0}
+.room{border-radius:14px;padding:20px;border:1px solid}
+.room.clean{background:#7c3aed08;border-color:#7c3aed40}
+.room.dirty{background:#f59e0b08;border-color:#f59e0b40}
+.room-head{font-size:.72rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px}
+.room.clean .room-head{color:#a78bfa}
+.room.dirty .room-head{color:#fbbf24}
+.room ul{list-style:none}
+.room ul li{font-size:.83rem;color:#94a3b8;padding:4px 0 4px 16px;position:relative}
+.room.clean ul li::before{content:'✓';position:absolute;left:0;color:#a78bfa;font-weight:700}
+.room.dirty ul li::before{content:'⚡';position:absolute;left:0}
+
+/* ── checklist ── */
+.checklist{list-style:none;margin:12px 0}
+.checklist li{font-size:.86rem;color:#94a3b8;padding:6px 0 6px 28px;position:relative;border-bottom:1px solid #1e293b30}
+.checklist li::before{content:'✅';position:absolute;left:0}
+.checklist li:last-child{border-bottom:none}
+
+/* ── Quote ── */
+.quote{background:#0d0a1a;border-left:3px solid #a78bfa;padding:16px 20px;border-radius:0 12px 12px 0;margin:20px 0;font-style:italic;color:#cbd5e1;font-size:.95rem}
+
+/* ── footer ── */
+footer{text-align:center;padding:32px 20px;color:#334155;font-size:.82rem;border-top:1px solid #7c3aed15;margin-top:20px}
+
+@media(max-width:700px){
+  .hero h1{font-size:2rem}
+  .vb-2,.vb-3,.vb-4{grid-template-columns:1fr}
+  .fp-rooms{grid-template-columns:1fr}
+  nav{padding:12px 16px}
+}
+</style>
+</head>
+<body class="lang-th">
+
+<nav>
+  <a href="index.html" class="nav-home">← <span class="en">Back</span><span class="th">กลับหน้าหลัก</span></a>
+  <div class="nav-toc">
+    <a href="#overview" class="toc-link"><span class="en">Overview</span><span class="th">ภาพรวม</span></a>
+    <a href="#code-review" class="toc-link"><span class="en">Code Review</span><span class="th">Code Review</span></a>
+    <a href="#4-pillars" class="toc-link"><span class="en">4 Pillars</span><span class="th">4 เสาหลัก</span></a>
+    <a href="#7-levels" class="toc-link"><span class="en">7 Levels</span><span class="th">7 ระดับ</span></a>
+    <a href="#level1" class="toc-link">L1</a>
+    <a href="#level2" class="toc-link">L2</a>
+    <a href="#level3" class="toc-link">L3</a>
+    <a href="#level4" class="toc-link">L4</a>
+    <a href="#level5" class="toc-link">L5</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge"><span class="en">Design Principles · #25</span><span class="th">หลักการออกแบบ · #25</span></div>
+  <h1><span class="en">Functional Programming</span><span class="th">การเขียนโปรแกรมเชิงฟังก์ชัน</span></h1>
+  <p class="hero-sub">
+    <span class="en">The 7-Level FP Ladder by John De Goes — from pure functions to type classes, with Scala examples throughout.</span>
+    <span class="th">บันได 7 ขั้นของ FP โดย John De Goes — ตั้งแต่ฟังก์ชันพื้นฐานไปจนถึง Type Classes พร้อมตัวอย่าง Scala ครบทุกระดับ</span>
+  </p>
+  <div class="hero-chips">
+    <span class="hero-chip">λ Scala 3</span>
+    <span class="hero-chip">🔒 Immutability</span>
+    <span class="hero-chip">🔀 HOFs</span>
+    <span class="hero-chip">🧩 ADTs</span>
+    <span class="hero-chip">📋 IO Monad</span>
+    <span class="hero-chip">🏷️ Type Classes</span>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- ══════════════════════════════════════════════════ -->
+<section id="overview">
+  <h2>λ <span class="en">Why Functional Programming?</span><span class="th">ทำไมต้อง Functional Programming?</span></h2>
+
+  <p class="lead">
+    <span class="en">Functional Programming (FP) is a style of writing code that treats computation as the evaluation of mathematical functions — avoiding mutable state and side effects. The goal: code that is <strong>concise, predictable, and trustworthy</strong>.</span>
+    <span class="th">Functional Programming (FP) คือแนวคิดการเขียนโปรแกรมที่มองการประมวลผลเป็นการประเมินค่าฟังก์ชันทางคณิตศาสตร์ — หลีกเลี่ยง mutable state และ side effects เป้าหมาย: โค้ดที่ <strong>กระชับ, คาดเดาได้, และน่าเชื่อถือ</strong></span>
+  </p>
+
+  <div class="callout tip">
+    <span class="callout-icon">💡</span>
+    <div class="callout-text">
+      <span class="en"><strong>"A function that does one thing is a function you can trust. When you can trust every small piece of your system, you can build complex architecture without fear of it collapsing like a house of cards."</strong></span>
+      <span class="th"><strong>"ฟังก์ชันที่ทำสิ่งเดียวคือฟังก์ชันที่คุณไว้วางใจได้ เมื่อคุณไว้ใจชิ้นส่วนเล็กๆ ทุกชิ้นในระบบ คุณจะสร้าง architecture ที่ซับซ้อนได้โดยไม่กลัวว่ามันจะพังเหมือนบ้านไพ่"</strong></span>
+    </div>
+  </div>
+
+  <div class="vb-wrap">
+    <div class="vb-label"><span class="en">The Holy Grail of Software</span><span class="th">เป้าหมายสูงสุดของซอฟต์แวร์</span></div>
+    <div class="vb-grid vb-2">
+      <div class="vbox">
+        <div class="vb-icon">✂️</div>
+        <div class="vb-title"><span class="en">Concise</span><span class="th">กระชับ (Concise)</span></div>
+        <div class="vb-body"><span class="en">Shorter code, fewer abstractions, less to read and maintain.</span><span class="th">โค้ดสั้นลง, ลด abstraction ที่ไม่จำเป็น, อ่านและ maintain ง่ายขึ้น</span></div>
+      </div>
+      <div class="vbox">
+        <div class="vb-icon">🏆</div>
+        <div class="vb-title"><span class="en">Trustworthy</span><span class="th">น่าเชื่อถือ (Trustworthy)</span></div>
+        <div class="vb-body"><span class="en">Reliable and predictable — the same input always returns the same output, errors are visible, not hidden.</span><span class="th">เชื่อถือได้และคาดเดาได้ — input เดิมได้ output เดิมเสมอ, error มองเห็นได้ ไม่ซ่อน</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════ -->
+<section id="code-review">
+  <h2>🔍 <span class="en">Code Review: The Imperative Trap</span><span class="th">Code Review: กับดักของ Imperative Code</span></h2>
+
+  <p>
+    <span class="en">Before climbing the FP ladder, let's see what problems arise in a typical <strong>Level 0 imperative program</strong> — an RSS feed processor written without FP principles.</span>
+    <span class="th">ก่อนจะปีน FP Ladder มาดูกันก่อนว่า <strong>โปรแกรม imperative ระดับ 0</strong> มีปัญหาอะไรบ้าง — ดูจาก RSS feed processor ที่เขียนโดยไม่ใช้หลัก FP</span>
+  </p>
+
+  <div class="vb-wrap">
+    <div class="vb-label"><span class="en">5 Problems Found in Imperative RSS Processor</span><span class="th">ปัญหา 5 ข้อที่พบในโค้ด Imperative</span></div>
+    <div class="vb-grid vb-2">
+      <div class="vbox">
+        <div class="vb-icon">🧩</div>
+        <div class="vb-title">1. Logic &amp; Readability</div>
+        <div class="vb-body">
+          <span class="en">Manual index loops (<code>var i</code>, <code>while</code>) are prone to <strong>off-by-one errors</strong>. FP prefers <code>.map</code> / <code>.foreach</code> to eliminate manual state.</span>
+          <span class="th">ลูปด้วย index มือ (<code>var i</code>, <code>while</code>) เสี่ยง <strong>off-by-one error</strong> FP ใช้ <code>.map</code> / <code>.foreach</code> แทนเพื่อลบ state มือออกไป</span>
+        </div>
+      </div>
+      <div class="vbox">
+        <div class="vb-icon">🔒</div>
+        <div class="vb-title">2. Safety &amp; Resource Integrity</div>
+        <div class="vb-body">
+          <span class="en"><strong>Blocking I/O</strong> freezes the thread. Manual <code>try-finally</code> for resource cleanup becomes a "Pyramid of Doom" when managing multiple resources.</span>
+          <span class="th"><strong>Blocking I/O</strong> หยุด thread ทั้งหมด การปิด resource ด้วย <code>try-finally</code> มือกลายเป็น "ปิรามิดแห่งหายนะ" เมื่อมีหลาย resource</span>
+        </div>
+      </div>
+      <div class="vbox">
+        <div class="vb-icon">💥</div>
+        <div class="vb-title">3. Resilience (The "Cruel World" Test)</div>
+        <div class="vb-body">
+          <span class="en"><strong>Zero fault tolerance</strong> — no timeout means the program hangs forever. No retry means a temporary WiFi blip ends the job.</span>
+          <span class="th"><strong>รับ fault ไม่ได้เลย</strong> — ไม่มี timeout โปรแกรมค้างตลอดกาล, ไม่มี retry แค่ WiFi กระพริบก็จบ</span>
+        </div>
+      </div>
+      <div class="vbox">
+        <div class="vb-icon">📈</div>
+        <div class="vb-title">4. Scalability &amp; Performance</div>
+        <div class="vb-body">
+          <span class="en"><strong>Sequential bottleneck</strong> — 10 feeds × 2 sec = 20 sec. <code>mkString</code> loads the entire XML into memory, risking <code>OutOfMemoryError</code>.</span>
+          <span class="th"><strong>ทำทีละอัน</strong> — 10 feeds × 2 วิ = 20 วิ. <code>mkString</code> โหลด XML ทั้งหมดในหน่วยความจำ เสี่ยง <code>OutOfMemoryError</code></span>
+        </div>
+      </div>
+      <div class="vbox">
+        <div class="vb-icon">🧪</div>
+        <div class="vb-title">5. Testing &amp; Maintainability</div>
+        <div class="vb-body">
+          <span class="en"><strong>Hard-wired side effects</strong> — logic is glued to real network and disk. Unit testing is impossible without integration test setup.</span>
+          <span class="th"><strong>Side effects ฝังอยู่ใน logic</strong> — ทดสอบต้องใช้ network จริงและ disk จริง ทำ unit test โดยลำพังไม่ได้</span>
+        </div>
+      </div>
+      <div class="vbox">
+        <div class="vb-icon">🎯</div>
+        <div class="vb-title"><span class="en">The Core Issue</span><span class="th">ปัญหาที่รากเหง้า</span></div>
+        <div class="vb-body">
+          <span class="en"><em>"Telling the computer <strong>how to move memory</strong> instead of showing your <strong>intention</strong>."</em> The fix: separate Pure Logic, Impure Effects, and Orchestration.</span>
+          <span class="th"><em>"บอกคอมพิวเตอร์ว่า <strong>ต้องย้าย memory อย่างไร</strong> แทนที่จะแสดง <strong>ความตั้งใจ</strong>"</em> แก้: แยก Pure Logic, Impure Effects, และ Orchestration ออกจากกัน</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="quote">
+    <span class="en">The Three Pillars of Any Program: <strong>Pure Logic</strong> (Math: XML → String) · <strong>Impure Effects</strong> (Actions: Fetch, Save) · <strong>Orchestration</strong> (The Story: Do this, then that)</span>
+    <span class="th">สามเสาหลักของทุกโปรแกรม: <strong>Pure Logic</strong> (คณิตศาสตร์: XML → String) · <strong>Impure Effects</strong> (การกระทำ: Fetch, Save) · <strong>Orchestration</strong> (เรื่องราว: ทำอันนี้ แล้วค่อยทำอันนั้น)</span>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════ -->
+<section id="4-pillars">
+  <h2>🏛️ <span class="en">4 Pillars of Trustworthy Code</span><span class="th">4 เสาหลักของโค้ดที่น่าเชื่อถือ</span></h2>
+
+  <p>
+    <span class="en">Whether you use Scala, Kotlin, or Java, trustworthy code boils down to these four pillars:</span>
+    <span class="th">ไม่ว่าจะใช้ Scala, Kotlin, หรือ Java โค้ดที่น่าเชื่อถือสรุปได้ด้วยสี่เสาหลักนี้:</span>
+  </p>
+
+  <div class="vb-grid vb-2">
+    <div class="vbox">
+      <div class="vb-icon">🎯</div>
+      <div class="vb-title">1. Determinism (Pure Functions)</div>
+      <div class="vb-body">
+        <span class="en">Same input → same output, always. No hidden globals, no DB writes inside logic functions.</span>
+        <span class="th">Input เดิม → output เดิม เสมอ ไม่มี global แอบซ่อน ไม่มีเขียน DB อยู่ใน logic function</span>
+        <ul class="vb-list">
+          <li><span class="en">No setup/teardown needed for tests</span><span class="th">ไม่ต้อง setup/teardown ใน test</span></li>
+          <li><span class="en">Logic in isolation, verifiable forever</span><span class="th">ทดสอบ logic แยกส่วนได้ตลอด</span></li>
+        </ul>
+      </div>
+    </div>
+    <div class="vbox">
+      <div class="vb-icon">🏷️</div>
+      <div class="vb-title">2. Strong, Expressive Typing</div>
+      <div class="vb-body">
+        <span class="en">Use <code>Email</code> type instead of <code>String</code>. Make illegal states unrepresentable at compile time.</span>
+        <span class="th">ใช้ type <code>Email</code> แทน <code>String</code> ทั่วไป ทำให้ state ที่ผิดกฎ compile ไม่ผ่าน</span>
+        <ul class="vb-list">
+          <li><span class="en">No 50× null checks everywhere</span><span class="th">ไม่ต้อง check null 50 จุดทั่วโค้ด</span></li>
+          <li><span class="en">Compiler = first line of defense</span><span class="th">Compiler คือด่านแรกของการป้องกัน</span></li>
+        </ul>
+      </div>
+    </div>
+    <div class="vbox">
+      <div class="vb-icon">📝</div>
+      <div class="vb-title">3. Declarative Logic (What, not How)</div>
+      <div class="vb-body">
+        <span class="en">Focus on intent, not manual steps. Replace loops and nested <code>if-else</code> with <code>map</code>, <code>filter</code>, <code>retry</code>.</span>
+        <span class="th">มุ่งที่ intent ไม่ใช่ขั้นตอนมือ แทน loop และ <code>if-else</code> ซ้อนกันด้วย <code>map</code>, <code>filter</code>, <code>retry</code></span>
+        <ul class="vb-list">
+          <li><span class="en">Standard operators = already battle-tested</span><span class="th">Operator มาตรฐาน = ผ่านการทดสอบมาแล้ว</span></li>
+          <li><span class="en">Less room for off-by-one mistakes</span><span class="th">โอกาส off-by-one น้อยลงมาก</span></li>
+        </ul>
+      </div>
+    </div>
+    <div class="vbox">
+      <div class="vb-icon">🛡️</div>
+      <div class="vb-title">4. Total Error Handling</div>
+      <div class="vb-body">
+        <span class="en">Treat errors as <strong>values</strong>, not explosions. Return <code>Either[Error, Result]</code> instead of throwing exceptions.</span>
+        <span class="th">มองว่า error คือ <strong>ค่า</strong> ไม่ใช่ระเบิด คืน <code>Either[Error, Result]</code> แทนการ throw exception</span>
+        <ul class="vb-list">
+          <li><span class="en">Errors visible in the function signature</span><span class="th">Error มองเห็นได้จาก signature ของฟังก์ชัน</span></li>
+          <li><span class="en">Unified pipeline, no scattered try-catch</span><span class="th">จัดการใน pipeline เดียว ไม่กระจาย try-catch</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="compare-wrap">
+    <table class="compare-table">
+      <thead><tr><th>Feature</th><th><span class="en">Trustworthy (Functional)</span><span class="th">น่าเชื่อถือ (Functional)</span></th><th><span class="en">"Quick &amp; Dirty" (Imperative)</span><span class="th">"เร็วๆ" (Imperative)</span></th></tr></thead>
+      <tbody>
+        <tr><td>State</td><td>Immutable (<code>val</code>)</td><td>Mutable (<code>var</code> / global)</td></tr>
+        <tr><td>Errors</td><td><span class="en">Returned as data</span><span class="th">คืนเป็นข้อมูล</span></td><td><span class="en">Thrown as exceptions</span><span class="th">Throw exception ออกมา</span></td></tr>
+        <tr><td>Side Effects</td><td><span class="en">Controlled and isolated</span><span class="th">ควบคุมและแยกส่วน</span></td><td><span class="en">Scattered everywhere</span><span class="th">กระจายทั่วโค้ด</span></td></tr>
+        <tr><td>Testing</td><td><span class="en">Easy (Input → Output)</span><span class="th">ง่าย (Input → Output)</span></td><td><span class="en">Hard (needs complex Mocks)</span><span class="th">ยาก (ต้องสร้าง Mock ซับซ้อน)</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3><span class="en">Elite Code Checklist</span><span class="th">Checklist โค้ดระดับเอลีท</span></h3>
+  <ul class="checklist">
+    <li><strong><span class="en">Can I delete this?</span><span class="th">ลบได้ไหม?</span></strong> — <span class="en">Remove boilerplate</span><span class="th">ตัด boilerplate ออก</span></li>
+    <li><strong><span class="en">Does this function lie?</span><span class="th">ฟังก์ชันนี้โกหกไหม?</span></strong> — <span class="en">Does it do things its name doesn't say?</span><span class="th">มันทำสิ่งที่ชื่อไม่ได้บอกไหม?</span></li>
+    <li><strong><span class="en">What happens if this fails?</span><span class="th">ถ้ามันพัง จะเกิดอะไรขึ้น?</span></strong> — <span class="en">Is the error path explicitly handled?</span><span class="th">จัดการ error path ชัดเจนไหม?</span></li>
+  </ul>
+</section>
+
+<!-- ══════════════════════════════════════════════════ -->
+<section id="7-levels">
+  <h2>🪜 <span class="en">The 7 Levels of Functional Programming</span><span class="th">บันได 7 ขั้นของ Functional Programming</span></h2>
+
+  <p>
+    <span class="en">Popularized by <strong>John A. De Goes</strong> (creator of ZIO), this hierarchy maps a programmer's journey from imperative "how" thinking to declarative "what" thinking. Each level builds on the previous.</span>
+    <span class="th">ถูกทำให้แพร่หลายโดย <strong>John A. De Goes</strong> (ผู้สร้าง ZIO) ลำดับชั้นนี้แสดงการเดินทางจากความคิด "how" แบบ imperative สู่ความคิด "what" แบบ declarative แต่ละ level ต่อยอดจาก level ก่อนหน้า</span>
+  </p>
+
+  <ul class="level-ladder">
+    <li>
+      <strong>Functions &amp; Immutability</strong>
+      <span><span class="en">Use <code>val</code> over <code>var</code>. Pure functions. No side effects.</span><span class="th">ใช้ <code>val</code> แทน <code>var</code> ฟังก์ชัน pure ไม่มี side effect</span></span>
+    </li>
+    <li>
+      <strong>Higher-Order Functions</strong>
+      <span><span class="en">Treat functions as data: <code>map</code>, <code>filter</code>, <code>fold</code>, <code>flatMap</code>.</span><span class="th">มองฟังก์ชันเป็นข้อมูล: <code>map</code>, <code>filter</code>, <code>fold</code>, <code>flatMap</code></span></span>
+    </li>
+    <li>
+      <strong>Algebraic Data Types (ADTs)</strong>
+      <span><span class="en">Model data with <code>sealed trait</code> and <code>case class</code> — Sum types and Product types.</span><span class="th">สร้าง model ข้อมูลด้วย <code>sealed trait</code> และ <code>case class</code> — Sum types และ Product types</span></span>
+    </li>
+    <li>
+      <strong>Error Handling &amp; Functional Effects</strong>
+      <span><span class="en"><code>Option</code>, <code>Either</code>, <code>IO</code> — manage failure and side effects as values.</span><span class="th"><code>Option</code>, <code>Either</code>, <code>IO</code> — จัดการ failure และ side effect ในรูปแบบ value</span></span>
+    </li>
+    <li>
+      <strong>Abstracting over Execution (Typeclasses)</strong>
+      <span><span class="en">Polymorphism via <code>Show</code>, <code>Eq</code>, <code>Functor</code> — where Category Theory begins.</span><span class="th">Polymorphism ผ่าน <code>Show</code>, <code>Eq</code>, <code>Functor</code> — จุดที่ Category Theory เริ่มปรากฏ</span></span>
+    </li>
+    <li>
+      <strong>Compositional Design</strong>
+      <span><span class="en">Monoids, Applicatives, Monads — compose complex systems from simple parts.</span><span class="th">Monoids, Applicatives, Monads — ประกอบระบบซับซ้อนจากชิ้นส่วนเล็กๆ</span></span>
+    </li>
+    <li>
+      <strong>High-Level Abstractions</strong>
+      <span><span class="en">Tagless Final, Free Monads, Recursion Schemes — zero assumptions about implementation.</span><span class="th">Tagless Final, Free Monads, Recursion Schemes — ไม่มีข้อสมมติใดๆ เกี่ยวกับ implementation</span></span>
+    </li>
+  </ul>
+
+  <div class="callout info">
+    <span class="callout-icon">🎓</span>
+    <div class="callout-text">
+      <span class="en"><strong>Why define these levels?</strong> To address the "intimidation factor" of FP. A developer can master <strong>Level 3</strong> (Data Modeling) without feeling like they failed because they don't yet understand <strong>Level 7</strong> (Category Theory abstractions). Libraries like <strong>Cats</strong> and <strong>ZIO</strong> are categorized by which level they primarily target.</span>
+      <span class="th"><strong>ทำไมต้องแบ่งระดับ?</strong> เพื่อลด "ปัจจัยน่าหวาดหวั่น" ของ FP นักพัฒนา master <strong>Level 3</strong> (Data Modeling) ได้โดยไม่ต้องรู้สึกว่าตัวเองล้มเหลวเพราะยังไม่เข้าใจ <strong>Level 7</strong> library อย่าง <strong>Cats</strong> และ <strong>ZIO</strong> ถูกจัดหมวดหมู่ตาม level ที่มุ่งเน้น</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════ -->
+<section id="level1">
+  <h2>L1 <span class="en">Functions &amp; Immutability</span><span class="th">ฟังก์ชันและความไม่เปลี่ยนแปลง</span></h2>
+
+  <p>
+    <span class="en"><strong>Goal:</strong> Shift from mutable state to immutable data. A pure function has no side effects and returns the same output for the same input — always.</span>
+    <span class="th"><strong>เป้าหมาย:</strong> เปลี่ยนจาก mutable state เป็น immutable data ฟังก์ชัน pure ไม่มี side effect และคืนค่าเดิมสำหรับ input เดิมเสมอ</span>
+  </p>
+
+  <div class="vb-grid vb-3">
+    <div class="vbox">
+      <div class="vb-icon">🔒</div>
+      <div class="vb-title"><span class="en">Immutability</span><span class="th">ความไม่เปลี่ยนแปลง</span></div>
+      <div class="vb-body"><span class="en"><code>val</code> instead of <code>var</code>. Once assigned, never changed. Eliminates race conditions.</span><span class="th"><code>val</code> แทน <code>var</code> กำหนดครั้งเดียว ไม่เปลี่ยนอีก ไม่มี race condition</span></div>
+    </div>
+    <div class="vbox">
+      <div class="vb-icon">🎯</div>
+      <div class="vb-title"><span class="en">Pure Functions</span><span class="th">ฟังก์ชัน Pure</span></div>
+      <div class="vb-body"><span class="en">No globals, no I/O, no DB inside. Just logic. Testable in isolation with simple <code>assert</code>.</span><span class="th">ไม่มี global, I/O, DB ข้างใน แค่ logic ทดสอบแยกได้ด้วย <code>assert</code> เดียว</span></div>
+    </div>
+    <div class="vbox">
+      <div class="vb-icon">🚫</div>
+      <div class="vb-title"><span class="en">No Side Effects</span><span class="th">ไม่มี Side Effect</span></div>
+      <div class="vb-body"><span class="en">No hidden state changes or outputs beyond the return value. What you see = what you get.</span><span class="th">ไม่มีการเปลี่ยนแปลง state แอบซ่อน สิ่งที่เห็น = สิ่งที่ได้</span></div>
+    </div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><span>level1.scala</span></div>
+    <pre><code class="language-scala">// ❌ Imperative (Level 0) — mutable state
+var count = 0
+count += 1
+var items = new ListBuffer[(String, String)]
+var i = 0
+while i < itemNodes.size do
+  val item = itemNodes(i)
+  items.append((item.title, item.link))
+  i += 1
+
+// ✅ Level 1 — immutable + pure function
+val count    = 0
+val newCount = count + 1
+
+// Pure function: XML → List[(String,String)]
+// Same XML in → same List out. Always.
+def extractItems(xml: Elem): List[(String, String)] =
+  (xml \\ "item").map { item =>
+    val title = (item \ "title").text.trim
+    val link  = (item \ "link").text.trim
+    (title, link)
+  }.toList</code></pre>
+  </div>
+
+  <div class="callout tip">
+    <span class="callout-icon">✅</span>
+    <div class="callout-text">
+      <span class="en"><strong>Why it matters:</strong> Eliminates race conditions. Makes code easier to test and reason about. If the math works once, it works forever.</span>
+      <span class="th"><strong>ทำไมสำคัญ:</strong> ไม่มี race condition อ่านและทดสอบง่ายขึ้น ถ้า logic ถูกครั้งหนึ่ง มันจะถูกตลอดไป</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════ -->
+<section id="level2">
+  <h2>L2 <span class="en">Higher-Order Functions</span><span class="th">ฟังก์ชันอันดับสูง</span></h2>
+
+  <p>
+    <span class="en"><strong>Goal:</strong> Treat functions as data — pass them as arguments, return them from functions. Stop telling the computer <em>how</em> to loop; tell it <em>what</em> transformation to apply.</span>
+    <span class="th"><strong>เป้าหมาย:</strong> มองฟังก์ชันเป็นข้อมูล — ส่งเป็น argument คืนจากฟังก์ชัน หยุดบอกคอมพิวเตอร์ว่า <em>วนลูปอย่างไร</em> บอกแทนว่า <em>ต้อง transform อะไร</em></span>
+  </p>
+
+  <div class="code-block">
+    <div class="code-header"><span>higher-order.scala</span></div>
+    <pre><code class="language-scala">val numbers = List(1, 2, 3)
+
+// map:    transform every element
+val squared     = numbers.map(_ * _)          // List(1, 4, 9)
+
+// filter: keep only elements matching predicate
+val evens       = numbers.filter(_ % 2 == 0)  // List(2)
+
+// fold:   reduce to a single value
+val total       = numbers.fold(0)(_ + _)       // 6
+
+// flatMap: transform + flatten (monadic chaining)
+val pairs       = numbers.flatMap(n => List(n, n * 10))
+// List(1, 10, 2, 20, 3, 30)
+
+// pipeline: compose multiple transforms
+val evenSquares = numbers
+  .filter(_ % 2 == 0)
+  .map(_ * _)</code></pre>
+  </div>
+
+  <h3><span class="en">Currying — Function Factory</span><span class="th">Currying — โรงงานฟังก์ชัน</span></h3>
+
+  <p>
+    <span class="en">A curried function takes <strong>one</strong> argument and returns a <strong>new function</strong> waiting for the next. This lets you pre-configure logic and create specialized versions of a general function.</span>
+    <span class="th">ฟังก์ชัน curried รับ argument <strong>ทีละหนึ่งตัว</strong> และคืน <strong>ฟังก์ชันใหม่</strong> ที่รอ argument ถัดไป ทำให้ตั้งค่า logic ล่วงหน้าและสร้างฟังก์ชันเฉพาะทางจากฟังก์ชันทั่วไปได้</span>
+  </p>
+
+  <div class="code-block">
+    <div class="code-header"><span>currying.scala</span></div>
+    <pre><code class="language-scala">// Standard (uncurried): (A, B) => C
+def add(x: Int, y: Int): Int = x + y
+
+// Curried: A => (B => C)
+val addCurried: Int => (Int => Int) =
+  x => (y => x + y)
+
+val addFive = addCurried(5)   // returns a new function
+val result  = addFive(10)     // 15
+
+// Scala sugar — multiple parameter lists:
+def log(level: String)(message: String): Unit =
+  println(s"[$level] $message")
+
+// Partially apply to create specialized loggers:
+val infoLog  = log("INFO")
+val errorLog = log("ERROR")
+
+infoLog("System started")   // [INFO] System started
+errorLog("Kernel panic!")   // [ERROR] Kernel panic!</code></pre>
+  </div>
+
+  <div class="callout info">
+    <span class="callout-icon">🏭</span>
+    <div class="callout-text">
+      <span class="en"><strong>Assembly Line Mental Model:</strong> Non-curried = put frame AND engine on the belt together, get the car. Curried = put the frame on, get back a <em>new machine</em> specifically configured to fit only that frame's engine.</span>
+      <span class="th"><strong>Mental Model โรงงาน:</strong> Non-curried = วางโครงรถและเครื่องยนต์พร้อมกัน ได้รถออกมา Curried = วางแค่โครงรถ ได้ <em>เครื่องจักรใหม่</em> ที่ออกแบบมาเพื่อใส่เครื่องยนต์ของโครงนั้นโดยเฉพาะ</span>
+    </div>
+  </div>
+
+  <h3><span class="en">Extension Methods (Scala 3)</span><span class="th">Extension Methods (Scala 3)</span></h3>
+
+  <p>
+    <span class="en">Add new methods to existing types without modifying their source code or using inheritance. How we create fluent, concise syntax like <code>.retryN(3)</code> or <code>.logTime</code>.</span>
+    <span class="th">เพิ่ม method ใหม่ให้ type ที่มีอยู่โดยไม่ต้องแก้ source หรือใช้ inheritance วิธีสร้าง syntax ที่ลื่นไหล เช่น <code>.retryN(3)</code> หรือ <code>.logTime</code></span>
+  </p>
+
+  <div class="code-block">
+    <div class="code-header"><span>extension-methods.scala</span></div>
+    <pre><code class="language-scala">extension (s: String)
+  def shout: String   = s.toUpperCase + "!!!"
+  def isEmail: Boolean = s.contains("@")
+
+"hello".shout        // "HELLO!!!"
+"me@home.com".isEmail // true
+
+// Custom HOF extensions on List
+extension [A](list: List[A])
+  def transform[B](f: A => B): List[B] =
+    if list.isEmpty then Nil
+    else f(list.head) :: list.tail.transform(f)
+
+  def keepOnly(p: A => Boolean): List[A] =
+    if list.isEmpty then Nil
+    else if p(list.head) then list.head :: list.tail.keepOnly(p)
+    else list.tail.keepOnly(p)
+
+// Usage — pipeline style:
+val students = List("Alice", "Bob", "Charlie")
+val titled   = students.transform(s => s"Title: $s")
+// List("Title: Alice", "Title: Bob", "Title: Charlie")
+
+val scores = List(100, 90, 80, 70, 60)
+val high   = scores.keepOnly(_ >= 80)
+// List(100, 90, 80)</code></pre>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════ -->
+<section id="level3">
+  <h2>L3 <span class="en">Algebraic Data Types</span><span class="th">ชนิดข้อมูลเชิงพีชคณิต</span></h2>
+
+  <p>
+    <span class="en"><strong>Goal:</strong> Stop using primitive types (<code>String</code> for status, <code>-1</code> for missing data). Define structures that <strong>only allow valid states</strong> — "make illegal states unrepresentable."</span>
+    <span class="th"><strong>เป้าหมาย:</strong> หยุดใช้ primitive type (<code>String</code> สำหรับ status, <code>-1</code> สำหรับข้อมูลหาย) กำหนด structure ที่ <strong>อนุญาตเฉพาะ state ที่ถูกต้อง</strong> — "ทำให้ state ที่ผิดกฎ represent ไม่ได้"</span>
+  </p>
+
+  <div class="vb-grid vb-2">
+    <div class="vbox">
+      <div class="vb-icon">✖️</div>
+      <div class="vb-title">Product Types — AND</div>
+      <div class="vb-body">
+        <span class="en">Combine multiple fields. A <code>User</code> is a Name <strong>AND</strong> an Age. In Scala: <code>case class</code>.</span>
+        <span class="th">รวมหลาย field เข้าด้วยกัน <code>User</code> คือ Name <strong>และ</strong> Age ใน Scala: <code>case class</code></span>
+        <div class="code-block" style="margin-top:10px">
+          <div class="code-header"><span>product.scala</span></div>
+          <pre><code class="language-scala">case class Ingredient(
+  name: String,
+  quantity: Int
+)
+// n × m possible combinations</code></pre>
+        </div>
+      </div>
+    </div>
+    <div class="vbox">
+      <div class="vb-icon">➕</div>
+      <div class="vb-title">Sum Types — OR</div>
+      <div class="vb-body">
+        <span class="en">Choose between variants. A payment is CreditCard <strong>OR</strong> PayPal <strong>OR</strong> Cash — never all three. In Scala 3: <code>enum</code>.</span>
+        <span class="th">เลือกระหว่าง variant การชำระเงินคือ CreditCard <strong>หรือ</strong> PayPal <strong>หรือ</strong> Cash — ไม่ใช่ทั้งสาม ใน Scala 3: <code>enum</code></span>
+        <div class="code-block" style="margin-top:10px">
+          <div class="code-header"><span>sum.scala</span></div>
+          <pre><code class="language-scala">enum PaymentMethod:
+  case CreditCard(number: String,
+                  expiration: String)
+  case PayPal(email: String)
+  case Cash
+// n + m + p possible states</code></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h3><span class="en">Pattern Matching — Total Exhaustive Switch</span><span class="th">Pattern Matching — Switch ที่ครอบคลุมทุกกรณี</span></h3>
+
+  <div class="code-block">
+    <div class="code-header"><span>pattern-matching.scala</span></div>
+    <pre><code class="language-scala">def processPayment(method: PaymentMethod): String =
+  method match
+    case PaymentMethod.CreditCard(n, _) =>
+      s"Charging card ending in ${n.takeRight(4)}"
+    case PaymentMethod.PayPal(e) =>
+      s"Redirecting to PayPal for $e"
+    case PaymentMethod.Cash =>
+      "Please pay at the counter"
+// No 'default' / 'else' needed!
+// Compiler knows we covered every case.</code></pre>
+  </div>
+
+  <h3><span class="en">Exercise: Smart Vending Machine</span><span class="th">แบบฝึกหัด: ตู้ขายสินค้าอัจฉริยะ</span></h3>
+
+  <div class="code-block">
+    <div class="code-header"><span>vending-machine.scala</span></div>
+    <pre><code class="language-scala">// Step 1: Product Type (case class = AND)
+case class Product(name: String, price: Double, category: Category)
+
+// Step 2: Category Sum Type (enum = OR)
+enum Category:
+  case Drink, Snack, FreshFood
+
+// Step 3: Machine State — complex ADT
+enum MachineState:
+  case Idle
+  case Selecting(item: Product)
+  case Processing(item: Product, inserted: Double)
+  case Dispensing(item: Product)
+
+// Step 4: Pattern matching on state
+def displayMessage(state: MachineState): String = state match
+  case MachineState.Idle =>
+    "Welcome! Please select an item."
+  case MachineState.Selecting(p) =>
+    s"Selected ${p.name}. Please insert ${p.price} THB."
+  case MachineState.Processing(p, inserted) =>
+    if inserted < p.price then
+      s"Insufficient funds: ${p.price - inserted} remaining."
+    else "Payment verified. Preparing your item..."
+  case MachineState.Dispensing(p) =>
+    s"Enjoy your ${p.name}!"</code></pre>
+  </div>
+
+  <div class="vb-grid vb-3" style="margin-top:16px">
+    <div class="vbox">
+      <div class="vb-icon">🚫</div>
+      <div class="vb-title"><span class="en">No Nulls</span><span class="th">ไม่มี Null</span></div>
+      <div class="vb-body"><span class="en">In <code>Idle</code> state there is no <code>item</code> variable to even access. Compiler prevents the mistake.</span><span class="th">เมื่อ state เป็น <code>Idle</code> ไม่มีตัวแปร <code>item</code> ให้เข้าถึงเลย Compiler ป้องกันความผิดพลาด</span></div>
+    </div>
+    <div class="vbox">
+      <div class="vb-icon">🔍</div>
+      <div class="vb-title"><span class="en">Exhaustivity</span><span class="th">ครอบคลุมทุก case</span></div>
+      <div class="vb-body"><span class="en">Add <code>OutOfOrder</code> state? Compiler <em>warns</em> every match that is now incomplete.</span><span class="th">เพิ่ม state <code>OutOfOrder</code>? Compiler <em>เตือน</em> ทุก match ที่ยังไม่ครอบคลุม</span></div>
+    </div>
+    <div class="vbox">
+      <div class="vb-icon">🔐</div>
+      <div class="vb-title"><span class="en">Data Integrity</span><span class="th">ความสมบูรณ์ของข้อมูล</span></div>
+      <div class="vb-body"><span class="en">Cannot be in <code>Processing</code> without both <code>Product</code> and <code>Amount</code>. Structure enforces business rules.</span><span class="th">เป็น <code>Processing</code> โดยไม่มีทั้ง <code>Product</code> และ <code>Amount</code> ไม่ได้ โครงสร้างบังคับ business rules</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════ -->
+<section id="level4">
+  <h2>L4 <span class="en">IO Monad &amp; Functional Effects</span><span class="th">IO Monad และ Functional Effects</span></h2>
+
+  <p>
+    <span class="en"><strong>Goal:</strong> Move from <em>eager execution</em> to <em>lazy description</em>. Instead of <em>doing</em> an action, return a <strong>Blueprint</strong> (<code>IO</code>) that describes what to do. Execute only at the very edge of the program.</span>
+    <span class="th"><strong>เป้าหมาย:</strong> เปลี่ยนจาก <em>การทำทันที</em> เป็น <em>การอธิบายแบบ lazy</em> แทนที่จะ <em>ทำ</em> action คืน <strong>Blueprint</strong> (<code>IO</code>) ที่อธิบายว่าจะทำอะไร Execute เฉพาะที่ขอบโปรแกรม</span>
+  </p>
+
+  <div class="callout info">
+    <span class="callout-icon">🎬</span>
+    <div class="callout-text">
+      <span class="en"><strong>Analogy:</strong> Level 1–3 is a <em>live performance</em> — if you mess up, the show is ruined. Level 4 is a <em>movie script</em>. You can read it, edit it, copy it, or decide not to film it at all. Only the last <code>IOApp</code> call "presses play."</span>
+      <span class="th"><strong>อุปมา:</strong> Level 1–3 คือ <em>การแสดงสด</em> — พลาดแล้วจบ Level 4 คือ <em>บท (script)</em> คุณอ่าน แก้ไข คัดลอก หรือตัดสินใจไม่ถ่ายก็ได้ มีแค่ <code>IOApp</code> ตัวสุดท้ายที่ "กด play"</span>
+    </div>
+  </div>
+
+  <div class="fp-rooms">
+    <div class="room clean">
+      <div class="room-head">✨ The Clean Room (Logic)</div>
+      <ul>
+        <li><span class="en">Levels 1, 2, and 3</span><span class="th">Level 1, 2, 3</span></li>
+        <li><span class="en">Pure functions (math-like)</span><span class="th">ฟังก์ชัน pure (คล้ายคณิตศาสตร์)</span></li>
+        <li><span class="en">Predictable: same input = same output</span><span class="th">คาดเดาได้: input เดิม = output เดิม</span></li>
+        <li><span class="en">No side effects</span><span class="th">ไม่มี side effect</span></li>
+      </ul>
+    </div>
+    <div class="room dirty">
+      <div class="room-head">⚡ The Dirty Room (Effects)</div>
+      <ul>
+        <li><span class="en">The IO Monad lives here</span><span class="th">IO Monad อยู่ที่นี่</span></li>
+        <li><span class="en">Network, Disk, Database calls</span><span class="th">Network, Disk, Database</span></li>
+        <li><span class="en">Unpredictable: can fail, timeout, lag</span><span class="th">คาดเดาไม่ได้: fail, timeout, ช้าได้</span></li>
+        <li><span class="en">Managed with IO wrapper</span><span class="th">ห่อด้วย IO เพื่อควบคุม</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <h3><span class="en">3 Superpowers of Level 4</span><span class="th">3 ความสามารถพิเศษของ Level 4</span></h3>
+
+  <div class="vb-grid vb-3">
+    <div class="vbox">
+      <div class="vb-icon">📦</div>
+      <div class="vb-title">A. <span class="en">Failure as Data</span><span class="th">Failure เป็น Data</span></div>
+      <div class="vb-body"><span class="en">Instead of the program crashing, failure is a <strong>Value</strong> (<code>Option</code> or <code>Either</code>). Pass an error around like a number.</span><span class="th">แทนที่โปรแกรมจะ crash, failure คือ <strong>Value</strong> (<code>Option</code> หรือ <code>Either</code>) ส่ง error ต่อได้เหมือนตัวเลข</span></div>
+    </div>
+    <div class="vbox">
+      <div class="vb-icon">⏱️</div>
+      <div class="vb-title">B. <span class="en">Time Control</span><span class="th">ควบคุมเวลา</span></div>
+      <div class="vb-body"><span class="en">The Blueprint lets you add time rules: <code>.timeout(5.seconds)</code> or <code>.retry(3.times)</code> — without changing the core logic.</span><span class="th">Blueprint ให้คุณเพิ่มกฎเรื่องเวลา: <code>.timeout(5.seconds)</code> หรือ <code>.retry(3.times)</code> โดยไม่ต้องแก้ logic หลัก</span></div>
+    </div>
+    <div class="vbox">
+      <div class="vb-icon">🧵</div>
+      <div class="vb-title">C. <span class="en">Concurrency (Fibers)</span><span class="th">การทำงานพร้อมกัน (Fibers)</span></div>
+      <div class="vb-body"><span class="en">Light-weight "assistant chefs." Run 100,000 Fibers on a single laptop without breaking a sweat — unlike heavy system threads.</span><span class="th">"เชฟผู้ช่วย" น้ำหนักเบา รัน 100,000 Fiber บน laptop เครื่องเดียวได้สบายๆ ต่างจาก system thread ขนาดใหญ่</span></div>
+    </div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><span>io-monad.scala</span></div>
+    <pre><code class="language-scala">// Level 1-3 (Eager): calling this DOES the thing
+def fetchUser(id: String): User = /* runs right now */ ???
+
+// Level 4 (Lazy Blueprint): calling this DESCRIBES the thing
+def fetchUser(id: String): IO[User] = IO {
+  /* described, not executed yet */
+  httpClient.get(s"/users/$id")
+}
+
+// Compose blueprints safely:
+def readUser(id: String): IO[Either[String, User]] =
+  IO.pure(getUser(id))
+
+def saveUser(user: User): IO[Either[String, Unit]] =
+  IO.pure(Right(()))
+
+// Chain effects — still just a blueprint:
+val program: IO[Either[String, Unit]] =
+  readUser("1").flatMap {
+    case Left(err)   => IO.pure(Left(err))
+    case Right(user) => saveUser(user)
+  }
+
+// Only here does the program ACTUALLY run:
+object Main extends IOApp:
+  def run(args: List[String]): IO[ExitCode] =
+    program.as(ExitCode.Success)</code></pre>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════ -->
+<section id="level5">
+  <h2>L5 <span class="en">Type Classes</span><span class="th">Type Classes</span></h2>
+
+  <p>
+    <span class="en">A <strong>Type Class</strong> is a pattern for <em>ad-hoc polymorphism</em> — adding new behavior to existing types without modifying them and without inheritance. Define a "concept" (<em>Summarizable</em>) and provide implementations for different types separately.</span>
+    <span class="th"><strong>Type Class</strong> คือ pattern สำหรับ <em>ad-hoc polymorphism</em> — เพิ่ม behavior ใหม่ให้ type ที่มีอยู่โดยไม่ต้องแก้ไขและไม่ใช้ inheritance กำหนด "concept" (<em>Summarizable</em>) และแยก implementation ออกสำหรับแต่ละ type</span>
+  </p>
+
+  <h3><span class="en">The 3 Components</span><span class="th">3 องค์ประกอบ</span></h3>
+
+  <div class="code-block">
+    <div class="code-header"><span>type-class.scala</span></div>
+    <pre><code class="language-scala">// 1. The Type Class (the interface — defines the concept)
+trait Summarizable[A]:
+  def summarize(value: A): String
+
+// 2. Type Class Instances (the implementations — Scala 3 `given`)
+given Summarizable[Int] with
+  def summarize(value: Int): String = s"The number is $value"
+
+given Summarizable[String] with
+  def summarize(value: String): String = s"The text says: '$value'"
+
+// 3. The Interface Surface (the usage — `using` keyword)
+def printSummary[A](item: A)(using s: Summarizable[A]): Unit =
+  println(s.summarize(item))
+
+printSummary(42)           // The number is 42
+printSummary("Hello Type") // The text says: 'Hello Type'
+
+// Context Bound shorthand (same as above, just syntactic sugar):
+def printSummary2[A : Summarizable](item: A): Unit =
+  val s = summon[Summarizable[A]]
+  println(s.summarize(item))</code></pre>
+  </div>
+
+  <h3><span class="en">Inheritance vs Type Classes</span><span class="th">Inheritance เทียบกับ Type Classes</span></h3>
+
+  <div class="compare-wrap">
+    <table class="compare-table">
+      <thead><tr><th>Feature</th><th><span class="en">Inheritance (Subtyping)</span><span class="th">Inheritance</span></th><th><span class="en">Type Classes (Ad-hoc)</span><span class="th">Type Classes</span></th></tr></thead>
+      <tbody>
+        <tr><td>Retroactive</td><td><span class="en">No — must modify the original class</span><span class="th">ไม่ได้ — ต้องแก้ class ต้นทาง</span></td><td><span class="en">✅ Yes — add to any type you don't own</span><span class="th">✅ ได้ — เพิ่มให้ type ที่คุณไม่ได้เป็นเจ้าของ</span></td></tr>
+        <tr><td>Coupling</td><td><span class="en">Tight — data and logic are mixed</span><span class="th">แน่น — ข้อมูลและ logic ผสมกัน</span></td><td><span class="en">Loose — data and logic are separate</span><span class="th">หลวม — ข้อมูลและ logic แยกกัน</span></td></tr>
+        <tr><td>Multiple impls</td><td><span class="en">One implementation per class</span><span class="th">หนึ่ง impl ต่อ class</span></td><td><span class="en">Multiple <code>given</code>s can exist for one type</span><span class="th">มี <code>given</code> หลายตัวสำหรับ type เดียวได้</span></td></tr>
+        <tr><td>Safety</td><td><span class="en">High</span><span class="th">สูง</span></td><td><span class="en">High — checked at compile time</span><span class="th">สูง — ตรวจที่ compile time</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="vb-wrap">
+    <div class="vb-label"><span class="en">Real-World Type Classes in Scala Ecosystem</span><span class="th">Type Classes ที่พบในโลกจริงของ Scala</span></div>
+    <div class="vb-grid vb-3">
+      <div class="vbox">
+        <div class="vb-icon">🔢</div>
+        <div class="vb-title">Numeric[T]</div>
+        <div class="vb-body"><span class="en">Perform math on any numeric type: <code>Int</code>, <code>Double</code>, <code>BigDecimal</code> — one function works for all.</span><span class="th">คำนวณกับ type ตัวเลขใดก็ได้: <code>Int</code>, <code>Double</code>, <code>BigDecimal</code> — ฟังก์ชันเดียวใช้ได้ทั้งหมด</span></div>
+      </div>
+      <div class="vbox">
+        <div class="vb-icon">🔀</div>
+        <div class="vb-title">Ordering[T]</div>
+        <div class="vb-body"><span class="en">Define how to sort any collection of type <code>T</code>. Used by <code>.sorted</code> and <code>.sortBy</code> transparently.</span><span class="th">กำหนดวิธี sort collection ของ type <code>T</code> ใดก็ได้ ใช้โดย <code>.sorted</code> และ <code>.sortBy</code></span></div>
+      </div>
+      <div class="vbox">
+        <div class="vb-icon">📄</div>
+        <div class="vb-title">Encoder / Decoder (Circe)</div>
+        <div class="vb-body"><span class="en">Convert any object to/from JSON. Derive instances automatically for <code>case class</code> without writing boilerplate.</span><span class="th">แปลง object ใดก็ได้เป็น/จาก JSON สร้าง instance อัตโนมัติจาก <code>case class</code> โดยไม่ต้องเขียน boilerplate</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout tip">
+    <span class="callout-icon">🚀</span>
+    <div class="callout-text">
+      <span class="en"><strong>Where to go next:</strong> Level 6 introduces Monoids, Applicatives, and Monads for composing complex systems. Level 7 covers Tagless Final — the pattern used inside <strong>ZIO</strong>, <strong>Cats Effect</strong>, and production Scala backends at scale.</span>
+      <span class="th"><strong>ขั้นถัดไป:</strong> Level 6 แนะนำ Monoids, Applicatives, Monads สำหรับประกอบระบบซับซ้อน Level 7 ครอบคลุม Tagless Final — pattern ที่ใช้ภายใน <strong>ZIO</strong>, <strong>Cats Effect</strong> และ Scala backend ระดับ production</span>
+    </div>
+  </div>
+</section>
+
+</div><!-- /container -->
+
+<footer>
+  <span class="en">Software Architecture Patterns &nbsp;·&nbsp; Functional Programming #25 &nbsp;·&nbsp; Bilingual EN / TH</span>
+  <span class="th">สื่อการสอน Software Architecture Patterns &nbsp;·&nbsp; Functional Programming #25 &nbsp;·&nbsp; สองภาษา EN / TH</span>
+</footer>
+
+<script>
+  hljs.highlightAll();
+</script>
+<script src="common.js"></script>
+<script src="i18n.js"></script>
+</body>
+</html>

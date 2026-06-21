@@ -65,30 +65,36 @@ a{color:#34d399;text-decoration:none}
 @keyframes dash{to{stroke-dashoffset:-20}}
 </style>
 </head>
-<body>
+<body class="lang-th">
 
 <nav class="topnav">
-  <a href="index.html" class="back-btn">← กลับหน้าหลัก</a>
+  <a href="index.html" class="back-btn"><span class="en">← Back</span><span class="th">← กลับหน้าหลัก</span></a>
   <span class="nav-title">03 / <span>Event Driven Design</span></span>
 </nav>
 
 <div class="hero">
-  <div class="hero-badge">⚡ หัวข้อที่ 3</div>
+  <div class="hero-badge"><span class="en">⚡ Topic 3</span><span class="th">⚡ หัวข้อที่ 3</span></div>
   <h1>Event Driven Design</h1>
-  <p>ออกแบบระบบที่สื่อสารกันผ่าน Events — ลด Coupling ระหว่าง Services ทำให้ Scale ได้ง่าย และทนต่อ Failure</p>
+  <p>
+    <span class="en">Design systems that communicate through Events — reducing Coupling between Services, making them easy to Scale and resilient to Failure</span>
+    <span class="th">ออกแบบระบบที่สื่อสารกันผ่าน Events — ลด Coupling ระหว่าง Services ทำให้ Scale ได้ง่าย และทนต่อ Failure</span>
+  </p>
 </div>
 
 <div class="content">
 
 <!-- ── CONCEPT ── -->
 <div class="section">
-  <div class="section-title">💡 Event Driven คืออะไร?</div>
-  <div class="section-sub">Pattern ที่ Components สื่อสารกันผ่าน Events แทนการ call กันโดยตรง</div>
+  <div class="section-title">💡 <span class="en">What is Event Driven?</span><span class="th">Event Driven คืออะไร?</span></div>
+  <div class="section-sub"><span class="en">A pattern where Components communicate through Events instead of calling each other directly</span><span class="th">Pattern ที่ Components สื่อสารกันผ่าน Events แทนการ call กันโดยตรง</span></div>
 
   <p style="color:#94a3b8;margin-bottom:1.5rem">
-    แทนที่ Service A จะ <strong>call</strong> Service B โดยตรง (Tight Coupling) —
+    <span class="en">Instead of Service A <strong>calling</strong> Service B directly (Tight Coupling) —
+    Service A <strong>publishes an event</strong> saying "something happened",
+    and Services B, C, D <strong>subscribe</strong> to that event themselves.</span>
+    <span class="th">แทนที่ Service A จะ <strong>call</strong> Service B โดยตรง (Tight Coupling) —
     Service A จะ <strong>publish event</strong> ว่า "มีอะไรเกิดขึ้น"
-    แล้ว Service B, C, D จะ <strong>subscribe</strong> event นั้นเอง
+    แล้ว Service B, C, D จะ <strong>subscribe</strong> event นั้นเอง</span>
   </p>
 
   <!-- Event Flow Diagram -->
@@ -150,48 +156,63 @@ a{color:#34d399;text-decoration:none}
       <polygon points="484,187 494,192 484,197" fill="#f59e0b" transform="rotate(25,490,192)"/>
 
       <!-- Labels -->
-      <text x="310" y="245" text-anchor="middle" fill="#334155" font-size="9">Order Service ไม่รู้จัก Notification/Inventory/Analytics เลย</text>
-      <text x="310" y="260" text-anchor="middle" fill="#334155" font-size="9">แค่ publish event — Subscribers จัดการเอง</text>
+      <text x="310" y="245" text-anchor="middle" fill="#334155" font-size="9">Order Service doesn't know about Notification / Inventory / Analytics</text>
+      <text x="310" y="260" text-anchor="middle" fill="#334155" font-size="9">Just publishes an event — Subscribers handle the rest</text>
     </svg>
   </div>
 
   <div class="callout">
-    <strong>Key Insight:</strong> Order Service <strong>ไม่รู้</strong> ว่ามีใครฟัง event อยู่บ้าง
-    — เพิ่ม subscriber ใหม่ได้โดยไม่ต้องแก้ Order Service เลย! นี่คือ <strong>Open/Closed Principle</strong>
+    <strong>Key Insight:</strong>
+    <span class="en">Order Service <strong>doesn't know</strong> who is listening to its events
+    — add new subscribers without touching Order Service at all! This is the <strong>Open/Closed Principle</strong>.</span>
+    <span class="th">Order Service <strong>ไม่รู้</strong> ว่ามีใครฟัง event อยู่บ้าง
+    — เพิ่ม subscriber ใหม่ได้โดยไม่ต้องแก้ Order Service เลย! นี่คือ <strong>Open/Closed Principle</strong></span>
   </div>
 </div>
 
 <!-- ── CORE CONCEPTS ── -->
 <div class="section">
-  <div class="section-title">🧩 ส่วนประกอบหลัก</div>
+  <div class="section-title">🧩 <span class="en">Core Components</span><span class="th">ส่วนประกอบหลัก</span></div>
 
   <div class="concept-grid">
     <div class="concept-card" style="--c:#10b981">
       <div class="label">Event</div>
       <h3>Event</h3>
-      <p>บันทึกว่า <strong>"มีอะไรเกิดขึ้นแล้ว"</strong> — Past tense เสมอ เช่น <code>OrderPlaced</code>, <code>PaymentReceived</code>. มี metadata: ID, timestamp, payload</p>
+      <p>
+        <span class="en">Records that <strong>"something already happened"</strong> — always past tense, e.g. <code>OrderPlaced</code>, <code>PaymentReceived</code>. Carries metadata: ID, timestamp, payload.</span>
+        <span class="th">บันทึกว่า <strong>"มีอะไรเกิดขึ้นแล้ว"</strong> — Past tense เสมอ เช่น <code>OrderPlaced</code>, <code>PaymentReceived</code>. มี metadata: ID, timestamp, payload</span>
+      </p>
     </div>
     <div class="concept-card" style="--c:#6366f1">
       <div class="label">Publisher</div>
       <h3>Publisher (Producer)</h3>
-      <p>สร้างและ publish events เมื่อมีสิ่งเกิดขึ้น ไม่รู้ว่าใคร subscribe อยู่ — Fire and forget</p>
+      <p>
+        <span class="en">Creates and publishes events when something happens. Doesn't know who is subscribing — Fire and forget.</span>
+        <span class="th">สร้างและ publish events เมื่อมีสิ่งเกิดขึ้น ไม่รู้ว่าใคร subscribe อยู่ — Fire and forget</span>
+      </p>
     </div>
     <div class="concept-card" style="--c:#f59e0b">
       <div class="label">Subscriber</div>
       <h3>Subscriber (Consumer)</h3>
-      <p>รับและประมวล events — สามารถมีหลาย Subscriber สำหรับ event เดียวกัน แต่ละตัวทำ logic ของตัวเอง</p>
+      <p>
+        <span class="en">Receives and processes events — multiple Subscribers can handle the same event, each running its own logic independently.</span>
+        <span class="th">รับและประมวล events — สามารถมีหลาย Subscriber สำหรับ event เดียวกัน แต่ละตัวทำ logic ของตัวเอง</span>
+      </p>
     </div>
     <div class="concept-card" style="--c:#06b6d4">
       <div class="label">Event Bus / Broker</div>
       <h3>Event Bus</h3>
-      <p>ตัวกลางรับและส่ง events เช่น In-Memory Bus, Kafka, RabbitMQ, NATS — รับประกันว่า events ถึง subscribers</p>
+      <p>
+        <span class="en">The intermediary that routes events, e.g. In-Memory Bus, Kafka, RabbitMQ, NATS — guarantees events reach their subscribers.</span>
+        <span class="th">ตัวกลางรับและส่ง events เช่น In-Memory Bus, Kafka, RabbitMQ, NATS — รับประกันว่า events ถึง subscribers</span>
+      </p>
     </div>
   </div>
 </div>
 
 <!-- ── CODE ── -->
 <div class="section">
-  <div class="section-title">💻 ตัวอย่าง Go — ระบบ Order Processing</div>
+  <div class="section-title">💻 <span class="en">Go Example — Order Processing System</span><span class="th">ตัวอย่าง Go — ระบบ Order Processing</span></div>
   <div class="section-sub">Event Bus, Publisher, Subscribers, Retry, Error Handling</div>
 
   <div class="code-block">
@@ -785,7 +806,7 @@ func (s *InventoryService) onOrderConfirmed(ctx context.Context, event events.Ev
 
   <div class="code-block">
     <div class="code-header">
-      <span>cmd/main.go — Wiring (ประกอบ Event Bus)</span>
+      <span>cmd/main.go — <span class="en">Wiring (assembling the Event Bus)</span><span class="th">Wiring (ประกอบ Event Bus)</span></span>
       <span class="lang">Go</span>
     </div>
     <pre><code class="language-go">package main
@@ -826,11 +847,13 @@ func main() {
 <!-- ── EVENT SOURCING ── -->
 <div class="section">
   <div class="section-title">🗂️ Event Sourcing</div>
-  <div class="section-sub">เก็บ State เป็น Sequence of Events แทนที่จะเก็บ Current State</div>
+  <div class="section-sub"><span class="en">Store State as a Sequence of Events instead of storing Current State directly</span><span class="th">เก็บ State เป็น Sequence of Events แทนที่จะเก็บ Current State</span></div>
 
   <p style="color:#94a3b8;margin-bottom:1.5rem">
-    แทนที่จะ UPDATE ข้อมูลใน database — เราเพิ่ม event ใหม่เสมอ
-    แล้ว rebuild state ปัจจุบันจากการ "replay" events ทั้งหมด
+    <span class="en">Instead of UPDATEing data in the database — we always append a new event,
+    then rebuild the current state by "replaying" all events.</span>
+    <span class="th">แทนที่จะ UPDATE ข้อมูลใน database — เราเพิ่ม event ใหม่เสมอ
+    แล้ว rebuild state ปัจจุบันจากการ "replay" events ทั้งหมด</span>
   </p>
 
   <div class="diagram">
@@ -843,25 +866,25 @@ func main() {
       <!-- Event 1 -->
       <circle cx="100" cy="90" r="8" fill="#6366f1" opacity=".9"/>
       <text x="100" y="75" text-anchor="middle" fill="#a5b4fc" font-size="8" font-weight="700">OrderCreated</text>
-      <text x="100" y="115" text-anchor="middle" fill="#475569" font-size="7">ยอด: ฿0</text>
+      <text x="100" y="115" text-anchor="middle" fill="#475569" font-size="7">Total: ฿0</text>
       <text x="100" y="125" text-anchor="middle" fill="#334155" font-size="7">09:00</text>
 
       <!-- Event 2 -->
       <circle cx="220" cy="90" r="8" fill="#06b6d4" opacity=".9"/>
       <text x="220" y="75" text-anchor="middle" fill="#67e8f9" font-size="8" font-weight="700">ItemAdded</text>
-      <text x="220" y="115" text-anchor="middle" fill="#475569" font-size="7">ยอด: ฿500</text>
+      <text x="220" y="115" text-anchor="middle" fill="#475569" font-size="7">Total: ฿500</text>
       <text x="220" y="125" text-anchor="middle" fill="#334155" font-size="7">09:01</text>
 
       <!-- Event 3 -->
       <circle cx="340" cy="90" r="8" fill="#06b6d4" opacity=".9"/>
       <text x="340" y="75" text-anchor="middle" fill="#67e8f9" font-size="8" font-weight="700">ItemAdded</text>
-      <text x="340" y="115" text-anchor="middle" fill="#475569" font-size="7">ยอด: ฿1200</text>
+      <text x="340" y="115" text-anchor="middle" fill="#475569" font-size="7">Total: ฿1200</text>
       <text x="340" y="125" text-anchor="middle" fill="#334155" font-size="7">09:02</text>
 
       <!-- Event 4 -->
       <circle cx="460" cy="90" r="8" fill="#10b981" opacity=".9"/>
       <text x="460" y="75" text-anchor="middle" fill="#6ee7b7" font-size="8" font-weight="700">OrderConfirmed</text>
-      <text x="460" y="115" text-anchor="middle" fill="#475569" font-size="7">ยอด: ฿1200</text>
+      <text x="460" y="115" text-anchor="middle" fill="#475569" font-size="7">Total: ฿1200</text>
       <text x="460" y="125" text-anchor="middle" fill="#334155" font-size="7">09:05</text>
 
       <!-- Event 5 -->
@@ -871,7 +894,7 @@ func main() {
       <text x="580" y="125" text-anchor="middle" fill="#334155" font-size="7">14:00</text>
 
       <!-- Current State arrow -->
-      <text x="340" y="160" text-anchor="middle" fill="#334155" font-size="9">← Replay events เพื่อได้ Current State</text>
+      <text x="340" y="160" text-anchor="middle" fill="#334155" font-size="9">← Replay events to get Current State</text>
     </svg>
   </div>
 
@@ -997,11 +1020,13 @@ func Reconstitute(id string, events []StoredEvent) *OrderAggregate {
 <!-- ── CQRS ── -->
 <div class="section">
   <div class="section-title">📊 CQRS — Command Query Responsibility Segregation</div>
-  <div class="section-sub">แยก Write Model (Command) ออกจาก Read Model (Query)</div>
+  <div class="section-sub"><span class="en">Separate the Write Model (Command) from the Read Model (Query)</span><span class="th">แยก Write Model (Command) ออกจาก Read Model (Query)</span></div>
 
   <p style="color:#94a3b8;margin-bottom:1.5rem">
-    Write Side (Command) — ทำ business logic, validate, save events<br>
-    Read Side (Query) — Denormalized views สำหรับ query เร็วๆ (ไม่ต้อง join หลายตาราง)
+    <span class="en">Write Side (Command) — handles business logic, validates, saves events<br>
+    Read Side (Query) — Denormalized views for fast queries (no expensive multi-table joins)</span>
+    <span class="th">Write Side (Command) — ทำ business logic, validate, save events<br>
+    Read Side (Query) — Denormalized views สำหรับ query เร็วๆ (ไม่ต้อง join หลายตาราง)</span>
   </p>
 
   <div class="diagram">
@@ -1056,42 +1081,54 @@ func Reconstitute(id string, events []StoredEvent) *OrderAggregate {
   </div>
 
   <div class="callout warn">
-    <strong>เมื่อไหร่ควรใช้ CQRS:</strong> เมื่อ Read และ Write มีความต้องการต่างกันมาก เช่น
-    Write ต้องการ consistency สูง แต่ Read ต้องการ performance สูง
+    <strong><span class="en">When to use CQRS:</span><span class="th">เมื่อไหร่ควรใช้ CQRS:</span></strong>
+    <span class="en">When Read and Write have very different requirements — e.g. Write needs high consistency but Read needs high performance.</span>
+    <span class="th">เมื่อ Read และ Write มีความต้องการต่างกันมาก เช่น Write ต้องการ consistency สูง แต่ Read ต้องการ performance สูง</span>
     <br><br>
-    <strong>ไม่ต้องใช้ CQRS:</strong> สำหรับ CRUD ธรรมดา — เพิ่ม complexity โดยไม่จำเป็น
+    <strong><span class="en">Skip CQRS:</span><span class="th">ไม่ต้องใช้ CQRS:</span></strong>
+    <span class="en">For plain CRUD apps — it adds unnecessary complexity.</span>
+    <span class="th">สำหรับ CRUD ธรรมดา — เพิ่ม complexity โดยไม่จำเป็น</span>
   </div>
 </div>
 
 <!-- ── WHEN TO USE ── -->
 <div class="section">
-  <div class="section-title">✅ สรุปและเมื่อไหร่ควรใช้</div>
+  <div class="section-title">✅ <span class="en">Summary &amp; When to Use</span><span class="th">สรุปและเมื่อไหร่ควรใช้</span></div>
 
   <div class="concept-grid">
     <div class="concept-card" style="--c:#10b981">
-      <div class="label">ควรใช้เมื่อ</div>
-      <h3>เหมาะกับ</h3>
-      <p>• Microservices ที่ต้องการ decoupling<br>• Systems ที่มีหลาย consumers สำหรับ event เดียว<br>• Audit trail / ประวัติย้อนหลัง<br>• Async processing ที่ tolerates delay</p>
+      <div class="label"><span class="en">Use when</span><span class="th">ควรใช้เมื่อ</span></div>
+      <h3><span class="en">Good fit for</span><span class="th">เหมาะกับ</span></h3>
+      <p>
+        <span class="en">• Microservices that need decoupling<br>• Systems with multiple consumers per event<br>• Audit trail / historical replay<br>• Async processing that tolerates delay</span>
+        <span class="th">• Microservices ที่ต้องการ decoupling<br>• Systems ที่มีหลาย consumers สำหรับ event เดียว<br>• Audit trail / ประวัติย้อนหลัง<br>• Async processing ที่ tolerates delay</span>
+      </p>
     </div>
     <div class="concept-card" style="--c:#ef4444">
-      <div class="label">ระวัง</div>
-      <h3>ความท้าทาย</h3>
-      <p>• Eventual Consistency — ข้อมูลอาจไม่ sync ทันที<br>• Event Schema versioning — เปลี่ยน event structure ยาก<br>• Debugging — trace events ข้าม services<br>• Message ordering ต้องดูแล</p>
+      <div class="label"><span class="en">Watch out</span><span class="th">ระวัง</span></div>
+      <h3><span class="en">Challenges</span><span class="th">ความท้าทาย</span></h3>
+      <p>
+        <span class="en">• Eventual Consistency — data may not sync instantly<br>• Event Schema versioning — changing event structure is hard<br>• Debugging — tracing events across services<br>• Message ordering needs careful handling</span>
+        <span class="th">• Eventual Consistency — ข้อมูลอาจไม่ sync ทันที<br>• Event Schema versioning — เปลี่ยน event structure ยาก<br>• Debugging — trace events ข้าม services<br>• Message ordering ต้องดูแล</span>
+      </p>
     </div>
   </div>
 
   <div class="callout">
     <strong>Production Tools:</strong><br>
-    • <strong>Kafka</strong> — High throughput, persistent, replay ได้<br>
-    • <strong>RabbitMQ</strong> — Feature rich routing, exchange patterns<br>
-    • <strong>NATS</strong> — Ultra low latency, Go-native<br>
-    • <strong>Google Pub/Sub</strong> — Managed, scalable, cloud-native
+    • <strong>Kafka</strong> — <span class="en">High throughput, persistent, replayable</span><span class="th">High throughput, persistent, replay ได้</span><br>
+    • <strong>RabbitMQ</strong> — <span class="en">Feature-rich routing, exchange patterns</span><span class="th">Feature rich routing, exchange patterns</span><br>
+    • <strong>NATS</strong> — <span class="en">Ultra low latency, Go-native</span><span class="th">Ultra low latency, Go-native</span><br>
+    • <strong>Google Pub/Sub</strong> — <span class="en">Managed, scalable, cloud-native</span><span class="th">Managed, scalable, cloud-native</span>
   </div>
 </div>
 
 <div style="text-align:center;margin:3rem 0;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
   <a href="2-hexagonal.html" style="display:inline-flex;align-items:center;gap:.5rem;background:#0d1117;border:1px solid #1e293b;color:#64748b;padding:.7rem 1.5rem;border-radius:10px;font-size:.88rem">← Hexagonal</a>
-  <a href="4-bff.html" style="display:inline-flex;align-items:center;gap:.5rem;background:#0d1117;border:1px solid #1e293b;color:#34d399;padding:.7rem 1.5rem;border-radius:10px;font-weight:600;font-size:.88rem">หัวข้อถัดไป: BFF Architecture →</a>
+  <a href="4-bff.html" style="display:inline-flex;align-items:center;gap:.5rem;background:#0d1117;border:1px solid #1e293b;color:#34d399;padding:.7rem 1.5rem;border-radius:10px;font-weight:600;font-size:.88rem">
+    <span class="en">Next: BFF Architecture →</span>
+    <span class="th">หัวข้อถัดไป: BFF Architecture →</span>
+  </a>
 </div>
 
 </div>
