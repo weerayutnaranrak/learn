@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>4 รูปแบบสถาปัตยกรรม — สื่อการสอน</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+<link rel="stylesheet" href="common.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#07090f;color:#e2e8f0;line-height:1.7}
+a{color:#a855f7;text-decoration:none}
+
+/* Nav */
+.topnav{display:flex;align-items:center;gap:1rem;padding:.9rem 2rem;background:#0d1117;border-bottom:1px solid #1e293b;position:sticky;top:0;z-index:100;flex-wrap:wrap}
+.back-btn{color:#64748b;font-size:.85rem;white-space:nowrap}.back-btn:hover{color:#e2e8f0}
+.nav-links{display:flex;gap:.6rem;flex-wrap:wrap;margin-left:.5rem}
+.nav-link{color:#475569;font-size:.78rem;padding:.25rem .65rem;border-radius:6px;border:1px solid #1e293b;transition:color .2s,border-color .2s;white-space:nowrap}
+.nav-link:hover{color:#a855f7;border-color:#7c3aed}
+
+/* Hero */
+.hero{padding:4rem 2rem 3rem;text-align:center;background:linear-gradient(160deg,#07090f,#130820)}
+.hero-badge{display:inline-block;background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.3);color:#c084fc;padding:.35rem 1rem;border-radius:999px;font-size:.8rem;font-weight:600;margin-bottom:1.5rem}
+.hero h1{font-size:clamp(1.8rem,4vw,3rem);font-weight:800;background:linear-gradient(135deg,#7c3aed,#a855f7,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:1rem}
+.hero-sub{color:#64748b;max-width:660px;margin:0 auto 1.5rem;font-size:1rem}
+.hero-chips{display:flex;gap:.6rem;justify-content:center;flex-wrap:wrap}
+.hero-chip{background:#110b1f;border:1px solid #2d1b6b;color:#a78bfa;padding:.3rem .9rem;border-radius:999px;font-size:.78rem;font-weight:500}
+
+/* Container */
+.container{max-width:960px;margin:0 auto;padding:2rem 1.5rem 5rem}
+section{margin-bottom:4.5rem}
+.section-title{font-size:1.4rem;font-weight:700;color:#a855f7;margin-bottom:.3rem;display:flex;align-items:center;gap:.6rem}
+.section-sub{color:#475569;font-size:.87rem;margin-bottom:2rem;padding-left:2rem}
+
+/* Callout */
+.callout{background:#0f172a;border-left:3px solid #7c3aed;border-radius:0 8px 8px 0;padding:1rem 1.2rem;margin:1.5rem 0;font-size:.87rem;color:#94a3b8}
+.callout strong{color:#c084fc}
+.callout.info{border-color:#38bdf8}.callout.info strong{color:#7dd3fc}
+.callout.tip{border-color:#10b981}.callout.tip strong{color:#6ee7b7}
+.callout.warn{border-color:#ef4444}.callout.warn strong{color:#fca5a5}
+.callout.danger{border-color:#f97316}.callout.danger strong{color:#fdba74}
+
+/* VBox grid */
+.vb-grid{display:grid;gap:.85rem;margin:1.5rem 0}
+.vb-2{grid-template-columns:repeat(2,1fr)}
+.vb-3{grid-template-columns:repeat(3,1fr)}
+@media(max-width:640px){.vb-2,.vb-3{grid-template-columns:1fr}}
+.vbox{background:#0d1117;border:1.5px solid #1e293b;border-radius:12px;padding:1.1rem 1.2rem;position:relative;overflow:hidden;transition:border-color .2s,transform .2s}
+.vbox:hover{border-color:#334155;transform:translateY(-2px)}
+.vbox::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--ac,#a855f7)}
+.vb-icon{font-size:1.5rem;display:block;margin-bottom:.5rem}
+.vb-title{font-size:.87rem;font-weight:700;color:#f1f5f9;margin-bottom:.35rem}
+.vb-body{font-size:.77rem;color:#64748b;line-height:1.55}
+.vb-list{margin-top:.5rem;display:flex;flex-direction:column;gap:.2rem;list-style:none}
+.vb-list li{font-size:.73rem;color:#475569;padding-left:1rem;position:relative}
+.vb-list li::before{content:'▸';position:absolute;left:0;color:var(--ac,#a855f7);font-size:.6rem;top:.08rem}
+
+/* Code block */
+.code-block{margin:1.5rem 0;border-radius:12px;overflow:hidden;border:1px solid #1e293b}
+.code-header{background:#111827;padding:.7rem 1rem;display:flex;justify-content:space-between;align-items:center}
+.code-header span{font-size:.78rem;color:#64748b;font-weight:600}
+.code-block pre{margin:0!important;border-radius:0!important;border:none!important;font-size:.83rem!important;line-height:1.6!important}
+
+/* Diagram */
+.diagram-wrap{background:#0d1117;border:1px solid #1e293b;border-radius:16px;padding:2rem 1.5rem;margin:2rem 0;overflow-x:auto}
+.diagram-title{font-size:.72rem;color:#475569;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:1.5rem;text-align:center}
+
+/* Comparison table */
+.compare-table{width:100%;border-collapse:collapse;font-size:.8rem;margin:1.5rem 0}
+.compare-table th{padding:.65rem .9rem;text-align:left;font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#64748b;border-bottom:1px solid #1e293b;background:#0d1117}
+.compare-table td{padding:.6rem .9rem;border-bottom:1px solid #0f172a;color:#94a3b8;vertical-align:top}
+.compare-table tr:last-child td{border-bottom:none}
+.compare-table tr:hover td{background:#0f172a}
+.compare-table .col-mono{background:rgba(124,58,237,.03)}
+.compare-table .col-modular{background:rgba(16,185,129,.03)}
+.compare-table .col-dist{background:rgba(239,68,68,.06)}
+.compare-table .col-micro{background:rgba(56,189,248,.03)}
+.th-mono{color:#a78bfa!important}
+.th-modular{color:#6ee7b7!important}
+.th-dist{color:#fca5a5!important}
+.th-micro{color:#7dd3fc!important}
+.bad{color:#f87171}
+.good{color:#4ade80}
+.warn-text{color:#fbbf24}
+
+footer{text-align:center;padding:2rem;color:#334155;font-size:.82rem;border-top:1px solid #0f172a;margin-top:1rem}
+</style>
+</head>
+<body class="lang-th">
+
+<nav class="topnav">
+  <a href="index.html" class="back-btn">← <span class="en">Back</span><span class="th">กลับหน้าหลัก</span></a>
+  <div class="nav-links">
+    <a href="#monolith" class="nav-link"><span class="en">Monolith</span><span class="th">Monolith</span></a>
+    <a href="#modular-monolith" class="nav-link"><span class="en">Modular Monolith</span><span class="th">Modular Monolith</span></a>
+    <a href="#distributed-monolith" class="nav-link"><span class="en">Distributed Monolith ⚠️</span><span class="th">Distributed Monolith ⚠️</span></a>
+    <a href="#microservices" class="nav-link"><span class="en">Microservices</span><span class="th">Microservices</span></a>
+    <a href="#comparison" class="nav-link"><span class="en">Comparison</span><span class="th">เปรียบเทียบ</span></a>
+    <a href="#when-to-use" class="nav-link"><span class="en">When to Use</span><span class="th">เลือกแบบไหน</span></a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">Architecture Styles</div>
+  <h1><span class="en">4 Architecture Styles</span><span class="th">4 รูปแบบสถาปัตยกรรม</span></h1>
+  <p class="hero-sub">
+    <span class="en">Compare Monolith, Modular Monolith, Distributed Monolith, and Microservices — understand the trade-offs and know when to choose each style</span>
+    <span class="th">เปรียบเทียบ Monolith, Modular Monolith, Distributed Monolith และ Microservices — เข้าใจ trade-offs และรู้ว่าควรเลือกแบบไหนในแต่ละสถานการณ์</span>
+  </p>
+  <div class="hero-chips">
+    <span class="hero-chip">🧱 Monolith</span>
+    <span class="hero-chip">📦 Modular Monolith</span>
+    <span class="hero-chip">⚠️ Distributed Monolith</span>
+    <span class="hero-chip">🔬 Microservices</span>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- ── SECTION 1: MONOLITH ── -->
+<section id="monolith">
+  <div class="section-title">🧱 <span class="en">Monolith</span><span class="th">Monolith (แบบดั้งเดิม)</span></div>
+  <p class="section-sub">
+    <span class="en">All modules live in a single codebase and are deployed as one unit — simple, fast to start, and great for small teams</span>
+    <span class="th">ทุก module รวมอยู่ใน codebase เดียวและ deploy เป็น unit เดียว — เรียบง่าย เริ่มได้เร็ว เหมาะกับทีมขนาดเล็ก</span>
+  </p>
+
+  <div class="vb-grid vb-3">
+    <div class="vbox" style="--ac:#a855f7">
+      <span class="vb-icon">🏗️</span>
+      <div class="vb-title"><span class="en">Structure</span><span class="th">โครงสร้าง</span></div>
+      <div class="vb-body"><span class="en">All layers in one project, one binary, one DB connection</span><span class="th">ทุก layer อยู่ในโปรเจกต์เดียว binary เดียว เชื่อม DB เดียว</span></div>
+      <ul class="vb-list">
+        <li>Presentation Layer</li>
+        <li>Business Logic Layer</li>
+        <li>Data Access Layer</li>
+        <li><span class="en">Single DB</span><span class="th">DB เดียว</span></li>
+      </ul>
+    </div>
+    <div class="vbox" style="--ac:#10b981">
+      <span class="vb-icon">✅</span>
+      <div class="vb-title"><span class="en">Advantages</span><span class="th">ข้อดี</span></div>
+      <ul class="vb-list">
+        <li><span class="en">Simple to develop and debug</span><span class="th">พัฒนาและ debug ง่าย</span></li>
+        <li><span class="en">Low operational overhead</span><span class="th">ต้นทุน ops ต่ำ</span></li>
+        <li><span class="en">Easy to test end-to-end</span><span class="th">ทดสอบ end-to-end ง่าย</span></li>
+        <li><span class="en">No network latency between modules</span><span class="th">ไม่มี network latency ระหว่าง module</span></li>
+        <li><span class="en">Fast for small teams / MVP</span><span class="th">เร็วสำหรับทีมเล็กและ MVP</span></li>
+      </ul>
+    </div>
+    <div class="vbox" style="--ac:#ef4444">
+      <span class="vb-icon">❌</span>
+      <div class="vb-title"><span class="en">Disadvantages</span><span class="th">ข้อเสีย</span></div>
+      <ul class="vb-list">
+        <li><span class="en">Must deploy everything at once</span><span class="th">ต้อง deploy ทั้งหมดพร้อมกัน</span></li>
+        <li><span class="en">Scale all or nothing</span><span class="th">ต้อง scale ทั้งหมด</span></li>
+        <li><span class="en">Codebase becomes hard to navigate</span><span class="th">codebase ยิ่งใหญ่ยิ่งยากจัดการ</span></li>
+        <li><span class="en">One bug can take down the whole app</span><span class="th">bug หนึ่งล้มทั้งระบบ</span></li>
+        <li><span class="en">Tech stack locked for entire app</span><span class="th">ใช้ tech stack เดียวทั้ง app</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="diagram-wrap">
+    <div class="diagram-title">Monolith — <span class="en">single deployable unit</span><span class="th">หน่วย deploy เดียว</span></div>
+    <svg viewBox="0 0 560 300" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;display:block;margin:0 auto">
+      <!-- outer box -->
+      <rect x="80" y="20" width="400" height="220" rx="12" fill="#0d1117" stroke="#7c3aed" stroke-width="2"/>
+      <text x="280" y="14" text-anchor="middle" font-size="10" fill="#7c3aed" font-weight="700" font-family="monospace" letter-spacing="1">MONOLITH BINARY</text>
+      <!-- layers -->
+      <rect x="110" y="40" width="340" height="42" rx="8" fill="#1e1040" stroke="#4c1d95" stroke-width="1.5"/>
+      <text x="280" y="57" text-anchor="middle" font-size="12" fill="#c084fc" font-weight="600" font-family="system-ui">Presentation Layer</text>
+      <text x="280" y="73" text-anchor="middle" font-size="10" fill="#475569" font-family="system-ui">HTTP Handlers / Controllers</text>
+      <!-- arrow -->
+      <line x1="280" y1="82" x2="280" y2="96" stroke="#334155" stroke-width="1.5" marker-end="url(#arr)"/>
+      <rect x="110" y="96" width="340" height="42" rx="8" fill="#1e1040" stroke="#4c1d95" stroke-width="1.5"/>
+      <text x="280" y="113" text-anchor="middle" font-size="12" fill="#c084fc" font-weight="600" font-family="system-ui">Business Logic Layer</text>
+      <text x="280" y="129" text-anchor="middle" font-size="10" fill="#475569" font-family="system-ui">Services / Domain / Use Cases</text>
+      <line x1="280" y1="138" x2="280" y2="152" stroke="#334155" stroke-width="1.5" marker-end="url(#arr)"/>
+      <rect x="110" y="152" width="340" height="42" rx="8" fill="#1e1040" stroke="#4c1d95" stroke-width="1.5"/>
+      <text x="280" y="169" text-anchor="middle" font-size="12" fill="#c084fc" font-weight="600" font-family="system-ui">Data Access Layer</text>
+      <text x="280" y="185" text-anchor="middle" font-size="10" fill="#475569" font-family="system-ui">Repositories / ORM</text>
+      <line x1="280" y1="194" x2="280" y2="210" stroke="#334155" stroke-width="1.5" marker-end="url(#arr)"/>
+      <!-- DB -->
+      <rect x="210" y="210" width="140" height="26" rx="6" fill="#1a0a2e" stroke="#7c3aed" stroke-width="1.5"/>
+      <text x="280" y="228" text-anchor="middle" font-size="11" fill="#a78bfa" font-weight="600" font-family="system-ui">🗄️ PostgreSQL</text>
+      <!-- deploy badge -->
+      <rect x="80" y="248" width="400" height="22" rx="0" fill="none"/>
+      <text x="280" y="263" text-anchor="middle" font-size="10" fill="#334155" font-family="system-ui">→ <span class="en">deploy as</span> 1 binary · 1 process · 1 DB</text>
+      <defs>
+        <marker id="arr" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L6,3 z" fill="#334155"/>
+        </marker>
+      </defs>
+    </svg>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>monolith/main.go</span>
+    </div>
+    <pre data-lang="go"><code class="language-go">package main
+
+import (
+	"database/sql"
+	"encoding/json"
+	"log"
+	"net/http"
+
+	_ "github.com/lib/pq"
+)
+
+// ทุกอย่างอยู่ในโปรเจกต์เดียว: handler + service + repository
+var db *sql.DB
+
+type Order struct {
+	ID     int     `json:"id"`
+	UserID int     `json:"user_id"`
+	Total  float64 `json:"total"`
+}
+
+// Handler layer
+func createOrderHandler(w http.ResponseWriter, r *http.Request) {
+	var order Order
+	json.NewDecoder(r.Body).Decode(&order)
+
+	// Service logic อยู่ตรงนี้เลย
+	if order.Total &lt;= 0 {
+		http.Error(w, "invalid total", http.StatusBadRequest)
+		return
+	}
+
+	// Repository อยู่ตรงนี้เลย
+	err := db.QueryRow(
+		"INSERT INTO orders(user_id, total) VALUES($1,$2) RETURNING id",
+		order.UserID, order.Total,
+	).Scan(&amp;order.ID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	json.NewEncoder(w).Encode(order)
+}
+
+func main() {
+	var err error
+	db, err = sql.Open("postgres", "postgres://localhost/shop?sslmode=disable")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	http.HandleFunc("/orders", createOrderHandler)
+	http.HandleFunc("/users", usersHandler)
+	http.HandleFunc("/payments", paymentsHandler)
+	log.Fatal(http.ListenAndServe(":8080", nil))
+}</code></pre>
+  </div>
+</section>
+
+<!-- ── SECTION 2: MODULAR MONOLITH ── -->
+<section id="modular-monolith">
+  <div class="section-title">📦 <span class="en">Modular Monolith</span><span class="th">Modular Monolith</span></div>
+  <p class="section-sub">
+    <span class="en">Still one deployable binary, but the codebase is split into well-defined modules that communicate only through interfaces — the best of both worlds for growing teams</span>
+    <span class="th">deploy เป็น binary เดียวเหมือนเดิม แต่แบ่ง codebase เป็น module ที่มีขอบเขตชัดเจน สื่อสารกันผ่าน interface เท่านั้น</span>
+  </p>
+
+  <div class="vb-grid vb-3">
+    <div class="vbox" style="--ac:#a855f7">
+      <span class="vb-icon">🏗️</span>
+      <div class="vb-title"><span class="en">Structure</span><span class="th">โครงสร้าง</span></div>
+      <div class="vb-body"><span class="en">One binary, modules separated by package boundary with interface contracts</span><span class="th">binary เดียว แต่แบ่ง module ด้วยขอบเขต package และ interface</span></div>
+      <ul class="vb-list">
+        <li>internal/order/</li>
+        <li>internal/payment/</li>
+        <li>internal/user/</li>
+        <li><span class="en">Shared DB (per module schema)</span><span class="th">DB ร่วม (แยก schema ต่อ module)</span></li>
+      </ul>
+    </div>
+    <div class="vbox" style="--ac:#10b981">
+      <span class="vb-icon">✅</span>
+      <div class="vb-title"><span class="en">Advantages</span><span class="th">ข้อดี</span></div>
+      <ul class="vb-list">
+        <li><span class="en">Clear module boundaries</span><span class="th">ขอบเขต module ชัดเจน</span></li>
+        <li><span class="en">Easy refactor toward microservices later</span><span class="th">refactor ไปเป็น microservices ได้ง่ายในอนาคต</span></li>
+        <li><span class="en">No network overhead — still in-process</span><span class="th">ยังเรียก in-process ไม่มี network latency</span></li>
+        <li><span class="en">Low ops complexity</span><span class="th">ops ยังง่าย</span></li>
+        <li><span class="en">Better team code ownership</span><span class="th">แต่ละทีม own module ได้ชัดเจน</span></li>
+      </ul>
+    </div>
+    <div class="vbox" style="--ac:#ef4444">
+      <span class="vb-icon">❌</span>
+      <div class="vb-title"><span class="en">Disadvantages</span><span class="th">ข้อเสีย</span></div>
+      <ul class="vb-list">
+        <li><span class="en">Still must deploy all modules together</span><span class="th">ยังต้อง deploy พร้อมกันทั้งหมด</span></li>
+        <li><span class="en">Shared DB can become a bottleneck</span><span class="th">shared DB อาจเป็น bottleneck</span></li>
+        <li><span class="en">Requires discipline to enforce boundaries</span><span class="th">ต้องวินัยสูงไม่ให้ import ข้าม module</span></li>
+        <li><span class="en">Scale all or nothing</span><span class="th">ยัง scale ทั้งหมดหรือไม่ scale</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="diagram-wrap">
+    <div class="diagram-title">Modular Monolith — <span class="en">one binary, clear module zones</span><span class="th">binary เดียว แต่แบ่ง module ชัดเจน</span></div>
+    <svg viewBox="0 0 580 280" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;display:block;margin:0 auto">
+      <!-- outer binary -->
+      <rect x="40" y="20" width="500" height="180" rx="12" fill="#0d1117" stroke="#7c3aed" stroke-width="2" stroke-dasharray="6,3"/>
+      <text x="290" y="14" text-anchor="middle" font-size="10" fill="#7c3aed" font-weight="700" font-family="monospace" letter-spacing="1">ONE BINARY — cmd/main.go</text>
+      <!-- module 1 -->
+      <rect x="60" y="40" width="140" height="140" rx="8" fill="#11082a" stroke="#6d28d9" stroke-width="1.5"/>
+      <text x="130" y="60" text-anchor="middle" font-size="11" fill="#a78bfa" font-weight="700" font-family="system-ui">📦 Order</text>
+      <text x="130" y="77" text-anchor="middle" font-size="10" fill="#a78bfa" font-family="monospace">Module</text>
+      <rect x="75" y="88" width="110" height="22" rx="4" fill="#1e1040"/>
+      <text x="130" y="103" text-anchor="middle" font-size="9.5" fill="#64748b" font-family="monospace">order.Service</text>
+      <rect x="75" y="116" width="110" height="22" rx="4" fill="#1e1040"/>
+      <text x="130" y="131" text-anchor="middle" font-size="9.5" fill="#64748b" font-family="monospace">order.Repository</text>
+      <rect x="75" y="144" width="110" height="22" rx="4" fill="#1e1040"/>
+      <text x="130" y="159" text-anchor="middle" font-size="9.5" fill="#64748b" font-family="monospace">PaymentModule i/f</text>
+      <!-- module 2 -->
+      <rect x="220" y="40" width="140" height="140" rx="8" fill="#062014" stroke="#065f46" stroke-width="1.5"/>
+      <text x="290" y="60" text-anchor="middle" font-size="11" fill="#6ee7b7" font-weight="700" font-family="system-ui">💳 Payment</text>
+      <text x="290" y="77" text-anchor="middle" font-size="10" fill="#6ee7b7" font-family="monospace">Module</text>
+      <rect x="235" y="88" width="110" height="22" rx="4" fill="#081a10"/>
+      <text x="290" y="103" text-anchor="middle" font-size="9.5" fill="#64748b" font-family="monospace">payment.Service</text>
+      <rect x="235" y="116" width="110" height="22" rx="4" fill="#081a10"/>
+      <text x="290" y="131" text-anchor="middle" font-size="9.5" fill="#64748b" font-family="monospace">payment.Gateway</text>
+      <rect x="235" y="144" width="110" height="22" rx="4" fill="#081a10"/>
+      <text x="290" y="159" text-anchor="middle" font-size="9.5" fill="#64748b" font-family="monospace">payment.Repo</text>
+      <!-- module 3 -->
+      <rect x="380" y="40" width="140" height="140" rx="8" fill="#0a1020" stroke="#1d4ed8" stroke-width="1.5"/>
+      <text x="450" y="60" text-anchor="middle" font-size="11" fill="#93c5fd" font-weight="700" font-family="system-ui">👤 User</text>
+      <text x="450" y="77" text-anchor="middle" font-size="10" fill="#93c5fd" font-family="monospace">Module</text>
+      <rect x="395" y="88" width="110" height="22" rx="4" fill="#0d1829"/>
+      <text x="450" y="103" text-anchor="middle" font-size="9.5" fill="#64748b" font-family="monospace">user.Service</text>
+      <rect x="395" y="116" width="110" height="22" rx="4" fill="#0d1829"/>
+      <text x="450" y="131" text-anchor="middle" font-size="9.5" fill="#64748b" font-family="monospace">user.Repository</text>
+      <rect x="395" y="144" width="110" height="22" rx="4" fill="#0d1829"/>
+      <text x="450" y="159" text-anchor="middle" font-size="9.5" fill="#64748b" font-family="monospace">user.Auth</text>
+      <!-- interface arrows -->
+      <line x1="200" y1="110" x2="220" y2="110" stroke="#6d28d9" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#arr2)"/>
+      <text x="210" y="104" text-anchor="middle" font-size="8" fill="#4c1d95" font-family="monospace">i/f</text>
+      <!-- DB -->
+      <rect x="160" y="220" width="260" height="26" rx="6" fill="#0d0d1a" stroke="#334155" stroke-width="1.5"/>
+      <text x="290" y="238" text-anchor="middle" font-size="11" fill="#64748b" font-weight="600" font-family="system-ui">🗄️ PostgreSQL — Shared DB</text>
+      <!-- lines to DB -->
+      <line x1="130" y1="180" x2="200" y2="220" stroke="#334155" stroke-width="1" stroke-dasharray="3,2"/>
+      <line x1="290" y1="180" x2="290" y2="220" stroke="#334155" stroke-width="1" stroke-dasharray="3,2"/>
+      <line x1="450" y1="180" x2="380" y2="220" stroke="#334155" stroke-width="1" stroke-dasharray="3,2"/>
+      <text x="290" y="265" text-anchor="middle" font-size="10" fill="#334155" font-family="system-ui">interface-based calls · same process · same DB</text>
+      <defs>
+        <marker id="arr2" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L6,3 z" fill="#6d28d9"/>
+        </marker>
+      </defs>
+    </svg>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>shop/internal/order/service.go</span>
+    </div>
+    <pre data-lang="go"><code class="language-go">package order
+
+import "context"
+
+// Module interface — Payment module เข้าถึงได้แค่นี้
+type PaymentModule interface {
+	Charge(ctx context.Context, userID int, amount float64) (string, error)
+}
+
+type Service struct {
+	repo    Repository
+	payment PaymentModule // inject ผ่าน interface, ไม่ import package โดยตรง
+}
+
+func NewService(repo Repository, payment PaymentModule) *Service {
+	return &amp;Service{repo: repo, payment: payment}
+}
+
+func (s *Service) CreateOrder(ctx context.Context, userID int, total float64) (*Order, error) {
+	// เรียก payment ผ่าน interface ไม่ใช่ HTTP call
+	txID, err := s.payment.Charge(ctx, userID, total)
+	if err != nil {
+		return nil, err
+	}
+
+	order := &amp;Order{UserID: userID, Total: total, PaymentTxID: txID}
+	return s.repo.Save(ctx, order)
+}</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>shop/cmd/main.go</span>
+    </div>
+    <pre data-lang="go"><code class="language-go">// wire ทุก module เข้าด้วยกัน, deploy เป็น binary เดียว
+package main
+
+import (
+	"shop/internal/order"
+	"shop/internal/payment"
+	"shop/internal/user"
+)
+
+func main() {
+	db := connectDB()
+
+	userSvc    := user.NewService(user.NewRepo(db))
+	paymentSvc := payment.NewService(payment.NewRepo(db))
+	orderSvc   := order.NewService(order.NewRepo(db), paymentSvc) // inject interface
+
+	// ทุก module อยู่ใน process เดียว
+	startServer(orderSvc, paymentSvc, userSvc)
+}</code></pre>
+  </div>
+</section>
+
+<!-- ── SECTION 3: DISTRIBUTED MONOLITH ── -->
+<section id="distributed-monolith">
+  <div class="section-title">⚠️ <span class="en">Distributed Monolith</span><span class="th">Distributed Monolith (Anti-pattern)</span></div>
+  <p class="section-sub">
+    <span class="en">Services are split but remain tightly coupled — synchronous chains, shared DB, must deploy together</span>
+    <span class="th">แยก service แล้วแต่ยัง tightly coupled — synchronous chain, shared DB, ต้อง deploy พร้อมกัน</span>
+  </p>
+
+  <div class="callout warn">
+    <strong>Anti-pattern — <span class="en">What NOT to do</span><span class="th">สิ่งที่ไม่ควรทำ</span></strong><br>
+    <span class="en">This is one of the most common pitfalls when teams migrate from Monolith to Microservices without understanding the principles. You get all the complexity of microservices without any of the benefits.</span>
+    <span class="th">นี่คือหนึ่งในกับดักที่พบบ่อยที่สุดเมื่อทีมย้ายจาก Monolith ไป Microservices โดยไม่เข้าใจหลักการ — ได้รับความซับซ้อนของ microservices ทั้งหมด แต่ไม่ได้ประโยชน์ใดๆ</span>
+  </div>
+
+  <div class="vb-grid vb-2">
+    <div class="vbox" style="--ac:#ef4444">
+      <span class="vb-icon">🚩</span>
+      <div class="vb-title"><span class="en">Warning Signs</span><span class="th">สัญญาณเตือน</span></div>
+      <ul class="vb-list">
+        <li><span class="en">Services must deploy at the same time</span><span class="th">services ต้อง deploy พร้อมกันเสมอ</span></li>
+        <li><span class="en">Service A crashes → Service B crashes too</span><span class="th">service A ล้ม → service B ล้มตาม</span></li>
+        <li><span class="en">Synchronous HTTP chain A → B → C</span><span class="th">เรียก HTTP chain แบบ A → B → C</span></li>
+        <li><span class="en">Services share the same database</span><span class="th">services ใช้ DB เดียวกัน</span></li>
+        <li><span class="en">Service knows the DB schema of another service</span><span class="th">service รู้โครงสร้าง DB ของ service อื่น</span></li>
+        <li><span class="en">Breaking change in one service forces all to redeploy</span><span class="th">เปลี่ยน API หนึ่งตัวต้อง redeploy ทุกตัว</span></li>
+      </ul>
+    </div>
+    <div class="vbox" style="--ac:#f97316">
+      <span class="vb-icon">💀</span>
+      <div class="vb-title"><span class="en">Consequences</span><span class="th">ผลเสีย — Worst of Both Worlds</span></div>
+      <ul class="vb-list">
+        <li><span class="en">Network latency of microservices</span><span class="th">network latency ของ microservices</span></li>
+        <li><span class="en">Fragility of monolith (cascade failure)</span><span class="th">ความเปราะบางของ monolith (cascade failure)</span></li>
+        <li><span class="en">Ops complexity — many services to manage</span><span class="th">ops ซับซ้อน — ดูแลหลาย service</span></li>
+        <li><span class="en">No independent deployability</span><span class="th">ไม่สามารถ deploy อิสระได้จริงๆ</span></li>
+        <li><span class="en">Distributed transaction problems without solutions</span><span class="th">ปัญหา distributed transaction โดยไม่มีทางแก้</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="diagram-wrap">
+    <div class="diagram-title">Distributed Monolith — <span class="en">tight coupling across process boundaries</span><span class="th">tightly coupled ข้าม process</span></div>
+    <svg viewBox="0 0 580 240" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;display:block;margin:0 auto">
+      <!-- services -->
+      <rect x="20" y="60" width="140" height="80" rx="8" fill="#1a0a0a" stroke="#ef4444" stroke-width="1.5"/>
+      <text x="90" y="88" text-anchor="middle" font-size="11" fill="#fca5a5" font-weight="700" font-family="system-ui">📦 Order</text>
+      <text x="90" y="105" text-anchor="middle" font-size="10" fill="#fca5a5" font-family="monospace">Service</text>
+      <text x="90" y="128" text-anchor="middle" font-size="9" fill="#475569" font-family="system-ui">:8081</text>
+      <!-- sync arrow 1 -->
+      <line x1="160" y1="100" x2="205" y2="100" stroke="#ef4444" stroke-width="2" marker-end="url(#arr-red)"/>
+      <text x="182" y="92" text-anchor="middle" font-size="9" fill="#ef4444" font-family="monospace">HTTP sync</text>
+      <rect x="205" y="60" width="140" height="80" rx="8" fill="#1a0a0a" stroke="#ef4444" stroke-width="1.5"/>
+      <text x="275" y="88" text-anchor="middle" font-size="11" fill="#fca5a5" font-weight="700" font-family="system-ui">💳 Payment</text>
+      <text x="275" y="105" text-anchor="middle" font-size="10" fill="#fca5a5" font-family="monospace">Service</text>
+      <text x="275" y="128" text-anchor="middle" font-size="9" fill="#475569" font-family="system-ui">:8082</text>
+      <!-- sync arrow 2 -->
+      <line x1="345" y1="100" x2="390" y2="100" stroke="#ef4444" stroke-width="2" marker-end="url(#arr-red)"/>
+      <text x="367" y="92" text-anchor="middle" font-size="9" fill="#ef4444" font-family="monospace">HTTP sync</text>
+      <rect x="390" y="60" width="160" height="80" rx="8" fill="#1a0a0a" stroke="#ef4444" stroke-width="1.5"/>
+      <text x="470" y="88" text-anchor="middle" font-size="11" fill="#fca5a5" font-weight="700" font-family="system-ui">🔔 Notification</text>
+      <text x="470" y="105" text-anchor="middle" font-size="10" fill="#fca5a5" font-family="monospace">Service</text>
+      <text x="470" y="128" text-anchor="middle" font-size="9" fill="#475569" font-family="system-ui">:8083</text>
+      <!-- shared DB -->
+      <rect x="160" y="185" width="240" height="30" rx="6" fill="#1a0a0a" stroke="#7f1d1d" stroke-width="2"/>
+      <text x="280" y="205" text-anchor="middle" font-size="11" fill="#fca5a5" font-weight="600" font-family="system-ui">🗄️ SHARED DATABASE ❌</text>
+      <!-- lines to shared DB -->
+      <line x1="90" y1="140" x2="195" y2="185" stroke="#7f1d1d" stroke-width="1.5" stroke-dasharray="4,2"/>
+      <line x1="275" y1="140" x2="280" y2="185" stroke="#7f1d1d" stroke-width="1.5" stroke-dasharray="4,2"/>
+      <line x1="470" y1="140" x2="365" y2="185" stroke="#7f1d1d" stroke-width="1.5" stroke-dasharray="4,2"/>
+      <!-- cascade label -->
+      <text x="90" y="170" text-anchor="middle" font-size="9" fill="#7f1d1d" font-family="system-ui">ถ้า payment ล้ม</text>
+      <text x="90" y="182" text-anchor="middle" font-size="9" fill="#7f1d1d" font-family="system-ui">→ order ล้มด้วย ❌</text>
+      <defs>
+        <marker id="arr-red" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L6,3 z" fill="#ef4444"/>
+        </marker>
+      </defs>
+    </svg>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>order-service/main.go</span>
+    </div>
+    <pre data-lang="go"><code class="language-go">// ⚠️ Distributed Monolith: Service A call B call C แบบ synchronous chain
+// หาก payment-service ล้ม → order-service ล้มตาม → user ไม่ได้รับ notification
+
+func (s *OrderService) CreateOrder(ctx context.Context, req CreateOrderReq) error {
+	// Step 1: บันทึก order ใน shared database (ตาราง "orders")
+	orderID, err := s.db.InsertOrder(ctx, req) // shared DB!
+	if err != nil {
+		return err
+	}
+
+	// Step 2: synchronous call ไปหา payment-service
+	// ถ้า payment-service timeout → order ค้างอยู่ในสถานะ pending ตลอด
+	resp, err := http.Post("http://payment-service/charge", "application/json",
+		encodeChargeRequest(orderID, req.Amount))
+	if err != nil {
+		return fmt.Errorf("payment failed: %w", err) // cascade failure
+	}
+	defer resp.Body.Close()
+
+	// Step 3: synchronous call ไปหา notification-service
+	// ต้อง deploy notification-service พร้อม order-service เสมอ
+	http.Post("http://notification-service/send", "application/json",
+		encodeNotification(req.UserID, orderID))
+
+	return nil
+}</code></pre>
+  </div>
+</section>
+
+<!-- ── SECTION 4: MICROSERVICES ── -->
+<section id="microservices">
+  <div class="section-title">🔬 <span class="en">Microservices</span><span class="th">Microservices</span></div>
+  <p class="section-sub">
+    <span class="en">Each service is truly independent — own DB, own deployment lifecycle, communicate via events or API Gateway</span>
+    <span class="th">แต่ละ service อิสระจริงๆ — มี DB ของตัวเอง, deploy lifecycle เป็นอิสระ, สื่อสารผ่าน event หรือ API Gateway</span>
+  </p>
+
+  <div class="vb-grid vb-3">
+    <div class="vbox" style="--ac:#a855f7">
+      <span class="vb-icon">🏗️</span>
+      <div class="vb-title"><span class="en">Structure</span><span class="th">โครงสร้าง</span></div>
+      <div class="vb-body"><span class="en">Separate services, separate DBs, async event communication</span><span class="th">services แยก, DB แยก, สื่อสารผ่าน event แบบ async</span></div>
+      <ul class="vb-list">
+        <li>API Gateway (<span class="en">single entry</span><span class="th">จุดเข้าเดียว</span>)</li>
+        <li>DB per Service</li>
+        <li>Message Bus (Kafka)</li>
+        <li><span class="en">Independent deploy</span><span class="th">deploy อิสระ</span></li>
+      </ul>
+    </div>
+    <div class="vbox" style="--ac:#10b981">
+      <span class="vb-icon">✅</span>
+      <div class="vb-title"><span class="en">Advantages</span><span class="th">ข้อดี</span></div>
+      <ul class="vb-list">
+        <li><span class="en">Deploy each service independently</span><span class="th">deploy แต่ละ service อิสระ</span></li>
+        <li><span class="en">Scale only what needs scaling</span><span class="th">scale เฉพาะ service ที่ต้องการ</span></li>
+        <li><span class="en">True fault isolation</span><span class="th">fault isolation จริงๆ</span></li>
+        <li><span class="en">Teams work independently (Conway's Law)</span><span class="th">ทีมทำงานอิสระจากกัน</span></li>
+        <li><span class="en">Different tech per service</span><span class="th">ใช้ tech ต่างกันต่อ service ได้</span></li>
+      </ul>
+    </div>
+    <div class="vbox" style="--ac:#ef4444">
+      <span class="vb-icon">❌</span>
+      <div class="vb-title"><span class="en">Disadvantages</span><span class="th">ข้อเสีย</span></div>
+      <ul class="vb-list">
+        <li><span class="en">High operational complexity</span><span class="th">ops ซับซ้อนมาก</span></li>
+        <li><span class="en">Distributed tracing is hard</span><span class="th">ต้องทำ distributed tracing</span></li>
+        <li><span class="en">Eventual consistency challenges</span><span class="th">ต้องรับมือ eventual consistency</span></li>
+        <li><span class="en">Integration testing is difficult</span><span class="th">integration test ยากขึ้น</span></li>
+        <li><span class="en">Not suitable for small teams</span><span class="th">ไม่เหมาะทีมเล็ก</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="diagram-wrap">
+    <div class="diagram-title">Microservices — <span class="en">independent services, async communication</span><span class="th">service อิสระ, สื่อสาร async</span></div>
+    <svg viewBox="0 0 580 290" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;display:block;margin:0 auto">
+      <!-- API Gateway -->
+      <rect x="200" y="10" width="160" height="36" rx="8" fill="#11082a" stroke="#7c3aed" stroke-width="2"/>
+      <text x="280" y="33" text-anchor="middle" font-size="12" fill="#c084fc" font-weight="700" font-family="system-ui">🚪 API Gateway</text>
+      <!-- arrows from gateway -->
+      <line x1="220" y1="46" x2="100" y2="96" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#arr-p)"/>
+      <line x1="280" y1="46" x2="280" y2="96" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#arr-p)"/>
+      <line x1="340" y1="46" x2="460" y2="96" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#arr-p)"/>
+      <!-- order service -->
+      <rect x="30" y="96" width="140" height="60" rx="8" fill="#11082a" stroke="#7c3aed" stroke-width="1.5"/>
+      <text x="100" y="122" text-anchor="middle" font-size="11" fill="#c084fc" font-weight="700" font-family="system-ui">📦 Order</text>
+      <text x="100" y="138" text-anchor="middle" font-size="10" fill="#a78bfa" font-family="monospace">:8081</text>
+      <!-- order DB -->
+      <rect x="30" y="176" width="140" height="24" rx="5" fill="#0d1117" stroke="#4c1d95" stroke-width="1.5"/>
+      <text x="100" y="192" text-anchor="middle" font-size="10" fill="#7c3aed" font-family="system-ui">🗄️ Orders DB</text>
+      <line x1="100" y1="156" x2="100" y2="176" stroke="#4c1d95" stroke-width="1.5"/>
+      <!-- payment service -->
+      <rect x="210" y="96" width="140" height="60" rx="8" fill="#062014" stroke="#059669" stroke-width="1.5"/>
+      <text x="280" y="122" text-anchor="middle" font-size="11" fill="#6ee7b7" font-weight="700" font-family="system-ui">💳 Payment</text>
+      <text x="280" y="138" text-anchor="middle" font-size="10" fill="#34d399" font-family="monospace">:8082</text>
+      <!-- payment DB -->
+      <rect x="210" y="176" width="140" height="24" rx="5" fill="#0d1117" stroke="#065f46" stroke-width="1.5"/>
+      <text x="280" y="192" text-anchor="middle" font-size="10" fill="#059669" font-family="system-ui">🗄️ Payments DB</text>
+      <line x1="280" y1="156" x2="280" y2="176" stroke="#065f46" stroke-width="1.5"/>
+      <!-- notification service -->
+      <rect x="390" y="96" width="160" height="60" rx="8" fill="#0a1020" stroke="#1d4ed8" stroke-width="1.5"/>
+      <text x="470" y="122" text-anchor="middle" font-size="11" fill="#93c5fd" font-weight="700" font-family="system-ui">🔔 Notification</text>
+      <text x="470" y="138" text-anchor="middle" font-size="10" fill="#60a5fa" font-family="monospace">:8083</text>
+      <!-- notification DB -->
+      <rect x="390" y="176" width="160" height="24" rx="5" fill="#0d1117" stroke="#1e3a8a" stroke-width="1.5"/>
+      <text x="470" y="192" text-anchor="middle" font-size="10" fill="#3b82f6" font-family="system-ui">🗄️ Notifications DB</text>
+      <line x1="470" y1="156" x2="470" y2="176" stroke="#1e3a8a" stroke-width="1.5"/>
+      <!-- Kafka bus -->
+      <rect x="60" y="225" width="440" height="28" rx="8" fill="#0d1117" stroke="#f59e0b" stroke-width="1.5"/>
+      <text x="280" y="244" text-anchor="middle" font-size="11" fill="#fbbf24" font-weight="700" font-family="system-ui">📨 Message Bus (Kafka) — Async Events</text>
+      <!-- publish/subscribe arrows -->
+      <line x1="100" y1="200" x2="130" y2="225" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4,2" marker-end="url(#arr-y)"/>
+      <text x="78" y="218" font-size="8.5" fill="#92400e" font-family="monospace">publish</text>
+      <line x1="310" y1="225" x2="330" y2="200" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4,2" marker-end="url(#arr-y)"/>
+      <line x1="430" y1="225" x2="450" y2="200" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4,2" marker-end="url(#arr-y)"/>
+      <text x="415" y="218" font-size="8.5" fill="#92400e" font-family="monospace">subscribe</text>
+      <defs>
+        <marker id="arr-p" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L6,3 z" fill="#7c3aed"/>
+        </marker>
+        <marker id="arr-y" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L6,3 z" fill="#f59e0b"/>
+        </marker>
+      </defs>
+    </svg>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>order-service/service.go</span>
+    </div>
+    <pre data-lang="go"><code class="language-go">// order-service: อิสระ มี DB ของตัวเอง publish event แทน sync call
+package order
+
+import (
+	"context"
+	"encoding/json"
+)
+
+type EventPublisher interface {
+	Publish(ctx context.Context, topic string, payload any) error
+}
+
+type Service struct {
+	repo      Repository
+	publisher EventPublisher // Kafka, NATS, etc.
+}
+
+func (s *Service) CreateOrder(ctx context.Context, req CreateOrderReq) (*Order, error) {
+	order := &amp;Order{
+		UserID: req.UserID,
+		Total:  req.Total,
+		Status: "pending", // รอ payment confirm
+	}
+
+	// บันทึกใน DB ของ order-service เท่านั้น
+	saved, err := s.repo.Save(ctx, order)
+	if err != nil {
+		return nil, err
+	}
+
+	// publish event แทนการ call payment-service โดยตรง
+	// payment-service จะ subscribe และทำงานอิสระ
+	event := OrderCreatedEvent{OrderID: saved.ID, UserID: req.UserID, Amount: req.Total}
+	s.publisher.Publish(ctx, "order.created", event)
+
+	return saved, nil
+}</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>payment-service/handler.go</span>
+    </div>
+    <pre data-lang="go"><code class="language-go">// payment-service: subscribe event จาก order-service
+// อิสระ deploy ได้เองโดยไม่ต้องรอ order-service
+func (h *PaymentHandler) HandleOrderCreated(ctx context.Context, msg Message) error {
+	var event OrderCreatedEvent
+	json.Unmarshal(msg.Payload, &amp;event)
+
+	txID, err := h.gateway.Charge(ctx, event.UserID, event.Amount)
+	if err != nil {
+		// publish failed event กลับ — order-service จัดการเอง
+		h.publisher.Publish(ctx, "payment.failed", PaymentFailedEvent{OrderID: event.OrderID})
+		return nil
+	}
+
+	h.publisher.Publish(ctx, "payment.completed", PaymentCompletedEvent{
+		OrderID: event.OrderID,
+		TxID:    txID,
+	})
+	return nil
+}</code></pre>
+  </div>
+</section>
+
+<!-- ── SECTION 5: COMPARISON ── -->
+<section id="comparison">
+  <div class="section-title">📊 <span class="en">Comparison Table</span><span class="th">ตารางเปรียบเทียบ</span></div>
+  <p class="section-sub">
+    <span class="en">9 dimensions compared across all 4 architecture styles</span>
+    <span class="th">เปรียบเทียบ 9 มิติทั้ง 4 รูปแบบ — Distributed Monolith ไม่ใช่ทางเลือก แต่เป็นสิ่งที่ต้องหลีกเลี่ยง</span>
+  </p>
+
+  <div style="overflow-x:auto;border-radius:12px;border:1px solid #1e293b">
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th style="min-width:150px"><span class="en">Dimension</span><span class="th">มิติ</span></th>
+          <th class="th-mono" style="min-width:130px">🧱 Monolith</th>
+          <th class="th-modular" style="min-width:150px">📦 Modular Monolith</th>
+          <th class="th-dist" style="min-width:170px">⚠️ Distributed Monolith</th>
+          <th class="th-micro" style="min-width:140px">🔬 Microservices</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong><span class="en">Deployment unit</span><span class="th">หน่วย deploy</span></strong></td>
+          <td class="col-mono"><span class="en">1 binary</span><span class="th">binary เดียว</span></td>
+          <td class="col-modular"><span class="en">1 binary</span><span class="th">binary เดียว</span></td>
+          <td class="col-dist bad"><span class="en">Many services (must deploy together)</span><span class="th">หลาย service (ต้อง deploy พร้อมกัน)</span></td>
+          <td class="col-micro good"><span class="en">Many services (independently)</span><span class="th">หลาย service (อิสระ)</span></td>
+        </tr>
+        <tr>
+          <td><strong><span class="en">Team size</span><span class="th">ขนาดทีม</span></strong></td>
+          <td class="col-mono">1–5 <span class="en">people</span><span class="th">คน</span></td>
+          <td class="col-modular">5–20 <span class="en">people</span><span class="th">คน</span></td>
+          <td class="col-dist bad">❌ <span class="en">Not suitable</span><span class="th">ไม่เหมาะ</span></td>
+          <td class="col-micro">20+ <span class="en">(2-pizza rule)</span><span class="th">คน (2-pizza rule)</span></td>
+        </tr>
+        <tr>
+          <td><strong><span class="en">Scalability</span><span class="th">การ scale</span></strong></td>
+          <td class="col-mono warn-text"><span class="en">Scale all together</span><span class="th">scale ทั้งหมด</span></td>
+          <td class="col-modular warn-text"><span class="en">Scale all together</span><span class="th">scale ทั้งหมด</span></td>
+          <td class="col-dist bad">❌ <span class="en">Hard (tight coupling)</span><span class="th">scale ยาก</span></td>
+          <td class="col-micro good">✅ <span class="en">Scale per service</span><span class="th">scale แยกต่อ service</span></td>
+        </tr>
+        <tr>
+          <td><strong><span class="en">Data isolation</span><span class="th">การแยก data</span></strong></td>
+          <td class="col-mono warn-text"><span class="en">Shared DB</span><span class="th">shared DB</span></td>
+          <td class="col-modular warn-text"><span class="en">Shared DB (schema per module)</span><span class="th">shared DB (schema ต่อ module)</span></td>
+          <td class="col-dist bad">❌ Shared DB</td>
+          <td class="col-micro good">✅ DB per service</td>
+        </tr>
+        <tr>
+          <td><strong><span class="en">Fault isolation</span><span class="th">การ isolate ความล้มเหลว</span></strong></td>
+          <td class="col-mono warn-text"><span class="en">Low</span><span class="th">ต่ำ</span></td>
+          <td class="col-modular warn-text"><span class="en">Medium</span><span class="th">ปานกลาง</span></td>
+          <td class="col-dist bad">❌ <span class="en">Very low (cascade)</span><span class="th">ต่ำมาก (cascade)</span></td>
+          <td class="col-micro good">✅ <span class="en">High</span><span class="th">สูง</span></td>
+        </tr>
+        <tr>
+          <td><strong><span class="en">Dev complexity</span><span class="th">ความซับซ้อน dev</span></strong></td>
+          <td class="col-mono good"><span class="en">Low</span><span class="th">ต่ำ</span></td>
+          <td class="col-modular"><span class="en">Medium</span><span class="th">ปานกลาง</span></td>
+          <td class="col-dist bad">❌ <span class="en">Very high</span><span class="th">สูงมาก</span></td>
+          <td class="col-micro warn-text"><span class="en">High</span><span class="th">สูง</span></td>
+        </tr>
+        <tr>
+          <td><strong><span class="en">Ops complexity</span><span class="th">ความซับซ้อน ops</span></strong></td>
+          <td class="col-mono good"><span class="en">Low</span><span class="th">ต่ำ</span></td>
+          <td class="col-modular good"><span class="en">Low</span><span class="th">ต่ำ</span></td>
+          <td class="col-dist bad">❌ <span class="en">Very high</span><span class="th">สูงมาก</span></td>
+          <td class="col-micro warn-text"><span class="en">Very high</span><span class="th">สูงมาก</span></td>
+        </tr>
+        <tr>
+          <td><strong><span class="en">Testing</span><span class="th">การทดสอบ</span></strong></td>
+          <td class="col-mono good"><span class="en">Easy (integration)</span><span class="th">ง่าย (integration)</span></td>
+          <td class="col-modular"><span class="en">Easy–Medium</span><span class="th">ง่าย–ปานกลาง</span></td>
+          <td class="col-dist bad">❌ <span class="en">Hard (mock many services)</span><span class="th">ยาก (mock หลาย service)</span></td>
+          <td class="col-micro warn-text"><span class="en">Hard (contract tests)</span><span class="th">ยาก (contract test)</span></td>
+        </tr>
+        <tr>
+          <td><strong><span class="en">Best for</span><span class="th">เหมาะกับ</span></strong></td>
+          <td class="col-mono"><span class="en">Startup, MVP</span><span class="th">startup, MVP</span></td>
+          <td class="col-modular"><span class="en">Growth stage SaaS</span><span class="th">growth stage</span></td>
+          <td class="col-dist bad">❌ <span class="en">Avoid entirely</span><span class="th">หลีกเลี่ยง</span></td>
+          <td class="col-micro"><span class="en">Large scale enterprise</span><span class="th">enterprise ขนาดใหญ่</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ── SECTION 6: WHEN TO USE ── -->
+<section id="when-to-use">
+  <div class="section-title">🧭 <span class="en">How to Choose?</span><span class="th">เลือกแบบไหนดี?</span></div>
+  <p class="section-sub">
+    <span class="en">There is no universally best architecture — it depends on team size, domain clarity, and operational maturity</span>
+    <span class="th">ไม่มีสถาปัตยกรรมที่ดีที่สุดตลอดกาล — ขึ้นอยู่กับขนาดทีม, ความชัดเจนของ domain, และความพร้อมด้าน ops</span>
+  </p>
+
+  <div class="callout tip">
+    <strong>🧱 <span class="en">Choose Monolith when:</span><span class="th">เลือก Monolith เมื่อ:</span></strong><br>
+    <span class="en">Startup / MVP / team &lt; 5 people / still figuring out domain boundaries / speed matters most right now</span>
+    <span class="th">startup / MVP / ทีม &lt; 5 คน / ยังไม่แน่ใจ domain boundary / ต้องการ ship เร็วที่สุด</span><br><br>
+    <span style="font-size:.82rem;color:#475569">
+      <span class="en">Example: An e-commerce site just launching — start with monolith, refactor later when you understand the domain</span>
+      <span class="th">ตัวอย่าง: ร้านค้าออนไลน์ที่เพิ่งเปิดตัว — เริ่มด้วย monolith ก่อน แล้วค่อย refactor เมื่อเข้าใจ domain มากขึ้น</span>
+    </span>
+  </div>
+
+  <div class="callout info">
+    <strong>📦 <span class="en">Choose Modular Monolith when:</span><span class="th">เลือก Modular Monolith เมื่อ:</span></strong><br>
+    <span class="en">Team is growing (5–20 people) / need better code organization / not yet ready for ops overhead of microservices / want a clear migration path</span>
+    <span class="th">ทีมเติบโต (5–20 คน) / ต้องการจัดระเบียบ code ที่ดีขึ้น / ยังไม่พร้อมรับ ops overhead ของ microservices / ต้องการ migration path ที่ชัดเจน</span><br><br>
+    <span style="font-size:.82rem;color:#475569">
+      <span class="en">Example: B2B SaaS with a team of 10–15 — clear module boundaries without the operational complexity</span>
+      <span class="th">ตัวอย่าง: SaaS B2B ที่มีทีม 10–15 คน — ขอบเขต module ชัดเจนโดยไม่เพิ่ม ops complexity</span>
+    </span>
+  </div>
+
+  <div class="callout warn">
+    <strong>⚠️ <span class="en">Avoid Distributed Monolith — always:</span><span class="th">หลีกเลี่ยง Distributed Monolith เสมอ:</span></strong><br>
+    <span class="en">If you find that services must deploy together or call each other synchronously in chains, stop. Revert to a Monolith first, understand the domain boundaries clearly, then refactor toward proper Microservices.</span>
+    <span class="th">ถ้าพบว่า services ต้อง deploy พร้อมกัน หรือ call กันแบบ synchronous chain ให้หยุดทันที — revert กลับเป็น Monolith ก่อน เข้าใจ domain boundary ให้ชัดเจน แล้วค่อย refactor ไปเป็น Microservices ที่ถูกต้อง</span>
+  </div>
+
+  <div class="callout" style="border-color:#38bdf8">
+    <strong style="color:#7dd3fc">🔬 <span class="en">Choose Microservices when:</span><span class="th">เลือก Microservices เมื่อ:</span></strong><br>
+    <span class="en">Very different scaling needs per service / large teams (Conway's Law) / clear domain boundaries / mature DevOps/K8s culture / independent release cadences per team</span>
+    <span class="th">แต่ละส่วนต้องการ scale ต่างกันมาก / ทีมใหญ่ (Conway's Law) / domain boundary ชัดเจนแล้ว / มีวัฒนธรรม DevOps/K8s ที่โตแล้ว / ทีมต้องการ release ได้อิสระ</span><br><br>
+    <span style="font-size:.82rem;color:#475569">
+      <span class="en">Example: Fintech with separate payment team, analytics team, and risk team — each deploys independently on its own schedule</span>
+      <span class="th">ตัวอย่าง: Fintech ที่มีทีม payment แยกจากทีม analytics และทีม risk — แต่ละทีม deploy ได้อิสระตามรอบของตัวเอง</span>
+    </span>
+  </div>
+
+  <div class="callout" style="border-color:#a855f7;margin-top:2rem">
+    <strong style="color:#c084fc">💡 <span class="en">Key Insight — Start Simple</span><span class="th">หลักคิดสำคัญ — เริ่มต้นแบบง่าย</span></strong><br>
+    <span class="en">Most successful microservices architectures started as monoliths. Sam Newman (author of "Building Microservices") recommends: <em>start with a monolith, understand your domain, then extract services when you have clear boundaries and a real scaling need.</em></span>
+    <span class="th">สถาปัตยกรรม microservices ที่สำเร็จส่วนใหญ่เริ่มต้นเป็น monolith ก่อน Sam Newman (ผู้เขียน "Building Microservices") แนะนำว่า: <em>เริ่มด้วย monolith, ทำความเข้าใจ domain ของคุณ แล้วค่อย extract services เมื่อมีขอบเขตที่ชัดเจนและมีความต้องการ scale จริงๆ</em></span>
+  </div>
+</section>
+
+</div><!-- /container -->
+
+<footer>
+  <span class="en">Software Architecture Patterns · Monolith vs Microservices #27</span>
+  <span class="th">สื่อการสอน Software Architecture Patterns · 4 รูปแบบสถาปัตยกรรม #27</span>
+</footer>
+
+<script>hljs.highlightAll();</script>
+<script src="common.js"></script>
+<script src="i18n.js"></script>
+</body>
+</html>

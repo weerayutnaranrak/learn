@@ -4,7 +4,7 @@
 
 > **อ่าน summaries ก่อน:** ดูสรุปทุกหัวข้อได้ที่ [`summaries/`](summaries/README.md)
 
-## หัวข้อทั้งหมด (25 หัวข้อ)
+## หัวข้อทั้งหมด (27 หัวข้อ)
 
 ### 🏛️ Design Principles & Patterns
 
@@ -44,6 +44,7 @@
 | 11 | Event Driven Design | Publisher/Subscriber, Event Bus, Event Sourcing | `3-event-driven.html` | [📄](summaries/03-event-driven.md) |
 | 12 | Peer-to-Peer (P2P) | DHT, Gossip Protocol, WebRTC | `14-p2p.html` | [📄](summaries/14-p2p.md) |
 | 21 | Saga Pattern | Choreography, Orchestration, Outbox Pattern | `21-saga.html` | [📄](summaries/21-saga.md) |
+| 27 | Monolith vs Microservices (4 styles) | Monolith, Modular Monolith, Distributed Monolith (anti-pattern), Microservices | `27-monolith-microservices.html` | [📄](summaries/27-monolith-microservices.md) |
 | 14 | BFF Architecture | Backend per client, aggregate, over/under-fetching | `4-bff.html` | [📄](summaries/04-bff.md) |
 
 ### ☸️ Infrastructure & Orchestration

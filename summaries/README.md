@@ -42,6 +42,7 @@
 | [09-microservice.md](09-microservice.md) | Microservice Architecture | API Gateway, Circuit Breaker, Service Mesh |
 | [14-p2p.md](14-p2p.md) | P2P | DHT, Gossip, WebRTC, Sybil attack |
 | [21-saga.md](21-saga.md) | Saga Pattern | Choreography, Orchestration, Outbox Pattern |
+| [27-monolith-microservices.md](27-monolith-microservices.md) | Monolith vs Microservices (4 styles) | Monolith, Modular Monolith, Distributed Monolith (anti-pattern), Microservices |
 
 ## ☸️ Infrastructure & Orchestration
 
