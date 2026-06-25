@@ -120,30 +120,32 @@ a{color:#f472b6;text-decoration:none}
 .hier-desc{font-size:.65rem;color:#475569;margin-top:.2rem}
 </style>
 </head>
-<body>
+<body class="lang-th">
 
 <nav class="topnav">
-  <a href="index.html" class="back-btn">← กลับหน้าหลัก</a>
+  <a href="index.html" class="back-btn">← <span class="en">Home</span><span class="th">กลับหน้าหลัก</span></a>
   <span class="nav-title">05 / <span>Atomic Design</span></span>
 </nav>
 
 <div class="hero">
-  <div class="hero-badge">⚛️ หัวข้อที่ 5</div>
+  <div class="hero-badge">⚛️ <span class="en">Topic 5</span><span class="th">หัวข้อที่ 5</span></div>
   <h1>Atomic Design</h1>
-  <p>methodology ออกแบบ UI Systems โดย Brad Frost — สร้าง components จากเล็กไปใหญ่ เหมือนนักเคมีสร้างสสารจากอะตอม</p>
+  <p><span class="en">UI System design methodology by Brad Frost — build components from smallest to largest, like a chemist building matter from atoms</span><span class="th">methodology ออกแบบ UI Systems โดย Brad Frost — สร้าง components จากเล็กไปใหญ่ เหมือนนักเคมีสร้างสสารจากอะตอม</span></p>
 </div>
 
 <div class="content">
 
 <!-- ── WHAT IS ── -->
 <div class="section">
-  <div class="section-title">💡 Atomic Design คืออะไร?</div>
-  <div class="section-sub">แนวคิดโดย Brad Frost — "We're not designing pages, we're designing systems of components"</div>
+  <div class="section-title">💡 <span class="en">What is Atomic Design?</span><span class="th">Atomic Design คืออะไร?</span></div>
+  <div class="section-sub"><span class="en">By Brad Frost — "We're not designing pages, we're designing systems of components"</span><span class="th">แนวคิดโดย Brad Frost — "We're not designing pages, we're designing systems of components"</span></div>
 
   <p style="color:#94a3b8;margin-bottom:1.5rem">
-    แนวคิดนี้มองว่า Interface เหมือนสสารในธรรมชาติ —
+    <span class="en">This methodology views the Interface like matter in nature —
+    composed of <strong style="color:#e2e8f0">small pieces (Atoms)</strong> that combine into increasingly complex things,
+    making Design Systems <strong style="color:#f9a8d4">consistent, reusable, and easy to maintain</strong></span><span class="th">แนวคิดนี้มองว่า Interface เหมือนสสารในธรรมชาติ —
     ประกอบขึ้นจาก <strong style="color:#e2e8f0">ชิ้นส่วนเล็กๆ (Atoms)</strong> ที่รวมกันเป็นสิ่งที่ซับซ้อนขึ้นเรื่อยๆ
-    ทำให้ Design System <strong style="color:#f9a8d4">สอดคล้อง, ซ้ำใช้ได้, และ Maintain ง่าย</strong>
+    ทำให้ Design System <strong style="color:#f9a8d4">สอดคล้อง, ซ้ำใช้ได้, และ Maintain ง่าย</strong></span>
   </p>
 
   <!-- Hierarchy -->
@@ -151,17 +153,17 @@ a{color:#f472b6;text-decoration:none}
     <div class="hier-item">
       <div class="hier-circle" style="background:rgba(99,102,241,.1);border-color:#6366f1">⚛️</div>
       <div class="hier-name" style="color:#a5b4fc">Atoms</div>
-      <div class="hier-desc">ชิ้นส่วนพื้นฐาน</div>
+      <div class="hier-desc"><span class="en">Basic building blocks</span><span class="th">ชิ้นส่วนพื้นฐาน</span></div>
     </div>
     <div class="hier-item">
       <div class="hier-circle" style="background:rgba(6,182,212,.1);border-color:#06b6d4">🧬</div>
       <div class="hier-name" style="color:#67e8f9">Molecules</div>
-      <div class="hier-desc">กลุ่ม Atoms</div>
+      <div class="hier-desc"><span class="en">Group of Atoms</span><span class="th">กลุ่ม Atoms</span></div>
     </div>
     <div class="hier-item">
       <div class="hier-circle" style="background:rgba(16,185,129,.1);border-color:#10b981">🦠</div>
       <div class="hier-name" style="color:#6ee7b7">Organisms</div>
-      <div class="hier-desc">Section ที่ซับซ้อน</div>
+      <div class="hier-desc"><span class="en">Complex sections</span><span class="th">Section ที่ซับซ้อน</span></div>
     </div>
     <div class="hier-item">
       <div class="hier-circle" style="background:rgba(245,158,11,.1);border-color:#f59e0b">📐</div>
@@ -171,20 +173,19 @@ a{color:#f472b6;text-decoration:none}
     <div class="hier-item">
       <div class="hier-circle" style="background:rgba(236,72,153,.1);border-color:#ec4899">📄</div>
       <div class="hier-name" style="color:#f9a8d4">Pages</div>
-      <div class="hier-desc">Instance จริง</div>
+      <div class="hier-desc"><span class="en">Real instance</span><span class="th">Instance จริง</span></div>
     </div>
   </div>
 
   <div class="callout">
-    <strong>ข้อดีหลัก:</strong> เมื่อแก้ Atom (เช่น ปุ่ม) ทุก Molecule, Organism, Page ที่ใช้ปุ่มนี้
-    จะเปลี่ยนตามอัตโนมัติ — <strong>Single Source of Truth</strong>
+    <span class="en"><strong>Main benefit:</strong> When you change an Atom (e.g. a button), every Molecule, Organism, and Page using that button updates automatically — <strong>Single Source of Truth</strong></span><span class="th"><strong>ข้อดีหลัก:</strong> เมื่อแก้ Atom (เช่น ปุ่ม) ทุก Molecule, Organism, Page ที่ใช้ปุ่มนี้ จะเปลี่ยนตามอัตโนมัติ — <strong>Single Source of Truth</strong></span>
   </div>
 </div>
 
 <!-- ── 5 LEVELS ── -->
 <div class="section">
-  <div class="section-title">⚛️ ทั้ง 5 ระดับ พร้อม Live Preview</div>
-  <div class="section-sub">จาก Atoms เล็กๆ ไปจนถึง Page ที่สมบูรณ์</div>
+  <div class="section-title">⚛️ <span class="en">All 5 Levels with Live Preview</span><span class="th">ทั้ง 5 ระดับ พร้อม Live Preview</span></div>
+  <div class="section-sub"><span class="en">From tiny Atoms up to a complete Page</span><span class="th">จาก Atoms เล็กๆ ไปจนถึง Page ที่สมบูรณ์</span></div>
 
   <div class="levels">
 
@@ -193,18 +194,18 @@ a{color:#f472b6;text-decoration:none}
       <div class="level-header" style="background:rgba(99,102,241,.06)">
         <div class="level-num" style="background:rgba(99,102,241,.2);color:#a5b4fc">1</div>
         <div class="level-info">
-          <h2 style="color:#a5b4fc">⚛️ Atoms — อะตอม</h2>
-          <p>ชิ้นส่วน UI พื้นฐานที่เล็กที่สุด ไม่สามารถแบ่งย่อยได้อีก</p>
+          <h2 style="color:#a5b4fc">⚛️ <span class="en">Atoms</span><span class="th">Atoms — อะตอม</span></h2>
+          <p><span class="en">The smallest, indivisible basic UI building blocks</span><span class="th">ชิ้นส่วน UI พื้นฐานที่เล็กที่สุด ไม่สามารถแบ่งย่อยได้อีก</span></p>
         </div>
       </div>
       <div class="level-body">
         <div class="level-desc">
-          <strong style="color:#e2e8f0">Atoms คือ:</strong><br><br>
-          • HTML elements พื้นฐาน: button, input, label, image, icon<br>
-          • Design tokens: สี, font, spacing, border-radius<br>
-          • ไม่มี context — ใช้ได้ทุกที่<br>
-          • มีแค่ styling และ basic interaction<br><br>
-          <strong style="color:#818cf8">ตัวอย่าง Atoms:</strong><br>
+          <strong style="color:#e2e8f0"><span class="en">Atoms are:</span><span class="th">Atoms คือ:</span></strong><br><br>
+          • <span class="en">Basic HTML elements: button, input, label, image, icon</span><span class="th">HTML elements พื้นฐาน: button, input, label, image, icon</span><br>
+          • <span class="en">Design tokens: color, font, spacing, border-radius</span><span class="th">Design tokens: สี, font, spacing, border-radius</span><br>
+          • <span class="en">No context — usable anywhere</span><span class="th">ไม่มี context — ใช้ได้ทุกที่</span><br>
+          • <span class="en">Only styling and basic interaction</span><span class="th">มีแค่ styling และ basic interaction</span><br><br>
+          <strong style="color:#818cf8"><span class="en">Example Atoms:</span><span class="th">ตัวอย่าง Atoms:</span></strong><br>
           Button, Input Field, Label, Badge, Avatar, Icon, Rating Stars, Checkbox
         </div>
         <div class="level-demo">
@@ -249,18 +250,18 @@ a{color:#f472b6;text-decoration:none}
       <div class="level-header" style="background:rgba(6,182,212,.06)">
         <div class="level-num" style="background:rgba(6,182,212,.2);color:#67e8f9">2</div>
         <div class="level-info">
-          <h2 style="color:#67e8f9">🧬 Molecules — โมเลกุล</h2>
-          <p>กลุ่มของ Atoms ที่ทำงานร่วมกันเพื่อหน้าที่เดียว</p>
+          <h2 style="color:#67e8f9">🧬 <span class="en">Molecules</span><span class="th">Molecules — โมเลกุล</span></h2>
+          <p><span class="en">Groups of Atoms working together for a single purpose</span><span class="th">กลุ่มของ Atoms ที่ทำงานร่วมกันเพื่อหน้าที่เดียว</span></p>
         </div>
       </div>
       <div class="level-body">
         <div class="level-desc">
-          <strong style="color:#e2e8f0">Molecules คือ:</strong><br><br>
-          • Atoms หลายตัวรวมกันที่มีหน้าที่ชัดเจน<br>
-          • เช่น: Search Box = Input + Button<br>
+          <strong style="color:#e2e8f0"><span class="en">Molecules are:</span><span class="th">Molecules คือ:</span></strong><br><br>
+          • <span class="en">Multiple Atoms combined with a clear purpose</span><span class="th">Atoms หลายตัวรวมกันที่มีหน้าที่ชัดเจน</span><br>
+          • <span class="en">e.g. Search Box = Input + Button</span><span class="th">เช่น: Search Box = Input + Button</span><br>
           • Product Card = Image + Name + Price + Rating + Button<br>
-          • ยังคง reusable อยู่ในหลายๆ ที่<br><br>
-          <strong style="color:#22d3ee">ตัวอย่าง Molecules:</strong><br>
+          • <span class="en">Still reusable in many places</span><span class="th">ยังคง reusable อยู่ในหลายๆ ที่</span><br><br>
+          <strong style="color:#22d3ee"><span class="en">Example Molecules:</span><span class="th">ตัวอย่าง Molecules:</span></strong><br>
           Search Box, Product Card, Form Field (Label+Input+Error),
           Stat Card, User Profile Mini, Navigation Link
         </div>
@@ -307,18 +308,18 @@ a{color:#f472b6;text-decoration:none}
       <div class="level-header" style="background:rgba(16,185,129,.06)">
         <div class="level-num" style="background:rgba(16,185,129,.2);color:#6ee7b7">3</div>
         <div class="level-info">
-          <h2 style="color:#6ee7b7">🦠 Organisms — สิ่งมีชีวิต</h2>
-          <p>Section ที่ซับซ้อน ประกอบจาก Molecules และ Atoms</p>
+          <h2 style="color:#6ee7b7">🦠 <span class="en">Organisms</span><span class="th">Organisms — สิ่งมีชีวิต</span></h2>
+          <p><span class="en">Complex sections composed of Molecules and Atoms</span><span class="th">Section ที่ซับซ้อน ประกอบจาก Molecules และ Atoms</span></p>
         </div>
       </div>
       <div class="level-body">
         <div class="level-desc">
-          <strong style="color:#e2e8f0">Organisms คือ:</strong><br><br>
-          • Interface sections ที่ standalone และซับซ้อน<br>
-          • มี business context ชัดเจน<br>
-          • เช่น: Navbar, Product Grid, Shopping Cart, Footer<br>
-          • อาจ reuse ได้ แต่ context-specific กว่า Molecules<br><br>
-          <strong style="color:#34d399">ตัวอย่าง Organisms:</strong><br>
+          <strong style="color:#e2e8f0"><span class="en">Organisms are:</span><span class="th">Organisms คือ:</span></strong><br><br>
+          • <span class="en">Standalone, complex interface sections</span><span class="th">Interface sections ที่ standalone และซับซ้อน</span><br>
+          • <span class="en">Have a clear business context</span><span class="th">มี business context ชัดเจน</span><br>
+          • <span class="en">e.g. Navbar, Product Grid, Shopping Cart, Footer</span><span class="th">เช่น: Navbar, Product Grid, Shopping Cart, Footer</span><br>
+          • <span class="en">Can be reused, but more context-specific than Molecules</span><span class="th">อาจ reuse ได้ แต่ context-specific กว่า Molecules</span><br><br>
+          <strong style="color:#34d399"><span class="en">Example Organisms:</span><span class="th">ตัวอย่าง Organisms:</span></strong><br>
           Navigation Bar, Product Listing Grid, Hero Section,
           Shopping Cart Sidebar, Footer, Filter Panel, Review Section
         </div>
@@ -345,9 +346,9 @@ a{color:#f472b6;text-decoration:none}
           <div>
             <p style="font-size:.68rem;color:#334155;margin-bottom:.3rem">Product Grid Organism</p>
             <div style="display:flex;gap:.5rem;align-items:center;margin-bottom:.5rem">
-              <span style="font-size:.72rem;color:#94a3b8">สินค้าทั้งหมด (128)</span>
-              <button class="btn btn-secondary btn-sm">⚙️ กรอง</button>
-              <button class="btn btn-secondary btn-sm">↕ เรียง</button>
+              <span style="font-size:.72rem;color:#94a3b8"><span class="en">All products (128)</span><span class="th">สินค้าทั้งหมด (128)</span></span>
+              <button class="btn btn-secondary btn-sm"><span class="en">⚙️ Filter</span><span class="th">⚙️ กรอง</span></button>
+              <button class="btn btn-secondary btn-sm"><span class="en">↕ Sort</span><span class="th">↕ เรียง</span></button>
             </div>
             <div class="product-grid-demo">
               <div class="product-mini">
@@ -381,18 +382,18 @@ a{color:#f472b6;text-decoration:none}
       <div class="level-header" style="background:rgba(245,158,11,.06)">
         <div class="level-num" style="background:rgba(245,158,11,.2);color:#fcd34d">4</div>
         <div class="level-info">
-          <h2 style="color:#fcd34d">📐 Templates — แม่แบบ</h2>
-          <p>Page-level structure ที่แสดง layout โดยยังไม่มีข้อมูลจริง</p>
+          <h2 style="color:#fcd34d">📐 <span class="en">Templates</span><span class="th">Templates — แม่แบบ</span></h2>
+          <p><span class="en">Page-level structure showing layout without real content</span><span class="th">Page-level structure ที่แสดง layout โดยยังไม่มีข้อมูลจริง</span></p>
         </div>
       </div>
       <div class="level-body">
         <div class="level-desc">
-          <strong style="color:#e2e8f0">Templates คือ:</strong><br><br>
-          • Wire frame ที่ประกอบ Organisms เข้าด้วยกัน<br>
-          • แสดง layout structure โดยยังไม่ใส่ real content<br>
-          • เป็น "skeleton" ของหน้าที่จะแสดงผล<br>
-          • ใช้ placeholder แทน real data<br><br>
-          <strong style="color:#fbbf24">ตัวอย่าง Templates:</strong><br>
+          <strong style="color:#e2e8f0"><span class="en">Templates are:</span><span class="th">Templates คือ:</span></strong><br><br>
+          • <span class="en">Wireframes that assemble Organisms together</span><span class="th">Wire frame ที่ประกอบ Organisms เข้าด้วยกัน</span><br>
+          • <span class="en">Shows layout structure without inserting real content</span><span class="th">แสดง layout structure โดยยังไม่ใส่ real content</span><br>
+          • <span class="en">The "skeleton" of the rendered page</span><span class="th">เป็น "skeleton" ของหน้าที่จะแสดงผล</span><br>
+          • <span class="en">Uses placeholders instead of real data</span><span class="th">ใช้ placeholder แทน real data</span><br><br>
+          <strong style="color:#fbbf24"><span class="en">Example Templates:</span><span class="th">ตัวอย่าง Templates:</span></strong><br>
           Product Page Template, Homepage Template,
           Category Page Template, Checkout Template,
           Dashboard Template
@@ -450,19 +451,19 @@ a{color:#f472b6;text-decoration:none}
       <div class="level-header" style="background:rgba(236,72,153,.06)">
         <div class="level-num" style="background:rgba(236,72,153,.2);color:#f9a8d4">5</div>
         <div class="level-info">
-          <h2 style="color:#f9a8d4">📄 Pages — หน้า</h2>
-          <p>Template + Real Content = สิ่งที่ผู้ใช้เห็นจริงๆ</p>
+          <h2 style="color:#f9a8d4">📄 <span class="en">Pages</span><span class="th">Pages — หน้า</span></h2>
+          <p><span class="en">Template + Real Content = What the user actually sees</span><span class="th">Template + Real Content = สิ่งที่ผู้ใช้เห็นจริงๆ</span></p>
         </div>
       </div>
       <div class="level-body">
         <div class="level-desc">
-          <strong style="color:#e2e8f0">Pages คือ:</strong><br><br>
-          • Template ที่ใส่ real data เข้าไปแล้ว<br>
-          • สิ่งที่ end-user เห็นจริงๆ<br>
-          • ทดสอบว่า Design System ทำงานร่วมกับ real content ได้<br>
-          • เป็น "evidence" ว่า templates ใช้งานได้จริง<br><br>
-          <strong style="color:#f472b6">สำคัญ:</strong><br>
-          หน้า Pages ไม่ควรมี styling ใหม่ — ทุก component ใช้จาก levels ที่ผ่านมา
+          <strong style="color:#e2e8f0"><span class="en">Pages are:</span><span class="th">Pages คือ:</span></strong><br><br>
+          • <span class="en">Templates with real data inserted</span><span class="th">Template ที่ใส่ real data เข้าไปแล้ว</span><br>
+          • <span class="en">What the end-user actually sees</span><span class="th">สิ่งที่ end-user เห็นจริงๆ</span><br>
+          • <span class="en">Tests whether the Design System works with real content</span><span class="th">ทดสอบว่า Design System ทำงานร่วมกับ real content ได้</span><br>
+          • <span class="en">"Evidence" that templates actually work</span><span class="th">เป็น "evidence" ว่า templates ใช้งานได้จริง</span><br><br>
+          <strong style="color:#f472b6"><span class="en">Important:</span><span class="th">สำคัญ:</span></strong><br>
+          <span class="en">Pages should have no new styling — every component comes from the previous levels</span><span class="th">หน้า Pages ไม่ควรมี styling ใหม่ — ทุก component ใช้จาก levels ที่ผ่านมา</span>
         </div>
         <div class="level-demo">
           <p style="font-size:.7rem;color:#475569;margin-bottom:.8rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase">Pages (Real Content)</p>
@@ -509,8 +510,8 @@ a{color:#f472b6;text-decoration:none}
 
 <!-- ── IN VUE ── -->
 <div class="section">
-  <div class="section-title">💚 Atomic Design ใน Vue 3</div>
-  <div class="section-sub">ประยุกต์ใช้กับ Vue 3 Composition API + &lt;script setup&gt; SFC</div>
+  <div class="section-title">💚 <span class="en">Atomic Design in Vue 3</span><span class="th">Atomic Design ใน Vue 3</span></div>
+  <div class="section-sub"><span class="en">Applied with Vue 3 Composition API + &lt;script setup&gt; SFC</span><span class="th">ประยุกต์ใช้กับ Vue 3 Composition API + &lt;script setup&gt; SFC</span></div>
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
@@ -771,12 +772,12 @@ function handleAddToCart(productId: number) {
   </div>
 
   <div class="callout tip">
-    <strong>Vue Project Structure แบบ Atomic:</strong>
+    <strong><span class="en">Vue Project Structure — Atomic style:</span><span class="th">Vue Project Structure แบบ Atomic:</span></strong>
     <pre style="font-size:.78rem;margin-top:.5rem;color:#94a3b8;line-height:1.6">src/
 ├── components/
-│   ├── atoms/           ← ชิ้นเล็กสุด  (AppButton, AppBadge, AppInput, AppAvatar)
-│   ├── molecules/       ← กลุ่ม atoms  (ProductCard, SearchBox, FormField)
-│   └── organisms/       ← sections ใหญ่ (Navbar, ProductGrid, Footer)
+│   ├── atoms/           ← <span class="en">smallest pieces</span><span class="th">ชิ้นเล็กสุด</span>  (AppButton, AppBadge, AppInput, AppAvatar)
+│   ├── molecules/       ← <span class="en">groups of atoms</span><span class="th">กลุ่ม atoms</span>  (ProductCard, SearchBox, FormField)
+│   └── organisms/       ← <span class="en">large sections</span><span class="th">sections ใหญ่</span> (Navbar, ProductGrid, Footer)
 ├── pages/               ← route-level components (Nuxt: auto-route)
 │   ├── index.vue
 │   ├── CategoryPage.vue
@@ -789,17 +790,17 @@ function handleAddToCart(productId: number) {
       <div style="background:#0f2820;border:1px solid #16a34a40;border-radius:8px;padding:.8rem">
         <div style="font-size:.75rem;font-weight:700;color:#4ade80;margin-bottom:.4rem">Props &amp; Emits (data flow)</div>
         <div style="font-size:.73rem;color:#86efac;line-height:1.7">
-          • <strong>Props</strong> → ส่งข้อมูลลง (parent → child)<br>
-          • <strong>Emits</strong> → ส่ง event ขึ้น (child → parent)<br>
-          • <strong>v-model</strong> = props + emit รวมกัน
+          • <strong>Props</strong> → <span class="en">pass data down (parent → child)</span><span class="th">ส่งข้อมูลลง (parent → child)</span><br>
+          • <strong>Emits</strong> → <span class="en">send event up (child → parent)</span><span class="th">ส่ง event ขึ้น (child → parent)</span><br>
+          • <strong>v-model</strong> = <span class="en">props + emit combined</span><span class="th">props + emit รวมกัน</span>
         </div>
       </div>
       <div style="background:#0f1a2e;border:1px solid #3b82f640;border-radius:8px;padding:.8rem">
         <div style="font-size:.75rem;font-weight:700;color:#60a5fa;margin-bottom:.4rem">Composables (logic reuse)</div>
         <div style="font-size:.73rem;color:#93c5fd;line-height:1.7">
-          • แทน Mixins ของ Vue 2<br>
-          • ใช้ <code style="background:#1e3a5f;padding:1px 4px;border-radius:3px">use</code> นำหน้าชื่อ (useCart, useAuth)<br>
-          • return reactive refs ออกมา
+          • <span class="en">Replaces Mixins from Vue 2</span><span class="th">แทน Mixins ของ Vue 2</span><br>
+          • <span class="en">Use <code style="background:#1e3a5f;padding:1px 4px;border-radius:3px">use</code> prefix (useCart, useAuth)</span><span class="th">ใช้ <code style="background:#1e3a5f;padding:1px 4px;border-radius:3px">use</code> นำหน้าชื่อ (useCart, useAuth)</span><br>
+          • <span class="en">Returns reactive refs</span><span class="th">return reactive refs ออกมา</span>
         </div>
       </div>
     </div>
@@ -809,7 +810,7 @@ function handleAddToCart(productId: number) {
 <!-- ══ Unit Testing Section ══════════════════════════ -->
 <div class="section">
   <div class="section-title">🧪 Unit Testing — Atomic Design</div>
-  <div class="section-sub">Best pattern สำหรับทดสอบแต่ละ level ใน Vue 3 ด้วย Vitest + @vue/test-utils</div>
+  <div class="section-sub"><span class="en">Best pattern for testing each level in Vue 3 with Vitest + @vue/test-utils</span><span class="th">Best pattern สำหรับทดสอบแต่ละ level ใน Vue 3 ด้วย Vitest + @vue/test-utils</span></div>
 
   <!-- Tool stack -->
   <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:1.5rem 0">
@@ -837,7 +838,7 @@ function handleAddToCart(productId: number) {
 
   <!-- Testing Philosophy -->
   <div class="callout">
-    <strong>หลักการ:</strong> แต่ละ Level ควรทดสอบในแบบต่างกัน — <strong>Atom</strong> ทดสอบ props/slots/emits เดี่ยวๆ &nbsp;|&nbsp; <strong>Molecule</strong> ทดสอบ composition + data binding &nbsp;|&nbsp; <strong>Organism</strong> ทดสอบ logic + store + mock API &nbsp;|&nbsp; <strong>Page</strong> ทดสอบ routing + async fetch end-to-end
+    <span class="en"><strong>Principle:</strong> Each Level should be tested differently — <strong>Atom</strong> tests props/slots/emits in isolation &nbsp;|&nbsp; <strong>Molecule</strong> tests composition + data binding &nbsp;|&nbsp; <strong>Organism</strong> tests logic + store + mock API &nbsp;|&nbsp; <strong>Page</strong> tests routing + async fetch end-to-end</span><span class="th"><strong>หลักการ:</strong> แต่ละ Level ควรทดสอบในแบบต่างกัน — <strong>Atom</strong> ทดสอบ props/slots/emits เดี่ยวๆ &nbsp;|&nbsp; <strong>Molecule</strong> ทดสอบ composition + data binding &nbsp;|&nbsp; <strong>Organism</strong> ทดสอบ logic + store + mock API &nbsp;|&nbsp; <strong>Page</strong> ทดสอบ routing + async fetch end-to-end</span>
   </div>
 
   <!-- Testing Pyramid -->
@@ -849,7 +850,7 @@ function handleAddToCart(productId: number) {
       <div style="width:100%;background:linear-gradient(135deg,#1a0010,#2d001a);border:1px solid #ec489940;border-radius:12px 12px 0 0;padding:14px 20px;display:flex;justify-content:space-between;align-items:center">
         <div>
           <div style="font-size:.88rem;font-weight:700;color:#f9a8d4">5 · Pages</div>
-          <div style="font-size:.76rem;color:#64748b;margin-top:2px">mount + mock router &amp; fetch · ตรวจ route + async data</div>
+          <div style="font-size:.76rem;color:#64748b;margin-top:2px"><span class="en">mount + mock router &amp; fetch · check route + async data</span><span class="th">mount + mock router &amp; fetch · ตรวจ route + async data</span></div>
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
           <span style="background:#ec489920;border:1px solid #ec489940;color:#f9a8d4;padding:2px 8px;border-radius:6px;font-size:.7rem">Integration / E2E</span>
@@ -861,7 +862,7 @@ function handleAddToCart(productId: number) {
       <div style="width:calc(100% - 40px);background:linear-gradient(135deg,#100a1a,#1a1030);border:1px solid #a78bfa40;border-left:1px solid #a78bfa40;border-right:1px solid #a78bfa40;border-top:none;padding:14px 20px;display:flex;justify-content:space-between;align-items:center">
         <div>
           <div style="font-size:.88rem;font-weight:700;color:#c4b5fd">4 · Organisms</div>
-          <div style="font-size:.76rem;color:#64748b;margin-top:2px">mock Pinia store · ตรวจ list/empty state · user events</div>
+          <div style="font-size:.76rem;color:#64748b;margin-top:2px"><span class="en">mock Pinia store · check list/empty state · user events</span><span class="th">mock Pinia store · ตรวจ list/empty state · user events</span></div>
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
           <span style="background:#a78bfa20;border:1px solid #a78bfa40;color:#c4b5fd;padding:2px 8px;border-radius:6px;font-size:.7rem">Integration</span>
@@ -872,7 +873,7 @@ function handleAddToCart(productId: number) {
       <div style="width:calc(100% - 80px);background:linear-gradient(135deg,#0a1020,#1a2030);border:1px solid #60a5fa40;border-top:none;padding:14px 20px;display:flex;justify-content:space-between;align-items:center">
         <div>
           <div style="font-size:.88rem;font-weight:700;color:#93c5fd">3 · Molecules</div>
-          <div style="font-size:.76rem;color:#64748b;margin-top:2px">ตรวจ child components ครบ · emits ถูกต้อง · data binding</div>
+          <div style="font-size:.76rem;color:#64748b;margin-top:2px"><span class="en">verify child components present · correct emits · data binding</span><span class="th">ตรวจ child components ครบ · emits ถูกต้อง · data binding</span></div>
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
           <span style="background:#60a5fa20;border:1px solid #60a5fa40;color:#93c5fd;padding:2px 8px;border-radius:6px;font-size:.7rem">Component</span>
@@ -883,7 +884,7 @@ function handleAddToCart(productId: number) {
       <div style="width:calc(100% - 120px);background:linear-gradient(135deg,#0a1a0a,#0d2a10);border:1px solid #4ade8050;border-top:none;border-radius:0 0 12px 12px;padding:14px 20px;display:flex;justify-content:space-between;align-items:center">
         <div>
           <div style="font-size:.88rem;font-weight:700;color:#86efac">1–2 · Atoms + Templates</div>
-          <div style="font-size:.76rem;color:#64748b;margin-top:2px">props/slots/emits · classes · accessibility · เยอะที่สุด</div>
+          <div style="font-size:.76rem;color:#64748b;margin-top:2px"><span class="en">props/slots/emits · classes · accessibility · most tests</span><span class="th">props/slots/emits · classes · accessibility · เยอะที่สุด</span></div>
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
           <span style="background:#4ade8020;border:1px solid #4ade8040;color:#86efac;padding:2px 8px;border-radius:6px;font-size:.7rem">Unit · Most tests</span>
@@ -899,9 +900,9 @@ function handleAddToCart(productId: number) {
       <div style="font-size:1.4rem;margin-bottom:8px">⚛️</div>
       <div style="font-size:.88rem;font-weight:700;color:#86efac;margin-bottom:6px">Atom Tests</div>
       <div style="font-size:.78rem;color:#64748b;line-height:1.7">
-        ✓ props → class/attr ถูกต้อง<br>
+        ✓ <span class="en">props → correct class/attr</span><span class="th">props → class/attr ถูกต้อง</span><br>
         ✓ slot renders content<br>
-        ✓ emit ถูกยิงเมื่อ click<br>
+        ✓ <span class="en">emit fires on click</span><span class="th">emit ถูกยิงเมื่อ click</span><br>
         ✓ disabled state works
       </div>
     </div>
@@ -909,8 +910,8 @@ function handleAddToCart(productId: number) {
       <div style="font-size:1.4rem;margin-bottom:8px">🔬</div>
       <div style="font-size:.88rem;font-weight:700;color:#93c5fd;margin-bottom:6px">Molecule Tests</div>
       <div style="font-size:.78rem;color:#64748b;line-height:1.7">
-        ✓ child atoms render ครบ<br>
-        ✓ props pass down ถูกต้อง<br>
+        ✓ <span class="en">all child atoms render</span><span class="th">child atoms render ครบ</span><br>
+        ✓ <span class="en">props pass down correctly</span><span class="th">props pass down ถูกต้อง</span><br>
         ✓ conditional v-if/v-show<br>
         ✓ snapshot toMatchSnapshot
       </div>
@@ -967,7 +968,7 @@ config.global.plugins = [createPinia()]</code></pre>
   <!-- ── Atom tests ── -->
   <div style="display:flex;align-items:center;gap:10px;margin:2rem 0 1rem">
     <div style="width:30px;height:30px;background:#4ade80;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;color:#0a0e1a;font-size:.82rem;flex-shrink:0">⚛️</div>
-    <div style="font-size:1rem;font-weight:700;color:#86efac">Atom Tests — ทดสอบ props / slots / emits</div>
+    <div style="font-size:1rem;font-weight:700;color:#86efac"><span class="en">Atom Tests — testing props / slots / emits</span><span class="th">Atom Tests — ทดสอบ props / slots / emits</span></div>
   </div>
 
   <div class="code-block" style="border:1px solid #1e293b;border-radius:12px;overflow:hidden;margin:1rem 0">
@@ -1021,11 +1022,11 @@ describe('AppButton', () => {
   <!-- ── Molecule tests ── -->
   <div style="display:flex;align-items:center;gap:10px;margin:2rem 0 1rem">
     <div style="width:30px;height:30px;background:#60a5fa;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;color:#0a0e1a;font-size:.82rem;flex-shrink:0">🔬</div>
-    <div style="font-size:1rem;font-weight:700;color:#93c5fd">Molecule Tests — ทดสอบ composition</div>
+    <div style="font-size:1rem;font-weight:700;color:#93c5fd"><span class="en">Molecule Tests — testing composition</span><span class="th">Molecule Tests — ทดสอบ composition</span></div>
   </div>
 
   <div class="callout tip">
-    <strong>Pattern:</strong> ใช้ <code>mount()</code> (ไม่ใช่ shallowMount) เพื่อให้ atoms render จริง — แล้วตรวจว่า props ถูก pass ลงไปถึง child ครบ และ emit bubble ขึ้นมาถูก
+    <span class="en"><strong>Pattern:</strong> Use <code>mount()</code> (not shallowMount) so atoms render for real — then verify props are passed down to children and emits bubble up correctly</span><span class="th"><strong>Pattern:</strong> ใช้ <code>mount()</code> (ไม่ใช่ shallowMount) เพื่อให้ atoms render จริง — แล้วตรวจว่า props ถูก pass ลงไปถึง child ครบ และ emit bubble ขึ้นมาถูก</span>
   </div>
 
   <div class="code-block" style="border:1px solid #1e293b;border-radius:12px;overflow:hidden;margin:1rem 0">
@@ -1094,7 +1095,7 @@ describe('ProductCard', () => {
   <!-- ── Organism tests ── -->
   <div style="display:flex;align-items:center;gap:10px;margin:2rem 0 1rem">
     <div style="width:30px;height:30px;background:#a78bfa;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;color:#0a0e1a;font-size:.82rem;flex-shrink:0">🧬</div>
-    <div style="font-size:1rem;font-weight:700;color:#c4b5fd">Organism Tests — ทดสอบ logic + Pinia store</div>
+    <div style="font-size:1rem;font-weight:700;color:#c4b5fd"><span class="en">Organism Tests — testing logic + Pinia store</span><span class="th">Organism Tests — ทดสอบ logic + Pinia store</span></div>
   </div>
 
   <div class="code-block" style="border:1px solid #1e293b;border-radius:12px;overflow:hidden;margin:1rem 0">
@@ -1177,7 +1178,7 @@ describe('ProductGrid', () => {
   <!-- ── Page tests ── -->
   <div style="display:flex;align-items:center;gap:10px;margin:2rem 0 1rem">
     <div style="width:30px;height:30px;background:#ec4899;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;color:white;font-size:.82rem;flex-shrink:0">📄</div>
-    <div style="font-size:1rem;font-weight:700;color:#f9a8d4">Page Tests — ทดสอบ async data + routing</div>
+    <div style="font-size:1rem;font-weight:700;color:#f9a8d4"><span class="en">Page Tests — testing async data + routing</span><span class="th">Page Tests — ทดสอบ async data + routing</span></div>
   </div>
 
   <div class="code-block" style="border:1px solid #1e293b;border-radius:12px;overflow:hidden;margin:1rem 0">
@@ -1262,27 +1263,219 @@ describe('CategoryPage', () => {
   <!-- ── Summary table ── -->
   <div style="background:#0d1117;border:1px solid #1e293b;border-radius:14px;overflow:hidden;margin:2rem 0">
     <div style="background:#111827;padding:12px 20px;display:grid;grid-template-columns:1.5fr 1fr 1.5fr 1fr;font-size:.78rem;font-weight:700;color:#4ade80;gap:8px">
-      <div>Level</div><div>Test Type</div><div>Tools / Pattern</div><div>จำนวน Tests</div>
+      <div>Level</div><div>Test Type</div><div>Tools / Pattern</div><div><span class="en">Test Count</span><span class="th">จำนวน Tests</span></div>
     </div>
     <div style="display:grid;grid-template-columns:1.5fr 1fr 1.5fr 1fr;padding:10px 20px;font-size:.8rem;color:#94a3b8;border-bottom:1px solid #ffffff08;gap:8px;align-items:center">
-      <div>⚛️ Atom</div><div>Unit</div><div>mount · it.each</div><div style="color:#4ade80">มากที่สุด ★★★</div>
+      <div>⚛️ Atom</div><div>Unit</div><div>mount · it.each</div><div style="color:#4ade80"><span class="en">Most ★★★</span><span class="th">มากที่สุด ★★★</span></div>
     </div>
     <div style="display:grid;grid-template-columns:1.5fr 1fr 1.5fr 1fr;padding:10px 20px;font-size:.8rem;color:#94a3b8;border-bottom:1px solid #ffffff08;gap:8px;align-items:center">
-      <div>🔬 Molecule</div><div>Component</div><div>mount · toMatchSnapshot</div><div style="color:#60a5fa">ปานกลาง ★★</div>
+      <div>🔬 Molecule</div><div>Component</div><div>mount · toMatchSnapshot</div><div style="color:#60a5fa"><span class="en">Medium ★★</span><span class="th">ปานกลาง ★★</span></div>
     </div>
     <div style="display:grid;grid-template-columns:1.5fr 1fr 1.5fr 1fr;padding:10px 20px;font-size:.8rem;color:#94a3b8;border-bottom:1px solid #ffffff08;gap:8px;align-items:center">
-      <div>🧬 Organism</div><div>Integration</div><div>createTestingPinia · vi.fn</div><div style="color:#a78bfa">น้อยลง ★★</div>
+      <div>🧬 Organism</div><div>Integration</div><div>createTestingPinia · vi.fn</div><div style="color:#a78bfa"><span class="en">Fewer ★★</span><span class="th">น้อยลง ★★</span></div>
     </div>
     <div style="display:grid;grid-template-columns:1.5fr 1fr 1.5fr 1fr;padding:10px 20px;font-size:.8rem;color:#94a3b8;gap:8px;align-items:center">
-      <div>📄 Page</div><div>E2E Component</div><div>createRouter · flushPromises</div><div style="color:#ec4899">น้อยที่สุด ★</div>
+      <div>📄 Page</div><div>E2E Component</div><div>createRouter · flushPromises</div><div style="color:#ec4899"><span class="en">Least ★</span><span class="th">น้อยที่สุด ★</span></div>
     </div>
+  </div>
+
+</div>
+
+<!-- ══ test-id Section ══════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">🏷️ <span class="en">data-testid with Atomic Design</span><span class="th">data-testid กับ Atomic Design</span></div>
+  <div class="section-sub"><span class="en">Stable selectors that scale with your component hierarchy</span><span class="th">Selector ที่เสถียรและขยายตามลำดับชั้น Component</span></div>
+
+  <div class="callout tip" style="margin:1.5rem 0">
+    <strong><span class="en">Why data-testid?</span><span class="th">ทำไมต้องใช้ data-testid?</span></strong>
+    <p style="margin:.5rem 0 0;font-size:.85rem"><span class="en">CSS classes and DOM structure change often. <code>data-testid</code> is a stable, intention-revealing hook that keeps tests green through refactors. Atomic Design's hierarchy gives a natural naming scheme.</span><span class="th">CSS class และโครงสร้าง DOM เปลี่ยนบ่อย <code>data-testid</code> คือ hook ที่เสถียรและบอกเจตนาชัดเจน ทำให้ test ผ่านแม้จะ refactor และลำดับชั้นของ Atomic Design ก็ให้รูปแบบการตั้งชื่อที่เป็นธรรมชาติ</span></p>
+  </div>
+
+  <!-- Naming convention -->
+  <h3 style="color:#ec4899;font-size:1rem;margin:1.5rem 0 .75rem"><span class="en">Naming Convention</span><span class="th">รูปแบบการตั้งชื่อ</span></h3>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin:1rem 0">
+    <div style="background:#0d1117;border:1px solid #6366f140;border-radius:10px;padding:14px">
+      <div style="font-size:.72rem;font-weight:700;color:#a5b4fc;margin-bottom:8px">⚛️ ATOM</div>
+      <code style="font-size:.78rem;color:#e2e8f0">atom-button</code><br>
+      <code style="font-size:.78rem;color:#e2e8f0">atom-badge</code><br>
+      <code style="font-size:.78rem;color:#e2e8f0">atom-input</code>
+    </div>
+    <div style="background:#0d1117;border:1px solid #06b6d440;border-radius:10px;padding:14px">
+      <div style="font-size:.72rem;font-weight:700;color:#67e8f9;margin-bottom:8px">🔬 MOLECULE</div>
+      <code style="font-size:.78rem;color:#e2e8f0">molecule-product-card</code><br>
+      <code style="font-size:.78rem;color:#e2e8f0">molecule-product-card-price</code><br>
+      <code style="font-size:.78rem;color:#e2e8f0">molecule-product-card-add-btn</code>
+    </div>
+    <div style="background:#0d1117;border:1px solid #10b98140;border-radius:10px;padding:14px">
+      <div style="font-size:.72rem;font-weight:700;color:#6ee7b7;margin-bottom:8px">🧬 ORGANISM</div>
+      <code style="font-size:.78rem;color:#e2e8f0">organism-nav</code><br>
+      <code style="font-size:.78rem;color:#e2e8f0">organism-nav-menu-item</code><br>
+      <code style="font-size:.78rem;color:#e2e8f0">organism-product-grid</code>
+    </div>
+    <div style="background:#0d1117;border:1px solid #ec489940;border-radius:10px;padding:14px">
+      <div style="font-size:.72rem;font-weight:700;color:#f9a8d4;margin-bottom:8px">📄 PAGE</div>
+      <code style="font-size:.78rem;color:#e2e8f0">page-category-hero</code><br>
+      <code style="font-size:.78rem;color:#e2e8f0">page-category-list</code><br>
+      <code style="font-size:.78rem;color:#e2e8f0">page-cart-summary</code>
+    </div>
+  </div>
+  <div style="background:#0d1117;border:1px solid #1e293b;border-radius:10px;padding:14px;margin:1rem 0;font-size:.82rem;color:#94a3b8">
+    <span class="en">Pattern: <code style="color:#f472b6">{level}-{component}[-{element}]</code> — prefix locks a component to its Atomic level; suffix scopes sub-elements inside it.</span>
+    <span class="th">รูปแบบ: <code style="color:#f472b6">{level}-{component}[-{element}]</code> — prefix ระบุ level ใน Atomic Design; suffix ระบุ sub-element ภายใน component</span>
+  </div>
+
+  <!-- Code examples -->
+  <h3 style="color:#ec4899;font-size:1rem;margin:1.5rem 0 .75rem"><span class="en">Code Examples</span><span class="th">ตัวอย่าง Code</span></h3>
+
+  <!-- Atom -->
+  <div style="display:flex;align-items:center;gap:10px;margin:1.5rem 0 .5rem">
+    <div style="width:28px;height:28px;background:#6366f1;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.75rem;flex-shrink:0">⚛️</div>
+    <div style="font-size:.88rem;font-weight:700;color:#a5b4fc"><span class="en">Atom — accept a testId prop and bind it</span><span class="th">Atom — รับ testId prop แล้วผูกเข้ากับ data-testid</span></div>
+  </div>
+  <div class="code-block" style="border:1px solid #1e293b;border-radius:12px;overflow:hidden;margin:.5rem 0 1.5rem">
+    <div class="code-header" style="background:#111827;padding:.7rem 1rem;display:flex;justify-content:space-between;align-items:center">
+      <span style="color:#a5b4fc;font-size:.82rem;font-family:monospace">atoms/AppButton.vue</span>
+      <span style="background:rgba(99,102,241,.15);color:#a5b4fc;padding:.15rem .6rem;border-radius:4px;font-size:.72rem;font-weight:700">Atom · Vue SFC</span>
+    </div>
+    <pre data-lang="html" style="margin:0;padding:0"><code class="language-html">&lt;script setup lang="ts"&gt;
+const props = defineProps&lt;{
+  variant?: 'primary' | 'secondary' | 'danger'
+  disabled?: boolean
+  testId?: string          // optional — parent provides a stable id
+}&gt;()
+
+const emit = defineEmits&lt;{ click: [] }&gt;()
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;button
+    :class="['btn', `btn--${props.variant ?? 'primary'}`]"
+    :disabled="props.disabled"
+    :data-testid="props.testId ?? 'atom-button'"
+    @click="emit('click')"
+  &gt;
+    &lt;slot /&gt;
+  &lt;/button&gt;
+&lt;/template&gt;</code></pre>
+  </div>
+
+  <!-- Molecule -->
+  <div style="display:flex;align-items:center;gap:10px;margin:1.5rem 0 .5rem">
+    <div style="width:28px;height:28px;background:#06b6d4;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.75rem;flex-shrink:0">🔬</div>
+    <div style="font-size:.88rem;font-weight:700;color:#67e8f9"><span class="en">Molecule — derive scoped sub-ids from testId</span><span class="th">Molecule — สร้าง sub-id ที่ scoped มาจาก testId</span></div>
+  </div>
+  <div class="code-block" style="border:1px solid #1e293b;border-radius:12px;overflow:hidden;margin:.5rem 0 1.5rem">
+    <div class="code-header" style="background:#111827;padding:.7rem 1rem;display:flex;justify-content:space-between;align-items:center">
+      <span style="color:#67e8f9;font-size:.82rem;font-family:monospace">molecules/ProductCard.vue</span>
+      <span style="background:rgba(6,182,212,.15);color:#67e8f9;padding:.15rem .6rem;border-radius:4px;font-size:.72rem;font-weight:700">Molecule · Vue SFC</span>
+    </div>
+    <pre data-lang="html" style="margin:0;padding:0"><code class="language-html">&lt;script setup lang="ts"&gt;
+import AppButton from '@/components/atoms/AppButton.vue'
+import type { Product } from '@/types'
+
+const props = defineProps&lt;{ product: Product; testId?: string }&gt;()
+const emit  = defineEmits&lt;{ 'add-to-cart': [id: number] }&gt;()
+
+// derive scoped sub-ids — fallback keeps a predictable default
+const tid = computed(() =&gt; props.testId ?? 'molecule-product-card')
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;article :data-testid="tid"&gt;
+    &lt;span :data-testid="`${tid}-name`"&gt;{{ product.name }}&lt;/span&gt;
+    &lt;span :data-testid="`${tid}-price`"&gt;{{ product.price.toLocaleString('th-TH') }}&lt;/span&gt;
+    &lt;AppButton
+      :testId="`${tid}-add-btn`"
+      @click="emit('add-to-cart', product.id)"
+    &gt;
+      &lt;span class="en"&gt;Add to Cart&lt;/span&gt;&lt;span class="th"&gt;เพิ่มในตะกร้า&lt;/span&gt;
+    &lt;/AppButton&gt;
+  &lt;/article&gt;
+&lt;/template&gt;</code></pre>
+  </div>
+
+  <!-- Organism -->
+  <div style="display:flex;align-items:center;gap:10px;margin:1.5rem 0 .5rem">
+    <div style="width:28px;height:28px;background:#10b981;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.75rem;flex-shrink:0">🧬</div>
+    <div style="font-size:.88rem;font-weight:700;color:#6ee7b7"><span class="en">Organism — unique testId per list item</span><span class="th">Organism — testId ไม่ซ้ำกันสำหรับแต่ละ item ใน list</span></div>
+  </div>
+  <div class="code-block" style="border:1px solid #1e293b;border-radius:12px;overflow:hidden;margin:.5rem 0 1.5rem">
+    <div class="code-header" style="background:#111827;padding:.7rem 1rem;display:flex;justify-content:space-between;align-items:center">
+      <span style="color:#6ee7b7;font-size:.82rem;font-family:monospace">organisms/ProductGrid.vue</span>
+      <span style="background:rgba(16,185,129,.15);color:#6ee7b7;padding:.15rem .6rem;border-radius:4px;font-size:.72rem;font-weight:700">Organism · Vue SFC</span>
+    </div>
+    <pre data-lang="html" style="margin:0;padding:0"><code class="language-html">&lt;template&gt;
+  &lt;section data-testid="organism-product-grid"&gt;
+    &lt;ProductCard
+      v-for="(product, i) in products"
+      :key="product.id"
+      :product="product"
+      :testId="`molecule-product-card-${i}`"
+    /&gt;
+    &lt;p v-if="!products.length" data-testid="organism-product-grid-empty"&gt;
+      &lt;span class="en"&gt;No products found&lt;/span&gt;
+      &lt;span class="th"&gt;ไม่พบสินค้า&lt;/span&gt;
+    &lt;/p&gt;
+  &lt;/section&gt;
+&lt;/template&gt;</code></pre>
+  </div>
+
+  <!-- Test file -->
+  <div style="display:flex;align-items:center;gap:10px;margin:1.5rem 0 .5rem">
+    <div style="width:28px;height:28px;background:#fbbf24;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.75rem;flex-shrink:0">🧪</div>
+    <div style="font-size:.88rem;font-weight:700;color:#fcd34d"><span class="en">Test — query with getByTestId</span><span class="th">Test — query ด้วย getByTestId</span></div>
+  </div>
+  <div class="code-block" style="border:1px solid #1e293b;border-radius:12px;overflow:hidden;margin:.5rem 0 1.5rem">
+    <div class="code-header" style="background:#111827;padding:.7rem 1rem;display:flex;justify-content:space-between;align-items:center">
+      <span style="color:#fcd34d;font-size:.82rem;font-family:monospace">molecules/ProductCard.spec.ts</span>
+      <span style="background:rgba(251,191,36,.12);color:#fbbf24;padding:.15rem .6rem;border-radius:4px;font-size:.72rem;font-weight:700">Vitest · @testing-library/vue</span>
+    </div>
+    <pre data-lang="ts" style="margin:0;padding:0"><code class="language-typescript">import { render, screen } from '@testing-library/vue'
+import userEvent from '@testing-library/user-event'
+import ProductCard from '@/components/molecules/ProductCard.vue'
+
+const product = { id: 1, name: 'Sneaker X', price: 1990, inStock: true, isNew: true }
+
+describe('ProductCard testid', () => {
+  it('exposes scoped test-ids for all key elements', () => {
+    render(ProductCard, {
+      props: { product, testId: 'molecule-product-card' }
+    })
+
+    expect(screen.getByTestId('molecule-product-card')).toBeTruthy()
+    expect(screen.getByTestId('molecule-product-card-name').textContent)
+      .toContain('Sneaker X')
+    expect(screen.getByTestId('molecule-product-card-price').textContent)
+      .toContain('1,990')
+    expect(screen.getByTestId('molecule-product-card-add-btn')).toBeTruthy()
+  })
+
+  it('emits add-to-cart when add button is clicked', async () => {
+    const { emitted } = render(ProductCard, {
+      props: { product, testId: 'molecule-product-card' }
+    })
+
+    await userEvent.click(screen.getByTestId('molecule-product-card-add-btn'))
+    expect(emitted()['add-to-cart']).toEqual([[1]])
+  })
+})</code></pre>
+  </div>
+
+  <!-- 3 rules -->
+  <div class="callout tip" style="margin:1.5rem 0">
+    <strong><span class="en">3 Rules for good test-ids</span><span class="th">3 กฎสำหรับ test-id ที่ดี</span></strong>
+    <ul style="margin:.6rem 0 0 1rem;line-height:2;font-size:.85rem">
+      <li><strong><span class="en">Unique</span><span class="th">ไม่ซ้ำ</span></strong> — <span class="en">add an index suffix (<code>-0</code>, <code>-1</code>) when rendering lists so selectors stay unambiguous</span><span class="th">เพิ่ม index suffix (<code>-0</code>, <code>-1</code>) เมื่อ render เป็น list เพื่อไม่ให้ selector ซ้ำกัน</span></li>
+      <li><strong><span class="en">Stable</span><span class="th">เสถียร</span></strong> — <span class="en">never derive from text content or CSS classes that can change during refactoring</span><span class="th">อย่าดึงมาจากข้อความหรือ CSS class ที่อาจเปลี่ยนตอน refactor</span></li>
+      <li><strong><span class="en">Descriptive</span><span class="th">บอกเจตนา</span></strong> — <span class="en">name the <em>role</em>, not the tag — <code>-add-btn</code> over <code>-button-2</code></span><span class="th">ตั้งชื่อตาม <em>หน้าที่</em> ไม่ใช่ tag เช่น <code>-add-btn</code> ไม่ใช่ <code>-button-2</code></span></li>
+    </ul>
   </div>
 
 </div>
 
 <div style="text-align:center;margin:3rem 0;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
   <a href="4-bff.html" style="display:inline-flex;align-items:center;gap:.5rem;background:#0d1117;border:1px solid #1e293b;color:#64748b;padding:.7rem 1.5rem;border-radius:10px;font-size:.88rem">← BFF</a>
-  <a href="6-htdp.html" style="display:inline-flex;align-items:center;gap:.5rem;background:#0d1117;border:1px solid #1e293b;color:#f472b6;padding:.7rem 1.5rem;border-radius:10px;font-weight:600;font-size:.88rem">หัวข้อถัดไป: HTDP →</a>
+  <a href="6-htdp.html" style="display:inline-flex;align-items:center;gap:.5rem;background:#0d1117;border:1px solid #1e293b;color:#f472b6;padding:.7rem 1.5rem;border-radius:10px;font-weight:600;font-size:.88rem"><span class="en">Next: HTDP →</span><span class="th">หัวข้อถัดไป: HTDP →</span></a>
 </div>
 
 </div>
